@@ -43,8 +43,9 @@
 		_slice  = _arr.slice,
 		_splice = _arr.splice;
 
-	var root = (function(){ return this || (0,eval)("this"); }());
-
+	var root = (function(){ 
+		return this || (0,eval)("this"); 
+	}());
 
 	var _ = {};
 	// _ extend other method
@@ -757,32 +758,32 @@
 	if(_.root.self){
 		// UserAgent
 		function checkUA(ng){
-			this.Language  = ng.language;
-			this._ = ng.userAgent;
-			this.Platform  = ng.platform;
+			this.info = ng.userAgent;
+			this.language  = ng.language;
+			this.platform  = ng.platform;
 		}
 
 		_.extend(checkUA.prototype,{
 			defineBroswer : function(browserlist,identifylist){
-				var ua = this._;
-				this.Browser = {};
+				var ua = this.info;
+				this.browser = {};
 
 				for(var i = browserlist.length; i--; ){
 					if(identifylist[i].call(ua,_.root)){
-						this.Browser[browserlist[i]] = true;
+						this.browser[browserlist[i]] = true;
 					} else {
-						this.Browser[browserlist[i]] = false;
+						this.browser[browserlist[i]] = false;
 					}
 				}
 				return this;
 			},
 
 			definePlatform : function(proplist,checklist){
-				var ua = this._;
-				this.Version = {};
+				var ua = this.info;
+				this.version = {};
 
 				for(var i = proplist.length ;i--;)
-					this.Version[proplist[i]] = checklist[i].call(ua,_.root);
+					this.version[proplist[i]] = checklist[i].call(ua,_.root);
 				return this;
 			}
 
@@ -875,6 +876,7 @@
 			]);
 
 	// about browser's api local
+	var xhrcount = 0;
 	_.extend({
 		// cookies
 		cookieparse : function(ckstr){
@@ -1004,6 +1006,7 @@
 					_s.param : 
 					_.paramstringify(_s.param))
 					:null);
+			xhrcount++;
 
 			// if set timeout for ajax , should abort after 
 			// trigger fail callee
@@ -1043,7 +1046,7 @@
 				_.root.document.body.removeChild(aixp_tag);
 				_.root[_s.fn] = null;
 				_s.success.call(_.root,res);
-			}
+			};
 
 			// append elm
 			// send request
@@ -1056,9 +1059,10 @@
 					_.root[_s.fn] = null;
 
 					_s.success.call(_.root);
-				},_s.timeout * 1000)
+				},_s.timeout * 1000);
 			}
 
+			xhrcount++;
 			// test example
 			// for this aixp 
 			// _.aixp({
@@ -1069,6 +1073,103 @@
 			//		console.log(res);
 			//	}
 			// });
+		},
+
+		// HTML page info 
+		pagepref : function(){
+			var tags = _.slice(document.getElementsByTagName("*"));
+			var ids = "";
+			var idchecker = {};
+
+			var classes = "" ; 
+			var classlist = [];
+			var classchecker = {};
+
+			var imges = "" ;
+			var imgtags = _.slice(document.getElementsByTagName("img"));
+
+			var scriptfiles = [];
+			var scripttags = _.slice(document.getElementsByTagName("script"));
+
+			var regclass = function(arr,e,n){
+				if(arr[n])
+					arr[n].push(e);
+				else
+					arr[n] = [e];
+			}
+
+			_.foreach(tags,function(elm){
+				var t = elm.getAttribute("class");
+				if(t){
+					classes+= " "+ t;
+
+					t = _.trim(t).split(" ");
+					_.foreach(t,function(classname){
+						regclass(classchecker,elm,classname)
+					});
+				}
+
+				t = elm.getAttribute("id");
+				if(t){
+					ids+= " "+t;
+					t = _.trim(t);
+					regclass(idchecker,elm,t)
+				}
+
+				t = _.root.getComputedStyle(elm);
+				if(   t 
+					&& t.backgroundImage
+					&& t.backgroundImage.toLowerCase() !== "none")
+					imges += " "+ t.backgroundImage;
+			});
+
+			_.foreach(imgtags,function(elm){
+				var t = elm.getAttribute("src");
+				if(t)
+					imges+= " "+ t;
+			});
+
+			_.foreach(scripttags,function(elm){
+				var t = elm.getAttribute("src");
+				if(t)
+					scriptfiles.push(t.split("/").pop().slice(0,-3));
+			});
+
+			var idlist = ids.split(" ");
+			idlist.shift();
+			idlist = _.unique(idlist);
+
+			var classlist = classes.split(" ");
+			classlist.shift();
+			classlist = _.unique(classlist);
+
+			var imglist = imges.split(" ");
+			imglist.shift();
+			imglist = _.unique(imglist);
+
+			return {
+				_url : window.location.href,
+				_hash : window.location.hash.slice(1),
+				_title : document.getElementsByTagName("title")[0].innerText,
+
+				htmlsize : (document.body.innerHTML + document.head.innerHTML).replace(whiteSpace,"").length,
+				htmltags : tags.length, 
+
+				idlist : idlist.sort(),
+				idchecker : idchecker,
+
+				classlist : classlist.sort(),
+				classchecker : classchecker,
+
+				scriptlist : scriptfiles,
+
+				imglist : imglist.sort(),
+
+				cookies : _.cookie(),
+				localstorage : localStorage || {},
+
+				aixxhr : xhrcount
+			}
 		}
 
 	});
