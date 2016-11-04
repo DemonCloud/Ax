@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="../src/_.js"></script>
+	<script src="../src/n.js"></script>
+	<script src="../src/aix.js"></script>
+	<style>
+		.a{
+			color: red;
+		}
+
+		.b{
+			color: blue;
+		}
+	</style>
+</head>
+<body>
+	<div id="a">1</div>
+	<div>2</div>
+	<div>3</div>
+	<div>4</div>
+	<div>5</div>
+	<div>
+		<input type="checkbox" name="hell" id="hell" />
+		<select name="geek" id="geek">
+			<option value="1">God1</option>
+			<option value="2">Geek2</option>
+			<option value="3">Guy3</option>
+		</select>
+
+		<div>
+			<li>1</li>
+			<li>2</li>
+			<li>3</li>
+		</div>
+
+		<div id="n">
+			<div>Hello</div>
+			<li>Mike</li>
+			<li>Fish</li>
+			<li>Sun</li>
+		</div>
+	</div>
+
+	<script>
+//		__("body").live("change","select",function(event){
+//			console.log(this.options.selectedIndex)
+//		})
+//
+//		__("#n").reg("click",function(event){
+//			event.stopPropagation();
+//			console.log("click #n")
+//		});
+//
+//		__("#n").live("click","li",function(event){
+//
+//			event.stopPropagation();
+//			console.log("click li"+this.innerText);
+//		});
+//
+//		var k = function(event){
+//			event.stopPropagation();
+//			console.log("see #m-li= "+this.innerText);
+//		}
+//
+//		__("#m").live("see","li", k);
+//
+	__("#n").live("click","li",function(event){
+		event.stopPropagation();
+
+		console.log(event);
+	});
+
+	var aModel = new aix.model.extend({
+		data : [1,2,3,4],
+		events : {
+			init : function(){
+				console.log("create aModel ID-> " + this.aid);
+			}
+		}
+	});
+
+	var bCollection = new aix.collection.extend({
+		model:aModel,
+		validate : function(model){
+			return _.typeof(model.data) === "object"
+		},
+
+		events : {
+			init : function(){
+				console.log("new Collection");
+			},
+			change: function(){
+				console.log("Collection change");
+			},
+
+			"validate:fail" : function(){
+				console.log("validate fail with model data type");
+			},
+
+			"validate:success" : function(){
+				console.log("validate pase!!")
+			}
+		}
+
+	});
+
+	var a1 = new aModel({ data:{id:50334, name:"aaa", time:"abc"} });
+	var a2 = new aModel({ data:{id:178199, name:"bbb", time:"321"} });
+
+	var c1 = new aix.model({ data:[5,3,2,1] });
+	var c2 = new aix.model({ data:["fuck","sad"] });
+	
+	var b1 = new bCollection();
+
+	var v = new aix.view({ 
+		el : "#a" , 
+		template: "{{-id}} * {{-name}} * {{-time}}",  
+		events:{ 
+			init: function(){ 
+				return this.render(a2.parse());
+			}
+ 		}	
+	});
+
+	</script>
+</body>
+</html>
