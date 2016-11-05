@@ -89,11 +89,12 @@
 		},
 
 		events : {
-			init : function(){
-				console.log("new Collection");
-			},
 			change: function(){
 				console.log("Collection change");
+			},
+
+			add : function(model){
+				console.log("add aModel -> "+model.aid);
 			},
 
 			"validate:fail" : function(){

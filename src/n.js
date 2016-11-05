@@ -90,7 +90,7 @@
 	// support set Doom some behiver
 	__.config = {
 		// cache limit
-		limit : 5,
+		limit : 4,
 
 		version : _.version,
 	};
@@ -541,9 +541,27 @@
 	];
 
 	var capTypes = {
-		"UIEvent"       : ["focus","blur","focusin","focusout"],
-		"MouseEvent"    : ["click","dbclick","mouseup","mousedown","mouseout","mouseover","mouseenter","mouseleave"] ,
-		"KeyboardEvent" : ["keydown","keypress","keyup"]
+		"UIEvent"       : [
+			"focus",
+			"blur",
+			"focusin",
+			"focusout"
+		],
+		"MouseEvent"    : [
+			"click",
+			"dbclick",
+			"mouseup",
+			"mousedown",
+			"mouseout",
+			"mouseover",
+			"mouseenter",
+			"mouseleave"
+		],
+		"KeyboardEvent" : [
+			"keydown",
+			"keypress",
+			"keyup"
+		]
 	};
 
 	function createEvent(elm,type,prop){

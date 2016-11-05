@@ -258,8 +258,8 @@
 			return this.dispatch("add",null,args);
 		},
 
-		// reduce [remove]
-		red : function(){
+		// remove
+		rev : function(){
 			// only deel with Array and object
 			var args = _.slice(arguments);
 			var tmp = _.clonedoom(this.data) , type = _.typeof(tmp);
@@ -285,19 +285,10 @@
 			this.data = tmp;
 
 			return this.dispatch("remove",null,args);
-		},
-
-		reduce : function(){
-			return this.red.apply(this,_.slice(arguments));
-		},
-
-		remove : function(){
-			return this.red.apply(this,_.slice(arguments));
 		}
 	};
 
 	// Extend aix model method 
-	// as Backbone extend
 	aix.model.extend = function(def){
 		var extend = function(ops){
 			var _this = this;
@@ -549,19 +540,53 @@
 		constructor : aix.collection,
 
 		add : function(){
+			var len = this.data.length;
 			var args = _.slice(arguments);
 			var tmp = _.slice(this.data);
-			tmp = tmp.concat.apply(tmp,args);
+			if(args.length)
+				tmp = tmp.concat.apply(tmp,args);
 
 			if(_.isequal(this.data,tmp))
 				return this;
 
 			this.data = tmp;
-			return this.dispatch("add",null,args);
+			return this.data.length === len ? 
+		 				 this :
+		 				 this.dispatch("add",null,args);
+		},
+
+		rev : function(it){
+			var len = this.data.length;
+			var tmp;
+			if(_.isString(it)){
+				tmp = _.slice(this.data);
+				tmp = _.cat(tmp,function(item){
+					return item.aid !== "#" + it;
+				});
+			}
+			else if(_.isObject(it)){
+				if(_.isFunction(this.model)){
+					if(it instanceof this.model){
+						tmp = _.slice(this.data);
+						tmp = _.not(tmp,it);
+					}
+				}else{
+					tmp = _.slice(this.data);
+					tmp = _.not(tmp,it);
+				}
+			}
+
+			if(tmp){
+				this.data = tmp
+				return this.data.length === len ? 
+							 this :
+							 this.dispatch("remove",null,[it]);
+			}
+			return this;
 		},
 
 		get : function(id){
-			if(id)
+			if(_.isString(id))
 				return _.filter(this.data,function(one){
 					return one.aid === "#"+id;
 				});
@@ -1004,6 +1029,9 @@
 		});
 
 		_.root.addEventListener("hashchange",function(event){
+			if(event.newURL === event.oldURL)
+				return event.preventDefault()
+
 			_this.history.now = event.newURL;
 			_this.history.old = event.oldURL;
 			

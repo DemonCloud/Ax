@@ -920,10 +920,6 @@
 			return parsec;
 		},
 
-		// userAgent
-		ua: _CHECKER,
-		useragent: _CHECKER,
-
 		// ajax, 
 		// aix-pipe require api
 		aix : function(options){
@@ -1063,6 +1059,7 @@
 			}
 
 			xhrcount++;
+
 			// test example
 			// for this aixp 
 			// _.aixp({
@@ -1082,8 +1079,9 @@
 			var idchecker = {};
 
 			var classes = "" ; 
-			var classlist = [];
 			var classchecker = {};
+
+			var links = "";
 
 			var imges = "" ;
 			var imgtags = _.slice(document.getElementsByTagName("img"));
@@ -1096,7 +1094,7 @@
 					arr[n].push(e);
 				else
 					arr[n] = [e];
-			}
+			};
 
 			_.foreach(tags,function(elm){
 				var t = elm.getAttribute("class");
@@ -1105,7 +1103,7 @@
 
 					t = _.trim(t).split(" ");
 					_.foreach(t,function(classname){
-						regclass(classchecker,elm,classname)
+						regclass(classchecker,elm,classname);
 					});
 				}
 
@@ -1113,7 +1111,7 @@
 				if(t){
 					ids+= " "+t;
 					t = _.trim(t);
-					regclass(idchecker,elm,t)
+					regclass(idchecker,elm,t);
 				}
 
 				t = _.root.getComputedStyle(elm);
@@ -1121,6 +1119,10 @@
 					&& t.backgroundImage
 					&& t.backgroundImage.toLowerCase() !== "none")
 					imges += " "+ t.backgroundImage;
+
+				t = elm.getAttribute("href");
+				if(t)
+					links += " "+t;
 			});
 
 			_.foreach(imgtags,function(elm){
@@ -1147,6 +1149,10 @@
 			imglist.shift();
 			imglist = _.unique(imglist);
 
+			var linklist = links.split(" ");
+			linklist.shift();
+			linklist = _.unique(linklist);
+
 			return {
 				_url : window.location.href,
 				_hash : window.location.hash.slice(1),
@@ -1164,13 +1170,17 @@
 				scriptlist : scriptfiles,
 
 				imglist : imglist.sort(),
+				linklist : linklist.sort(),
 
 				cookies : _.cookie(),
 				localstorage : localStorage || {},
 
-				aixxhr : xhrcount
-			}
-		}
+				_aixxhr : xhrcount
+			};
+		},
+
+		// userAgent
+		ua: _CHECKER
 
 	});
 	}
