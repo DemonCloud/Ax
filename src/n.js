@@ -13,7 +13,7 @@
  * @Date    : 2016.6.22
  * @Version : 0.1
  *
- * @License : MIT
+ * @License : Fuck any LISCENSE
  *
  */
 

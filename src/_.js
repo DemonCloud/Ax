@@ -10,7 +10,7 @@
  * @Date    : 2016.6.22
  * @Version : 0.1
  *
- * @License : MIT
+ * @License : Fuck any LISCENSE
  *
  */
 
@@ -163,9 +163,9 @@
 			else if(_.isObject(list) && !_.isFunction(list)){
 				// clone object
 				// copy prototype
-				var cpr = function(){};
-				cpr.prototype = list.constructor.prototype;
-				var res = new cpr();
+				var ___ = function(){};
+				___.prototype = list.constructor.prototype;
+				var res = new ___;
 
 				// dist clone data
 				_.foreach(list, function(val,key){
@@ -179,6 +179,12 @@
 			}
 				 
 			return list;
+		},
+
+		sort : function(arr,fn){
+			if(!_.isArray(arr))
+				return arr
+			return arr.sort(fn);
 		},
 
 		unique : function(ary){

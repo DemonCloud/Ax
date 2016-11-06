@@ -93,10 +93,6 @@
 				console.log("Collection change");
 			},
 
-			add : function(model){
-				console.log("add aModel -> "+model.aid);
-			},
-
 			"validate:fail" : function(){
 				console.log("validate fail with model data type");
 			},
@@ -110,18 +106,40 @@
 
 	var a1 = new aModel({ data:{id:50334, name:"aaa", time:"abc"} });
 	var a2 = new aModel({ data:{id:178199, name:"bbb", time:"321"} });
+	var a3 = new aModel({ data:{id:213, name:"aaa", time:"abc"} });
+	var a4 = new aModel({ data:{id:1, name:"aaa", time:"abc"} });
+	var a5 = new aModel({ data:{id:59, name:"aaa", time:"abc"} });
+	var a6 = new aModel({ data:{id:4551, name:"aaa", time:"abc"} });
 
 	var c1 = new aix.model({ data:[5,3,2,1] });
 	var c2 = new aix.model({ data:["fuck","sad"] });
 	
 	var b1 = new bCollection();
 
+	// add extra event
+	b1.addEvent("sort",function(data){
+		console.log("b1 collection data has been sorted!");
+		console.log(data);
+	});
+
+	// add data to collection
+	b1.add([a1,a2,a3,a4,a5,a6]);
+	
+	// try to add unbind data in collection
+	// b1.add(c1);
+	// b1.add([c1,c2]);
+
+	// @ sort method
+	//	b1.sort(function(m1,m2){
+	//		return m1.data.id - m2.data.id;
+	//	})
+
 	var v = new aix.view({ 
 		el : "#a" , 
 		template: "{{-id}} * {{-name}} * {{-time}}",  
 		events:{ 
 			init: function(){ 
-				return this.render(a2.parse());
+				return this.render(a1.parse());
 			}
  		}	
 	});

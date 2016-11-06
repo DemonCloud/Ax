@@ -14,7 +14,7 @@
  * @Date    : 2016.6.22
  * @Version : 0.1
  *
- * @License : MIT
+ * @License : Fuck any LISCENSE
  *
  * require Lib [ _ , jQuery or Other DOM lib ]
  *
@@ -35,60 +35,88 @@
 
 })( this , function(_,$){
 	'use strict';
-
 	var aix = {};
 	
-	var AIX_MODELS_COUNT = 0;
-	var AIX_MODELS_DEFAULT = {
-		data:""
-		//events : {
-		// init : 					[@function || @array[@fn]]   #init Event when model to be new
-		// change : *       [@function || @array[@fn]]   #when change data value will trigger
-		// custom event :   [@function || @array[@fn]]   #custom [ model.addevent or model.dispatch ] api 
-		//}
-	};
+	var AIX_VIEW_COUNT = 0,
+			AIX_MODELS_COUNT = 0,
+			AIX_COLLECTION_COUNT = 0,
 
-	var AIX_COLLECTION_COUNT = 0;
-	var AIX_COLLECTION_DEFAULT = {
-		data:[],
-		model: 0
-		//events : {
-		// init : 					[@function || @array[@fn]]   #init Event when model to be new
-		// change : *       [@function || @array[@fn]]   #when change data value will trigger
-		// custom event :   [@function || @array[@fn]]   #custom [ model.addEvent or model.dispatch ] api 
-		//}
-	};
+			AIX_VIEW_DEFAULT = { el : "", template : ""},
+			AIX_MODELS_DEFAULT = { data:"" },
+			AIX_COLLECTION_DEFAULT = { data:[], model: 0 };
 
-	var AIX_VIEW_COUNT = 0;
-	var AIX_VIEW_DEFAULT = {
-		el : "",
-		template : ""
+	// resetful list 
+	// use for aix ajax-api
+	var RESTFUL_enable = {
+		get    : "GET",
+		put    : "PUT",
+		post   : "POST",
+		pull   : "PULL",
+		fetch  : "FETCH",
+		update : "UPDATE",
+		delete : "DELETE"
 	};
+	var RESTFUL_disable = {
+		get    : "GET",
+		put    : "POST",
+		post   : "POST",
+		pull   : "POST",
+		fetch  : "GET",
+		update : "POST",
+		delete : "POST"
+	};
+	// default with disable and emude RESTFUL_API
+	var RESTFUL_LIST = RESTFUL_disable
 
 	// log the prefernce
-	aix.pref = function(){
+	aix.aixpref = function(){
 		return {
 			count:{
 				views : AIX_VIEW_COUNT,
 				models : AIX_MODELS_COUNT,
 				collections : AIX_COLLECTION_COUNT
-			},
-			setting:{
-				view : _.clone(AIX_VIEW_DEFAULT),
-				models : _.clone(AIX_MODELS_DEFAULT),
-				collection : _.clone(AIX_COLLECTION_DEFAULT)
 			}
 		};
 	};
 
-	// Aix model format
-	// you can define Data as : 
-	//
-	// { 
-	//	 aid : 		 [@string]{""}  						# signet id for search ,
-	//	 data : 	 [@string]{""}							# object data or array data. save the mode 
-	// }
-	//
+	// config for aix 
+	// default with disable and emude RESTFUL_API
+	aix.config = {
+		restful : false
+	}
+
+	_.watch(aix.config,"restful",function(val){
+		if(val)
+			RESTFUL_LIST = RESTFUL_enable;
+		else
+			RESTFUL_LIST = RESTFUL_disable;
+		return val;
+	})
+	
+	// aix model genertor function
+	function _genertor_(api){
+		return function(){
+			var tmp = _.clonedoom(this.data);
+			var args = [tmp].concat(_.slice(arguments));
+			tmp = _[api].apply(tmp,args);
+			if(!_.isequal(tmp,this.data)){
+				this.data = tmp;
+				this.dispatch(api,null,args);
+			}
+			return this;
+		};
+	}
+
+	// not change rebase data
+	function _genertor_$(api){
+		return function(){
+			var tmp = _.clonedoom(this.data);
+			var args = [tmp].concat(_.slice(arguments));
+			return _[api].apply(tmp,args);
+		};
+	}
+
+	// Aix Model
 	aix.model = function(obj){
 		var _this = this;
 
@@ -111,7 +139,17 @@
 				_.addEvent(_this,k,v);
 		});
 
+		if(_.isFunction(obj.validate)){
+			_.define(_this,"validate",{
+				value : obj.validate,
+  			writable: false,
+  			enumerable: false,
+  			configurable: false
+			});
+		}
+
 		//delete undefault properties
+		delete obj.validate;
 		delete obj.change;
 		delete obj.events;
 
@@ -120,7 +158,7 @@
 		//add listen for object data change
 		_.watch(_this,"data",function(nv,ov){
 			// Validate checker for change
-			if(_this.validate){
+			if(_.isFunction(_this.validate)){
 				var vali = true;
 
 				if(_.isFunction(_this.validate) ? !_this.validate.call(_this,nv) : 0 )
@@ -156,26 +194,99 @@
 		_.dispatch(_this,"init");
 	};
 
-	
-	// aix model genertor function
-	function _genertor_(api){
-		return function(){
-			var tmp = _.clonedoom(this.data);
-			var args = [tmp].concat(_.slice(arguments));
-			tmp = _[api].apply(tmp,args);
-			if(!_.isequal(tmp,this.data))
-				this.data = tmp;
-			return this;
-		};
-	}
+	// Extend aix model method 
+	aix.model.extend = function(def){
+		var extend = function(ops){
+			var _this = this;
+			var updef = _.extend(_.clone(AIX_MODELS_DEFAULT),def);
+			var obj = _.extend(updef,ops);
 
-	function _genertor_$(api){
-		return function(){
-			var tmp = _.clonedoom(this.data);
-			var args = [tmp].concat(_.slice(arguments));
-			return _[api].apply(tmp,args);
+			// if userobj has more events
+			if(_.isObject(obj.events))
+				_.foreach(obj.events,function(v,k){
+					_.addEvent(_this,k,v);
+				});
+
+			if(_.isFunction(obj.validate)){
+				_.define(_this,"validate",{
+					value : obj.validate,
+  				writable: false,
+  				enumerable: false,
+  				configurable: false
+				});
+			}
+
+			//delete undefault properties
+			delete obj.validate;
+			delete obj.change;
+			delete obj.events;
+
+			// copy data
+			_.compose(_this,obj);
+			_this.data = _.clone(this.data);
+
+			_.define(_this,{
+				aid : {
+					value : "#"+(++AIX_MODELS_COUNT),
+					writable : true,
+					enumerable : false
+				},
+				change : {
+					value : false,
+					writable : true,
+					enumerable : false
+				}
+			});
+
+			//add listen for object data change
+			_.watch(_this,"data",function(nv,ov){
+			// Validate checker for change
+				if(_.isFunction(_this.validate)){
+					var vali = true;
+	
+					if(_.isFunction(_this.validate) ? !_this.validate.call(_this,nv) : 0 )
+						vali = false;
+	
+					// validate status check
+					if(vali){
+						// trigger validate and success events
+						if(!_.isequal(nv,ov)){
+							_.dispatch(_this,"change",null,[nv,ov]);
+							_this.change = true;
+						}
+						_.dispatch(_this,"validate",null,[nv,ov]);
+						_.dispatch(_this,"validate:success",null,[nv,ov]);
+						return nv;
+					}else{
+						// trigger validate and fail events
+						_.dispatch(_this,"validate",null,[nv,ov]);
+						_.dispatch(_this,"validate:fail",null,[nv,ov]);
+						return ov;
+					}
+				}else{
+					// No validate 
+					if(!_.isequal(nv,ov)){
+						_.dispatch(_this,"change",null,[nv,ov]);
+						_this.change = true;
+					}
+					return nv;
+				}
+			});
+
+			_.dispatch(_this,"init");
 		};
-	}
+
+		_.compose(extend.prototype,aix.model.prototype);
+		extend.prototype.constructor = extend;
+		_.define(extend,"base",{
+			value: aix.model,
+  		writable: false,
+  		enumerable: false,
+  		configurable: false
+		});
+
+		return extend;
+	};
 
 	// Model Prototype extend
 	// model data usually define as pure data, not javascript event or function
@@ -288,88 +399,8 @@
 		}
 	};
 
-	// Extend aix model method 
-	aix.model.extend = function(def){
-		var extend = function(ops){
-			var _this = this;
-			var updef = _.extend(_.clone(AIX_MODELS_DEFAULT),def);
-			var obj = _.extend(updef,ops);
-
-			// if userobj has more events
-			if(_.isObject(obj.events))
-				_.foreach(obj.events,function(v,k){
-					_.addEvent(_this,k,v);
-				});
-
-			//delete undefault properties
-			delete obj.change;
-			delete obj.events;
-
-			// copy data
-			_.compose(_this,obj);
-			_this.data = _.clone(this.data);
-
-			_.define(_this,{
-				aid : {
-					value : "#"+(++AIX_MODELS_COUNT),
-					writable : true,
-					enumerable : false
-				},
-				change : {
-					value : false,
-					writable : true,
-					enumerable : false
-				}
-			});
-
-			//add listen for object data change
-			_.watch(_this,"data",function(nv,ov){
-			// Validate checker for change
-				if(_this.validate){
-					var vali = true;
-	
-					if(_.isFunction(_this.validate) ? !_this.validate.call(_this,nv) : 0 )
-						vali = false;
-	
-					// validate status check
-					if(vali){
-						// trigger validate and success events
-						if(!_.isequal(nv,ov)){
-							_.dispatch(_this,"change",null,[nv,ov]);
-							_this.change = true;
-						}
-						_.dispatch(_this,"validate",null,[nv,ov]);
-						_.dispatch(_this,"validate:success",null,[nv,ov]);
-						return nv;
-					}else{
-						// trigger validate and fail events
-						_.dispatch(_this,"validate",null,[nv,ov]);
-						_.dispatch(_this,"validate:fail",null,[nv,ov]);
-						return ov;
-					}
-				}else{
-					// No validate 
-					if(!_.isequal(nv,ov)){
-						_.dispatch(_this,"change",null,[nv,ov]);
-						_this.change = true;
-					}
-					return nv;
-				}
-			});
-
-			_.dispatch(_this,"init");
-		};
-
-		_.compose(extend.prototype,aix.model.prototype);
-		extend.prototype.constructor = extend;
-		extend.base = aix.model;
-
-		return extend;
-	};
-
-
+	// Aix Collection
 	aix.collection = function(obj){
-	
 		var _this = this;
 
 		_.define(_this,{
@@ -391,12 +422,23 @@
 				_.addEvent(_this,k,v);
 		});
 
+		if(_.isFunction(obj.validate)){
+			_.define(_this,"validate",{
+				value : obj.validate,
+  			writable: false,
+  			enumerable: false,
+  			configurable: false
+			});
+		}
+
 		//delete undefault properties
+		delete obj.validate;
 		delete obj.change;
 		delete obj.events;
 
 		_.extend(_this,_.extend(_.clone(AIX_COLLECTION_DEFAULT),obj));
 		
+		// filter init data as this.model type
 		if(_this.model){
 			_this.data = _.filter(_this.data,function(one){
 				return one.constructor === _this.model;
@@ -410,7 +452,7 @@
 				nv = [nv];
 
 			// Validate checker for change
-			if(_this.validate){
+			if(_.isFunction(_this.validate)){
 				var vali = true;
 
 				_.foreach(nv,function(one){
@@ -462,7 +504,17 @@
 					_.addEvent(_this,k,v);
 				});
 
+			if(_.isFunction(obj.validate)){
+				_.define(_this,"validate",{
+					value : obj.validate,
+  				writable: false,
+  				enumerable: false,
+  				configurable: false
+				});
+			}
+
 			//delete undefault properties
+			delete obj.validate;
 			delete obj.change;
 			delete obj.events;
 
@@ -489,7 +541,7 @@
 					nv = [nv];
 
 				// Validate checker for change
-				if(_this.validate){
+				if(_.isFunction(_this.validate)){
 					var vali = true;
 
 					_.foreach(nv,function(one){
@@ -530,7 +582,12 @@
 
 		_.compose(extend.prototype,aix.collection.prototype);
 		extend.prototype.constructor = extend;
-		extend.base = aix.collection;
+		_.define(extend,"base",{
+			value: aix.collection,
+  		writable: false,
+  		enumerable: false,
+  		configurable: false
+		});
 
 		return extend;
 	};
@@ -538,6 +595,28 @@
 
 	aix.collection.prototype = {
 		constructor : aix.collection,
+
+		addEvent: function(type,fn){
+			if(_.isFunction(fn))
+				_.addEvent(this,type,fn);
+			return this;
+		},
+
+		removeEvent : function(type,fn){
+			return _.removeEvent(this,type,fn);
+		},
+
+		listen : function(prop,handler){
+			if(_.isObject(this.data))
+				_.watch(this.data,prop,handler);
+			return this;
+		},
+
+		unlisten : function(prop){
+			if(_.isObject(this.data))
+				_.unwatch(this.data,prop);
+			return this;
+		},
 
 		add : function(){
 			var len = this.data.length;
@@ -601,14 +680,19 @@
 
 		dispatch : function(type,fn,args){
 			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
-		}
+		},
 	
+		trigger : function(type,fn,args){
+			return this.dispatch(type,fn,args);
+		},
+
 	};
 
 	// #genertor
 	_.foreach([
 		"foreach",
 		"splice",
+		"sort",
 		"unique",
 		"reject",
 		"filter",
@@ -644,17 +728,6 @@
 
 	// Aix Restful API design for
 	// [Aix Model] data format serialize
-	//
-	var RESTFUL_LIST = {
-		get    : "GET",
-		put    : "PUT",
-		post   : "POST",
-		pull   : "POST",
-		fetch  : "GET",
-		update : "POST",
-		delete : "DELETE"
-	};
-
 	_.extend(aix.model.prototype,{
 		toJSON : function(){
 			if(_.isArray(this.data) || _.isObject(this.data))
@@ -971,7 +1044,7 @@
 						_.dispatch(_this,"init");
 					},
 					fail:function(xhr){
-						console.error("Fetch template url->[" + obj.url + "] has fail!" );
+						console.error("Fetch template url->[ " + obj.url + " ] has fail!" );
 						console.log(xhr);
 					}
 				});
@@ -986,7 +1059,12 @@
 
 		_.compose(extend.prototype,aix.view.prototype);
 		extend.prototype.constructor = extend;
-		extend.base = aix.view;
+		_.define(extend,"base",{
+			value: aix.view,
+  		writable: false,
+  		enumerable: false,
+  		configurable: false
+		});
 
 		return extend;
 	};
