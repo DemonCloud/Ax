@@ -881,10 +881,11 @@
 			return this.pipe.apply(this,["fetch",(this.url||""),param,function(responseText,xhr,event){
 				var _this = this;
 				_this.data = JSON.parse(responseText);
-				if(_this.model)
+				if(_this.model){
 					_.foreach(data,function(val,index){
 						data[index] = new _this.model({ data : val });
 					});
+				}
 				_this.data = data;
 				fns.call(this,responseText,xhr,event);
 			},fnf]);
@@ -901,8 +902,8 @@
 		}
 	});
 
+	// bind selector
 	$ = $ || _.NULL; 
-
 	aix.view = function(obj){
 		obj = obj || {};
 		if(!_.isString(obj.el))
@@ -1134,5 +1135,6 @@
 	};
 
 	return aix;
+
 });
 

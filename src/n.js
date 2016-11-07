@@ -101,23 +101,27 @@
 	}
 
 	function inpage(sl){
-		return sl.$el.every(function(e){ return _.useragent.isIE ? document.body.contains(e) : document.contains(e); });
+		return sl.$el.every(function(e){ 
+			return _.ua.browser.IE ? 
+						 document.body.contains(e) :
+						 document.contains(e); });
 	}
 
 	// get childNodes and filter by selector
 	// cant use Global matcher
 	var isId      = /^#[^\s\=\+\.\#\[\]]+/i														// "#idname"
 	   ,isClass   = /^\.[^\s\=\+\.\#\[\]]+$/i													// ".className"
-	   ,isTag	  = /^[^\[\]\+\-\.#\s\=]+$/i													// "p" "div" "DIV"
-	   ,isAttr	  = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i 		// div[id="nami"]
+	   ,isTag     = /^[^\[\]\+\-\.#\s\=]+$/i													// "p" "div" "DIV"
+	   ,isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i 		// div[id="nami"]
 	   ,mreSl     = /^[^\s]+,[^\s]+/gi
-	   ,cidSl	  = /[\s|\r]+/gi
-	   ,pitSl     = /[>|\+|\~]+/gi;
-	
+	   ,cidSl     = /[\s|\r]+/gi
+	   ,pitSl     = /[>|\+|\~]+/gi
+		 ,isHTML    = /<[a-z][\s\S]*>/i;
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
 	function dsizzle(elm){
+		elm = _.trim(elm);
 		var $el,$1 = !cidSl.test(elm) ,$2 = !pitSl.test(elm);
 		if($1&&$2){
 			if(isId.test(elm))
@@ -143,9 +147,17 @@
 			}
 			else 
 				$el = document.querySelectorAll(elm);
-		}
-		else 
-			$el = document.querySelectorAll(elm);
+		}else 
+			if(isHTML.test(elm)){
+				var dg = document.createElement("i");
+						dg.innerHTML = elm;
+				$el = _.slice(dg.querySelectorAll("*"));
+				return $el.filter(function(node){
+					return node.nodeType === 1;
+				});
+			}
+			else
+				$el = document.querySelectorAll(elm);
 		return _.slice($el);
 	}
 
@@ -446,20 +458,20 @@
 			if(ct != null)
 				return this.each(function(e){ e.innerText = ct+"" });
 			else 
-				return this.get(0).innerText || "";
+				return _.decodeHTML(this.get(0).innerText||"");
 		},
 
 		fill : function(ct){
+			var tmp= ""; 
 			if(ct != null){
 				if(ct.nodeType && ct.nodeType === 1)
-					ct = ct.outerHTML;
-				if(_.isObject(ct) && ct instanceof DOOM){
-					var rt = "";
-					ct.each(function(e){ rt+= e.outerHTML; })
-					ct = rt;
-				}
+					tmp = ct.outerHTML;
+				else if(_.isObject(ct) && ct instanceof DOOM)
+					ct.each(function(e){ tmp+= e.outerHTML; })
+				else
+					tmp = ct+"";
 				return this.each(function(e){
-					e.innerHTML = ct+"";
+					e.innerHTML = tmp+"";
 				});
 			}else{
 				return this.get(0).innerHTML || "";

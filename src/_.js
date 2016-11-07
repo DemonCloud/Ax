@@ -674,7 +674,10 @@
 		watch : function(obj,prop,handler){
 			var oldval = obj[prop] , newval = oldval;
 			function getter(){ return newval; }
-			function setter(val){ oldval = newval; return newval = handler.call(obj,val,oldval,prop); }
+			function setter(val){ 
+				oldval = newval; 
+				return newval = handler.call(obj,val,oldval,prop); 
+			}
 
 			if(delete obj[prop]){
 				if(Object.defineProperty)
@@ -988,7 +991,9 @@
 			xhr.setRequestHeader("Aix-Requested","AixHttpRequest");
 
 			if(_.isObject(_s.header) && _s.header !== _.broken)
-				_.foreach(_s.header,function(val,key){ xhr.setRequestHeader(key,val); });
+				_.foreach(_s.header,function(val,key){ 
+					xhr.setRequestHeader(key,val); 
+				});
 
 			xhr.onreadystatechange = function(event){
 				// response HTTP response header 200 or lower 300
@@ -1161,8 +1166,6 @@
 
 			return {
 				_url : window.location.href,
-				_hash : window.location.hash.slice(1),
-				_title : document.getElementsByTagName("title")[0].innerText,
 
 				htmlsize : (document.body.innerHTML + document.head.innerHTML).replace(whiteSpace,"").length,
 				htmltags : tags.length, 
@@ -1212,7 +1215,7 @@
 				},t*1000);
 			}
 
-			firelist.unshift(fire);
+			firelist.push(fire);
 		});
 
 		_.define(this,"=",{
@@ -1224,10 +1227,12 @@
 	}
 
 	_.extend(stack.prototype,{
-		start : function(){
-			return this.fire.call(this);
-		},
 
+		noop : function(){
+			this["="] = [];
+			return this;
+		},
+		
 		fire : function(){
 			return this["="].length && 
 						 this["="].pop().call(_.root);
