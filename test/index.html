@@ -3,9 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<title></title>
-	<script src="../src/_.js"></script>
-	<script src="../src/n.js"></script>
-	<script src="../src/aix.js"></script>
+	<!-- <script src="../src/_.js"></script> -->
+	<!-- <script src="../src/n.js"></script> -->
+	<!-- <script src="../src/aix.js"></script> -->
+	<script src="../dest/aix.c.js"></script>
 	<style>
 		.a{
 			color: red;
@@ -142,7 +143,8 @@
 		console.log(4);
 	}
 
-	st = new _.stack([[fn1],[fn2,3],[fn3],[fn4]]);
+	st = new _.stack([[fn1],[fn2,3]]);
+	st.add([fn3,4],fn4);
 	
 	// try to add unbind data in collection
 	// b1.add(c1);

@@ -1193,7 +1193,8 @@
 
 	// _.stack
 	// trunk aysnc function
-	_.stack = function(arr){
+	var stack;
+	_.stack = stack = function(arr){
 		var ram = arr || [];
 		//[[fn:func,time:0]]
 		
@@ -1214,18 +1215,48 @@
 			firelist.unshift(fire);
 		});
 
-		_.define(this,"_",{
+		_.define(this,"=",{
 			value : firelist,
-			writable : false,
+			writable : true,
 			enumerable: false,
 			configurable: false
 		});
 	}
 
-	_.extend(_.stack.prototype,{
+	_.extend(stack.prototype,{
+		start : function(){
+			return this.fire.call(this);
+		},
+
 		fire : function(){
-			return this._.length && 
-						 this._.pop().call(_.root);
+			return this["="].length && 
+						 this["="].pop().call(_.root);
+		},
+
+		add : function(){
+			return this.push.apply(this,_.slice(arguments));
+		},
+
+		push : function(){
+			var _this = this;
+			var args = _.slice(arguments);
+
+			_.foreach(args,function(item){
+				if(!_.isFunction(item)&&!_.isArray(item))
+					return console.error("add/push arguments error when assign to stack!");
+				var fn = _.isArray(item) ? item[0] : item;
+				var t = _.isArray(item) ? (item[1]||0) : parseFloat(item||0);
+				 
+				var fire = function(){
+					setTimeout(function(){ 
+						var nx = _this["="].pop();
+						nx && nx();
+						fn();
+					},t*1000);
+				}
+
+				_this["="].push(fire);
+			});
 		}
 	});
 

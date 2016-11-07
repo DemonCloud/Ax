@@ -1,0 +1,33 @@
+{
+  "name": "aix",
+  "version": "1.0.0",
+  "description": "[ Aix ] is a simple javascript mvc framework",
+  "main": "aix.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DemonCloud/aix.git"
+  },
+  "keywords": [
+    "javascript",
+    "mvc",
+    "aixjs",
+    "aix"
+  ],
+  "author": "YiJun",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/DemonCloud/aix/issues"
+  },
+  "homepage": "https://github.com/DemonCloud/aix#readme",
+	"dependencies" :{ 
+		"gulp" : "latest",
+		"gulp-uglify" : "latest",
+		"gulp-concat" : "latest"
+  }
+}
