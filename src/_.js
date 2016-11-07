@@ -763,7 +763,7 @@
 	// about browser api
 	if(_.root.self){
 		// UserAgent
-		function checkUA(ng){
+		var checkUA = function(ng){
 			this.info = ng.userAgent;
 			this.language  = ng.language;
 			this.platform  = ng.platform;
@@ -1190,6 +1190,44 @@
 
 	});
 	}
+
+	// _.stack
+	// trunk aysnc function
+	_.stack = function(arr){
+		var ram = arr || [];
+		//[[fn:func,time:0]]
+		
+		var firelist = [];
+		_.foreach(ram,function(g){
+			var x = _.isObject(g) ? _.toarray(g) : (g||[]);
+			var fn = _.isFunction(x[0]) ? x[0] : _.NULL;
+			var t = _.isNumber(x[1]) ? x[1] : 0;
+			
+			var fire = function(){
+				setTimeout(function(){ 
+					var nx = firelist.pop();
+					nx && nx();
+					fn();
+				},t*1000);
+			}
+
+			firelist.unshift(fire);
+		});
+
+		_.define(this,"_",{
+			value : firelist,
+			writable : false,
+			enumerable: false,
+			configurable: false
+		});
+	}
+
+	_.extend(_.stack.prototype,{
+		fire : function(){
+			return this._.length && 
+						 this._.pop().call(_.root);
+		}
+	});
 
 	return _;
 

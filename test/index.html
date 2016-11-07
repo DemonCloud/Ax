@@ -42,6 +42,10 @@
 			<li>Fish</li>
 			<li>Sun</li>
 		</div>
+		<form action="/" method="POST">
+			<input type="number" value="" name="num" id="num" required>
+			<input type="submit" name="submit" id="submit" value="submit" />
+		</form>
 	</div>
 
 	<script>
@@ -124,6 +128,21 @@
 
 	// add data to collection
 	b1.add([a1,a2,a3,a4,a5,a6]);
+
+	var fn1 = function(){
+		console.log(1);
+	}
+	var fn2 = function(){
+		console.log(2);
+	}
+	var fn3 = function(){
+		console.log(3);
+	}
+	var fn4 = function(){
+		console.log(4);
+	}
+
+	st = new _.stack([[fn1],[fn2,3],[fn3],[fn4]]);
 	
 	// try to add unbind data in collection
 	// b1.add(c1);
