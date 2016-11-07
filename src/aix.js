@@ -17,7 +17,6 @@
  * @License : Fuck any LISCENSE
  *
  * require Lib [ _ , jQuery or Other DOM lib ]
- *
  */
 
 (function(root,factory){

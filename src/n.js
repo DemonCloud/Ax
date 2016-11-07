@@ -14,7 +14,6 @@
  * @Version : 0.1
  *
  * @License : Fuck any LISCENSE
- *
  */
 
 (function(root,factory){

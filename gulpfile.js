@@ -16,7 +16,17 @@ gulp.task('uglify',function(){
 	return gulp.src(path_disjs)
 				 .pipe(uglify())
 				 .pipe(gulp.dest(path_dis));
-})
+});
 
-gulp.task('default',['concat','uglify'])
+gulp.task('watch',function(){
+	gulp.watch(path_js,['default']);
+});
+
+gulp.task('make',['concat'],function(){
+	gulp.start('uglify');
+});
+
+gulp.task('default',['concat'],function(){
+	gulp.start('uglify');
+});
 
