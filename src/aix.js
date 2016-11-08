@@ -25,9 +25,6 @@
 		// support AMD require.js
 		// ruler by UMD Javascript
 		define(factory);
-	else if(typeof exports === "object")
-		// support NodeJS exports
-		module.exports = factory(_,__);
 	else
 		// build on browser global object
 		root.aix = factory(_,__);
@@ -705,6 +702,7 @@
 		"not",
 		"bale",
 		"pluck",
+		"reverse",
 		"shuffle",
 		"merge"
 	],function(api){

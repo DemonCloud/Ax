@@ -17,14 +17,10 @@
  */
 
 (function(root,factory){
-
 	if(typeof define === 'function' && define.amd)
 		// support AMD require.js
 		// ruler by UMD Javascript
 		define(factory);
-	else if(typeof exports === "object")
-		// support NodeJS exports
-		module.exports = factory(_);
 	else
 		// build on browser global object
 		root.__ = factory(_);

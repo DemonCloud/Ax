@@ -281,6 +281,12 @@
 			return obj;
 		},
 
+		reverse : function(list){
+			if(!_.isArray(list))
+				return list;
+			return _.slice(list).reverse();
+		},
+
 		pluck : function(list,mapkey){
 			var res = [];
 
