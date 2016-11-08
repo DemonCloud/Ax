@@ -130,21 +130,18 @@
 	// add data to collection
 	b1.add([a1,a2,a3,a4,a5,a6]);
 
-	fn1 = function(){
-		console.log(1);
-	}
-	fn2 = function(){
-		console.log(2);
-	}
-	fn3 = function(){
-		console.log(3);
-	}
-	fn4 = function(){
-		console.log(4);
+	fn = function(num){
+		num = num || 1;
+		console.log(num);
+		return num*2;
 	}
 
-	st = new _.stack([[fn1],[fn2,3]]);
-	st.add([fn3,4],fn4);
+	st = new _.stack([[fn],[fn,3]]);
+	st.add([fn,4],fn);
+
+	ar = new _.hack([[fn],[fn,3],[fn,2],[fn]],function(){
+		console.log(_.slice(arguments));
+	});
 	
 	// try to add unbind data in collection
 	// b1.add(c1);

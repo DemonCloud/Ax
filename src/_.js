@@ -81,11 +81,10 @@
 	});
 
 	// Loop for Array
+	// fuck any Array.forEach method
 	function aloop(ary,fn,ts){
-		ary.forEach(function(elm,index,arr){
-			return fn.apply(ts||arr,[elm,index,arr]);
-		});
-
+		for(var i=0, l=ary.length; i<l; i++)
+			fn.apply(ts||ary,[ary[i],i,ary]);
 		return ary;
 	}
 
@@ -357,7 +356,8 @@
 		has : function(list,n){
 			var idf = 0;
 			_.foreach(list,function(v){
-				if(v===n) idf = 1;
+				if(v===n) 
+					idf = 1;
 			});
 			return !!idf;
 		},
@@ -1207,11 +1207,11 @@
 			var fn = _.isFunction(x[0]) ? x[0] : _.NULL;
 			var t = _.isNumber(x[1]) ? x[1] : 0;
 			
-			var fire = function(){
+			var fire = function(arg){
 				setTimeout(function(){ 
 					var nx = firelist.pop();
-					nx && nx();
-					fn();
+					var tmp = fn.call(_.root,arg);
+					nx && nx.call(_.root,tmp);
 				},t*1000);
 			}
 
@@ -1252,15 +1252,78 @@
 				var fn = _.isArray(item) ? item[0] : item;
 				var t = _.isArray(item) ? (item[1]||0) : parseFloat(item||0);
 				 
-				var fire = function(){
+				var fire = function(arg){
 					setTimeout(function(){ 
 						var nx = _this["="].pop();
-						nx && nx();
-						fn();
+						var tmp = fn.call(_.root,arg);
+						nx && nx.call(_.root,tmp);
 					},t*1000);
 				}
 
 				_this["="].push(fire);
+			});
+		}
+	});
+
+
+	// Parallel queue
+	var hack;
+	_.hack = hack = function(arr,complete){
+		var _this = this;
+		var ram = arr || [];
+		var ramlen = ram.length;
+
+		var checklist=new Array(ramlen);
+		var firelist =[];
+
+		// define property
+		_.define(this,{
+			"complete" : {
+				value : (complete||_.NULL),
+				writable : true,
+				enumerable: false,
+				configurable: false
+			},
+
+			"-" : {
+				value : firelist,
+				writable : true,
+				enumerable: false,
+				configurable: false
+			}
+		});
+
+		_.foreach(ram,function(g,i){
+			var index = i;
+			var x = _.isObject(g) ? _.toarray(g) : (g||[]);
+			var fn = _.isFunction(x[0]) ? x[0] : _.NULL;
+			var t = _.isNumber(x[1]) ? x[1] : 0;
+			
+			var fire = function(){
+				setTimeout(function(){ 
+					var tmp = fn();
+					checklist[index] = (tmp||1) ;
+					if(!_.has(checklist)){
+						_this.complete.apply(_.root,checklist);
+						_this.noop();
+					}
+				},t*1000);
+			}
+
+			firelist.push(fire);
+		});
+	
+	}
+	_.extend(hack.prototype,{
+		noop : function(){
+			this["-"] = null;
+			this.complete = null;
+			return this;
+		},
+
+		fire: function(){
+			return !this["-"].length ? 0 : _.foreach(this["-"],function(fn){
+				return fn.call(_.root);
 			});
 		}
 	});
