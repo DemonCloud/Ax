@@ -1160,15 +1160,6 @@
 
 		save : function(){
 			return this.storage.setItem(this.rid,JSON.stringify(this.history));
-		},
-
-		goBack : function(){
-			window.location.href = this.history.old;
-			return this;
-		},
-		
-		getHistory : function(){
-			return _.clone(this.history);
 		}
 	};
 
