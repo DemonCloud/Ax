@@ -1076,17 +1076,6 @@
 			}
 
 			xhrcount++;
-
-			// test example
-			// for this aixp 
-			// _.aixp({
-			//	url : "http://jsfiddle.net/echo/jsonp",
-			//	fn : "setup",
-			//	param:{ a:1,b:2 },
-			//	success: function(res){
-			//		console.log(res);
-			//	}
-			// });
 		},
 
 		// HTML page info 

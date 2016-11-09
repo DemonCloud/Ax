@@ -902,6 +902,7 @@
 
 	// bind selector
 	$ = $ || _.NULL; 
+
 	aix.view = function(obj){
 		obj = obj || {};
 		if(!_.isString(obj.el))
@@ -1078,41 +1079,56 @@
 
 	//if HashChange callee
 	function changeHash(hash,oldhash,event){
-		var _this = this;
-		_.foreach(_this.routes,function(fn,key){
-			if(RegExp(key,"im").test(hash))
-				fn.call(_this,hash,oldhash,event,key);
-		});
+		_.foreach(this.routes,function(fn,key){
+			if(RegExp(key,"i").test(hash))
+				fn.call(this,event,hash,oldhash,key);
+		},this);
 	}
 
 	// define route for SPA
 	aix.route = function(obj){
+		obj = obj || {};
+
 		var _this = this;
+
+		this.storage = _.root.localStorage||{};
 
 		if(_.isObject(obj.events))
 			_.foreach(obj.events,function(v,k){
 				_.addEvent(_this,k,v);
 			});
 
-		//delete undefault properties
-		delete obj.events;
+		if(_.isObject(obj.routes))
+			this.routes = obj.routes
 
 		// cant change regular hash title
-		_.define(_this,"history",{
-			value : { old:"" , now:"" },
-			writable : true,
-			enumerable : false
-		});
+		_.define(this, {
+			"history" : {
+				value : { old:"" , now:"" },
+				writable : true,
+				enumerable : false
+			},
+			"rid" : {
+				value : "ai-route-"+Math.random(),
+				writable : false,
+				enumerable : false,
+				configurable: false
+			},
+			"event" : {
+				value : function(event){
+					if(event.newURL === event.oldURL)
+						return event.preventDefault()
 
-		_.root.addEventListener("hashchange",function(event){
-			if(event.newURL === event.oldURL)
-				return event.preventDefault()
+					_this.history.now = event.newURL;
+					_this.history.old = event.oldURL;
 
-			_this.history.now = event.newURL;
-			_this.history.old = event.oldURL;
-			
-			_.dispatch(_this,"hashchange",null,
-								[getHash(event.newURL),getHash(event.oldURL),event]);
+					_.dispatch(_this,"hashchange",null,
+						[getHash(event.newURL),getHash(event.oldURL),event]);
+				},
+				writable : false,
+				enumerable : false,
+				configurable: false
+			}
 		});
 
 		_.addEvent(_this,"hashchange",changeHash);
@@ -1121,6 +1137,30 @@
 
 	aix.route.prototype = {
 		constructor : aix.route,
+
+		listen: function(){
+			if(!this._init){
+				_.define(this,"$listen",{
+					value:1,
+					writable : false,
+					enumerable : false,
+					configurable: true,
+				})
+				_.root.addEventListener("hashchange",this.event);
+				_.dispatch(this,"hashchange",null,[getHash(window.location.href)])
+			}
+			return this;
+		},
+
+		stop: function(){
+			if(delete this.$listen)
+				_.root.removeEventListener("hashchange",this.event);
+			return this;
+		},
+
+		save : function(){
+			return this.storage.setItem(this.rid,JSON.stringify(this.history));
+		},
 
 		goBack : function(){
 			window.location.href = this.history.old;
