@@ -162,6 +162,33 @@
  		}	
 	});
 
+	var route = new aix.route({
+		events:{
+			init: function(){
+				console.log("route init!");
+			},
+			listen: function(){
+				console.log("route listened!");
+			}
+		},
+		routes:{
+			"^\\d+$":function(event,hash){
+				console.log("hash change to -> "+hash);
+			},
+
+			"^custom$":function(event,hash){
+				console.log("custom hash");
+			},
+
+			"^custom#\\d+":function(event,hash){
+				console.log("double hash!");
+			}
+		}
+	});
+	
+	route.listen();
+	
+
 	__('.abs').html(__('<div>123</div><div>321</div><div>213</div>'));
 
 	</script>

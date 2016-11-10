@@ -1070,11 +1070,8 @@
 
 	//get Hash param form URL
 	var getHash = aix.getHash = function(url){
-		var arr = url.split("#");
-		var res = "";
-		if(arr.length>1)
-			res = arr[1];
-		return res;
+		var index = url.search("#");
+		return index>0?url.slice(index+1):"";
 	};
 
 	//if HashChange callee
@@ -1135,32 +1132,62 @@
 		_.dispatch(_this,"init");
 	};
 
+	// Aix-Route for SPA Architecture
+	// auto trigger regex event when route change
 	aix.route.prototype = {
 		constructor : aix.route,
 
+		dispatch:function(type,fn,args){
+			return _.dispatch(this,type,fn,args);
+		},
+
 		listen: function(){
-			if(!this._init){
+			if(!this.$listen){
 				_.define(this,"$listen",{
 					value:1,
 					writable : false,
 					enumerable : false,
 					configurable: true,
-				})
+				});
 				_.root.addEventListener("hashchange",this.event);
-				_.dispatch(this,"hashchange",null,[getHash(window.location.href)])
+				this.dispatch("listen");
+				this.dispatch("hashchange",null,[getHash(window.location.href)])
 			}
 			return this;
 		},
 
 		stop: function(){
-			if(delete this.$listen)
+			if(delete this.$listen){
 				_.root.removeEventListener("hashchange",this.event);
+				this.dispatch("stop");
+			}
+			return this;
+		},
+
+		assign : function(hash){
+			if(this.$listen){			
+				var url = _.root.location.href; 
+				var hashindex = url.search("#");
+				if(hashindex > 0)
+					url = url.slice(0,hashindex);
+
+				_.root.location.href = url + (hash.slice(0,1)==="#"?"":"#") + hash;
+			}
+			return this;
+		},
+
+		addhash : function(hash){
+			var now = _.root.location.href + (hash||"");
+			if(now!==_.root.location.href)
+				_.root.location.href = now;
 			return this;
 		},
 
 		save : function(){
-			return this.storage.setItem(this.rid,JSON.stringify(this.history));
+			this.storage.setItem(this.rid,JSON.stringify(this.history));
+			return this;
 		}
+		
 	};
 
 	return aix;
