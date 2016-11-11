@@ -172,24 +172,28 @@
 			}
 		},
 		routes:{
-			"^\\d+$":function(event,hash){
-				console.log("hash change to -> "+hash);
+			"^\\d+$":"number",
+			"^custom$":"custom",
+			"^custom#\\d+":["custom","customdouble"]
+		},
+		action:{
+			number:function(event,hash){
+				console.log("hash change to number -> "+ hash);
+				__('.abs').html(__('<div>single hash -> '+hash+'</div>'));
 			},
 
-			"^custom$":function(event,hash){
+			custom:function(event,hash){
 				console.log("custom hash");
 			},
 
-			"^custom#\\d+":function(event,hash){
+			customdouble:function(event,hash){
 				console.log("double hash!");
+				__('.abs').html(__('<div>double hash -> '+ hash + '</div>'));
 			}
 		}
 	});
 	
 	route.listen();
-	
-
-	__('.abs').html(__('<div>123</div><div>321</div><div>213</div>'));
 
 	</script>
 </body>

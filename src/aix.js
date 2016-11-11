@@ -38,6 +38,7 @@
 			AIX_COLLECTION_COUNT = 0,
 
 			AIX_VIEW_DEFAULT = { el : "", template : ""},
+			AIX_ROUTE_DEFAULT = { routes:{}, action:{} },
 			AIX_MODELS_DEFAULT = { data:"" },
 			AIX_COLLECTION_DEFAULT = { data:[], model: 0 };
 
@@ -906,7 +907,7 @@
 	aix.view = function(obj){
 		obj = obj || {};
 		if(!_.isString(obj.el))
-			return console.error("view must define its 'el' prop bind with dom elm");
+			return console.error("view must define its 'el' prop bind with elm (custom string)");
 
 		var _this = this;
 
@@ -931,7 +932,9 @@
 
 		// parse template
 		if(!obj.template || _.isString(obj.template))
-			obj.template = _.doom(obj.template||"");
+				obj.template = _.isFunction(obj.build)?
+											 obj.build.call(_this,obj.template||""):
+											 _.doom(obj.template||"");
 		if(!obj.render || !_.isFunction(obj.render)){
 			obj.render = function(data){ 
 				return $(this.el).html(this.template(data)) && this;
@@ -947,8 +950,11 @@
 		if(_.isString(obj.url)){
 			_.aix({
 				url: obj.url,
+				cache : _.isBoolean(obj.cache) ? obj.cache : true,
 				success:function(text){
-					obj.template = _.doom(text);
+					obj.template = _.isFunction(obj.build) ? 
+												 obj.build.call(_this,text):
+												 _.doom(text);
 					_.extend(_this,_.extend(_.clone(AIX_VIEW_DEFAULT),obj));
 					_.dispatch(_this,"init");
 				},
@@ -1022,7 +1028,9 @@
 
 			// parse template
 			if(!obj.template || _.isString(obj.template))
-				obj.template = _.doom(obj.template||"");
+				obj.template = _.isFunction(obj.build)?
+											 obj.build.call(_this,obj.template||""):
+											 _.doom(obj.template||"");
 			if(!obj.render || !_.isFunction(obj.render)){
 				obj.render = function(data){ 
 					return $(this.el).html(this.template(data)) && this;
@@ -1037,8 +1045,11 @@
 			if(_.isString(obj.url)){
 				_.aix({
 					url: obj.url,
+					cache : _.isBoolean(obj.cache) ? obj.cache : true ,
 					success:function(text){
-						obj.template = _.doom(text);
+						obj.template = _.isFunction(obj.build) ?
+													 obj.build.call(_this,text):
+													 _.doom(text);
 						_.extend(_this,_.extend(_.clone(AIX_VIEW_DEFAULT),obj));
 						_.dispatch(_this,"init");
 					},
@@ -1078,8 +1089,25 @@
 	function changeHash(hash,oldhash,event){
 		_.foreach(this.routes,function(fn,key){
 			if(RegExp(key,"i").test(hash))
-				fn.call(this,event,hash,oldhash,key);
+				changeHashReg.call(this,fn,[event,hash,oldhash,key])
 		},this);
+	}
+
+	// detect args callback
+	function changeHashReg(fn,args){
+		switch(_.typeof(fn)){
+			case "function":
+				fn.apply(this||_.root,args);
+				break;
+			default:
+				// array or string
+				_.foreach(
+				_.isString(fn) ? fn.split(",") : fn,
+				function(reg){
+					this.action[reg].apply(this||_.root,args);
+				},this);
+				break;
+		}
 	}
 
 	// define route for SPA
@@ -1095,8 +1123,13 @@
 				_.addEvent(_this,k,v);
 			});
 
-		if(_.isObject(obj.routes))
-			this.routes = obj.routes
+		delete obj.events;
+
+		_.extend(_this,_.extend(_.clone(AIX_ROUTE_DEFAULT),obj));
+
+		_.addEvent(_this,
+							 "hashchange",
+								changeHash);
 
 		// cant change regular hash title
 		_.define(this, {
@@ -1128,7 +1161,6 @@
 			}
 		});
 
-		_.addEvent(_this,"hashchange",changeHash);
 		_.dispatch(_this,"init");
 	};
 

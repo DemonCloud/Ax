@@ -601,7 +601,7 @@
 			"\u2029" : "u2029"
 		};
 
-	var doomSetting = {
+	var doomSetting = _.doomSetting = {
 		escape      : "{{-([\\s\\S]+?)}}",
 		interpolate : "{{#([\\s\\S]+?)}}",
 		evaluate    : "{{([\\s\\S]+?)}}"
@@ -892,6 +892,11 @@
 
 	// about browser's api local
 	var xhrcount = 0;
+	// setcache
+	var ls = _.root.localStorage;
+	if(!ls.getItem("aixcache"))
+			ls.setItem("aixcache","{}");
+
 	_.extend({
 		// cookies
 		cookieparse : function(ckstr){
@@ -945,6 +950,7 @@
 				param     : _.broken,
 				aysnc     : true,
 				vaild     : true,
+				cache     : false,
 				success   : _.NULL,
 				fail      : _.NULL,
 				loading   : null,
@@ -954,6 +960,16 @@
 				password  : null,
 				timeout   : 0
 			} , options || {} );
+
+
+			// if use cache assign
+			if(_s.cache){
+				var aixcache = JSON.parse(ls.getItem("aixcache"));
+				var key = _s.url || _.root.location.href.split("#")[0];
+
+				if(aixcache[key])
+					return _s.success.call(_.root,aixcache[key]);
+			}
 
 			// create AJAX XMLHttpRequest constructor
 			var xhr = new XMLHttpRequest();
@@ -1007,10 +1023,17 @@
 				if(xhr.readyState === 4 && xhr.responseText){
 					var status = xhr.status;
 
-					if(( status >= 200 && status < 300) || status === 304)
+					if(( status >= 200 && status < 300) || status === 304){
 						_s.success.call(_.root,xhr.responseText,xhr,event);
-					else
+						// if cache been set writeJSON in chache
+						if(_s.cache){
+							var aixcache = JSON.parse(ls.getItem("aixcache"));
+							aixcache[_s.url||_.root.location.href.split("#")[0]] = xhr.responseText;
+							ls.setItem("aixcache",JSON.stringify(aixcache));
+						}
+					} else {
 						_s.fail.call(_.root,xhr,event);
+					}
 				}
 			};
 
@@ -1177,7 +1200,7 @@
 				linklist : linklist.sort(),
 
 				cookies : _.cookie(),
-				localstorage : localStorage || {},
+				localstorage : ls || {},
 
 				_aixxhr : xhrcount
 			};
