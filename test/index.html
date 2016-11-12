@@ -179,7 +179,9 @@
 		action:{
 			number:function(event,hash){
 				console.log("hash change to number -> "+ hash);
-				__('.abs').html(__('<div>single hash -> '+hash+'</div>'));
+				__('.abs').html(__('<div>single hash -> '+hash+'</div>'))
+									.addClass("a")
+									.removeClass("b");
 			},
 
 			custom:function(event,hash){
@@ -188,10 +190,14 @@
 
 			customdouble:function(event,hash){
 				console.log("double hash!");
-				__('.abs').html(__('<div>double hash -> '+ hash + '</div>'));
+				__('.abs').html(__('<div>double hash -> '+ hash + '</div>'))
+									.removeClass("a")
+									.addClass("b");
 			}
 		}
 	});
+
+	var dom = _.domparse("<div id='nec' class='abc'><ul><li>smart</li><li>smooth</li></ul><div><i>1</i><span>2</span></div></div>");
 	
 	route.listen();
 

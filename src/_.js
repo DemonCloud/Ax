@@ -521,6 +521,17 @@
 
 		async : function(fn,time){
 			return setTimeout(fn,time||0);
+		},
+
+		combom : function(list,fn){
+			var res;
+			for(var i=0, l= list.length; i<l; i++){
+				if(fn.call(list,list[i],i,list)){
+					res = list[i];
+					break;
+				}
+			}
+			return res;
 		}
 	});
 
@@ -891,13 +902,106 @@
 			]);
 
 	// about browser's api local
+	// ajax counter
 	var xhrcount = 0;
-	// setcache
+	// ajax setcache
 	var ls = _.root.localStorage;
 	if(!ls.getItem("aixcache"))
 			ls.setItem("aixcache","{}");
+	
+	// dom parser
+	var bdlevel = /<(\/)?(\w+)\s?([^>]+?)?\>{1}/gi;
+	var parseattr = function(str){
+		var res = {};
+		var arr = str ? str.split(" "):[];
+		_.foreach(arr,function(prop,i){
+			var pr = prop.split("=");
+			res[pr[0]] = (pr[1]||"").replace(/[\'\"]/gm,"");
+		});
+
+		return res;
+	}
 
 	_.extend({
+		// dom parse 
+		domparse : function(domstr){
+			var newlevel = 1; 
+			var find = 1;
+			// make a newtree default node
+			var newtree  = [
+				[{
+					tagname:"_",
+					parent:null,
+					content:domstr,
+					attributes:"",
+					$ob:0,
+					$oe:domstr.length
+				}]
+			];
+
+			var resentnode = [];
+
+			domstr.replace(bdlevel,function($match,close,tag,attr,offset){
+				var node = {};
+				var level;
+
+				if(close !== "/"){
+					// find begin
+					level = newlevel++;
+
+					// check parent
+					// save the level;
+
+					if(newtree[level]==null)
+						newtree[level] = [];
+					var n = level-1;
+					var nlevel = level-find++;
+
+					_.compose(node,{
+						tagname:tag,
+						attributes:parseattr(_.trim(attr||"")),
+						$ob:offset+$match.length
+					});
+					newtree[level].push(node);
+					resentnode.push(node);
+		  	} else {
+		  		// find end
+					level = --newlevel; --find;
+
+					var gtn = resentnode.pop();
+					gtn.$oe = offset-gtn.$ob;
+
+				}
+
+				return $match;
+			});
+
+
+			for(var i=1,l=newtree.length;i<l;i++){
+				var np = newtree[i];
+				var npc = newtree[i+1];
+				var npp = newtree[i-1]; 
+
+				for(var j=0,k=np.length;j<k;j++){
+					var begin = np[j].$ob;
+					var end = np[j].$oe;
+					np[j].content = _.trim(domstr.substr(begin,end));
+
+					// find child
+					np[j].child = npc ? _.filter(npc,function(node){
+						return node.$ob>begin && (node.$ob+node.$oe)<(begin+end)
+					}) : [];
+
+					// find parent
+					np[j].parent = npp ? _.combom(npp,function(node){
+						return begin>node.$ob && (begin+end)<(node.$ob+node.$oe);
+					}) : null;
+				}
+			}
+
+			return newtree;
+		},
+
 		// cookies
 		cookieparse : function(ckstr){
 			var tmp ;

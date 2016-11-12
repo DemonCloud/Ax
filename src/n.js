@@ -110,9 +110,10 @@
 	   ,isTag     = /^[^\[\]\+\-\.#\s\=]+$/i													// "p" "div" "DIV"
 	   ,isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i 		// div[id="nami"]
 	   ,mreSl     = /^[^\s]+,[^\s]+/gi
-	   ,cidSl     = /[\s|\r]+/gi
-	   ,pitSl     = /[>|\+|\~]+/gi
+	   ,cidSl     = /[\s|\r]+/gim
+	   ,pitSl     = /[>|\+|\~]+/gim
 		 ,isHTML    = /<[a-z][\s\S]*>/i;
+
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
@@ -138,22 +139,32 @@
 				} else {
 					return dsizzle(parent).filter(function(e){
 						return e.getAttribute(attr) === value;
-					})			
+					});			
+				}
+			} else { 
+				if(isHTML.test(elm)){
+					var dg = document.createElement("i");
+					dg.innerHTML = elm;
+					$el = _.slice(dg.childNodes);
+					return $el.filter(function(node){
+						return node.nodeType === 1;
+					});
+				} else {
+					$el = document.querySelectorAll(elm);
 				}
 			}
-			else 
-				$el = document.querySelectorAll(elm);
-		}else 
+		}else{ 
 			if(isHTML.test(elm)){
 				var dg = document.createElement("i");
 						dg.innerHTML = elm;
-				$el = _.slice(dg.querySelectorAll("*"));
+				$el = _.slice(dg.childNodes);
 				return $el.filter(function(node){
 					return node.nodeType === 1;
 				});
-			}
-			else
+			} else {
 				$el = document.querySelectorAll(elm);
+			}
+		}
 		return _.slice($el);
 	}
 
@@ -193,7 +204,8 @@
 	__.fn.extend({
 
 		each : function(fn,context){
-			return _.foreach(this.$el,fn,context)
+			_.foreach(this.$el,fn,context)
+			return this;
 		},
 
 		get : function(index){
@@ -470,7 +482,8 @@
 					e.innerHTML = tmp+"";
 				});
 			}else{
-				return this.get(0).innerHTML || "";
+			 	this.get(0).innerHTML || "";
+			 	return this;
 			}
 		},
 
@@ -700,10 +713,6 @@
 			return this.live.apply(this,_.slice(arguments));
 		},
 
-		agent : function(){
-			return this.live.apply(this,_.slice(arguments));
-		},
-
 		live : function(type,sl,cal,context,ctbak){
 			var t = !_.isFunction(sl) , data;
 			if(!_.isFunction(cal)){
@@ -737,7 +746,12 @@
 						if(e[name])
 							e.name = val;
 						else
-							_.define(e,name,{ value : val, writable : true, enumerable: false, configurable: true })
+							_.define(e,name,{ 
+								value : val, 
+								writable : true, 
+								enumerable: false, 
+								configurable: true 
+							});
 
 					});
 				else
