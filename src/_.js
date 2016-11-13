@@ -925,6 +925,7 @@
 	_.extend({
 		// dom parse 
 		domparse : function(domstr){
+			var str = (domstr||"").replace(/[\t\r\n]/gm,'');
 			var newlevel = 1; 
 			var find = 1;
 			// make a newtree default node
@@ -932,20 +933,21 @@
 				[{
 					tagname:"_",
 					parent:null,
-					content:domstr,
+					content:str,
 					attributes:"",
 					$ob:0,
-					$oe:domstr.length
+					$oe:str.length
 				}]
 			];
 
 			var resentnode = [];
 
-			domstr.replace(bdlevel,function($match,close,tag,attr,offset){
+			str.replace(bdlevel,function($match,close,tag,attr,offset){
 				var node = {};
 				var level;
 
 				if(close !== "/"){
+					console.log(tag);
 					// find begin
 					level = newlevel++;
 
@@ -964,6 +966,13 @@
 					});
 					newtree[level].push(node);
 					resentnode.push(node);
+
+					if($match.search("<input")>-1){
+						--newlevel; --find;
+						node.$ob = node.$ob-$match.length;
+						node.$oe = $match.length;
+					}
+
 		  	} else {
 		  		// find end
 					level = --newlevel; --find;
@@ -985,7 +994,7 @@
 				for(var j=0,k=np.length;j<k;j++){
 					var begin = np[j].$ob;
 					var end = np[j].$oe;
-					np[j].content = _.trim(domstr.substr(begin,end));
+					np[j].content = _.trim(str.substr(begin,end));
 
 					// find child
 					np[j].child = npc ? _.filter(npc,function(node){

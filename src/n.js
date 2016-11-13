@@ -470,8 +470,8 @@
 		},
 
 		fill : function(ct){
-			var tmp= ""; 
 			if(ct != null){
+				var tmp= ""; 
 				if(ct.nodeType && ct.nodeType === 1)
 					tmp = ct.outerHTML;
 				else if(_.isObject(ct) && ct instanceof DOOM)
@@ -482,8 +482,7 @@
 					e.innerHTML = tmp+"";
 				});
 			}else{
-			 	this.get(0).innerHTML || "";
-			 	return this;
+			 	return this.get(0).innerHTML || "";
 			}
 		},
 

@@ -197,7 +197,7 @@
 		}
 	});
 
-	var dom = _.domparse("<div id='nec' class='abc'><ul><li>smart</li><li>smooth</li></ul><div><i>1</i><span>2</span></div></div>");
+	var dom = _.domparse(__("body").html());
 	
 	route.listen();
 
