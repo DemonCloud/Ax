@@ -478,11 +478,14 @@
 					ct.each(function(e){ tmp+= e.outerHTML; })
 				else
 					tmp = ct+"";
+
 				return this.each(function(e){
-					e.innerHTML = tmp+"";
+					if(e != null)
+						e.innerHTML = tmp+"";
 				});
 			}else{
-			 	return this.get(0).innerHTML || "";
+				var elm = this.get(0);
+			 	return elm.innerHTML != null ? elm.innerHTML : "";
 			}
 		},
 

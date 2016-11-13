@@ -73,7 +73,21 @@
 	_.isObject = function(e){
 		return typeof e === "function" || typeof e === "object" && !!e;
 	};
-	var typeArray =['Array','Arguments','Boolean','Function','String','Number','Null','Date','RegExp','NodeList','Undefined',"HTMLCollection"];
+
+	var typeArray =[
+		'Array',
+		'Arguments',
+		'Boolean',
+		'Function',
+		'String',
+		'Number',
+		'Null',
+		'Date',
+		'RegExp',
+		'NodeList',
+		'Undefined',
+		'HTMLCollection'
+	]
 	typeArray.forEach(function(v,i){
 		_[ 'is' + v ] = function(e){
 			return OP.toString.call(e) === '[object ' + v + ']';
@@ -925,16 +939,17 @@
 	_.extend({
 		// dom parse 
 		domparse : function(domstr){
-			var str = (domstr||"").replace(/[\t\r\n]/gm,'');
+			var str = (domstr||"")
+				.replace(/[\t\r\n\f]/gm,'')
+				.replace(/<script\b[^>]*>(.*?)<\/script>/gi,'');
+
+			// make a newtree default node
 			var newlevel = 1; 
 			var find = 1;
-			// make a newtree default node
 			var newtree  = [
 				[{
 					tagname:"_",
-					parent:null,
-					content:str,
-					attributes:"",
+					html:str,
 					$ob:0,
 					$oe:str.length
 				}]
@@ -947,7 +962,6 @@
 				var level;
 
 				if(close !== "/"){
-					console.log(tag);
 					// find begin
 					level = newlevel++;
 
@@ -965,12 +979,12 @@
 						$ob:offset+$match.length
 					});
 					newtree[level].push(node);
-					resentnode.push(node);
 
-					if($match.search("<input")>-1){
+					if(tag === "input"){
 						--newlevel; --find;
-						node.$ob = node.$ob-$match.length;
-						node.$oe = $match.length;
+						node.$oe = 0
+					}else{
+						resentnode.push(node);
 					}
 
 		  	} else {
@@ -1395,7 +1409,6 @@
 			});
 		}
 	});
-
 
 	// Parallel queue
 	var hack;

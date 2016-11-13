@@ -18,35 +18,20 @@
 	</style>
 </head>
 <body>
-	<div id="a">1</div>
-	<div>2</div>
-	<div>3</div>
-	<div>4</div>
-	<div>5</div>
-	<div class="idea">
+	<div class="idea" id="idea">
+		<div id="a"></div>
+
 		<input type="checkbox" name="hell" id="hell" />
+
 		<select name="geek" id="geek" class="geek">
 			<option value="1" class="geek">God1</option>
-			<option value="2" class="geek">Geek2</option>
-			<option value="3" class="asb">Guy3</option>
 		</select>
 
 		<div class="abs">
-			<li>1</li>
-			<li>2</li>
-			<li>3</li>
+			<div>1</div>
+			<div>2</div>
+			<div>3</div>
 		</div>
-
-		<div id="n" class="asb">
-			<div>Hello</div>
-			<li>Mike</li>
-			<li>Fish</li>
-			<li>Sun</li>
-		</div>
-		<form action="/" method="POST">
-			<input type="number" value="" name="num" id="num" required>
-			<input type="submit" name="submit" id="submit" value="submit" />
-		</form>
 	</div>
 
 	<script>
@@ -197,10 +182,11 @@
 		}
 	});
 
-	var dom = _.domparse(__("body").html());
+	var dom1 = _.domparse(__("body").html());
 	
 	route.listen();
 
+	var dom2 = _.domparse(__("body").html());
 	</script>
 </body>
 </html>

@@ -31,6 +31,7 @@
 
 })( this , function(_,$){
 	'use strict';
+
 	var aix = {};
 	
 	var AIX_VIEW_COUNT = 0,
