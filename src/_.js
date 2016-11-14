@@ -552,8 +552,14 @@
 	// URL parse and stringify
 	// useful browser
 	var whiteSpace = /[\t\r\n\f\x20]/g;
-	function pP_rSpace(part){ return decodeURIComponent(part.replace(/\+/g," ")); }
-	function sP_rInsignia(part){ return encodeURIComponent(part).replace(" ","%20"); }
+
+	function pP_rSpace(part){ 
+		return decodeURIComponent(part.replace(/\+/g," ")); 
+	}
+
+	function sP_rInsignia(part){ 
+		return encodeURIComponent(part).replace(" ","%20"); 
+	}
 
 	// @ parse the queryString to JSON Object
 	_.extend({
@@ -1372,7 +1378,6 @@
 	}
 
 	_.extend(stack.prototype,{
-
 		noop : function(){
 			this["="] = [];
 			return this;

@@ -719,7 +719,8 @@
 		"has",
 		"isequal",
 		"requery",
-		"typeof"
+		"typeof",
+		"combom"
 	],function(api){
 		aix.model.prototype[api]=_genertor_$(api);
 		aix.collection.prototype[api]= _genertor_$(api);

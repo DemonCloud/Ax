@@ -493,6 +493,10 @@
 			return this.fill.apply(this,_.slice(arguments));
 		},
 
+		replacewith : function(str){
+			
+		},
+
 		empty : function(){
 			return this.each(function(e){ e.innerHTML = ""; });
 		},
