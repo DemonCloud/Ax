@@ -30,7 +30,7 @@
 		root.aix = factory(_,__);
 
 })( this , function(_,$){
-	'use strict';
+	"use strict";
 
 	var aix = {};
 	
@@ -114,11 +114,37 @@
 		};
 	}
 
+	function hackex(origin,extend){
+		var oargs = origin.toString()
+											.match(/function\s.*?\(([^)]*)\)/)[1];
+		var eargs = extend.toString()
+											.match(/function\s.*?\(([^)]*)\)/)[1];
+		var fnstr = origin.toString(); 
+		var body = fnstr.slice(
+							 fnstr.indexOf("{") + 1, 
+							 fnstr.lastIndexOf("}"));
+
+		oargs = oargs.split(',').map(function(arg) {
+    	return arg.replace(/\/\*.*\*\//, '').trim();
+  	}).filter(function(arg) {
+    	return arg;
+  	});
+
+		eargs = eargs.split(',').map(function(arg) {
+    	return arg.replace(/\/\*.*\*\//, '').trim();
+  	}).filter(function(arg) {
+    	return arg;
+  	});
+  	
+  	return [oargs[0],eargs[0],body];
+	}
+
+
 	// Aix Model
 	aix.model = function(obj){
 		var _this = this;
 
-		_.define(_this,{
+		_.define(this,{
 			aid : {
 				value : "#"+(++AIX_MODELS_COUNT),
 				writable : true,
@@ -193,86 +219,15 @@
 	};
 
 	// Extend aix model method 
+
 	aix.model.extend = function(def){
-		var extend = function(ops){
-			var _this = this;
-			var updef = _.extend(_.clone(AIX_MODELS_DEFAULT),def);
-			var obj = _.extend(updef,ops);
-
-			// if userobj has more events
-			if(_.isObject(obj.events))
-				_.foreach(obj.events,function(v,k){
-					_.addEvent(_this,k,v);
-				});
-
-			if(_.isFunction(obj.validate)){
-				_.define(_this,"validate",{
-					value : obj.validate,
-  				writable: false,
-  				enumerable: false,
-  				configurable: false
-				});
-			}
-
-			//delete undefault properties
-			delete obj.validate;
-			delete obj.change;
-			delete obj.events;
-
-			// copy data
-			_.compose(_this,obj);
-			_this.data = _.clone(this.data);
-
-			_.define(_this,{
-				aid : {
-					value : "#"+(++AIX_MODELS_COUNT),
-					writable : true,
-					enumerable : false
-				},
-				change : {
-					value : false,
-					writable : true,
-					enumerable : false
-				}
-			});
-
-			//add listen for object data change
-			_.watch(_this,"data",function(nv,ov){
-			// Validate checker for change
-				if(_.isFunction(_this.validate)){
-					var vali = true;
-	
-					if(_.isFunction(_this.validate) ? !_this.validate.call(_this,nv) : 0 )
-						vali = false;
-	
-					// validate status check
-					if(vali){
-						// trigger validate and success events
-						if(!_.isequal(nv,ov)){
-							_.dispatch(_this,"change",null,[nv,ov]);
-							_this.change = true;
-						}
-						_.dispatch(_this,"validate",null,[nv,ov]);
-						_.dispatch(_this,"validate:success",null,[nv,ov]);
-						return nv;
-					}else{
-						// trigger validate and fail events
-						_.dispatch(_this,"validate",null,[nv,ov]);
-						_.dispatch(_this,"validate:fail",null,[nv,ov]);
-						return ov;
-					}
-				}else{
-					// No validate 
-					if(!_.isequal(nv,ov)){
-						_.dispatch(_this,"change",null,[nv,ov]);
-						_this.change = true;
-					}
-					return nv;
-				}
-			});
-
-			_.dispatch(_this,"init");
-		};
+		var x = hackex(aix.model,aix.model.extend);
+		var extend = eval(
+				"(function(ops){ "
+			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
+			+  x[2]
+			+ "})"
+		);
 
 		_.compose(extend.prototype,aix.model.prototype);
 		extend.prototype.constructor = extend;
@@ -491,93 +446,14 @@
 	};
 
 	aix.collection.extend = function(def){
-		var extend = function(ops){
-			var _this = this;
-			var updef = _.extend(_.clone(AIX_COLLECTION_DEFAULT),def);
-			var obj = _.extend(updef,ops);
-
-			// if userobj has more events
-			if(_.isObject(obj.events))
-				_.foreach(obj.events,function(v,k){
-					_.addEvent(_this,k,v);
-				});
-
-			if(_.isFunction(obj.validate)){
-				_.define(_this,"validate",{
-					value : obj.validate,
-  				writable: false,
-  				enumerable: false,
-  				configurable: false
-				});
-			}
-
-			//delete undefault properties
-			delete obj.validate;
-			delete obj.change;
-			delete obj.events;
-
-			// copy data
-			_.compose(_this,obj);
-
-			_.define(_this,{
-				aid : {
-					value : "#"+(++AIX_COLLECTION_COUNT),
-					writable : true,
-					enumerable : false
-				},
-				change : {
-					value : false,
-					writable : true,
-					enumerable : false
-				}
-			});
-
-			//add listen for object data change
-			_.watch(_this,"data",function(nv,ov){
-				// collection must be format as arr
-				if(!_.isArray(nv))
-					nv = [nv];
-
-				// Validate checker for change
-				if(_.isFunction(_this.validate)){
-					var vali = true;
-
-					_.foreach(nv,function(one){
-						if(_this.model ? (one.constructor !== _this.model) : 0 )
-							vali = false;
-						if(_.isFunction(_this.validate) ? !_this.validate.call(_this,one) : 0 )
-							vali = false;
-					});
-
-					// validate status check
-					if(vali){
-						// trigger validate and success events
-						if(!_.isequal(nv,ov)){
-							_.dispatch(_this,"change",null,[nv,ov]);
-							_this.change = true;
-						}
-						_.dispatch(_this,"validate",null,[nv,ov]);
-						_.dispatch(_this,"validate:success",null,[nv,ov]);
-						return nv;
-					}else{
-						// trigger validate and fail events
-						_.dispatch(_this,"validate",null,[nv,ov]);
-						_.dispatch(_this,"validate:fail",null,[nv,ov]);
-						return ov;
-					}
-				}else{
-					// No validate 
-					if(!_.isequal(nv,ov)){
-						_.dispatch(_this,"change",null,[nv,ov]);
-						_this.change = true;
-					}
-					return nv;
-				}
-			});
-
-			_.dispatch(_this,"init");
-		};
-
+		var x = hackex(aix.collection,aix.collection.extend);
+		var extend = eval(
+				"(function(ops){ "
+			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
+			+  x[2]
+			+ "})"
+		);
+		
 		_.compose(extend.prototype,aix.collection.prototype);
 		extend.prototype.constructor = extend;
 		_.define(extend,"base",{
@@ -973,6 +849,27 @@
 		_.dispatch(_this,"init");
 	};
 
+	aix.view.extend = function(def){
+		var x = hackex(aix.view,aix.view.extend);
+		var extend = eval(
+				"(function(ops){ "
+			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
+			+  x[2]
+			+ "})"
+		);
+
+		_.compose(extend.prototype,aix.view.prototype);
+		extend.prototype.constructor = extend;
+		_.define(extend,"base",{
+			value: aix.view,
+  		writable: false,
+  		enumerable: false,
+  		configurable: false
+		});
+
+		return extend;
+	};
+
 	aix.view.prototype = {
 		
 		addEvent : function(type,fn){
@@ -997,88 +894,6 @@
 		dispatch : function(type,fn,args){
 			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
 		},
-	};
-
-	aix.view.extend = function(def){
-		var extend = function(ops){
-			def = def || {};
-			if(!_.isString(def.el))
-				return console.error("view must define its 'el' prop bind with dom elm");
-
-			var _this = this;
-			var updef = _.extend(_.clone(AIX_VIEW_DEFAULT),def);
-			var obj = _.extend(updef,ops);
-
-			_.define(_this,{
-				vid : {
-					value : "#"+(++AIX_VIEW_COUNT),
-					writable : true,
-					enumerable : false
-				}
-			});
-
-			// if userobj has more events
-			if(_.isObject(obj.events))
-				_.foreach(obj.events,function(v,k){
-					var type = k.split(":");
-					if(type.length > 1){
-						$(obj.el).on(type[0],type[1],{ self:_this },v);
-					}else{
-						_.addEvent(_this,k,v);
-					}
-				});
-
-			// parse template
-			if(!obj.template || _.isString(obj.template))
-				obj.template = _.isFunction(obj.build)?
-											 obj.build.call(_this,obj.template||""):
-											 _.doom(obj.template||"");
-			if(!obj.render || !_.isFunction(obj.render)){
-				obj.render = function(data){ 
-					return $(this.el).html(this.template(data)) && this;
-				};
-			}
-
-			//delete undefault properties
-			delete obj.change;
-			delete obj.events;
-
-			// ajax get html template
-			if(_.isString(obj.url)){
-				_.aix({
-					url: obj.url,
-					cache : _.isBoolean(obj.cache) ? obj.cache : true ,
-					success:function(text){
-						obj.template = _.isFunction(obj.build) ?
-													 obj.build.call(_this,text):
-													 _.doom(text);
-						_.extend(_this,_.extend(_.clone(AIX_VIEW_DEFAULT),obj));
-						_.dispatch(_this,"init");
-					},
-					fail:function(xhr){
-						console.error("Fetch template url->[ " + obj.url + " ] has fail!" );
-						console.log(xhr);
-					}
-				});
-				return this;
-			}
-
-			_.extend(_this,_.extend(_.clone(AIX_VIEW_DEFAULT),obj));
-			// first trgger "init" event
-			_.dispatch(_this,"init");
-		};
-
-
-		_.compose(extend.prototype,aix.view.prototype);
-		extend.prototype.constructor = extend;
-		_.define(extend,"base",{
-			value: aix.view,
-  		writable: false,
-  		enumerable: false,
-  		configurable: false
-		});
-
-		return extend;
 	};
 
 	//get Hash param form URL
@@ -1129,9 +944,9 @@
 
 		_.extend(_this,_.extend(_.clone(AIX_ROUTE_DEFAULT),obj));
 
-		_.addEvent(_this,
-							 "hashchange",
-								changeHash);
+		// addEvent for this route object
+		// use dispatch event to trigger
+		_.addEvent(_this,"hashchange",changeHash);
 
 		// cant change regular hash title
 		_.define(this, {
@@ -1141,7 +956,7 @@
 				enumerable : false
 			},
 			"rid" : {
-				value : "ai-route-"+Math.random(),
+				value : "aix-route-"+Math.random(),
 				writable : false,
 				enumerable : false,
 				configurable: false
@@ -1165,6 +980,27 @@
 
 		_.dispatch(_this,"init");
 	};
+
+	aix.route.extend = function(def){
+		var x = hackex(aix.route,aix.route.extend);
+		var extend = eval(
+				"(function(ops){ "
+			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
+			+  x[2]
+			+ "})"
+		)
+		
+		_.compose(extend.prototype,aix.route.prototype);
+		extend.prototype.constructor = extend;
+		_.define(extend,"base",{
+			value: aix.route,
+  		writable: false,
+  		enumerable: false,
+  		configurable: false
+		});
+
+		return extend;
+	}
 
 	// Aix-Route for SPA Architecture
 	// auto trigger regex event when route change

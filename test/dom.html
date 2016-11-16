@@ -4,10 +4,10 @@
 	<meta charset="UTF-8">
 	<title>domtest</title>
 
-	<!-- <script src="../dest/aix.c.js"></script> -->
-	<script src="../src/_.js"></script>
-	<script src="../src/n.js"></script>
-	<script src="../src/aix.js"></script>
+	<script src="../dest/aix.c.js"></script>
+	<!-- <script src="../src/_.js"></script> -->
+	<!-- <script src="../src/n.js"></script> -->
+	<!-- <script src="../src/aix.js"></script> -->
 </head>
 <body>
 	<style type="text/css" media="screen">
@@ -29,9 +29,9 @@
 		var a = __("#abc")
 						.replacewith("<div id='fuck'> <div>3</div><div>2</div><div>1</div> </div>")
 						.addClass("a")
-	.live("click","div",{ live :1 }, function(event){ 
-		console.log(event);
-	});
+						.on("click","div",{ live :1 }, function(event){ 
+							console.log(event.data.live);
+						});
 
 		a.insertafter(__('<div id="hack">x</div>'));
 		a.insertbefore(__('<div id="huck" class="b">y</div>'));
@@ -40,6 +40,18 @@
 
 		var b = __("#fuck");
 				b.compose("#hack,#huck");
+
+
+		__("#hack").reg("click",{ value : "hack" },function(event){
+			event.preventDefault();
+			event.stopPropagation();
+
+			console.log(event.data.value+" click");
+		});
+
+		__("body").once("click",{ target : "self" }, function(event){
+			console.log("body click "+event.data.target);
+		});
 	</script>
 </body>
 </html>

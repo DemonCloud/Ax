@@ -577,6 +577,15 @@
 			});
 		},
 
+		remove : function(){
+			this.off().each(function(elm){
+				elm.parentNode.removeChild(elm);
+			});
+			this.$el = [];
+			this.length = 0;
+			return this;
+		},
+
 		empty : function(){
 			return this.each(function(e){ 
 				e.innerHTML = ""; 
@@ -678,28 +687,33 @@
 		]
 	};
 
-	var eventProperty = {
-	};
+	var x = {};
 
-
-	function cloneEvent(event,targetObj){
-		if(targetObj != null){
-			var x = {};
-			x.Events = function(o){
-				for(var key in o )
-					this[key] = o[key]
-				this.data = targetObj.data;
-			} 
-
-			var xEvent = new x.Events(event);
-			// gc
-			delete x.Events;
-			return xEvent;
-		}else{
-			// as dispatchEvent
-			return event;
+	x.Events = function(o,target){
+		for(var key in o ){
+			if(!_.isFunction(o[key]) && key !== key.toUpperCase())
+				this[key] = o[key]
 		}
+		this.data = target.data;
+		_.define(this,"_event",{
+			value : o, 
+			writable : false, 
+			enumerable: false, 
+			configurable: true 
+		});
 	};
+
+	x.Events.consoda = [
+		"stopImmediatePropagation",
+		"stopPropagation",
+		"preventDefault"
+	];
+
+	x.Events.consoda.forEach(function(api){
+		x.Events.prototype[api] = function(){
+			return this._event[api]();
+		}
+	})
 
 	function createEvent(elm,type,prop,Jevent){
 		var event = _.isObject(Jevent) ? 
@@ -721,11 +735,22 @@
 			eventInit.data = prop;
 		}
 
-		return cloneEvent(event,eventInit);
+		// gc - the stack
+		if(eventInit != null)
+			return new x.Events(event,eventInit);
+		// as dispatchEvent
+		return event;
 	}
 
 	__.fn.extend({
-		reg : function(type,cal,context,capit){
+		reg : function(type,data,cal,context,capit){
+			if(_.isFunction(data)){
+				capit = context;
+				context = cal;
+				cal = data;
+				data = null;
+			}
+
 			return this.each(function(elm){
 				if(elm._events == null){
 					_.define(elm,"_events",{
@@ -738,7 +763,8 @@
 
 				if(cal!=null){
 					var fn = function(event){
-						cal.call(context||elm,event,type,context);
+						var xevent = createEvent(elm,type,data,event);
+						cal.call(context||elm,xevent,type,context);
 					};
 
 					fn.fn = cal.fn || cal;
@@ -802,7 +828,7 @@
 						if(type.search("_") != -1){
 							// live remove binder
 							_.foreach(fns,function(fn){
-								detectLive.removeEventListener(type.slice(1),fn.cal,true);
+								document.removeEventListener(type.slice(1),fn.cal,true);
 							});
 						}else{
 							_.foreach(fns,function(fn){
@@ -851,8 +877,9 @@
 
 					__(elm).reg("_"+type,fn,null);
 					document.documentElement.addEventListener(type,fn,true);
-				}else
+				}else{
 					__(elm).reg(type,sl,cal);
+				}
 			})
 
 		},
@@ -877,10 +904,16 @@
 			return this;
 		},
 
-		once : function(type,cal){
+		once : function(type,data,cal,context){
+			if(_.isFunction(data)){
+				context = cal;
+				cal = data;
+				data = null;
+			}
+
 			return this.each(function(e){
 				var fn = function(event){
-					cal.call(e,event,type);
+					cal.call(e,createEvent(e,type,data,event),type);
 					e.removeEventListener(type,fn); fn = null;
 				};
 				e.addEventListener(type,fn);
