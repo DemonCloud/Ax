@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>domtest</title>
+
+	<!-- <script src="../dest/aix.c.js"></script> -->
+	<script src="../src/_.js"></script>
+	<script src="../src/n.js"></script>
+	<script src="../src/aix.js"></script>
+</head>
+<body>
+	<style type="text/css" media="screen">
+		.a{
+			color: red;
+		}
+		.b{
+			color: blue;
+		}
+		.c{
+			color: green;
+		}
+	</style>
+
+	<div id="abc">
+	</div>
+
+	<script>
+		var a = __("#abc")
+						.replacewith("<div id='fuck'> <div>3</div><div>2</div><div>1</div> </div>")
+						.addClass("a")
+	.live("click","div",{ live :1 }, function(event){ 
+		console.log(event);
+	});
+
+		a.insertafter(__('<div id="hack">x</div>'));
+		a.insertbefore(__('<div id="huck" class="b">y</div>'));
+
+		__("body").append('<div class="c">c</div>');
+
+		var b = __("#fuck");
+				b.compose("#hack,#huck");
+	</script>
+</body>
+</html>
