@@ -64,16 +64,28 @@
 	});
 
 	var aModel = new aix.model.extend({
-		data : [1,2,3,4],
+		data : [1,2,3,4,5],
+		validate : function(data){
+			return _.isArray(data);
+		},
 		events : {
 			init : function(){
 				console.log("create aModel ID-> " + this.aid);
+			},
+			not : function(data){
+				console.log("not")
+				console.log(data);
+			},
+			"validate:fail":function(data){
+				console.log(this);
+				console.log("fail");
 			}
 		}
 	});
 
 	var bCollection = new aix.collection.extend({
 		model:aModel,
+
 		validate : function(model){
 			return _.typeof(model.data) === "object"
 		},
@@ -113,7 +125,7 @@
 	});
 
 	// add data to collection
-	b1.add([a1,a2,a3,a4,a5,a6]);
+	b1.add(a1);
 
 	fn = function(num){
 		num = num || 1;
@@ -140,6 +152,7 @@
 	var v = new aix.view({ 
 		el : "#a" , 
 		template: "{{-id}} * {{-name}} * {{-time}}",  
+
 		events:{ 
 			init: function(){ 
 				return this.render(a1.parse());
@@ -156,11 +169,16 @@
 				console.log("route listened!");
 			}
 		},
+
+		// 规则
 		routes:{
-			"^\\d+$":"number",
-			"^custom$":"custom",
-			"^custom#\\d+":["custom","customdouble"]
+			"^\\d+$"       : "number",
+			"^custom$"     : "custom",
+			"^custom#\\d+" : ["custom","customdouble"]
 		},
+
+
+		//　行为
 		action:{
 			number:function(event,hash){
 				console.log("hash change to number -> "+ hash);

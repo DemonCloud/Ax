@@ -52,11 +52,11 @@
 	_.extend = function(protos){
 		var args = _slice.call(arguments);
 		if(args.length>1){
-			_.compose(protos,args[1]);
+			_.compose(protos,args[1],args[2]);
 		}else{
 			for (var chain in protos)
 				if(protos.hasOwnProperty(chain))
-				_[chain] = protos[chain];
+					this[chain] = protos[chain];
 		}
 		return protos;
 	};
@@ -368,8 +368,20 @@
 			return min + Math.floor(Math.random()*(max-min+1));
 		},
 
-		compose : function(o1,o2){
-			_.foreach(o2,function(v,k){ o1[k] = v; });
+		compose : function(o1,o2,nothisproperty){
+			if(nothisproperty){
+				_.foreach(o2,function(v,k){
+					var idf = _.isArray(nothisproperty) ? 
+										!_.has(nothisproperty,k) :
+										k !== nothisproperty;
+					if(idf)
+						o1[k] = v; 
+				});
+			}else{
+				_.foreach(o2,function(v,k){
+					o1[k] = v; 
+				});
+			}
 			return o1;
 		},
 
@@ -471,7 +483,12 @@
 		},
 
 		isequal : function(x,y){
-			if(x===y) return true;
+			if(x===y) 
+				return true;
+
+			if(_.isFunction(x) || _.isFunction(y))
+				return x===y;
+
 			if(_.tostring(x) === _.tostring(y)){
 				if(_.isArray(x)){
 					if(x.length === y.length){

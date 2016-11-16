@@ -119,14 +119,22 @@
 	// @ much more need its better
 	function dsizzle(elm){
 		elm = _.trim(elm);
-		var $el,$1 = !cidSl.test(elm) ,$2 = !pitSl.test(elm);
+		var $el=[] ,$1 = !cidSl.test(elm) ,$2 = !pitSl.test(elm);
 		if($1&&$2){
-			if(isId.test(elm))
+			if(elm.search(",")>-1)
+				_.foreach(elm.split(","),function(sl){
+					$el = $el.concat(dsizzle(sl));
+				});
+
+			else if(isId.test(elm))
 				return [document.getElementById(elm.substr(1))];
+
 			else if(isClass.test(elm))
 				$el = document.getElementsByClassName(elm.substr(1));
+
 			else if(isTag.test(elm))
 				$el = document.getElementsByTagName(elm);
+
 			else if(isAttr.test(elm)){
 				var matcher = isAttr.exec(elm);
 				var parent = matcher[1],
@@ -141,6 +149,7 @@
 						return e.getAttribute(attr) === value;
 					});			
 				}
+
 			} else { 
 				if(isHTML.test(elm)){
 					var dg = document.createElement("i");
@@ -153,7 +162,9 @@
 					$el = document.querySelectorAll(elm);
 				}
 			}
+		
 		}else{ 
+
 			if(isHTML.test(elm)){
 				var dg = document.createElement("i");
 						dg.innerHTML = elm;
@@ -165,9 +176,12 @@
 				$el = document.querySelectorAll(elm);
 			}
 		}
+
 		return _.slice($el);
 	}
 
+
+	// DOOM constructor for __
 	var DOOM = function(str){
 		this.$el = [];
 		
@@ -182,11 +196,9 @@
 		}
 
 		this.length = this.$el.length;
+
 		pushcache(_.clonedoom(this));
-
-		return this;
 	};
-
 
 	// Define base porperty
 	__.fn = DOOM.prototype = {
@@ -196,7 +208,7 @@
 		version : _.version,
 
 		extend: function(obj){
-			_.extend(__.fn,obj);
+			_.extend(this,obj);
 		}
 	};
 
@@ -228,6 +240,18 @@
 
 		last : function(){
 			return this.at(-1);
+		},
+
+		compose : function(sl){
+			if(sl != null){
+				if(sl instanceof DOOM )
+					this.$el = _.unique(this.$el.concat(sl.$el||[]));
+				else if(_.isString(sl))
+					this.$el = _.unique(this.$el.concat(__(sl).$el));
+			}
+			this.length = this.$el.length;
+
+			return this;
 		},
 
 		by : function(idf){
@@ -349,6 +373,18 @@
 
 	function hex(s){
 		return ("0"+ parseInt(s).toString(16)).slice(-2);
+	}
+
+	function getnext(elm){
+		if(elm==null)
+			return elm
+
+		var sibling = elm.nextSibling;
+
+		if(sibling !=null && sibling.nodeType === 1)
+			return sibling;
+		else
+			return getnext(sibling);
 	}
 
 	__.fn.extend({
@@ -494,11 +530,57 @@
 		},
 
 		replacewith : function(str){
+			var $sl = __(str);
 			
+			this.each(function(elm){
+				$sl.each(function(dom){
+					elm.parentNode.insertBefore(dom,elm);
+				});
+				elm.parentNode.removeChild(elm);
+			});
+
+			return $sl;
+		},
+
+		insertbefore : function(str){
+			var $sl = __(str);
+
+			return this.each(function(elm){
+				$sl.each(function(dom){
+					elm.parentNode.insertBefore(dom,elm);
+				});
+			});
+		},
+
+		insertafter : function(str){
+			var $sl = __(str);
+		
+			return this.each(function(elm){
+				$sl.each(function(dom){
+					var sb = getnext(elm);
+
+					if(sb != null)
+						elm.parentNode.insertBefore(dom,sb);
+					else
+						elm.parentNode.appendChild(dom);
+				});
+			});
+		},
+
+		append : function(str){
+			var $sl = __(str);
+		
+			return this.each(function(elm){
+				$sl.each(function(dom){
+					elm.appendChild(dom);
+				});
+			});
 		},
 
 		empty : function(){
-			return this.each(function(e){ e.innerHTML = ""; });
+			return this.each(function(e){ 
+				e.innerHTML = ""; 
+			});
 		},
 
 		offset : function(){
@@ -540,12 +622,18 @@
 				if(val == null)
 					return styleFilter(window.getComputedStyle(this.get(0),null)[css]);
 				else
-					return this.each(function(e){ e.style[styleParse(css)] = val+"" });
+					return this.each(function(e){ 
+						e.style[styleParse(css)] = (val||"")+"" 
+					});
 			else if(_.isObject(css))
 				for(var key in css)
 					this.draw(key,css[key]);
 
 			return this;
+		},
+
+		css : function(){
+			return this.draw.apply(this,_.slice(arguments));
 		},
 
 		redraw : function(){
@@ -590,30 +678,50 @@
 		]
 	};
 
-	function createEvent(elm,type,prop){
-		var structor = "CustomEvent";
+	var eventProperty = {
+	};
 
-		_.foreach(capTypes,function(typelist,con){
-			if(_.has(typelist,type))
-				structor = con;
-		});
 
-		var eventInit = {
-			data: prop,
-			bubbles: true,
-			cancelable: true,
-			target: elm,
-			toElement: elm,
-			srcElement: elm,
-			currentTarget: elm
-		};
+	function cloneEvent(event,targetObj){
+		if(targetObj != null){
+			var x = {};
+			x.Events = function(o){
+				for(var key in o )
+					this[key] = o[key]
+				this.data = targetObj.data;
+			} 
 
-		switch(structor){
-			case "CustomEvent"   : return new CustomEvent(type,eventInit);
-			case "UIEvent"       : return new UIEvent(type,eventInit);
-			case "MouseEvent"    : return new MouseEvent(type,eventInit);
-			case "KeyboardEvent" : return new KeyboardEvent(type,eventInit);
+			var xEvent = new x.Events(event);
+			// gc
+			delete x.Events;
+			return xEvent;
+		}else{
+			// as dispatchEvent
+			return event;
 		}
+	};
+
+	function createEvent(elm,type,prop,Jevent){
+		var event = _.isObject(Jevent) ? 
+								Jevent : 
+								new CustomEvent(type,{
+									data : prop,
+									bubbles: true,
+									cancelable: true,
+									target: elm,
+									toElement: elm,
+									srcElement: elm,
+									currentTarget: elm
+								});
+
+		var eventInit;
+
+		if(_.isObject(Jevent)){
+			eventInit = {};
+			eventInit.data = prop;
+		}
+
+		return cloneEvent(event,eventInit);
 	}
 
 	__.fn.extend({
@@ -731,11 +839,15 @@
 				if(t){
 					var fn = function(event){
 						var fire = event.target || event.toElement;
-								event.data = data;
 
 						if(_.has(__(elm).find(sl).$el,fire))
-							return cal.call(context||fire,event,type);
-					}; fn.fn = cal; fn.elm = elm;
+							return cal.call(context||fire,
+															createEvent(fire,type,data,event),
+															type);
+
+					}; 
+					fn.fn = cal; 
+					fn.elm = elm;
 
 					__(elm).reg("_"+type,fn,null);
 					document.documentElement.addEventListener(type,fn,true);
