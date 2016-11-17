@@ -114,31 +114,26 @@
 		};
 	}
 
-	function hackex(origin,extend){
-		var oargs = origin.toString()
-											.match(/function\s.*?\(([^)]*)\)/)[1];
-		var eargs = extend.toString()
-											.match(/function\s.*?\(([^)]*)\)/)[1];
+	var strip_comment = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
+
+	function hackaix(origin,extend){
 		var fnstr = origin.toString(); 
+
+		var oargs = origin.toString()
+											.replace(strip_comment,'')
+		var eargs = extend.toString()
+											.replace(strip_comment,'')
 		var body = fnstr.slice(
 							 fnstr.indexOf("{") + 1, 
 							 fnstr.lastIndexOf("}"));
 
-		oargs = oargs.split(',').map(function(arg) {
-    	return arg.replace(/\/\*.*\*\//, '').trim();
-  	}).filter(function(arg) {
-    	return arg;
-  	});
-
-		eargs = eargs.split(',').map(function(arg) {
-    	return arg.replace(/\/\*.*\*\//, '').trim();
-  	}).filter(function(arg) {
-    	return arg;
-  	});
+		oargs = oargs.slice(oargs.indexOf('(')+1, oargs.indexOf(')'))
+								 .match(/([^\s,]+)/g)[0];
+		eargs = eargs.slice(eargs.indexOf('(')+1, eargs.indexOf(')'))
+								 .match(/([^\s,]+)/g)[0];
   	
-  	return [oargs[0],eargs[0],body];
+  	return [oargs||"",eargs||"",body];
 	}
-
 
 	// Aix Model
 	aix.model = function(obj){
@@ -221,7 +216,7 @@
 	// Extend aix model method 
 
 	aix.model.extend = function(def){
-		var x = hackex(aix.model,aix.model.extend);
+		var x = hackaix(aix.model,aix.model.extend);
 		var extend = eval(
 				"(function(ops){ "
 			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
@@ -446,7 +441,7 @@
 	};
 
 	aix.collection.extend = function(def){
-		var x = hackex(aix.collection,aix.collection.extend);
+		var x = hackaix(aix.collection,aix.collection.extend);
 		var extend = eval(
 				"(function(ops){ "
 			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
@@ -850,7 +845,7 @@
 	};
 
 	aix.view.extend = function(def){
-		var x = hackex(aix.view,aix.view.extend);
+		var x = hackaix(aix.view,aix.view.extend);
 		var extend = eval(
 				"(function(ops){ "
 			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
@@ -905,8 +900,9 @@
 	//if HashChange callee
 	function changeHash(hash,oldhash,event){
 		_.foreach(this.routes,function(fn,key){
-			if(RegExp(key,"i").test(hash))
+			if(RegExp(key,"i").test(hash)){
 				changeHashReg.call(this,fn,[event,hash,oldhash,key])
+			}
 		},this);
 	}
 
@@ -942,16 +938,19 @@
 
 		delete obj.events;
 
-		_.extend(_this,_.extend(_.clone(AIX_ROUTE_DEFAULT),obj));
+		_.extend(this,_.extend(_.clone(AIX_ROUTE_DEFAULT),obj));
 
 		// addEvent for this route object
 		// use dispatch event to trigger
-		_.addEvent(_this,"hashchange",changeHash);
+		_.addEvent(this,"hashchange",changeHash);
 
 		// cant change regular hash title
 		_.define(this, {
 			"history" : {
-				value : { old:"" , now:"" },
+				value : { 
+					old: "" , 
+					now: _.root.location.href
+				},
 				writable : true,
 				enumerable : false
 			},
@@ -963,14 +962,16 @@
 			},
 			"event" : {
 				value : function(event){
-					if(event.newURL === event.oldURL)
-						return event.preventDefault()
+					if(_.root.location.href===_this.history.now)
+						return event.preventDefault();
+					
+					_this.history.old = _this.history.now; 
+					_this.history.now = _.root.location.href;
 
-					_this.history.now = event.newURL;
-					_this.history.old = event.oldURL;
-
-					_.dispatch(_this,"hashchange",null,
-						[getHash(event.newURL),getHash(event.oldURL),event]);
+					return _.dispatch(_this,"hashchange",null,
+						[getHash(_.root.location.href),
+						 getHash(_this.history.old),
+						 event]);
 				},
 				writable : false,
 				enumerable : false,
@@ -982,7 +983,7 @@
 	};
 
 	aix.route.extend = function(def){
-		var x = hackex(aix.route,aix.route.extend);
+		var x = hackaix(aix.route,aix.route.extend);
 		var extend = eval(
 				"(function(ops){ "
 			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
