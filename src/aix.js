@@ -965,6 +965,7 @@
 					if(_.root.location.href===_this.history.now)
 						return event.preventDefault();
 					
+					// change the save hash url
 					_this.history.old = _this.history.now; 
 					_this.history.now = _.root.location.href;
 
