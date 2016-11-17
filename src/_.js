@@ -135,7 +135,7 @@
 		
 		foreach : function(list,fn,ts){
 			if(list !=null ){
-				if(_.isArray(list))
+				if(this.isArray(list))
 					return aloop(list,fn,ts);
 				else if(_.isObject(list) && !_.isFunction(list))
 					return oloop(list,fn,ts);
@@ -143,7 +143,11 @@
 			return list;
 		},
 
-		keys : Object.keys,
+		keys : function(arr){
+			if(_.isArray(arr))
+				return Object.keys(arr).map(function(n){ return +n;});
+			return Object.keys(arr);
+		},
 
 		slice : function(obj){
 			return obj != null ? _slice.call(obj) : [];
@@ -169,7 +173,11 @@
 		// Only use deep clone to custom model & collection
 		// cloneDoom reduce each element
 		clonedoom : function(list){
-			if(_.isArray(list) || _.isArguments(list) || _.isNodeList(list) || _.isHTMLCollection(list))
+			if(_.isArray(list) || 
+				 _.isArguments(list) || 
+				 _.isNodeList(list) || 
+				 _.isHTMLCollection(list)
+				)
 				// clone array
 				return _slice.call(list);
 			else if(_.isObject(list) && !_.isFunction(list)){
@@ -181,7 +189,10 @@
 
 				// dist clone data
 				_.foreach(list, function(val,key){
-					if(!_.isString(val) && !_.isNumber(val))
+					if(!_.isString(val) && 
+						 !_.isNumber(val) && 
+						 !_.isFunction(val)
+						)
 						res[key] = _.clonedoom(val);
 					else 
 						res[key] = val;
@@ -200,58 +211,56 @@
 		},
 
 		unique : function(ary){
-			var olen = ary.length;
-			for(var i = 0 ; i<olen; i++){
-				if(i === ary.length-1)
-				  break;
-				else  
+			for(var i = 0 , ol = ary.length; i<ol; i++)
+				if(i !== ary.length-1)
 				  for(var j=i+1; j<ary.length; j++)
 				    if( ary[i] === ary[j] ) 
 				    	ary.splice(j--,1);
-			}
 			return ary;
 		},
 
 		reject : function(list,idf){
 			var res = [];
-			_.foreach(_.clonedoom(list),function(elm,i,arr){ 
-				if(!idf.call(arr,elm,i,arr)) res.push(elm) ; 
-			});
+			_.foreach(_.clonedoom(list),function(elm,i){ 
+				if(!idf.call(this,elm,i,this)) this.push(elm) ; 
+			},res);
 			return res;
 		},
 
 		filter : function(list,idf){
 			var res = [];
-			_.foreach(_.clonedoom(list),function(elm,i,arr){ 
-				if(idf.call(arr,elm,i,arr)) res.push(elm) ; 
-			});
-
+			_.foreach(_.clonedoom(list),function(elm,i){ 
+				if(idf.call(this,elm,i,this)) this.push(elm) ; 
+			},res);
 			return res;
 		},
 
 		map : function(list,fn){
-			return list.map(fn);
+			_.foreach(list,function(val,key){
+				this[key] = fn.call(this,val,key,this)
+			},list)
+			return list;
 		},
 
 		// find the idf value
 		find : function(list,idf){
-			return _.filter(list,idf);
+			return this.filter(list,idf);
 		},
 
+		// cat identity rule values form array or object
 		cat : function(list,idf){
 			var res = [];
 			if(_.isArray(list)){
-				for(var i=list.length; i--;){
+				for(var i=list.length; i--;)
 					if(idf.call(list,list[i],i,list))
-						res.push(list.splice(i,1)[0]);
-				}
+						res.push(list.splice(i,1).pop());
 			}else if(_.isObject(list)){
-				for(var i in list){
-					if(idf.call(list,list[i],i,list)){
-						res.push(list[i]);
-						delete list[i];
-					}
-				}
+				for(var i in list)
+					if(list.hasOwnProperty(i))
+						if(idf.call(list,list[i],i,list)){
+							res.push(list[i]);
+							delete list[i];
+						}
 			}
 
 			return res;
@@ -260,21 +269,17 @@
 		// find the idf index
 		findindex : function(list,idf){
 			var res = [];
-			_.foreach(list,function(elm,i,arr){ if(idf.call(arr,elm,i,arr)) res.push(i); });
+			_.foreach(list,function(elm,i){ 
+				if(idf.call(this,elm,i,this)) this.push(i); 
+			},res);
 			return res;
-		},
-
-		contain : function(list,val){
-			return !!_.find(list,function(elm){ 
-				return elm===val;
-			}).length;
 		},
 
 		hook : function(list,hook){
 			var args = _slice.call(arguments,2),
 					isFn = _.isFunction(hook);
 				
-			return _.map(list, function(v){
+			return this.map(list, function(v){
 				return (isFn ? hook : v[hook]).apply(v,args);
 			});
 		},
@@ -287,9 +292,9 @@
 		// Object ready binding
 		bind : function(obj){
 			var args = _slice.call(arguments,1);
-			_.foreach(args,function(fn,k){
-				obj[k] = _.fnbind(obj[k],obj); 
-			});
+			this.foreach(args,function(fn,k){
+				obj[k] = this.fnbind(obj[k],obj); 
+			},this);
 
 			return obj;
 		},
@@ -297,7 +302,7 @@
 		reverse : function(list){
 			if(!_.isArray(list))
 				return list;
-			return _.slice(list).reverse();
+			return this.slice(list).reverse();
 		},
 
 		pluck : function(list,mapkey){
@@ -307,8 +312,8 @@
 				var keys = _.keys(item);
 				for( var i=keys.length; i--; )
 					if(keys[i]===mapkey+'')
-						res.push(item[keys[i]]);
-			});
+						this.push(item[keys[i]]);
+			},res);
 
 			return res;
 		},
@@ -319,12 +324,12 @@
 						isFn  = _.isFunction(by);
 				_.foreach(ary,function(val){
 					var key = isFn ? by(val) : val[by];
-					if(!group[key])
+					if(!this[key])
 						// first time should init group check
-						group[key] = [val];
-					else if(group.hasOwnProperty(key))
-						group[key].push(val);
-				});
+						this[key] = [val];
+					else if(this.hasOwnProperty(key))
+						this[key].push(val);
+				},group);
 				return group;
 			}
 			return ary;
@@ -370,12 +375,13 @@
 		compose : function(o1,o2,nothisproperty){
 			if(nothisproperty){
 				_.foreach(o2,function(v,k){
-					var idf = _.isArray(nothisproperty) ? 
-										!_.has(nothisproperty,k) :
-										k !== nothisproperty;
+					var idf = this.isArray(nothisproperty) ? 
+										!this.has(nothisproperty,k) :
+										(nothisproperty != null ?
+											k !== nothisproperty : true);
 					if(idf)
 						o1[k] = v; 
-				});
+				},this);
 			}else{
 				_.foreach(o2,function(v,k){
 					o1[k] = v; 
@@ -387,8 +393,7 @@
 		has : function(list,n){
 			var idf = 0;
 			_.foreach(list,function(v){
-				if(v===n) 
-					idf = 1;
+				if(v===n) idf = 1;
 			});
 			return !!idf;
 		},
@@ -400,11 +405,11 @@
 			return list;
 		},
 
-		bale : function(o1,o2){
+		bale : function(o1,o2,nothisproperty){
 			if(_.isArray(o1) && _.isArray(o2))
-				return ba.contact(o2);
+				return [].concat(o1).concat(o2);
 			else
-				return _.compose(_.clonedoom(o1),_.clonedoom(o2));
+				return _.compose(_.clonedoom(o1),_.clonedoom(o2),nothisproperty);
 		},
 
 		// Array list Disorder
@@ -430,7 +435,9 @@
 
 		merge : function(){
 			var tmp = [] , args = _slice.call(arguments);
-			args.forEach(function(arr){ tmp = tmp.concat(arr); });
+			args.forEach(function(arr){ 
+				tmp = tmp.concat(arr); 
+			});
 
 			return _.unique(tmp);
 		},
@@ -540,7 +547,8 @@
 			return index == null ? "object" : typeArray[index].toLowerCase(); 
 		},
 
-		// make ths jQuery.serializeArray to Object
+		// make the jQuery.serializeArray to Object
+		// make the __.formdataArray to Object
 		requery : function(arr){
 			var res = {};
 			_.foreach(arr,function(elm){
@@ -611,7 +619,7 @@
 							  .replace(whiteSpace,"");
 		},
 
-		parseString : function(val){
+		stringparse : function(val){
 			return _.isBoolean(val) ? val : val+"";
 		}
 	});
@@ -1145,7 +1153,7 @@
 				var rfn = function(event){ _s.loaded.call(_.root,event); };
 				xhr.addEventListener("loadend",function(event){
 					rfn(event);
-					xhr.removeEventListener("loadend",lfn);
+					xhr.removeEventListener("loadend",rfn);
 					rfn = null;
 				});
 			}
