@@ -212,4 +212,132 @@
 		a.equal(fl[0](1),2,"unique function save only current")
 	});
 
+	Q.test("method - [ has ]",function(a){
+	
+		var l = [1,23,4,5,"k",2,4,6,1,"sad",2,"fun"];
+		a.equal(_.has(l,"sad"),true,"detect has string in array success")
+
+		var fn = function(){};
+		var s = { k:"k" }
+		var l2 = [1,23,4,s,"k",2,fn,4,6,1,"sad",2,"fun"];
+		a.equal(_.has(l2,fn)&&_.has(l2,s),true,"detect function && object success");
+
+		var s2 = { K:"k"}
+		var l3 = [1,2,5,{k:"k"},{k:1},fn,]
+		a.equal(_.has(l3,s2),false,"strict mode has not detect object pointer");
+	});
+
+	Q.test("method - [ filter ]",function(a){
+		var l = [1,2,3,4,5,6]
+		var list = _.filter(l,function(n){ return n%2===0 });
+
+		a.equal(list.length,3,"array filter only three even number "+list.toString())
+		a.equal(_.has(list,2),true,"detect array filter even number success")
+		a.equal(_.has(list,1),false,"detect array filter no contain odd number success")
+
+		var ob = { a:1,b:2,c:3,d:4,e:5,f:6 };
+		var list2 = _.filter(ob,function(n){ return n%2!==0 })
+		a.equal(list2.length,3,"object filter only tree odd number "+list2.toString())
+		a.equal(_.has(list2,2),false,"detect object filter no contain even number success")
+		a.equal(_.has(list2,1),true,"detect array filter odd number success")
+	});
+
+	Q.test("method - [ reject ]",function(a){
+		var l = [1,2,3,4,5,6]
+		var list = _.reject(l,function(n){ return n%2===0 });
+
+		a.equal(list.length,3,"array reject only three odd number "+list.toString())
+		a.equal(_.has(list,2),false,"detect array reject not contain even number success")
+		a.equal(_.has(list,1),true,"detect array reject odd number success")
+
+		var ob = { a:1,b:2,c:3,d:4,e:5,f:6 };
+		var list2 = _.reject(ob,function(n){ return n%2!==0 })
+		a.equal(list2.length,3,"object reject only tree even number "+list2.toString())
+		a.equal(_.has(list2,2),true,"detect object reject even number success")
+		a.equal(_.has(list2,1),false,"detect array reject no contain odd number success")
+	});
+
+	Q.test("method - [ map ]",function(a){
+		var l = [1,2,3,4,5]
+		_.map(l,function(val){ return val*2 });
+
+		a.equal(l.length,5,"map won't change the array length");
+		a.equal(l[l.length-1],10,"map to change the val 5 -> " + l[l.length-1]);
+	
+		var o = { a:1,b:2,c:3,d:4 }
+		_.map(o,function(val){ return val-1; })
+		a.equal(_.keys(o).length,4,"map won't change the object keys length")
+		a.equal(o.b===1&&o.d===3,true,"detect object maping change");
+	});
+
+	Q.test("method - [ cat ]",function(a){
+		var l = [1,2,3,4,5];
+		var list = _.cat(l,function(n){ return n-1 })
+
+		a.equal(list.length,4,"cat array identity be trusity push to list -> " + list.toString())
+		a.equal(l.length,1,"cat origin array list with now -> " + l.toString())
+
+		var o = { a:1,b:2,c:3,d:4 }
+		var olist = _.cat(o,function(n){ return n%2 });
+		a.equal((!o.a&&!o.c)===true,true,"cat origin object detect property removed! to json -> "+JSON.stringify(o))
+		a.equal(olist.length,2,"cat return object content to json -> "+ JSON.stringify(olist))
+	});
+
+	Q.test("method - [ findindex ]",function(a){
+		var l = [1,2,3,4,5];
+
+		var indexs = _.findindex(l,function(n){ return n%2 });
+		a.equal(indexs.length,3,"get array current indexs length");
+		a.equal(!indexs[0]&&indexs[indexs.length-1]===4,true,"findindex filter the odd position -> " + indexs.toString());
+
+		var o = { a:1,b:2,c:3,d:4 }
+		var oindexs = _.findindex(o,function(n){ return n%2===0 });
+		a.equal(oindexs.length,2,"get object current indexs length");
+		a.equal(oindexs[oindexs.length-1]==="d",true,"findindex filter the object.key position -> " + oindexs.toString());
+	});
+
+	Q.test("method - [ hook ]",function(a){
+		var l = [1,2,3,4,5]
+		_.hook(l,"toString");
+
+		a.equal(l.length,5,"hook won't change the array length");
+		a.equal(l[l.length-1],"5","hook toString to change the number 5 -> " + _.typeof(l[l.length-1]));
+	
+		var o = { a:[3,2,1],b:[2,1,3],c:[4,1,3],d:[3,5,2] }
+		_.hook(o,"sort")
+		a.equal(_.keys(o).length,4,"hook won't change the object keys length")
+		a.equal(o.a[0]===1&&o.d[2]===5,true,"detect object hooking change -> " + JSON.stringify(o));
+	});
+
+	Q.test("method - [ bind ]",function(a){
+		var k = { log:function(){ return this.a+1 },a:1 };
+		var b = { log:function(){ return this.a} ,a:6 };
+		
+		a.equal(k.log(),k.a+1,"a not bind will trigger get itself");
+		a.equal(b.log(),b.a,"b not bind will trigger get itself");
+
+		_.bind(b,k);
+
+		a.equal(b.log(),k.a,"b's function bind pointer to object[k] will get value " + k.a);
+	
+	});
+
+	Q.test("method - [ reverse ]",function(a){
+		var l = [1,2,3,4];
+		l = _.reverse(l);
+		
+		a.equal(l[2],2,"array has been reverse");
+
+		var k = function(){};
+		a.equal(_.reverse(k),k,"typeof not array will return itself");
+	});
+
+	Q.test("method - [ pluck ]",function(a){
+		var list = [{a:1,b:2,c:3},{a:2,b:4},{a:"a",b:"b",c:"c"},{a:"ax",b:"bb",c:"cs"}]
+
+		var p = _.pluck(list,"c");
+		a.equal(p.length,list.length-1,"pluck get current key data -> "+p.toString());
+		a.equal(_.has(p,"cs"),true,"pluck get last c:cs value in result");
+	})
+
 })(QUnit,_,__,aix);

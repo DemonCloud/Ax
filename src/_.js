@@ -236,15 +236,14 @@
 		},
 
 		map : function(list,fn){
-			_.foreach(list,function(val,key){
+			return _.foreach(list,function(val,key){
 				this[key] = fn.call(this,val,key,this)
 			},list)
-			return list;
 		},
 
 		// find the idf value
-		find : function(list,idf){
-			return this.filter(list,idf);
+		find : function(){
+			return this.filter.apply(this,this.slice(arguments));
 		},
 
 		// cat identity rule values form array or object
@@ -258,11 +257,12 @@
 				for(var i in list)
 					if(list.hasOwnProperty(i))
 						if(idf.call(list,list[i],i,list)){
-							res.push(list[i]);
+							var po = {};
+							po[i] = list[i];
+							res.push(po);
 							delete list[i];
 						}
 			}
-
 			return res;
 		},
 
@@ -284,16 +284,12 @@
 			});
 		},
 
-			// function bind
-		fnbind : function(fn){
-			Function.bind.apply(fn,_slice.call(arguments,1));
-		},
-			
 		// Object ready binding
 		bind : function(obj){
 			var args = _slice.call(arguments,1);
-			this.foreach(args,function(fn,k){
-				obj[k] = this.fnbind(obj[k],obj); 
+			_.foreach(obj,function(fn,k){
+				if(this.isFunction(fn))
+					obj[k] = Function.bind.apply(fn,args); 
 			},this);
 
 			return obj;
