@@ -356,7 +356,7 @@
 			var res = [];
 			var keys = _.keys(obj);
 			for(var i=0,l=keys.length; i<l ; i++)
-				result.push([keys[i],obj[keys[i]]]);
+				res.push([keys[i],obj[keys[i]]]);
 			return res;
 		},
 
@@ -369,7 +369,7 @@
 		},
 
 		compose : function(o1,o2,nothisproperty){
-			if(nothisproperty){
+			if(nothisproperty)
 				_.foreach(o2,function(v,k){
 					var idf = this.isArray(nothisproperty) ? 
 										!this.has(nothisproperty,k) :
@@ -378,11 +378,10 @@
 					if(idf)
 						o1[k] = v; 
 				},this);
-			}else{
+			else
 				_.foreach(o2,function(v,k){
 					o1[k] = v; 
 				});
-			}
 			return o1;
 		},
 

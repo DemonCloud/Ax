@@ -338,6 +338,47 @@
 		var p = _.pluck(list,"c");
 		a.equal(p.length,list.length-1,"pluck get current key data -> "+p.toString());
 		a.equal(_.has(p,"cs"),true,"pluck get last c:cs value in result");
-	})
+	});
+
+	Q.test("method - [ groupby ]",function(a){
+		var list = [1,2,3,4,5,6,7,8];
+		var fn = function(val){
+			if(val%2){
+				return "odd";
+			}else{
+				return "even";
+			}
+		}
+
+		var res = _.groupby(list,fn);
+
+		a.equal(_.isArray(res.odd)&&_.isArray(res.even),true,"groupby array success!");
+		a.equal(_.has(res.odd,2),false,"groupby as rule return the result odd as : " + res.odd.toString());
+		a.equal(_.has(res.even,5),false,"groupby as rule return the result even as : " + res.even.toString());
+
+	});
+
+	Q.test("method - [ toarray ]",function(a){
+		var obj = { a:1,b:2,c:1,d:5 }
+
+		var list = _.toarray(obj);
+		a.equal(list.length,4,"convert object to array list");
+		a.equal(list[list.length-1],5,"get list val after return array as : "+list.toString());
+	});
+
+	Q.test("method - [ forarray ]",function(a){
+		var o = {
+			name : "cloud",
+			score: 80,
+			id : 10086
+		}
+
+		var list = _.forarray(o);
+		//[ { name : "cloud" },{ score : 80 },{ id : 10086 } ]
+	
+		a.equal(list.length,3,"convert object to array list");
+		a.equal(list[0].name,"cloud","check current array property [name] -> " + list[0].name)
+		a.equal(list[1].score,80,"check current array property [score] -> " + list[1].score)
+	});
 
 })(QUnit,_,__,aix);
