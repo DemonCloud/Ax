@@ -381,4 +381,46 @@
 		a.equal(list[1].score,80,"check current array property [score] -> " + list[1].score)
 	});
 
+	Q.test("method - [ pairs ]",function(a){
+		var o = {
+			name : "cloud",
+			score: 80,
+			id : 10086
+		}
+
+		var list = _.pairs(o);
+		a.equal(list.length,3,"convert object to array list pairs");
+		a.equal(list[0][0],"name","check the key in array");
+		a.equal(list[1][1],80,"check the value in array");
+	});
+
+	Q.test("method - [ random ]",function(a){
+		var r = _.random(1,6) 
+		var arr = [9,1,2,3,0,0,0,0,0,0,0,0,0];
+
+		a.equal(r<=6&&r>=1,true,"random the number " + r + " in 1-6");
+		a.equal(Boolean(arr[_.random(1,3)]),true,"random in array index 0-3 to value is true!")
+	});
+
+	Q.test("method - [ not ]",function(a){
+		var list = [6,2,3,4,6,6,7]
+		_.not(list,6);
+		var fn = function(){};
+		var o = {o:2};
+		var fnlist = [21,32,5,54,1,o,2,fn,2312312,"w12312","sasd",fn]
+		_.not(fnlist,fn);
+		_.not(fnlist,o);
+
+	
+		a.equal(list.length,4,"remove the 6 in array res length")
+		a.equal(_.has(list,6),false,"remove the 6 in array res -> " + list.toString())
+		a.equal(_.has(fnlist,fn)||_.has(fnlist,o),false,"remove object and funtion")
+		a.equal(_.has(fnlist,2),true,"save the true value in array")
+	});
+
+	// Q.test("method - [ bale ]",function(a){
+		
+	
+	// });
+
 })(QUnit,_,__,aix);
