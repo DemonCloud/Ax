@@ -64,7 +64,7 @@
 		delete : "POST"
 	};
 	// default with disable and emude RESTFUL_API
-	var RESTFUL_LIST = RESTFUL_disable
+	var RESTFUL_LIST = RESTFUL_disable;
 
 	// log the prefernce
 	aix.aixpref = function(){
@@ -81,7 +81,7 @@
 	// default with disable and emude RESTFUL_API
 	aix.config = {
 		restful : false
-	}
+	};
 
 	_.watch(aix.config,"restful",function(val){
 		if(val)
@@ -89,11 +89,11 @@
 		else
 			RESTFUL_LIST = RESTFUL_disable;
 		return val;
-	})
+	});
 	
 	var strip_comment = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
 
-	// aix model genertor function
+	// aix genertor function
 	function _genertor_(api){
 		return function(){
 			var tmp = _.clonedoom(this.data);
@@ -116,13 +116,28 @@
 		};
 	}
 
+	// change rebase data
+	// change return data
+	function _genertor__(api){
+		return function(){
+			var tmp = _.clonedoom(this.data);
+			var args = [tmp].concat(_.slice(arguments));
+			var res =  _[api].apply(tmp,args);
+			if(!_.isequal(tmp,this.data)){
+				this.data = tmp;
+				this.dispatch(api,null,args);
+			}
+			return res;
+		};
+	}
+
 	function hackaix(origin,extend){
 		var fnstr = origin.toString(); 
 
 		var oargs = origin.toString()
-											.replace(strip_comment,'')
+											.replace(strip_comment,'');
 		var eargs = extend.toString()
-											.replace(strip_comment,'')
+											.replace(strip_comment,'');
 		var body = fnstr.slice(
 							 fnstr.indexOf("{") + 1, 
 							 fnstr.lastIndexOf("}"));
@@ -243,7 +258,7 @@
 		constructor : aix.model,
 
 		get : function(key){
-			if(_.isString(key))
+			if(_.isString(key)||_.isNumber(key))
 				return _.clone(this.data[key]||"");
 			return _.clone(this.data);
 		},
@@ -525,7 +540,7 @@
 			}
 
 			if(tmp){
-				this.data = tmp
+				this.data = tmp;
 				return this.data.length === len ? 
 							 this :
 							 this.dispatch("remove",null,[it]);
@@ -534,9 +549,9 @@
 		},
 
 		get : function(id){
-			if(_.isString(id))
+			if(_.isString(id)||_.isNumber(id))
 				return _.filter(this.data,function(one){
-					return one.aid === "#"+id;
+					return one.aid === ("#"+id);
 				});
 			else
 				return _.slice(this.data);
@@ -557,27 +572,32 @@
 
 	};
 
-	// #genertor
+	// #genertor api
 	_.foreach([
+		"loop",
 		"foreach",
 		"splice",
+		"push",
+		"unshift",
 		"sort",
 		"unique",
 		"reject",
+		"find",
 		"filter",
 		"map",
-		"find",
 		"cat",
 		"groupby",
 		"toarray",
 		"forarray",
 		"pairs",
 		"not",
+		"hook",
 		"bale",
 		"pluck",
 		"reverse",
 		"shuffle",
-		"merge"
+		"merge",
+		"compose"
 	],function(api){
 		aix.model.prototype[api]= _genertor_(api);
 		aix.collection.prototype[api]= _genertor_(api);
@@ -587,6 +607,7 @@
 		"keys",
 		"clone",
 		"contain",
+		"findindex",
 		"has",
 		"isequal",
 		"requery",
@@ -595,6 +616,14 @@
 	],function(api){
 		aix.model.prototype[api]=_genertor_$(api);
 		aix.collection.prototype[api]= _genertor_$(api);
+	});
+
+	_.foreach([
+		"pop",
+		"shift"
+	],function(api){
+		aix.model.prototype[api]=_genertor__(api);
+		aix.collection.prototype[api]= _genertor__(api);
 	});
 
 	// Aix Restful API design for
@@ -751,14 +780,12 @@
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 
 			return this.pipe.apply(this,["fetch",(this.url||""),param,function(responseText,xhr,event){
-				var _this = this;
-				_this.data = JSON.parse(responseText);
-				if(_this.model){
+				var data = JSON.parse(responseText);
+				if(this.model)
 					_.foreach(data,function(val,index){
-						data[index] = new _this.model({ data : val });
-					});
-				}
-				_this.data = data;
+						data[index] = new this.model({ data : val });
+					},this);
+				this.data = data;
 				fns.call(this,responseText,xhr,event);
 			},fnf]);
 		},
@@ -901,7 +928,7 @@
 	function changeHash(hash,oldhash,event){
 		_.foreach(this.routes,function(fn,key){
 			if(RegExp(key,"i").test(hash)){
-				changeHashReg.call(this,fn,[event,hash,oldhash,key])
+				changeHashReg.call(this,fn,[event,hash,oldhash,key]);
 			}
 		},this);
 	}
@@ -990,7 +1017,7 @@
 			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
 			+  x[2]
 			+ "})"
-		)
+		);
 		
 		_.compose(extend.prototype,aix.route.prototype);
 		extend.prototype.constructor = extend;
@@ -1002,7 +1029,7 @@
 		});
 
 		return extend;
-	}
+	};
 
 	// Aix-Route for SPA Architecture
 	// auto trigger regex event when route change
@@ -1023,7 +1050,7 @@
 				});
 				_.root.addEventListener("hashchange",this.event);
 				this.dispatch("listen");
-				this.dispatch("hashchange",null,[getHash(window.location.href)])
+				this.dispatch("hashchange",null,[getHash(window.location.href)]);
 			}
 			return this;
 		},

@@ -86,7 +86,7 @@
 		'NodeList',
 		'Undefined',
 		'HTMLCollection'
-	]
+	];
 	typeArray.forEach(function(v,i){
 		_[ 'is' + v ] = function(e){
 			return OP.toString.call(e) === '[object ' + v + ']';
@@ -143,9 +143,15 @@
 			return list;
 		},
 
+		loop : function(){
+			return this.foreach.apply(_.slice(arguments));
+		},
+
 		keys : function(arr){
 			if(_.isArray(arr))
-				return Object.keys(arr).map(function(n){ return +n;});
+				return Object.keys(arr).map(function(n){ 
+					return +n;
+				});
 			return Object.keys(arr);
 		},
 
@@ -159,6 +165,30 @@
 			else
 				delete list[index_key];
 			return list;
+		},
+
+		pop: function(arr){
+			if(_.isArray(arr))
+				return arr.pop();
+			return arr;
+		},
+
+		shift: function(arr){
+			if(_.isArray(arr))
+				return arr.shift();
+			return arr;
+		},
+
+		push: function(arr){
+			if(_.isArray(arr))
+				arr.push.apply(arr,_slice.call(arguments,1));
+			return arr;
+		},
+
+		unshift: function(arr){
+			if(_.isArray(arr))
+				arr.unshift.apply(arr,_slice.call(arguments,1));
+			return arr;
 		},
 
 		// use this for pure data Object
@@ -206,7 +236,7 @@
 
 		sort : function(arr,fn){
 			if(!_.isArray(arr))
-				return arr
+				return arr;
 			return arr.sort(fn);
 		},
 
@@ -237,8 +267,8 @@
 
 		map : function(list,fn){
 			return _.foreach(list,function(val,key){
-				this[key] = fn.call(this,val,key,this)
-			},list)
+				this[key] = fn.call(this,val,key,this);
+			},list);
 		},
 
 		// find the idf value
@@ -834,7 +864,7 @@
 			this.info = ng.userAgent;
 			this.language  = ng.language;
 			this.platform  = ng.platform;
-		}
+		};
 
 		_.extend(checkUA.prototype,{
 			defineBroswer : function(browserlist,identifylist){
@@ -967,7 +997,7 @@
 		});
 
 		return res;
-	}
+	};
 
 	_.extend({
 		// dom parse 
@@ -1015,7 +1045,7 @@
 
 					if(tag === "input"){
 						--newlevel; --find;
-						node.$oe = 0
+						node.$oe = 0;
 					}else{
 						resentnode.push(node);
 					}
@@ -1045,7 +1075,7 @@
 
 					// find child
 					np[j].child = npc ? _.filter(npc,function(node){
-						return node.$ob>begin && (node.$ob+node.$oe)<(begin+end)
+						return node.$ob>begin && (node.$ob+node.$oe)<(begin+end);
 					}) : [];
 
 					// find parent
@@ -1083,7 +1113,7 @@
 			if(len){
 				// get cookie
 				if(len === 1)
-					return parsec[param]
+					return parsec[param];
 				else{
 					var time = new Date();
 					time.setDate(time.getDate()+365);
@@ -1391,7 +1421,7 @@
 					var tmp = fn.call(_.root,arg);
 					nx && nx.call(_.root,tmp);
 				},t*1000);
-			}
+			};
 
 			firelist.push(fire);
 		});
@@ -1402,7 +1432,7 @@
 			enumerable: false,
 			configurable: false
 		});
-	}
+	};
 
 	_.extend(stack.prototype,{
 		noop : function(){
@@ -1435,7 +1465,7 @@
 						var tmp = fn.call(_.root,arg);
 						nx && nx.call(_.root,tmp);
 					},t*1000);
-				}
+				};
 
 				_this["="].push(fire);
 			});
@@ -1484,12 +1514,13 @@
 						_this.noop();
 					}
 				},t*1000);
-			}
+			};
 
 			firelist.push(fire);
 		});
 	
-	}
+	};
+
 	_.extend(hack.prototype,{
 		noop : function(){
 			this["-"] = null;
