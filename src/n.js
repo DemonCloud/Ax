@@ -20,7 +20,7 @@
 	if(typeof define === 'function' && define.amd)
 		// support AMD require.js
 		// ruler by UMD Javascript
-		define(factory);
+		define(['_'],factory);
 	else
 		// build on browser global object
 		root.__ = factory(_);
