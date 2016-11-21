@@ -150,6 +150,28 @@
   	return [oargs||"",eargs||"",body];
 	}
 
+	function createextend(origin){
+		return function(def){
+			var x = hackaix(aix[origin],aix[origin].extend);
+			var extend = eval(
+				"(function(ops){ "
+				+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
+				+  x[2]
+				+ "})"
+			);
+
+			_.compose(extend.prototype,aix[origin].prototype);
+			extend.prototype.constructor = extend;
+			_.define(extend,"base",{
+				value: aix[origin],
+  			writable: false,
+  			enumerable: false,
+  			configurable: false
+			});
+			return extend;
+		}
+	}
+
 	// Aix Model
 	aix.model = function(obj){
 		var _this = this;
@@ -230,26 +252,7 @@
 
 	// Extend aix model method 
 
-	aix.model.extend = function(def){
-		var x = hackaix(aix.model,aix.model.extend);
-		var extend = eval(
-				"(function(ops){ "
-			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
-			+  x[2]
-			+ "})"
-		);
-
-		_.compose(extend.prototype,aix.model.prototype);
-		extend.prototype.constructor = extend;
-		_.define(extend,"base",{
-			value: aix.model,
-  		writable: false,
-  		enumerable: false,
-  		configurable: false
-		});
-
-		return extend;
-	};
+	aix.model.extend = createextend("model");
 
 	// Model Prototype extend
 	// model data usually define as pure data, not javascript event or function
@@ -333,7 +336,7 @@
 		},
 
 		// remove
-		rev : function(){
+		remove: function(){
 			// only deel with Array and object
 			var args = _.slice(arguments);
 			var tmp = _.clonedoom(this.data) , type = _.typeof(tmp);
@@ -359,6 +362,10 @@
 			this.data = tmp;
 
 			return this.dispatch("remove",null,args);
+		},
+
+		del: function(){
+			return this.remove.apply(this,_.slice(arguments));
 		}
 	};
 
@@ -455,27 +462,7 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.collection.extend = function(def){
-		var x = hackaix(aix.collection,aix.collection.extend);
-		var extend = eval(
-				"(function(ops){ "
-			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
-			+  x[2]
-			+ "})"
-		);
-		
-		_.compose(extend.prototype,aix.collection.prototype);
-		extend.prototype.constructor = extend;
-		_.define(extend,"base",{
-			value: aix.collection,
-  		writable: false,
-  		enumerable: false,
-  		configurable: false
-		});
-
-		return extend;
-	};
-
+	aix.collection.extend = createextend("collection");
 
 	aix.collection.prototype = {
 		constructor : aix.collection,
@@ -518,7 +505,7 @@
 		 				 this.dispatch("add",null,args);
 		},
 
-		rev : function(it){
+		remove: function(it){
 			var len = this.data.length;
 			var tmp;
 			if(_.isString(it)){
@@ -548,6 +535,10 @@
 			return this;
 		},
 
+		del: function(){
+			return this.remove.apply(this,_.slice(arguments));
+		},
+
 		get : function(id){
 			if(_.isString(id)||_.isNumber(id))
 				return _.filter(this.data,function(one){
@@ -568,7 +559,7 @@
 	
 		trigger : function(type,fn,args){
 			return this.dispatch(type,fn,args);
-		},
+		}
 
 	};
 
@@ -700,7 +691,7 @@
 			},fnf]);
 		},
 
-		pull : function(){
+		sync: function(){
 			return this.fetch.apply(this,_.slice(arguments));
 		},
 
@@ -708,6 +699,10 @@
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf]);
+		},
+
+		save: function(){
+			return this.post.apply(this,_.slice(arguments));
 		}
 	});
 
@@ -790,7 +785,7 @@
 			},fnf]);
 		},
 
-		pull : function(){
+		sync: function(){
 			return this.fetch.apply(this,_.slice(arguments));
 		},
 
@@ -798,6 +793,10 @@
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf]);
+		},
+
+		save: function(){
+			return this.post.apply(this,_.slice(arguments));
 		}
 	});
 
@@ -823,12 +822,11 @@
 		if(_.isObject(obj.events))
 			_.foreach(obj.events,function(v,k){
 				var type = k.split(":");
-				if(type.length > 1){
-					$(obj.el).on(type[0],type[1],{self:_this},v);
-				}else{
+				if(type.length > 1)
+					$(obj.el).on(type[0],type[1],{self:this},v);
+				else
 					_.addEvent(_this,k,v);
-				}
-		});
+			},this);
 
 		// parse template
 		if(!obj.template || _.isString(obj.template))
@@ -871,26 +869,7 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.view.extend = function(def){
-		var x = hackaix(aix.view,aix.view.extend);
-		var extend = eval(
-				"(function(ops){ "
-			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
-			+  x[2]
-			+ "})"
-		);
-
-		_.compose(extend.prototype,aix.view.prototype);
-		extend.prototype.constructor = extend;
-		_.define(extend,"base",{
-			value: aix.view,
-  		writable: false,
-  		enumerable: false,
-  		configurable: false
-		});
-
-		return extend;
-	};
+	aix.view.extend = createextend("view");
 
 	aix.view.prototype = {
 		
@@ -1010,26 +989,7 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.route.extend = function(def){
-		var x = hackaix(aix.route,aix.route.extend);
-		var extend = eval(
-				"(function(ops){ "
-			+ "var " + x[0] + "=_.extend(_.extend({},"+x[1]+"),ops||{}); "
-			+  x[2]
-			+ "})"
-		);
-		
-		_.compose(extend.prototype,aix.route.prototype);
-		extend.prototype.constructor = extend;
-		_.define(extend,"base",{
-			value: aix.route,
-  		writable: false,
-  		enumerable: false,
-  		configurable: false
-		});
-
-		return extend;
-	};
+	aix.route.extend = createextend("route");
 
 	// Aix-Route for SPA Architecture
 	// auto trigger regex event when route change
