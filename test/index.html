@@ -160,7 +160,7 @@
  		}	
 	});
 
-	var route = new aix.route({
+	var route = new aix.route.extend({
 		events:{
 			init: function(){
 				console.log("route init!");
@@ -179,7 +179,7 @@
 
 
 		//　行为
-		action:{
+		actions:{
 			number:function(event,hash){
 				console.log("hash change to number -> "+ hash);
 				__('.abs').html(__('<div>single hash -> '+hash+'</div>'))
@@ -200,9 +200,11 @@
 		}
 	});
 
+	var aroute = new route();
+
 	var dom1 = _.domparse(__("body").html());
 	
-	route.listen();
+	aroute.listen();
 
 	var dom2 = _.domparse(__("body").html());
 	</script>

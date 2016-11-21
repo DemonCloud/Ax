@@ -25,6 +25,18 @@
 	<div id="abc">
 	</div>
 
+	<script id="tmp" type="aix/template">
+	<div>{{-a.a}}</div>
+	<div>{{-a.b}}</div>
+	<div>{{-b.a}}</div>
+	<div>{{-b.b}}</div>
+	</script>
+
+	<script id="single" type="aix/template">
+	<div>{{-a}}</div>
+	<div>{{-b}}</div>
+	</script>
+
 	<script>
 		var a = __("#abc")
 						.replacewith("<div id='fuck'> <div>3</div><div>2</div><div>1</div> </div>")
@@ -52,6 +64,15 @@
 		__("body").once("click",{ target : "self" }, function(event){
 			console.log("body click "+event.data.target);
 		});
+
+
+		var s = {a:1,b:2}
+		var x = {a:3,b:4}
+		var t = _.doom(__("#tmp").html(),"a","b");
+
+		a.fill(t(x,s));
+
+		//var t2 = _.doom(__("#single").html());
 	</script>
 </body>
 </html>

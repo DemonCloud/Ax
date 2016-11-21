@@ -39,7 +39,7 @@
 			AIX_COLLECTION_COUNT = 0,
 
 			AIX_VIEW_DEFAULT = { el : "", template : ""},
-			AIX_ROUTE_DEFAULT = { routes:{}, action:{} },
+			AIX_ROUTE_DEFAULT = { routes:{}, actions:{} },
 			AIX_MODELS_DEFAULT = { data:"" },
 			AIX_COLLECTION_DEFAULT = { data:[], model: 0 };
 
@@ -150,7 +150,7 @@
   	return [oargs||"",eargs||"",body];
 	}
 
-	function createextend(origin){
+	function createExtend(origin){
 		return function(def){
 			var x = hackaix(aix[origin],aix[origin].extend);
 			var extend = eval(
@@ -252,7 +252,7 @@
 
 	// Extend aix model method 
 
-	aix.model.extend = createextend("model");
+	aix.model.extend = createExtend("model");
 
 	// Model Prototype extend
 	// model data usually define as pure data, not javascript event or function
@@ -462,7 +462,7 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.collection.extend = createextend("collection");
+	aix.collection.extend = createExtend("collection");
 
 	aix.collection.prototype = {
 		constructor : aix.collection,
@@ -869,7 +869,7 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.view.extend = createextend("view");
+	aix.view.extend = createExtend("view");
 
 	aix.view.prototype = {
 		
@@ -923,7 +923,7 @@
 				_.foreach(
 				_.isString(fn) ? fn.split(",") : fn,
 				function(reg){
-					this.action[reg].apply(this||_.root,args);
+					this.actions[reg].apply(this||_.root,args);
 				},this);
 				break;
 		}
@@ -934,8 +934,6 @@
 		obj = obj || {};
 
 		var _this = this;
-
-		this.storage = _.root.localStorage||{};
 
 		if(_.isObject(obj.events))
 			_.foreach(obj.events,function(v,k){
@@ -989,20 +987,52 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.route.extend = createextend("route");
+	aix.route.extend = createExtend("route");
 
 	// Aix-Route for SPA Architecture
 	// auto trigger regex event when route change
 	aix.route.prototype = {
 		constructor : aix.route,
 
+		addEvent: function(type,fn){
+			if(_.isFunction(fn))
+				_.addEvent(this,type,fn);
+			return this;
+		},
+
+		removeEvent : function(type,fn){
+			return _.removeEvent(this,type,fn);
+		},
+
 		dispatch:function(type,fn,args){
 			return _.dispatch(this,type,fn,args);
 		},
 
+		addRoute:function(route,fname){
+			if(_.isString(fname)||_.isArray(fnname))
+		 		this.routes[route] = fnname
+		 	return this;
+		},
+
+		removeRoute:function(route){
+			delete this.routes[route];
+			return this;
+		},
+
+		addAction:function(name,fn){
+			if(_.isString(name)&&isFunction(fn))
+				this.actions[name] = fn;
+			return this;
+		},
+
+		removeAction:function(name){
+			delete this.actions[name];
+			return this;
+		},
+
 		listen: function(){
-			if(!this.$listen){
-				_.define(this,"$listen",{
+			if(!this._listen){
+				_.define(this,"_listen",{
 					value:1,
 					writable : false,
 					enumerable : false,
@@ -1016,7 +1046,7 @@
 		},
 
 		stop: function(){
-			if(delete this.$listen){
+			if(delete this._listen){
 				_.root.removeEventListener("hashchange",this.event);
 				this.dispatch("stop");
 			}
@@ -1024,29 +1054,24 @@
 		},
 
 		assign : function(hash){
-			if(this.$listen){			
+			if(this._listen){			
 				var url = _.root.location.href; 
 				var hashindex = url.search("#");
 				if(hashindex > 0)
 					url = url.slice(0,hashindex);
 
-				_.root.location.href = url + (hash.slice(0,1)==="#"?"":"#") + hash;
+				_.root.location.href = url + (hash.toString().slice(0,1)==="#"?"":"#") + hash;
 			}
 			return this;
 		},
 
 		addhash : function(hash){
-			var now = _.root.location.href + (hash||"");
+			var now = _.root.location.href + (hash||"").toString();
 			if(now!==_.root.location.href)
 				_.root.location.href = now;
 			return this;
 		},
 
-		save : function(){
-			this.storage.setItem(this.rid,JSON.stringify(this.history));
-			return this;
-		}
-		
 	};
 
 	return aix;

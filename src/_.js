@@ -743,8 +743,14 @@
 			// Complete building Function string
 			// try to build anmousyous function
 			try {
-				var render = new Function(name||"_x","_",res);
-				var render = eval("(function("+(name||"_x") + ",_" + ( args.length ? ","+args.toString() : "" ) + "){" + res + "})");
+				// var render = new Function(name||"_x","_",res);
+				var render = eval("(function("+(name||"_x") 
+													+ ",_" 
+													+ ( args.length ? ","+args.toString() : "" ) 
+													+ "){" 
+													+ res 
+													+ "})"
+												 );
 			}catch(e){
 				e.res = res;
 				console.log(res);
@@ -755,7 +761,9 @@
       // @ the you build once template that use diff Data, not use diff to build function again
 			// @ protect your template code other can observe it?
 			return function(data){
-				return render.call(this , data , _ );
+				return render.apply(this , 
+					[data,_].concat(_slice.call(arguments,1))
+				);
 			};
 		}
 

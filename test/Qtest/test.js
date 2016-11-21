@@ -639,9 +639,28 @@
 		a.equal(o2 instanceof aix.model, false," model is not instanceof aix.model");
 	});
 	
-	// Q.test("method ( aix.model ) - [ addEvent ]",function(a){
+	Q.test("method ( aix.model ) - [ addEvent , removeEvent ]",function(a){
+		var o = new aix.model({
+			data:2,
+			events:{
+				"a" : function(){
+					this.data +=1;
+				}
+			}
+		});
+
+		o.addEvent("a",function(){
+			this.data+=2;
+		});
+
+		o.dispatch("a");
 	
-	
-	// });
+		a.equal(o.data,5,"event trigger to change the data value form 1 to "+o.data);
+
+		o.removeEvent("a");
+		o.dispatch("a");
+
+		a.equal(o.data,5,"remove events the data value also equal "+o.data);
+	});
 
 })(QUnit,_,__,aix);
