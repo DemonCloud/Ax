@@ -91,6 +91,8 @@
 		return val;
 	})
 	
+	var strip_comment = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
+
 	// aix model genertor function
 	function _genertor_(api){
 		return function(){
@@ -113,8 +115,6 @@
 			return _[api].apply(tmp,args);
 		};
 	}
-
-	var strip_comment = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
 
 	function hackaix(origin,extend){
 		var fnstr = origin.toString(); 

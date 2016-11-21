@@ -2,7 +2,7 @@
 
 	Q.module("[ _ ]");
 
-	Q.test("method - [ define ]",function(a){
+	Q.test(" method - [ define ]",function(a){
 		var k = {};
 
 		_.define(k,"init",{
@@ -31,7 +31,7 @@
 		a.equal(k.a,1,"define mutip key success!")
 	});
 
-	Q.test("method - [ extend , compose ]",function(a){
+	Q.test(" method - [ extend , compose ]",function(a){
 		var _k = function(){};
 		_.extend({ qtest : _k });
 		a.equal(_.qtest,_k,"extend new method on _ success!");
@@ -45,7 +45,7 @@
 		a.equal(!k2.isIgnore,true,"extend compose ignore define key success!")
 	});
 
-	Q.test("method - [ isObject ]",function(a){
+	Q.test(" method - [ isObject ]",function(a){
 		var k = {};
 		a.equal(_.isObject(k),true,"isObject test pure object");
 
@@ -53,12 +53,12 @@
 		a.equal(_.isObject(k2),false,"isObject detect string is not object");
 	});
 
-	Q.test("method - [ cool ]",function(a){
+	Q.test(" method - [ cool ]",function(a){
 		var k = {};
 		a.equal(_.cool(k),k,"cool return same value pointer");
 	});
 
-	Q.test("method - [ foreach ]",function(a){
+	Q.test(" method - [ foreach ]",function(a){
 		var k = 0;
 		_.foreach([1,2,3,4],function(num){
 			k += num;
@@ -95,7 +95,7 @@
 		a.equal(v,true,"empty length array or object won't trigger loop!")
 	});
 
-	Q.test("method - [ keys ]",function(a){
+	Q.test(" method - [ keys ]",function(a){
 		var k = [1,2,3,4];
 		var vali = true;
 
@@ -113,7 +113,7 @@
 		a.equal(k2keys[2],"c","get current key form keys array!");
 	});
 
-	Q.test("method - [ slice ]",function(a){
+	Q.test(" method - [ slice ]",function(a){
 		a.equal(_.slice("").length,0,"slice empty string return new array");
 		a.equal(_.slice(_.NULL).length,0,"slice function return new array");
 
@@ -122,7 +122,7 @@
 		a.equal(_.slice(c)!==c,true,"slice is copy op detect");
 	});
 	
-	Q.test("method - [ splice ]",function(a){
+	Q.test(" method - [ splice ]",function(a){
 		var k = _.splice([1,2,3],0,2);
 		a.equal(k[0],3,"splice offset two num in array");
 		a.equal(k.length,1,"splice cat array success!");
@@ -131,7 +131,7 @@
 		a.equal(_.splice(s,"k").k == null, true,"splice delete object key detect" );
 	});
 
-	Q.test("method - [ clone ]",function(a){
+	Q.test(" method - [ clone ]",function(a){
 		var k = [1,2,3,4];
 		var o = { a:1,b:2,c:3 }
 		a.equal(_.clone(k)!==k,true,"clone array not equal to origin!")
@@ -155,7 +155,7 @@
 		a.equal(voli,true,"clone object as same values and keys")
 	});
 
-	Q.test("method - [ clonedoom ]",function(a){
+	Q.test(" method - [ clonedoom ]",function(a){
 		var k = [1,2,3,4];
 		var o = { a:1,b:2,c:3 }
 		a.equal(_.clonedoom(k)!==k,true,"clone array not equal to origin!")
@@ -227,7 +227,7 @@
 		a.equal(_.has(l3,s2),false,"strict mode has not detect object pointer");
 	});
 
-	Q.test("method - [ filter ]",function(a){
+	Q.test("method - [ filter , find ]",function(a){
 		var l = [1,2,3,4,5,6]
 		var list = _.filter(l,function(n){ return n%2===0 });
 
@@ -418,8 +418,229 @@
 		a.equal(_.has(fnlist,2),true,"save the true value in array")
 	});
 
-	// Q.test("method - [ bale ]",function(a){
+	Q.test("method - [ bale ]",function(a){
+		var k = {a:1};
+		var d = {b:2};
+
+		var c = _.bale(k,d);
 		
+		a.equal(c===k,false,"not extend for k object !");
+		a.equal(c===d,false,"not extend for d object !");
+		a.equal(c.b,2,"get extend value form objects !");
+	});
+
+
+	Q.test("method - [ shuffle ]",function(a){
+		var k = [2.1,3.3,2,8,1.1,2.5,3.2,5.3,8.2]
+		var l = _.shuffle(k);
+	
+		a.equal(l.length,k.length,"with same length to array!");
+	});
+
+	Q.test("method - [ merge ]",function(a){
+		var k = [1,2,3];
+		var b = [2,3,4];
+
+		var c = _.merge(k,b);
+
+		a.equal(c.length,4,"merge array [1,2,3] and [2,3,4] to [" + c.toString() + "]");
+		a.equal(c!==k,true,"not extend to origin array k");
+	});
+
+	Q.test("method - [ once ]",function(a){
+	
+		var l = 1;
+		var fn = function(){
+			l++;
+		}
+
+		var oncefn = _.once(fn);
+		a.equal(l,1,"fn not running when create a part function");
+		oncefn();
+		a.equal(l,2,"fn run first the value add as " + l);
+		oncefn();
+		a.equal(l,2,"fn can't running second times the value as " + l);
+	
+	});
+
+	Q.test("method - [ isequal ]",function(a){
+		var b = {a:1,b:2,c:"3"};
+		var c = {a:1,b:2,c:"3"};
+		var d = 1;
+		var e = "1";
+
+		var f = [1,2,3]
+		var g = _.merge([1,2,3],[3,3]);
+
+		var x = function(){};
+		var h = [x,2,"2",123]
+		var i = [_.NULL,2,"2",123]
+
+		a.equal(_.isequal(b,c),true,"to diff object define value equal "+ JSON.stringify(b) + " and " + JSON.stringify(c));
+		a.equal(_.isequal(d,e),false,"the number 1 not equal to string '1'")
+		a.equal(_.isequal(f,g),true,"array same value for equal!")
+		a.equal(_.isequal(h,i),false,"function pointer not same in array!")
+		a.equal(_.isequal(b,f),false,"as not same typeof will be define")
+	});
+
+	Q.test("method - [ typeof ]",function(a){
+		var b = [];
+		var c = {};
+		var d = "d";
+		var e = 1;
+		var f = null;
+		var g;
+		
+		a.equal(_.typeof(b),"array","array check!")
+		a.equal(_.typeof(c),"object","object check!")
+		a.equal(_.typeof(d),"string","string check!")
+		a.equal(_.typeof(e),"number","number check!")
+		a.equal(_.typeof(f),"null","null check!")
+		a.equal(_.typeof(g),"undefined","undefined check!")
+	});
+
+	Q.test("method - [ requery ]",function(a){
+		var r = [
+			{name:"a",value:1},
+			{name:"b",value:2},
+			{name:"c",value:3},
+			{name:"d",value:"4"},
+		]
+		var l = _.requery(r);
+
+		a.equal(_.keys(l).length,4,"requery array to object form jquery or __ serialize -> "+JSON.stringify(l));
+		a.equal(_.isequal(l.a,"1"),false,"requery get true value number not string typeof ");
+		a.equal(_.isequal(l.b,2),true,"requery get true value number");
+		a.equal(_.isequal(l.d,"4"),true,"requery get true value equal the true type");
+	});
+
+	Q.test("method - [ combom ]",function(a){
+		var list = [1,3,5,2,7,8,4,2,3,1,9]
+		var r = _.combom(list,function(val){ return val%2 === 0 });
+		
+		a.equal(r,2,"combom return find first value in array "+r)
+	});
+
+	Q.test("method - [ paramparse ]",function(a){
+		var url = "https://www.google.com.hk/search?q=python&oq=python&aqs=chrome..69i57.7291j0j7&sourceid=chrome&ie=UTF-8&wx=";
+		var param = _.paramparse(url);
+
+		a.equal(_.isObject(param),true,"paramparse return object value")
+		a.equal(param.q,"python","object parse to string in key q")
+		a.equal(param.oq,"python","pobject parse to string in key oq")
+		a.equal(param.aqs,"chrome..69i57.7291j0j7","object parse to string really complicated")
+	});
+
+	Q.test("method - [ paramstringify ]",function(a){
+		var url = "https://www.google.com.hk/search?q=python&oq=python&aqs=chrome..69i57.7291j0j7&sourceid=chrome&ie=UTF-8&wx=";
+		var param = _.paramparse(url);
+		var str = _.paramstringify(param);
+
+		a.equal(_.isString(str),true,"paramstringify return string value")
+		a.equal(str,"q=python&oq=python&aqs=chrome..69i57.7291j0j7&sourceid=chrome&ie=UTF-8&wx=","validate return string with same querystring")
+	});
+
+	Q.test("method - [ encodeHTML ]",function(a){
+		var script = "<script>  <select form &`>;"
+
+		var strip = _.encodeHTML(script);
+		a.equal(strip.search(">"),-1,"encode will parse > to &gt;")
+		a.equal(strip.search("<"),-1,"encode will parse > to &lt;")
+		a.equal(strip,"&lt;script&gt;  &lt;select form &amp;`&gt;;","encode success")
+	});
+
+	Q.test("method - [ decodeHTML ]",function(a){
+		var strip="&lt;script&gt;  &lt;select form &amp;`&gt;;";
+		var dc = _.decodeHTML(strip);
+
+		var vali = "<script>  <select form &`>;"
+		a.equal(dc,vali,"decode success")
+	});
+
+
+	Q.test("method - [ addEvent ]",function(a){
+		var o = {};
+	
+		_.addEvent(o,"trunk",function(){
+			console.log(213);
+		});
+
+		a.equal(!!o._events.trunk,true,"has prop trunk!")
+	});
+
+	Q.test("method - [ removeEvent ]",function(a){
+		var o = {};
+	
+		_.addEvent(o,"trunk",function(){
+			console.log(213);
+		});
+
+		_.removeEvent(o,"trunk");
+
+		a.equal(o._events.trunk,undefined,"has remove prop trunk!")
+	});
+
+	Q.test("method - [ release ]",function(a){
+		var o = {};
+	
+		_.addEvent(o,"a",function(){});
+		_.addEvent(o,"b",function(){});
+		_.addEvent(o,"c",function(){});
+
+		a.equal(!!o._events.a,true,"has prop a event!")
+
+		_.release(o);
+		
+		a.equal(!!o._events,false,"with _events property!");
+	});
+
+	Q.test("method - [ dispatch ]",function(a){
+		var b = 1;
+		var c = 2;
+		var d = 3;
+
+		var o = {};
+
+		_.addEvent(o,"b",function(){ b=b+1; });
+		_.addEvent(o,"c",function(){ c=c+2; });
+		_.addEvent(o,"d",function(){ d=d-1; });
+
+		_.dispatch(o,"b");
+		_.dispatch(o,"c");
+		_.dispatch(o,"d");
+
+		a.equal(b,2,"o dispatch event success , b+1=2")
+		a.equal(c,4,"o dispatch event success , c+2=4")
+		a.equal(d,2,"o dispatch event success , d-1=2")
+
+	});
+
+	Q.module("[ aix ]");
+
+	Q.test("method ( aix.model ) - [ create ]",function(a){
+	
+		var o = new aix.model({
+			data:1
+		});
+	
+		a.equal(o.data,1,"Aix Model create success")
+		a.equal(o instanceof aix.model, true,"mode instanceof aix.model detect");
+	});
+
+	Q.test("method ( aix.model ) - [ extend ]",function(a){
+		var o = new aix.model.extend({
+			data:2
+		});
+	
+		var o2 = new o;
+
+		a.equal(o2.data,2," init form custom model success !");
+		a.equal(o2 instanceof o, true," model is a new struct for extend");
+		a.equal(o2 instanceof aix.model, false," model is not instanceof aix.model");
+	});
+	
+	// Q.test("method ( aix.model ) - [ addEvent ]",function(a){
+	
 	
 	// });
 

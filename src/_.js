@@ -28,14 +28,14 @@
 		root._ = factory();
 
 }( this , function(){
-	'use strict';
+	// not use strict for eval
+	// 'use strict';
 
 	var VERSION = "0.1";
 
 	// # DEFINE some useful varible
 	// # Cache global object
-	var OP = Object.prototype,	AP = Array.prototype,
-			NP = Number.prototype,	SP = String.prototype;
+	var OP = Object.prototype;
 
 	// # Function Caller 
 	var _arr  = [],
@@ -434,11 +434,11 @@
 				tmp = tmp.concat(arr); 
 			});
 
-			return _.unique(tmp);
+			return this.unique(tmp);
 		},
 
 		partial : function(func){
-			var boundArgs = slice.call(arguments,1);
+			var boundArgs = _slice.call(arguments,1);
 
 			return function(){
 				var position = 0;
@@ -469,28 +469,25 @@
 
 		// building the (*) times Function
 		// base it on _.once  --- underscore.js
-		hack : function(fn,times){
+		part : function(fn,times){
 			var creater = _.partial(_.before,(parseInt(times)||1)+1);
 			return creater(fn);
 		},
 
 		// create function run once time
 		once: function(fn){
-			return _.hack(fn,1);
+			return _.part(fn,1);
 		},
 
-		tostring: function(e){
-			return OP.toString.call(e);
-		},
-
-		isequal : function(x,y){
-			if(x===y) 
-				return true;
-
-			if(_.isFunction(x) || _.isFunction(y))
+		isequal : function(x,y,strictmode){
+			if((strictmode||(x==null||y==null))||
+				((_.isFunction(x)||_.isFunction(y))||x===y))
 				return x===y;
 
-			if(_.tostring(x) === _.tostring(y)){
+			if(_.typeof(x) !== _.typeof(y))
+				return false;
+
+			if(x.toString() === y.toString()){
 				if(_.isArray(x)){
 					if(x.length === y.length){
 						for(var i=x.length; i--; )
@@ -512,16 +509,26 @@
 					}
 					return false;
 
-				} else if(_.isString(x) || _.isNumber(x)){
-					return x.toString()===y.toString();
 				}
 			}
-
 			return false;
 		},
 
 		typeof : function(def){
-	  //['Array','Arguments','Boolean','Function','String','Number','Null','Date','RegExp','NodeList','Undefined',"HTMLCollection"]
+	  	//[
+	  	//'Array',
+	  	//'Arguments',
+	  	//'Boolean',
+	  	//'Function',
+	  	//'String',
+	  	//'Number',
+	  	//'Null',
+	  	//'Date',
+	  	//'RegExp',
+	  	//'NodeList',
+	  	//'Undefined',
+	  	//"HTMLCollection"
+	  	//]
 	  	var index,
 					types = [
 				_.isArray(def),
@@ -580,9 +587,9 @@
 		return encodeURIComponent(part).replace(" ","%20"); 
 	}
 
-	// @ parse the queryString to JSON Object
 	_.extend({
 		
+		// @ parse the queryString to JSON Object
 		paramparse : function(url){
 			var findQuery = url.indexOf("?"),
 				reg = /([^&=]+)=?([^&]*)/g ,
@@ -615,7 +622,7 @@
 		},
 
 		stringparse : function(val){
-			return _.isBoolean(val) ? val : val+"";
+			return _.isBoolean(val) ? val : (val+"");
 		}
 	});
 
@@ -675,10 +682,11 @@
 		doom : function(txt,name){
 			var index = 0,
 					res = "_p+='",
+					args = _slice.call(arguments,2),
 
-					exp = RegExp((doomSetting.escape||no) + 
-								"|" + (doomSetting.interpolate||no) + 
-								"|" + (doomSetting.evaluate||no) +"|$","g");
+					exp = RegExp((this.doomSetting.escape||no) + 
+								"|" + (this.doomSetting.interpolate||no) + 
+								"|" + (this.doomSetting.evaluate||no) +"|$","g");
 
 			// start replace working
 			txt.replace( exp , function(match,escape,interpolate,evaluate,offset){
@@ -700,12 +708,13 @@
 			// End wrap res@ String
 			res += "';\n";
 			if(!name) res = "with(_x||{}){\n" + res + "}\n";
-			res = "var _t,_p='',_j=Array.prototype.join,print=function(){_p+=_j.call(arguments,'');};\n" + res + "return _p;\n";
+			res = "var _t,_p='';\n" + res + "return _p;\n";
 
 			// Complete building Function string
 			// try to build anmousyous function
 			try {
 				var render = new Function(name||"_x","_",res);
+				var render = eval("(function("+(name||"_x") + ",_" + ( args.length ? ","+args.toString() : "" ) + "){" + res + "})");
 			}catch(e){
 				e.res = res;
 				console.log(res);
@@ -736,14 +745,14 @@
 			}
 
 			if(delete obj[prop]){
-				if(Object.defineProperty)
+				if(Object.defineProperty){
 					Object.defineProperty(obj,prop,{
 						get: getter,
 						set: setter,
 						enumerable: true,
 						configurable: true
 					});
-				else if (Object.prototype.__defineGetter__ && Object.prototype.__defineSetter__){
+				}else if (Object.prototype.__defineGetter__ && Object.prototype.__defineSetter__){
 					Object.prototype.__defineGetter__.call(obj, prop, getter);
           Object.prototype.__defineSetter__.call(obj, prop, setter);
 				}
@@ -788,38 +797,37 @@
 			}else if(!type && !fn){
 				return _.release(obj); 
 			}
-
 			return obj;
 		},
 
 		release: function(obj){
 			delete obj._events;
-
 			return obj;
 		},
 
 		dispatch : function(obj,type,fn,args){
 			var hasFn = _.isFunction(fn);
-			if(obj._events){
-				if(obj._events[type]){
-					hasFn ? _.foreach(obj._events[type],function(f){
+			if(obj._events)
+				if(obj._events[type])
+					hasFn ? 
+					_.foreach(obj._events[type],function(f){
 						if(f===fn) f.apply(obj,args||[]);
-					})    : _.foreach(obj._events[type],function(f){
+					}) : 
+					_.foreach(obj._events[type],function(f){
 						f.apply(obj,args||[]);
 					});
-				}
-			}
 			return obj;
 		},
 
-		trigger : function(obj,type,fn,args){
-			return _.dispatch(obj,type,fn,args);
+		trigger : function(){
+			return _.dispatch(_.slice(arguments));
 		}
 
 	});
 
 	
 	// about browser api
+	// support Browser eval struct
 	if(_.root.self){
 		// UserAgent
 		var checkUA = function(ng){
@@ -1494,6 +1502,7 @@
 				return fn.call(_.root);
 			});
 		}
+
 	});
 
 	return _;
