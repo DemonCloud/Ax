@@ -252,8 +252,6 @@
 
 	// Extend aix model method 
 
-	aix.model.extend = createExtend("model");
-
 	// Model Prototype extend
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
@@ -461,8 +459,6 @@
 		// first trgger "init" event
 		_.dispatch(_this,"init");
 	};
-
-	aix.collection.extend = createExtend("collection");
 
 	aix.collection.prototype = {
 		constructor : aix.collection,
@@ -869,8 +865,6 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.view.extend = createExtend("view");
-
 	aix.view.prototype = {
 		
 		addEvent : function(type,fn){
@@ -987,8 +981,6 @@
 		_.dispatch(_this,"init");
 	};
 
-	aix.route.extend = createExtend("route");
-
 	// Aix-Route for SPA Architecture
 	// auto trigger regex event when route change
 	aix.route.prototype = {
@@ -1073,6 +1065,11 @@
 		},
 
 	};
+
+	aix.model.extend      = createExtend("model");
+	aix.collection.extend = createExtend("collection");
+	aix.view.extend       = createExtend("view");
+	aix.route.extend      = createExtend("route");
 
 	return aix;
 
