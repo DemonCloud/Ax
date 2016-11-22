@@ -1,0 +1,44 @@
+<h2 class="content-s-title">_.sort</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.sort(arr,func)</code><br>
+
+	<hr>
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>arr</span> [ 类型:Array ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>func</span> [ 类型:Function ]</h5>
+	</div>
+
+	<h3>返回值:</h3>
+	<div class="content-param">
+		<h5><span>arr</span> [ 返回被排序过的arr，或者是参数arr本身 ]</h5>
+	</div>
+
+	<hr>
+	
+	<h3>说明:</h3>
+	<p>_.sort方法对数组进行排序，func参数是可选的，不传入的话则会导致js使用其默认的排序规则</p>
+	<p>方法执行成功后会立马修改arr原数组</p>
+	<p>当arr参数非法时，则会返回arr本身</p>
+
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1. 对数值进行由小到大排序
+	</div>
+	<pre class="code">
+var a = [31,12,1,2,23,4,15,66,3,9,84,200,8,68]
+_.sort(a,function(n,m){ return n-m; })
+
+console.log(a)
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  [1,2,3,4,8,9,12,15,23,31,66,68,84,200]</pre>
+
+</div>

@@ -1,0 +1,66 @@
+<h2 class="content-s-title">_.keys</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.keys(varible)</code>
+
+	<hr>
+
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>varible</span> [ 类型:非null类型 ]</h5>
+	</div>
+
+	<h3>返回值:</h3>
+	<div class="content-param">
+		<h5><span>[key,key1,...]</span> [ 包含参数对象或者数组中所有的key或index的数组 ]</h5>
+	</div>
+
+	<hr>
+
+	<h3>说明:</h3>
+	<p>_.keys 整合出对象和键，或者数组的下标(index)，作为数组返回</p>
+	<p class="warning">当对象中有属性的enumerable被设置为false时(非枚举属性),则该属性不会在返回数组中</p>
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1.整合出对象的键 
+	</div>
+	<pre class="code">
+console.log(_.keys({ a:1,b:2 }))
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  ["a","b"]</pre>
+
+	<div class="code-info">
+		2.整合出数组的下标 
+	</div>
+	<pre class="code">
+console.log(_.keys([5,5,5,5,5]))
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  [0,1,2,3,4]</pre>
+
+	<div class="code-info">
+		3.非枚举属性不会被返回 
+	</div>
+	<pre class="code">
+var o = { a:1,c:2 }
+_.define(o,"b",{
+  value:"?",
+  enumerable:false
+});
+
+<span class="comment">//属性已经存在但不会被枚举</span>
+console.log(o.b);
+console.log(_.keys(o));
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  "?"
+&gt;  ["a","c"]</pre>
+
+</div>

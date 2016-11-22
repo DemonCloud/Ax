@@ -42,9 +42,10 @@
 		_slice  = _arr.slice,
 		_splice = _arr.splice;
 
-	var root = (function(){ 
-		return this || (0,eval)("this"); 
-	}());
+	// var root = (function(){ 
+	// 	return this || (0,eval)("this"); 
+	// }());
+	var root = this;
 
 	var _ = {};
 	// _ extend other method
@@ -144,15 +145,17 @@
 		},
 
 		loop : function(){
-			return this.foreach.apply(_.slice(arguments));
+			return this.foreach.apply(this,_.slice(arguments));
 		},
 
 		keys : function(arr){
-			if(_.isArray(arr))
-				return Object.keys(arr).map(function(n){ 
-					return +n;
-				});
-			return Object.keys(arr);
+			if(arr !==null){
+				if(_.isArray(arr))
+					return Object.keys(arr).map(function(n){ 
+						return +n;
+					});
+				return Object.keys(arr);
+			}
 		},
 
 		slice : function(obj){
@@ -249,18 +252,23 @@
 			return ary;
 		},
 
-		reject : function(list,idf){
+		// find the idf value
+		find : function(){
+			return this.filter.apply(this,_.slice(arguments));
+		},
+
+		filter : function(list,idf,reverse){
 			var res = [];
 			_.foreach(_.clonedoom(list),function(elm,i){ 
-				if(!idf.call(this,elm,i,this)) this.push(elm) ; 
+				if(idf.call(this,elm,i,this)&&!reverse) this.push(elm) ; 
 			},res);
 			return res;
 		},
 
-		filter : function(list,idf){
+		reject : function(list,idf){
 			var res = [];
 			_.foreach(_.clonedoom(list),function(elm,i){ 
-				if(idf.call(this,elm,i,this)) this.push(elm) ; 
+				if(!idf.call(this,elm,i,this)) this.push(elm) ; 
 			},res);
 			return res;
 		},
@@ -271,16 +279,11 @@
 			},list);
 		},
 
-		// find the idf value
-		find : function(){
-			return this.filter.apply(this,this.slice(arguments));
-		},
-
 		// cat identity rule values form array or object
 		cat : function(list,idf){
 			var res = [];
 			if(_.isArray(list)){
-				for(var i=list.length; i--;)
+				for(var i=0,l=list.length; i<l; i++)
 					if(idf.call(list,list[i],i,list))
 						res.push(list.splice(i,1).pop());
 			}else if(_.isObject(list)){

@@ -1,0 +1,53 @@
+<h2 class="content-s-title">_.isObject</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.isObject(varible)</code>
+
+	<hr>
+
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>varible</span> [ 类型:任意类型 ]</h5>
+	</div>
+
+	<hr>
+
+	<h3>说明:</h3>
+	<p>_.isObject 检测变量类型是否为对象类型</p>
+	<p class="warning">Js 中的大多数变量类型都属于,比如数组,这也是为什么在Js中有“一切皆对象”的说法</p>
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1. 使用isObject来检测出变量的类型
+	</div>
+	<pre class="code">
+console.log(_.isObject(1))
+console.log(_.isObject("1"))
+console.log(_.isObject([]))
+console.log(_.isObject({}))
+console.log(_.isObject(true))
+console.log(_.isObject(/reg/))
+console.log(_.isObject(null))
+console.log(_.isObject(undefined))
+console.log(_.isObject(new Date))
+console.log(_.isObject(function(){}))
+console.log(_.isObject(new String("a")))
+console.log(_.isObject(new Number(1)))</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  false
+&gt;  false
+&gt;  true
+&gt;  true
+&gt;  false
+&gt;  true
+&gt;  false
+&gt;  false
+&gt;  true
+&gt;  true
+&gt;  true
+&gt;  true</pre>
+
+</div>

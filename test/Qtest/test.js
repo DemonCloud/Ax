@@ -639,7 +639,7 @@
 		a.equal(o2 instanceof aix.model, false," model is not instanceof aix.model");
 	});
 	
-	Q.test("method ( aix.model ) - [ addEvent , removeEvent ]",function(a){
+	Q.test("method ( aix.model ) - [ events ]",function(a){
 		var o = new aix.model({
 			data:2,
 			events:{

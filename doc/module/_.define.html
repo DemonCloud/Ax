@@ -1,0 +1,92 @@
+<h2 class="content-s-title">_.define</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.define(obj,prop,setting)</code>
+	<br>
+	<code>_.define(obj,setting)</code>
+
+	<hr>
+
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>obj</span> [ 类型:Object ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>prop</span> [ 类型:String , Number ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>setting</span> [ 类型:Object ]</h5>
+	</div>
+
+	<hr>
+
+	<h3>说明:</h3>
+	<p>_.define 用于给指定的Object对象定义属性,并且可以设置该属性的参数</p>
+
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1. _.define 可以定义单个属性，也可以一次性定义多个属性
+	</div>
+	<pre class="code">
+var a = {};
+
+_.define(a,"a",{
+  value : 1,
+  enumerable: false,
+  configurable: false,
+  writable: true
+});
+
+console.log(a.a);
+
+<span class="comment">//定义多个属性,b和c</span>
+_.define(a,{
+  "b":{
+    value : 2,
+    enumerable: true,
+    configurable: true,
+    writable: true
+  },
+  "c":{
+    value : 3,
+    enumerable: true,
+    configurable: true,
+    writable: true
+  },
+});
+
+console.log(a.b,a.c);</pre>
+
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  1
+&gt;  2,3</pre>
+	<br>
+	
+	<div class="code-info">
+		2.定义属性时,设置enumerable configurable writable
+	</div>
+	<pre class="code">
+var a = {};
+
+_.define(a,"a",{
+  value : 1,
+  enumerable: false,
+  configurable: false,
+  writable: false
+});
+
+console.log(a.a===1);
+
+<span class="comment">//无法设置a.a的数值，因为writable定义为false</span>
+a.a = 4;
+console.log(a.a);
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  true
+&gt;  1</pre>
+</div>

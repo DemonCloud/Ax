@@ -1,0 +1,43 @@
+<h2 class="content-s-title">_.pop</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.pop(arr)</code><br>
+
+	<hr>
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>arr</span> [ 类型:Array ]</h5>
+	</div>
+
+	<h3>返回值:</h3>
+	<div class="content-param">
+		<h5><span>arr 或 pop-elm</span> [ 返回被弹出的元素，或者是参数arr本身 ]</h5>
+	</div>
+
+	<hr>
+	
+	<h3>说明:</h3>
+	<p>_.pop用于将数组末尾的元素弹出,执行成功后直接导致原数组被修改</p>
+	<p>如果参数不是数组(非法)，则返回此参数</p>
+	<p class="warning">可用于模拟堆栈</p>
+
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1. 弹出数组末尾的元素
+	</div>
+	<pre class="code">
+var a = [1,2,3,4];
+console.log(_.pop(a))
+<span class="comment">//原数组已经被修改</span>
+console.log(a)
+
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  4
+&gt;  [1,2,3]</pre>
+
+</div>

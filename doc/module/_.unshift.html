@@ -1,0 +1,42 @@
+<h2 class="content-s-title">_.unshift</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.unshift(arr,val1,val2,...)</code><br>
+
+	<hr>
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>arr</span> [ 类型:Array ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>val</span> [ 类型:任意类型 ]</h5>
+	</div>
+
+	<h3>返回值:</h3>
+	<div class="content-param">
+		<h5><span>arr</span> [ 参数arr本身 ]</h5>
+	</div>
+
+	<hr>
+	
+	<h3>说明:</h3>
+	<p>_.unshift用于将数组起始位置添加新的元素,执行成功后直接导致原数组被修改</p>
+	<p>如果参数不是数组(非法)，则返回此参数</p>
+
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1.数组起始位置新增元素 
+	</div>
+	<pre class="code">
+var a = [1,2,3,4];
+console.log(_.unshift(a,1,2,3))
+
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  [1,2,3,1,2,3,4]</pre>
+
+</div>

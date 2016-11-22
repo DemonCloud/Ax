@@ -1,0 +1,66 @@
+<h2 class="content-s-title">_.hook</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.hook(list,callback(args,...),args,args1,...)</code><br>
+
+	<hr>
+
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>list</span> [ 类型:Array,Object ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>callback</span> [ 类型:Function,String ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>args</span> [ 类型:任意类型 ]</h5>
+	</div>
+
+	<h3>callback回调参数:</h3>
+	<div class="content-param">
+		<h5><span>args</span> [ 指向 _.hook 第三参数之后所有的参数会被传递到这个回调中供使用 ]</h5>
+	</div>
+
+	<h3>返回值:</h3>
+	<div class="content-param">
+		<h5><span>hook list</span>　[ 修改之后的list值 ]</h5>
+	</div>
+
+	<hr>
+	
+	<h3>说明:</h3>
+	<p>_.hook提供了一种高级的映射方式，构建与 <a href="#_.map">_.map</a> 之上的一层封装，使用映射的方式修改了原数组或者对象的数值</p>
+	<p>执行成功则会立马修改原来的数组或对象</p>
+
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1.数组和对象的映射修改 
+	</div>
+	<pre class="code">
+var a = ["cloud","is","your","god","!"];
+var o = {
+  a:[1],
+  b:[1,2],
+  c:[1,2,3],
+  d:[1,2,3,4],
+  e:[1,2,3,4,5]
+}
+
+_.hook(a,function(sharp,at){
+	return this+sharp+at;
+},"#","@");
+
+_.hook(o,"toString");
+
+console.log(a)
+console.log(o)
+</pre>
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  ["cloud#@", "is#@", "your#@", "god#@", "!#@"]
+&gt;  {a: "1", b: "1,2", c: "1,2,3", d: "1,2,3,4", e: "1,2,3,4,5"}</pre>
+
+</div>

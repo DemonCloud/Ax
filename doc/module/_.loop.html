@@ -1,0 +1,105 @@
+<h2 class="content-s-title">_.loop</h2>
+<h2 class="content-s-title">_.foreach</h2>
+
+<div class="content-introduce">
+	<h3>API:</h3>
+	<code>_.loop(list,callback(val,index,list),context)</code><br>
+	<code>_.foreach(list,callback(val,index,list),context)</code>
+
+	<hr>
+
+	<h3>参数:</h3>
+	<div class="content-param">
+		<h5><span>list</span> [ 类型:Array,Object ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>callback</span> [ 类型:Function ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>context</span> [ 类型:任意类型]</h5>
+	</div>
+
+	<h3>callback回调参数:</h3>
+	<div class="content-param">
+		<h5><span>val</span> [ list 每次遍历返回的值 ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>index</span> [ list 每次遍历返回的key或者index ]</h5>
+	</div>
+	<div class="content-param">
+		<h5><span>list</span> [ 指向list本身 ]</h5>
+	</div>
+
+	<h3>返回值:</h3>
+	<div class="content-param">
+		<h5><span>list</span></h5>
+	</div>
+
+	<hr>
+
+	<h3>说明:</h3>
+	<p>_.loop同_.foreach，用于对象或者数组的循环</p>
+	<hr>
+
+	<h3>示例:</h3>
+	<div class="code-info">
+		1.使用循环 
+	</div>
+	<pre class="code">
+var num = 0;
+var list = [1,2,3,4];
+_.loop(list,function(val){
+  num+=val;
+});
+
+console.log(num)
+
+var obj = { a:1,b:2,c:3 };
+_.loop(obj,function(val){
+  num+=val;
+});
+
+console.log(num)
+</pre>
+
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  10
+&gt;  16</pre>
+
+	<div class="code-info">
+		2.叠加 index 或者 key 
+	</div>
+	<pre class="code">
+var str = "call - ";
+
+var obj = { a:1,b:2,c:3 };
+_.loop(obj,function(val,key){
+  str+= key + " ";
+});
+
+console.log(str)
+</pre>
+
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  call - a b c</pre>
+
+
+	<div class="code-info">
+		3. 改变回调的this指向
+	</div>
+	<pre class="code">
+var obj = { a:1,b:2,c:3 };
+_.loop(obj,function(val,key){ 
+ console.log(key+this);
+}," is sb");
+</pre>
+
+	<div class="code-res">输出结果:</div>
+	<pre class="code">
+&gt;  a is sb
+&gt;  b is sb
+&gt;  c is sb</pre>
+
+</div>
