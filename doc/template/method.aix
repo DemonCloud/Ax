@@ -1,0 +1,63 @@
+{{ for(var i=0, l=toptitle.length; i<l; i++){ }}
+<h2 class="content-s-title">{{-toptitle[i]}}</h2>
+{{ } }} 
+
+<div class="content-introduce">
+
+	<h3>API:</h3>
+{{ for(var i=0, l=api.length; i<l; i++){ }}
+	<code>{{-api[i]}}</code><br>
+{{ } }} 
+	<hr>
+
+
+{{ if( param.length ){ }}
+	<h3>参数:</h3>
+	{{ for(var i=0, l=param.length; i<l; i++){ }}
+	<div class="content-param">
+		<h5><span>{{-param[i][0]}}</span> {{-param[i][1]}}</h5>
+	</div>
+	{{ } }}
+{{ } }}
+
+{{ if( paramcall.length ){ }}
+	<h3>callback回调参数:</h3>
+	{{ for(var i=0, l=paramcall.length; i<l; i++){ }}
+	<div class="content-param">
+		<h5><span>{{-paramcall[i][0]}}</span>{{-paramcall[i][1]}}</h5>
+	</div>
+	{{ } }}
+{{ } }}
+	<hr>
+
+{{ if( returnval.length ){ }}
+	<h3>返回值:</h3>
+	{{ for(var i=0, l=returnval.length; i<l; i++){ }}
+	<div class="content-param">
+		<h5><span>{{-returnval[i][0]}}</span>{{-returnval[i][1]}}</h5>
+	</div>
+	{{ } }}
+	<hr>
+{{ } }}
+
+
+	<h3>说明:</h3>
+	{{ for(var i=0, l=info.length; i<l; i++){ }}
+	<p>{{-info[i]}}</p>
+	{{ } }}
+	{{ for(var i=0, l=infowarning.length; i<l; i++){ }}
+	<p class="warning">{{-infowarning[i]}}</p>
+	{{ } }}
+	<hr>
+
+{{ if( example.length ){ }}
+	<h3>示例:</h3>
+	{{ for(var i=0, l=example.length; i<l; i++){ }}
+	<div class="code-info">{{-example[i].info}}</div>
+	<pre class="code">{{-example[i].code.join("\n")}}</pre>
+
+	<div class="code-res">输出结果:</div>
+	<pre class="code">{{-example[i].result.join("\n")}}</pre>
+	{{ } }}
+{{ } }}
+</div>

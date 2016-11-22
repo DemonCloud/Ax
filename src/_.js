@@ -285,7 +285,7 @@
 			if(_.isArray(list)){
 				for(var i=0,l=list.length; i<l; i++)
 					if(idf.call(list,list[i],i,list))
-						res.push(list.splice(i,1).pop());
+						res.push(list.splice(i,1).pop())&&i--;
 			}else if(_.isObject(list)){
 				for(var i in list)
 					if(list.hasOwnProperty(i))

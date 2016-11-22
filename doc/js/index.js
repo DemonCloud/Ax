@@ -1,12 +1,20 @@
 (function(){
 
 	var list = __("#list");
-		
 
 	var view = new aix.view({
 		el : "#render",
-		render: function(data){
-			__(this.el).fill(data);
+		url: "template/method.aix"
+	});
+		
+	var model = new aix.model({
+		url:"module/data.json",
+		events:{
+			init:function(){
+				this.fetch({},function(){
+					route.listen();
+				});
+			}
 		}
 	});
 
@@ -19,18 +27,11 @@
 				list.find("a").removeClass("active");
 				list.find("a[href='#"+hash+"']").addClass("active");
 
-				_.aix({
-					url : 'module/'+hash+'.html',
-					type : "GET",
-					success:function(responseText){
-						window.scrollTo(0,0);
-						view.render(responseText);
-					}
-				});
+				window.scrollTo(0,0);
+				view.render(model.data[hash]);
 			}
 		}
 	});
 
-	route.listen();
 
 })();
