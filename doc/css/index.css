@@ -25,6 +25,8 @@ body{
 	height: 100%;
 	width: 270px;
 	background:#f8f8f8;
+	overflow-x:hidden;
+	overflow-y:auto;
 	z-index: 1;
 }
 
@@ -68,12 +70,17 @@ body{
 }
 
 .contain .list .list-items a{
+	display:inline-block;
 	text-decoration:none;
 	cursor: pointer;
 	color:#ca4d3f;
 	background-color: transparent;
 	padding: 2px 4px;
 	font-size: 12px;
+}
+
+.contain .list .list-items a.child{
+	margin-left:18px;
 }
 
 .contain .list .list-items a.active,
@@ -140,7 +147,7 @@ body{
 	font-weight: bold;
   font-size: 14px;
   color: #ca4d3f;
-	vertical-align: middle;
+	/* vertical-align: middle; */
 }
 
 .content-render pre{
@@ -168,6 +175,7 @@ body{
 
 .content-render pre.code{
   font-family: monospace;
+  font-weight:normal;
 	display: block;
   line-height: 1.6;
   color: #ddd;

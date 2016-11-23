@@ -266,11 +266,15 @@
 
 		set : function(){
 			var args = _.slice(arguments);
-			if(args.length>1)
+			if(args.length>1){
+				this.dispatch("change",
+											null,
+											[args[1],this.data[args[0]]]
+										 );
 				this.data[args[0]] = args[1];
-			else
+			}else
 				this.data = args[0];
-			return this;
+			return this.dispatch("set",null,args);
 		},
 
 		// API event
@@ -307,7 +311,7 @@
 		add : function(){
 			// compose and format data as this.data
 			var args = _.slice(arguments);
-			var tmp = _.clonedoom(this.data) , type = _.typeof(tmp);
+			var tmp = _.clone(this.data) , type = _.typeof(tmp);
 			_.foreach(args,function(data){
 				switch(type){
 					case "number":
@@ -337,9 +341,12 @@
 		remove: function(){
 			// only deel with Array and object
 			var args = _.slice(arguments);
-			var tmp = _.clonedoom(this.data) , type = _.typeof(tmp);
+			var tmp = _.clone(this.data) , type = _.typeof(tmp);
 			_.foreach(args,function(data){
 				switch(type){
+					case "string":
+						tmp = tmp.replace(data.toString,"");
+						break;
 					case "array":
 						if(_.isArray(data))
 							_.foreach(data,function(e){ _.not(tmp,e); });
@@ -357,13 +364,11 @@
 				}
 			});
 			// trigger change event
-			this.data = tmp;
-
+			if(args.length)
+				this.data = tmp;
+			else
+				this.data = null;
 			return this.dispatch("remove",null,args);
-		},
-
-		del: function(){
-			return this.remove.apply(this,_.slice(arguments));
 		}
 	};
 
@@ -531,10 +536,6 @@
 			return this;
 		},
 
-		del: function(){
-			return this.remove.apply(this,_.slice(arguments));
-		},
-
 		get : function(id){
 			if(_.isString(id)||_.isNumber(id))
 				return _.filter(this.data,function(one){
@@ -546,7 +547,7 @@
 
 		set : function(data){
 			this.data = _.isArray(data) ? data : [data];
-			return this;
+			return this.dispatch("set",null,[data]);
 		},
 
 		dispatch : function(type,fn,args){
@@ -623,8 +624,6 @@
 		},
 
 		parse : function(){
-			if(_.isString(this.data))
-				return JSON.parse(this.data);
 			return _.clone(this.data);
 		},
 
@@ -889,6 +888,10 @@
 		dispatch : function(type,fn,args){
 			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
 		},
+
+		trigger : function(){
+			return this.dispatch.apply(this,_.slice(arguments));
+		}
 	};
 
 	//get Hash param form URL

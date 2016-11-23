@@ -1011,11 +1011,16 @@
 	};
 
 	_.extend({
+		strip: function(str){
+			return _.isString(str) ? str
+									.replace(/[\t\r\n\f]/gm,'')
+									.replace(/<script\b[^>]*>(.*?)<\/script>/gi,'')
+								 : "";
+		},
+
 		// dom parse 
 		domparse : function(domstr){
-			var str = (domstr||"")
-				.replace(/[\t\r\n\f]/gm,'')
-				.replace(/<script\b[^>]*>(.*?)<\/script>/gi,'');
+			var str = _.strip(domstr);
 
 			// make a newtree default node
 			var newlevel = 1; 

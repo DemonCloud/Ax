@@ -110,15 +110,16 @@
 	   ,isTag     = /^[^\[\]\+\-\.#\s\=]+$/i													// "p" "div" "DIV"
 	   ,isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i 		// div[id="nami"]
 	   ,mreSl     = /^[^\s]+,[^\s]+/gi
-	   ,cidSl     = /[\s|\r]+/gim
-	   ,pitSl     = /[>|\+|\~]+/gim
-		 ,isHTML    = /<[a-z][\s\S]*>/i;
+	   ,cidSl     = /[\s|\r]+/im
+	   ,pitSl     = /[>|\+|\~]+/im
+		 ,isHTML    = /\<[a-zA-Z][\s\S]*\>/;
 
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
 	function dsizzle(elm){
-		elm = _.trim(elm);
+		elm = _.strip(_.trim(elm));
+
 		var $el=[] ,$1 = !cidSl.test(elm) ,$2 = !pitSl.test(elm);
 		if($1&&$2){
 			if(elm.search(",")>-1)
@@ -164,7 +165,6 @@
 			}
 		
 		}else{ 
-
 			if(isHTML.test(elm)){
 				var dg = document.createElement("i");
 						dg.innerHTML = elm;
@@ -494,7 +494,7 @@
 					if(elm.tagName.toUpperCase() === "SELECT")
 						return elm.options[elm.selectedIndex].value || elm.innerText;
 					else 
-						return elm.value || elm.getAttribute("value");
+						return elm.value||"";
 			}
 		},
 

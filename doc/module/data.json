@@ -18,6 +18,7 @@
 		],
 		"infowarning":[
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"",
@@ -28,7 +29,8 @@
 					""
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -55,6 +57,7 @@
 		],
 		"infowarning":[
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"在 _ 扩展方法，使其可以随处调用",
@@ -104,6 +107,8 @@
 				"{ a:2,b:1 }"
 				]
 			}
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -127,6 +132,7 @@
 		],
 		"infowarning":[
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"_.define 可以定义单个属性，也可以一次性定义多个属性",
@@ -187,6 +193,8 @@
 					"1"
 				]
 			}
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -207,6 +215,20 @@
 			"_.typeof 用于准确的检测变量类型，并且返回当前变量类型对应的字符串(小写)"
 		],
 		"infowarning":[
+		],
+		"table":[
+			["类型","返回值"],
+			["对象","object"],
+			["数组","array"],
+			["函数","function"],
+			["参数","arguments"],
+			["布尔值","boolean"],
+			["字符串","string"],
+			["数字","number"],
+			["正则表达式","regexp"],
+			["时间对象","date"],
+			["Null","null"],
+			["未定义","undefined"]
 		],
 		"example":[
 			{ 
@@ -237,6 +259,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -258,6 +282,8 @@
 		],
 		"infowarning":[
 			"Js 中的大多数变量类型都属于对象,比如数组,这也是为什么在Js中有“一切皆对象”的说法"
+		],
+		"table":[
 		],
 		"example":[
 			{ 
@@ -292,6 +318,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -323,6 +351,8 @@
 		"infowarning":[
 			"非必要时,使用用_.is*效率远高于 _.typeof"
 		],
+		"table":[
+		],
 		"example":[
 			{ 
 				"info":"使用isFunction来检测出变量的类型",
@@ -333,7 +363,8 @@
 					"false"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -355,7 +386,10 @@
 		"infowarning":[
 			"可以将无用函数,空函数都指向_.NULL,作用和jQuery.noop等同,从而减少创建无用匿名函数的次数,编译器也不会GC"
 		],
+		"table":[],
 		"example":[
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -376,7 +410,10 @@
 		],
 		"infowarning":[
 		],
+		"table":[],
 		"example":[
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -397,7 +434,10 @@
 		],
 		"infowarning":[
 		],
+		"table":[],
 		"example":[
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -424,6 +464,7 @@
 			"_.loop同_.foreach，用于对象或者数组的循环"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"使用循环",
@@ -476,6 +517,8 @@
 				"c is sb"
 				]
 			}
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -498,6 +541,7 @@
 		"infowarning":[
 			"当对象中有属性的enumerable被设置为false时(非枚举属性),则该属性不会在返回数组中"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"整合出对象的键 ",
@@ -535,6 +579,8 @@
 				"['a','c']"
 				]
 			}
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -556,6 +602,7 @@
 			"如果参数不是一个数组或者不是一个类数组,则返回值均为一个空的数组"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"拷贝数组的必要性",
@@ -598,6 +645,8 @@
 					"[]"
 				]
 			}
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -622,6 +671,7 @@
 		],
 		"infowarning":[
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"删除数组中的元素，或者对象中的键值对",
@@ -644,7 +694,8 @@
 				"{b:2}"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -668,6 +719,7 @@
 		"infowarning":[
 			"可用于模拟堆栈"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"弹出数组末尾的元素",
@@ -682,7 +734,8 @@
 				"[1,2,3]"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -706,6 +759,7 @@
 		"infowarning":[
 			"可用于模拟队列"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"弹出数组首个元素",
@@ -720,7 +774,8 @@
 					"[2,3,4]"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -743,6 +798,7 @@
 			"如果参数不是数组(非法)，则返回此参数"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"数组末尾新增元素",
@@ -753,7 +809,8 @@
 					"[1,2,3,4,1,2,3]"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -776,6 +833,7 @@
 			"如果参数不是数组(非法)，则返回此参数"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"数组起始位置新增元素",
@@ -786,7 +844,8 @@
 					"[1,2,3,1,2,3,4]"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -810,6 +869,7 @@
 		"infowarning":[
 			"浅拷贝对象 拷贝会自动将Function类型的变量给省略掉"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"拷贝对象,数组",
@@ -835,7 +895,8 @@
 				"&gt;  [3,2,1]"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -859,6 +920,7 @@
 		],
 		"infowarning":[
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"深度拷贝对象,数组",
@@ -881,7 +943,8 @@
 				"&gt;  false"
 				]
 			}
-		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -905,6 +968,7 @@
 			"当arr参数非法时，则会返回arr本身"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"对数值进行由小到大排序",
@@ -919,6 +983,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -940,6 +1006,7 @@
 			"方法执行成功后会立马修改arr原数组"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"去除数组中重复的元素",
@@ -955,6 +1022,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -981,6 +1050,7 @@
 			"与 _.reject 完全相反"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"使用筛选函数",
@@ -1007,6 +1077,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1032,6 +1104,7 @@
 			"与 _.filter 完全相反"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"使用筛选函数",
@@ -1057,6 +1130,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1082,6 +1157,7 @@
 			"执行成功则会立马修改原来的数组或对象"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"数组和对象的映射修改 ",
@@ -1106,6 +1182,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1132,6 +1210,7 @@
 			"执行成功则会立马修改原来的数组或对象"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"裁剪掉数组中的偶数，裁剪掉对象中的奇数",
@@ -1163,6 +1242,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1188,6 +1269,7 @@
 			"执行成功则会立马修改原来的数组或对象"
 		],
 		"infowarning":[],
+		"table":[],
 		"example":[
 			{ 
 				"info":"数组和对象的映射修改",
@@ -1216,6 +1298,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1225,12 +1309,12 @@
 			"aix.model(setting)"
 		],
 		"param" : [
-			["setting","[ 类型:Object ]"]
+			["setting","[ 类型:Object,Null ]"]
 		],
 		"paramcall" : [
 		],
 		"returnval" : [
-			["model","实例化的aix.model数据模型"]
+			["aix model","实例化的aix.model数据模型"]
 		],
 		"info" : [
 			"aix.model 是 aix 框架中模型的基础构造函数",
@@ -1241,6 +1325,7 @@
 		"infowarning":[
 			"构造函数 aix.model"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"创建一个模型",
@@ -1258,6 +1343,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1281,6 +1368,7 @@
 			"虽然,直接访问model.data可以获取到模型的数据,但是我们不推荐这样的做法",
 			"由于Js中的对象是指针,我们尽量使用parse()方法来返回模型的安全数据,防止外部逻辑轻易的修改了模型的数据(model.data)"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"获取模型中的数据",
@@ -1299,6 +1387,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1308,7 +1398,7 @@
 			"model.get(arg)"
 		],
 		"param" : [
-			["arg","[ 类型:String,Number]"]
+			["arg","[ 类型:String,Number,Null ]"]
 		],
 		"paramcall" : [
 		],
@@ -1322,6 +1412,7 @@
 			"当属性不存在时,则会返回一个空的字符串",
 			"适用于模型数据为对象或者数组"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"获取模型数据的一条数据",
@@ -1343,6 +1434,8 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -1369,6 +1462,7 @@
 		"infowarning":[
 			"设置数据最好使用set方法,只要data数据被改变(通过验证).则会触发change事件,详情查看 aix.model - events"
 		],
+		"table":[],
 		"example":[
 			{ 
 				"info":"设置模型数据",
@@ -1394,6 +1488,607 @@
 				]
 			}
 		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.events" : {
+		"toptitle" : ["aix.model - [ events ]"],
+		"api" : [
+			"model.addEvent(type,func)",
+			"model.removeEvent(type,func)",
+			"model.dispatch(type,func,args)",
+			"model.trigger(type,func,args)"
+		],
+		"param" : [
+			["type","[ 类型:String ]"],
+			["func","[ 类型:Function,Null ]"],
+			["args","[ 类型:Array,Null ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"aix.model作为一个数据容器,它提供一些基础的事件api,用于给模型绑定事件,移除事件,已经触发事件",
+			"事件的触发都基于dispatch api, 模型在一些特定的行为下会触发特定的事件"
+		],
+		"infowarning":[
+			"事件是模型的重要api,利用事件分发机制可以做到1对n的数据进行双向绑定",
+			"事件函数中的this一般都是指向模型本身的,所以可以直接调用this[api]来对模型本身进行操作",
+			"_",
+			"* trigger 和 dispatch的作用等同.",
+			"* change事件是一个比较特殊的事件,它的触发时机并不是在模型数据改变后才触发的,而是模型数据通过了验证,即将要改变之前触发的,所以change事件的两个参数 change(newvalue,oldvalue). 分别传入了修改后的数值(newvalue),以及未修改时候的原数值(oldvalue)"
+		],
+		"table" : [
+			["API","触发事件"],
+			["init","init(初始化事件,一般只在模型创建的时候被调用)"],
+			["set","change,set"],
+			["add","change,add"],
+			["remove","change,remove"],
+			["aget","get,get:success,get:fail"],
+			["fetch","fetch,change,fetch:success,fetch:fail"],
+			["sync","fetch,change,fetch:success,fetch:fail"],
+			["post","post,change,post:success,post:fail"],
+			["save","post,change,post:success,post:fail"],
+			["pipe(type)","type,type:success,type:fail"],
+			["validate","validate,validate:success,validate:fail,change"]
+		],
+		"example":[
+			{ 
+				"info":"常规的定义事件方法",
+				"code":[
+				"var m = new aix.model({",
+				"  data:{",
+				"    a : 1,",
+				"    b : 2",
+				"  },",
+				"  events:{",
+				"    init:function(){",
+				"      console.log(this.data.a+this.data.b)",
+				"    },",
+				"    custom:function(){",
+				"      this.set({a:4,b:6});",
+				"    },",
+				"    change:function(newModeldata,oldModeldata){",
+				"     console.log(newModeldata.a*newModeldata.b)",
+				"    }",
+				"  }",
+				"})",
+				"",
+				"//custom事件中修改了模型的数值,所以会触发change事件",
+				"m.dispatch('custom');",
+				"",
+				"//查看模型当前的数据",
+				"console.log(m.parse())"
+				],
+				"result":[
+					"3",
+					"24",
+					"{a:4,b:6}"
+				]
+			},
+			{ 
+				"info":"使用addEvent添加事件,触发事件",
+				"code":[
+				"var m = new aix.model({",
+				"  data: 'cloud',",
+				"  events:{",
+				"    init:function(){",
+				"      console.log('model create!');",
+				"    }",
+				"  }",
+				"});",
+				"",
+				"m.addEvent('hello',function(){",
+				"  console.log('hello '+this.parse())",
+				"});",
+				"",
+				"//可以为同一个事件添加多个触发函数,按添加先后顺序执行",
+				"m.addEvent('hello',function(){",
+				"  console.log('Lucky day today!')",
+				"});",
+				"",
+				"m.dispatch('hello');"
+				],
+				"result":[
+					"model create!",
+					"hello cloud",
+					"Lucky day today!"
+				]
+			},
+			{ 
+				"info":"使用removeEvent移除事件",
+				"code":[
+				"var fn = function(){ ",
+				"  console.log('fn函数')",
+				"}",
+				"",
+				"var m = new aix.model({",
+				"  events:{",
+				"    log:fn",
+				"  }",
+				"});",
+				"",
+				"m.addEvent('log',function(){",
+				"  console.log('匿名函数')",
+				"});",
+				"",
+				"m.addEvent('log',function(){",
+				"  console.log('匿名函数2')",
+				"});",
+				"",
+				"m.dispatch('log');",
+				"",
+				"//只移除了某个指定的函数 fn",
+				"m.removeEvent('log',fn)",
+				"m.dispatch('log')",
+				"",
+				"//直接移除了log上的所有事件",
+				"m.removeEvent('log')",
+				"m.dispatch('log')  //无效触发"
+				],
+				"result":[
+					"fn函数",
+					"匿名函数",
+					"匿名函数2",
+					"",
+					"匿名函数",
+					"匿名函数2"
+				]
+			},
+			{ 
+				"info":"触发事件时携带参数",
+				"code":[
+				"var m = new aix.model({",
+				"  data:213,",
+				"  events:{",
+				"    log:function(number){",
+				"      console.log(this.parse()+(number||0))",
+				"    }",
+				"  }",
+				"});",
+				"",
+				"m.dispatch('log');",
+				"",
+				"// 可以携带自定义参数,作为事件函数的参数来使用",
+				"m.dispatch('log',null,[87]);"
+				],
+				"result":[
+					"213",
+					"300"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.listen" : {
+		"toptitle" : ["aix.model - [ listen ]"],
+		"api" : [
+			"model.listen(prop,handle(new,old))",
+			"model.unlisten(prop)"
+		],
+		"param" : [
+			["prop","[ 类型:String ]"],
+			["handle","[ 类型:Function ]"]
+		],
+		"paramcall" : [
+			["new","[ prop属性发生改变时,会将改变的值传入handle ]"],
+			["old","[ prop属性发生改变时,会将prop原值传入handle ]"],
+			["return new","[ handle最终需要将new值返回,否则无法设置属性值 ]"]
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"listen 方法用于监听模型数据中,某个属性的变化",
+			"unlisten 用于解除监听绑定"
+		],
+		"infowarning":[
+			"使用listen,unlisten要求模型的数据为一个对象,否则不能监听",
+			"如果model.data被替换成了一个新的值,则之前绑定的监听事件无效"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"监听模型数据中某个值的改变. 然后解除监听",
+				"code":[
+				"var m = new aix.model({",
+				"  data:{",
+				"    a:1,",
+				"    b:2",
+				"  },",
+				"  events:{",
+				"    change:function(){",
+				"      console.log('model has change!')",
+				"    }",
+				"  }",
+				"});",
+				"",
+				"m.listen('a',function(newval,old){",
+				"  console.log(newval,old); ",
+				"  return newval; ",
+				"})",
+				"",
+				"m.set('a',3)",
+				"console.log(m.parse())",
+				"",
+				"",
+				"m.unlisten('a')",
+				"//不再触发监听事件",
+				"m.set('a',10)"
+				],
+				"result":[
+					"model has change!",
+					"3,1",
+					"{a:3,b:2}",
+					"",
+					"model has change!"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.toJSON" : {
+		"toptitle" : ["aix.model - [ toJSON ]"],
+		"api" : [
+			"model.toJSON()"
+		],
+		"param" : [
+			["无",""]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["serilaize data","被JSON序列化的字符串数据"]
+		],
+		"info" : [
+			"将模型内的数据,转化为标准的JSON字符串"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"将模型数据JSON序列化",
+				"code":[
+				"var m = new aix.model({",
+				"  data:{",
+				"    a:1,",
+				"    b:2,",
+				"    c:{",
+				"      c1:3,",
+				"      c2:4,",
+				"      c3:5",
+				"    }",
+				"  }",
+				"});",
+				"",
+				"console.log(m.toJSON())"
+				],
+				"result":[
+					"{'a':1,'b':2,'c':{'c1':3,'c2':4,'c3':5}}"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.add" : {
+		"toptitle" : ["aix.model - [ add ]"],
+		"api" : [
+			"model.add(arg,arg1,...)"
+		],
+		"param" : [
+			["arg","[类型:任意类型]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"aix.model.add 是一个比较特殊的操作,他会改变模型原来的数值,同时触发校验,和set不同的是他在原有的数据上做了'叠加'操作"
+		],
+		"infowarning":[
+			"使用add之前最好明白模型里存储数据的类型"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"扩充模型数据的数组",
+				"code":[
+				"var m = new aix.model({",
+				"  data:[1,2]",
+				"});",
+				"",
+				"m.add([3,4],[5,6,7],[8,9]);",
+				"console.log(m.parse())"
+				],
+				"result":[
+					"[1,2,3,4,5,6,7,8,9]"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.remove" : {
+		"toptitle" : ["aix.model - [ remove ]"],
+		"api" : [
+			"model.remove(arg,arg1,...)"
+		],
+		"param" : [
+			["arg","任意类型"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"remove 用于移除掉原数据中特定的数据"
+		],
+		"infowarning":[
+			"参数为空传入时,则会默认将模型数据变成null"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"移除模型数据中的特定值",
+				"code":[
+				"var m = new aix.model({",
+				"  data:[1,2,3,4,5]",
+				"});",
+				"",
+				"m.remove(2)",
+				"console.log(m.parse());",
+				"",
+				"",
+				"//没有参数则完全移除模型数据",
+				"m.remove()",
+				"console.log(m.parse());"
+				],
+				"result":[
+					"[1,3,4,5]",
+					"null"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.validate" : {
+		"toptitle" : ["aix.model - [ remove ]"],
+		"api" : [
+			"model.validate(data)"
+		],
+		"param" : [
+			["无",""]
+		],
+		"paramcall" : [
+			["data","[ 每次模型发生修改时,传入的修改值 ]"]
+		],
+		"returnval" : [
+			["vali boolean","[ 需要在Validate校验函数内部返回布尔值来判断是否通过了校验 ]"]
+		],
+		"info" : [
+			"validate最好是在模型初始化的时候预先定义好,是一个校验函数,来校验模型数据的合法性"
+		],
+		"infowarning":[
+			"validate为Function类型,否则无效"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"定义校验函数",
+				"code":[
+				"var m = new aix.model({",
+				"  //模型数据只能为数组",
+				"  validate:function(data){",
+				"    return _.typeof(data) === 'array';",
+				"  },",
+				"  events:{",
+				"    'validate:success':function(data){",
+				"       console.log('model data has been success set to array -> ['+data.toString()+']')",
+				"    },",
+				"    'validate:fail':function(data){",
+				"       console.log('model data set fail with '+_.typeof(data))",
+				"    }",
+				"  }",
+				"});",
+				"",
+				"m.set([3,2,1]);",
+				"console.log(m.parse())",
+				"",
+				"m.set('this String');",
+				"console.log(m.parse())",
+				""
+				],
+				"result":[
+				"model data has been success set to array -> [3,2,1]",
+				"[3, 2, 1]",
+				"",
+				"model data set fail with string",
+				"[3, 2, 1]"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.extend" : {
+		"toptitle" : ["aix.model - [ extend ]"],
+		"api" : [
+			"aix.model.extend(setting)"
+		],
+		"param" : [
+			["setting","[ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["extend model constructor","[ 从aix.model中扩展出的自定义模型构造器 ]"]
+		],
+		"info" : [
+			"aix.model.extend 用于生成自定义的模型构造函数, 以下实例详细的展示了这一点",
+			"通常生成模型我们使用 new aix.model() , 立即产生了一个实例化模型",
+			"而new aix.model.extend()则是返回了一个模型构造器"
+		],
+		"infowarning":[
+			"模型构造器的base属性指向了aix.model"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"创建一个模型构造器",
+				"code":[
+				"var mc = new aix.model.extend({",
+				"  data:[1,2,3],",
+				"  events:{",
+				"    init:function(){",
+				"      console.log('new mc model create -> '+this.aid)",
+				"    }",
+				"  }",
+				"})",
+				"",
+				"var m = new mc();",
+				"var m2 = new mc();",
+				"",
+				"console.log(m instanceof mc);",
+				"console.log(m instanceof aix.model);",
+				"",
+				"//通过构造器创建出的模型携带初始数据",
+				"m.parse();"
+				],
+				"result":[
+				"new mc model create -> #2",
+				"new mc model create -> #3",
+				"",
+				"true",
+				"false",
+				"",
+				"[1,2,3]"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.view" : {
+		"toptitle" : [ "aix.view" ],
+		"api" : [
+			"aix.view(setting)"
+		],
+		"param" : [
+			["setting","[ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["aix view","实例化的aix.view视图容器"]
+		],
+		"info" : [
+			"aix.view 是一个视图管理器, 用于封装视图的逻辑",
+			"使用new 关键字来创建一个新的aix.view视图容器",
+			"aixview集成了简单的js模版引擎,以及可以使用内置的库[ __ ]进行dom操作"
+		],
+		"infowarning":[
+			"aixview 创建时,会自动将template属性中的字符串编译成模版,直接套入数据即可获得需要html结构",
+			"_",
+			"* 如果设置了url属性,则会调用底层ajax方法去获取url地址的数据并且编译成模板,[ 需要注意的是该操作是异步的 ]",
+			"* 如果没有设置render方法,则会默认创建生成一个render方法,此方法是像el dom节点中渲染模板编译的数据",
+			"* 如果设置了build属性为Function类型,则会将view中的模板字符串传入到build函数中调用,编译成一个自定义的值,返回到view.template上,则不会使用默认的模板引擎.build函数的this指向view本身",
+			"_",
+			"@ 创建aix.view的时候必须传入el节点,否则报错",
+			"@ 内置模板引擎使用了 _.doom"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"创建一个aixview视图,使用内置的模版引擎",
+				"code":[
+				"var v = new aix.view({",
+				"  el : '#id',",
+				"  template: '<div>{{#a}}</div>\\n'",
+				"           +'<div>{{#b}}</div>\\n'",
+				"           +'<div>{{#c}}</div>',",
+				"",
+				"  getRender:function(data){",
+				"    return this.template(data);",
+				"  }",
+				"});",
+				"",
+				"var data = {a:1,b:2,c:3}; ",
+				"",
+				"console.log(v.getRender(data))"
+				],
+				"result":[
+				"<div>1</div>",
+				"<div>2</div>",
+				"<div>3</div>"
+				]
+			}
+		],
+		"exampledemo":[
+			"demo/aixview.html"
+		]
+	},
+
+	"aix.view.events" : {
+		"toptitle" : ["aix.model - [ view ]"],
+		"api" : [
+			"view.addEvent(type,func)",
+			"view.removeEvent(type,func)",
+			"view.dispatch(type,func,args)",
+			"view.trigger(type,func,args)"
+		],
+		"param" : [
+			["type","[ 类型:String ]"],
+			["func","[ 类型:Function,Null ]"],
+			["args","[ 类型:Array,Null ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["view","this视图"]
+		],
+		"info" : [
+			"view 提供了和 model一样的事件触发机制",
+			"和model事件不同的地方在于, view的事件有两种:"
+		],
+		"infowarning":[
+			"@ dom事件 - 绑定在视图的dom元素上的事件, 绑定时,需要以:分开,例如 'click:.sxz' 等于给视图内的.sxz绑定了对应的click事件 ",
+			"@ 自定义事件 - 和模型事件一样, view事件并不提供一些自动触发的事件,都需要手动通过dispatch的方式去触发"
+		],
+		"table":[
+			["事件类型","触发事件"],
+			["init","init(初始化事件,一般只在视图创建的时候被调用)"]
+		],
+		"example":[
+		],
+		"exampledemo":[
+			"demo/aixview.html",
+			"demo/aixview2.html",
+			"demo/aixview3.html"
 		]
 	}
 

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>demo-aixview</title>
+	<link rel="stylesheet" href="../css/normalize.css" media="all">
+	<link rel="stylesheet" href="../css/demo.css" media="all">
+</head>
+<body>
+	<div class="code">
+		<div class="top">
+		<pre contenteditable="true">
+var model = new aix.model.extend({
+	data:"hello",
+	events:{
+		change:function(val){
+			this.view.dispatch("upinput",null,[val]);
+		}
+	}
+});
+
+var view = new aix.view({
+	el:"#render",
+
+	template:_.doom(__("#tmp").html()),
+	render:function(data){
+		__(this.el).append(this.template(data));
+	},
+
+	events:{
+		init:function(){
+			__(this.el).find("#ri")
+								 .value("Hello Aix")
+			this.render({text:"Hello Aix"});
+
+			this.model = new model({
+				view : this
+			});
+		},
+
+		upinput:function(txt){
+			__(this.el).find("#rv").fill(txt||"");
+		},
+
+		"keyup:#ri":function(event){
+			var view = event.data.self;
+			view.model.set(__(this).value());
+		}
+	},
+});</pre>
+		</div>
+		<div class="bottom">
+		<pre contenteditable="true">
+&lt;div id="rv"&gt;{{-text}}&lt;/div&gt;
+	</pre>
+		</div>
+	</div>
+	<div class="preview">
+		<div id="render">
+			<input type="text" id="ri" value="">
+		</div>
+	</div>
+
+
+<script id="tmp" type="aix/template">
+	<div id="rv">{{-text}}</div>
+</script>
+
+<script src="../../dest/aix.c.js"></script>
+<script>
+(function(){
+	var model = new aix.model.extend({
+		data:"hello",
+		events:{
+			change:function(val){
+				this.view.dispatch("upinput",null,[val]);
+			}
+		}
+	});
+
+	var view = new aix.view({
+		el:"#render",
+
+		template:_.doom(__("#tmp").html()),
+		render:function(data){
+			__(this.el).append(this.template(data));
+		},
+
+		events:{
+			init:function(){
+				__(this.el).find("#ri")
+									 .value("Hello Aix");
+				this.render({text:"Hello Aix"});
+
+				this.model = new model({
+					view : this
+				});
+			},
+
+			upinput:function(txt){
+				__(this.el).find("#rv").fill(txt||"");
+			},
+
+			"keyup:#ri":function(event){
+				var view = event.data.self;
+				view.model.set(__(this).value());
+			}
+		},
+	});
+})()
+</script>
+</body>
+</html>

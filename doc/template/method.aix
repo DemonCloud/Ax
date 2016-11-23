@@ -8,10 +8,10 @@
 {{ for(var i=0, l=api.length; i<l; i++){ }}
 	<code>{{-api[i]}}</code><br>
 {{ } }} 
-	<hr>
 
 
 {{ if( param.length ){ }}
+	<hr>
 	<h3>参数:</h3>
 	{{ for(var i=0, l=param.length; i<l; i++){ }}
 	<div class="content-param">
@@ -28,19 +28,19 @@
 	</div>
 	{{ } }}
 {{ } }}
-	<hr>
 
 {{ if( returnval.length ){ }}
+	<hr>
 	<h3>返回值:</h3>
 	{{ for(var i=0, l=returnval.length; i<l; i++){ }}
 	<div class="content-param">
 		<h5><span>{{-returnval[i][0]}}</span>{{-returnval[i][1]}}</h5>
 	</div>
 	{{ } }}
-	<hr>
 {{ } }}
 
 
+	<hr>
 	<h3>说明:</h3>
 	{{ for(var i=0, l=info.length; i<l; i++){ }}
 	<p>{{-info[i]}}</p>
@@ -48,16 +48,46 @@
 	{{ for(var i=0, l=infowarning.length; i<l; i++){ }}
 	<p class="warning">{{-infowarning[i]}}</p>
 	{{ } }}
-	<hr>
+
+{{ if( table.length ){ }}
+	<table>
+		<thead>
+			<tr>
+		{{ for(var i=0,l=table[0].length;i<l;i++){ }}
+				<th>{{#table[0][i]}}</th>
+		{{ } }}
+			</tr>
+		</thead>
+		<tbody>
+		{{ for(var i=1,l=table.length;i<l;i++){ }}
+				<tr>
+				{{ for(var j=0,k=table[i].length;j<k;j++){ }}
+					<td>{{#table[i][j]}}</td>
+				{{ } }}
+				</tr>
+		{{ } }}
+		</tbody>
+	</table>
+{{ } }}
 
 {{ if( example.length ){ }}
+	<hr>
 	<h3>示例:</h3>
 	{{ for(var i=0, l=example.length; i<l; i++){ }}
-	<div class="code-info">{{-example[i].info}}</div>
+	<div class="code-info">{{#i+1}}. {{-example[i].info}}</div>
 	<pre class="code">{{-example[i].code.join("\n")}}</pre>
 
 	<div class="code-res">输出结果:</div>
 	<pre class="code">{{-example[i].result.join("\n")}}</pre>
 	{{ } }}
 {{ } }}
+
+{{ if( exampledemo.length ){ }}
+	<hr>
+	<h3>DEMO</h3>
+	{{ for(var i=0, l=exampledemo.length; i<l; i++){ }}
+	<div><a class="demolink" href="{{#exampledemo[i]}}" target="_blank">demo{{#i+1}}</a></div>
+	{{ } }}
+{{ } }}
+
 </div>
