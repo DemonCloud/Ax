@@ -2,17 +2,23 @@
 
 	var list = __("#list");
 
-	var view = new aix.view({
-		el : "#render",
-		url: "template/method.aix"
-	});
 		
 	var model = new aix.model({
 		url:"module/data.json",
 		events:{
 			init:function(){
 				this.fetch({},function(){
-					route.listen();
+					
+					var view = new aix.view({
+						el : "#render",
+						url: "template/method.aix",
+						events:{
+							init:function(){
+								route.view = this;
+								route.listen();
+							}
+						}
+					});
 				});
 			}
 		}
@@ -28,7 +34,7 @@
 				list.find("a[href='#"+hash+"']").addClass("active");
 
 				window.scrollTo(0,0);
-				view.render(model.data[hash]);
+				this.view.render(model.data[hash]);
 			}
 		}
 	});

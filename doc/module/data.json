@@ -2090,6 +2090,63 @@
 			"demo/aixview2.html",
 			"demo/aixview3.html"
 		]
+	},
+
+	"_.bind" : {
+		"toptitle" : ["_.bind"],
+		"api" : [
+			"_.bind(obj,args,...)"
+		],
+		"param" : [
+			["obj","[类型:Object,Array]"],
+			["args","[类型:任意类型]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["bind function","已经被绑定了指向的Function"]
+		],
+		"info" : [
+			"需要bind函数的原因很简单,假设a对象中有个函数a.fn=function(){ console.log(this.a) }, 很明显, 这个函数返回了当前对象a的a属性值, 那么当b对象,引用了a.fn, 像这样 b.fn = a.fn, 则当b.fn调用时结果会输出b的a属性值, 那么,如果我们希望的是,在b引用了a.fn时,调用b.fn, 输出的结果依然是a.a的值,这个时候则需要给a.fn做绑定了."
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"为什么需要_.bind",
+				"code":[
+					"var a = {",
+					"  a : 1,",
+					"  fn:function(){",
+					"    console.log(this.a)",
+					"  }",
+					"}",
+					"",
+					"var b = {",
+					"  a : 4",
+					"}",
+					"",
+					"b.fn = a.fn;",
+					"",
+					"a.fn();",
+					"b.fn();",
+					"",
+					"",
+					"_.bind(a,a);",
+					"",
+					"b.fn = a.fn",
+					"b.fn()"
+				],
+				"result":[
+					"1",
+					"4",
+					"1"
+				]
+			}
+		],
+		"exampledemo":[
+		]
 	}
 
 }
