@@ -1011,6 +1011,25 @@
 	};
 
 	_.extend({
+		// parse data require
+		// parse by http [ Content-type ]
+		datamime : function(header,param){
+			if(_.isObject(header)){
+				if(header["Content-type"]){
+					switch(header["Content-type"]){
+						case "application/json":
+							return JSON.stringify(param||{});
+							break;
+						default : 
+							return _.paramstringify(param||{});
+							break;
+					}
+				}
+			}
+
+			return _.paramstringify(param||{})
+		},
+
 		strip: function(str){
 			return _.isString(str) ? str
 									.replace(/[\t\r\n\f]/gm,'')
@@ -1213,7 +1232,7 @@
 				xhr.open(_s.type,_s.url,_s.aysnc);
 
 			// typeof "POST" method
-			if( _s.type === "POST" && _s.param)
+			if( _s.type === "POST" && _s.param && !_.isObject(_s.header))
 				xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 			xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
 			xhr.setRequestHeader("Aix-Requested","AixHttpRequest");
@@ -1246,7 +1265,7 @@
 			xhr.send(_s.param ? 
 				(!_.isObject(_s.param) ? 
 					_s.param : 
-					_.paramstringify(_s.param))
+					_.datamime(_s.header,_s.param))
 					:null);
 			xhrcount++;
 

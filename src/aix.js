@@ -629,7 +629,7 @@
 
 		// Fetch mean Restful "GET"
 		// fetch data form url with param
-		pipe : function(type,url,param,fns,fnf){
+		pipe : function(type,url,param,fns,fnf,header){
 			var _this = this,
 			//param must be object typeof
 			st = {
@@ -656,6 +656,8 @@
 				_fnf = _.NULL;
 			}
 
+			// set http header param
+			st.header = header||{};
 			st.success  = function(responseText,xhr,event){
 				// change the data before dispatch event;
 				_fns.call(_this,responseText,xhr,event);
@@ -671,29 +673,29 @@
 			return this.dispatch(type,null,[get_xhr]);
 		},
 
-		aget: function(url,param,fns,fnf){
+		aget: function(url,param,fns,fnf,header){
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
-			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf]);
+			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf,header]);
 		},
 
-		fetch: function(param,fns,fnf){
+		fetch: function(param,fns,fnf,header){
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 			return this.pipe.apply(this,["fetch",(this.url||""),param,function(responseText,xhr,event){
 				this.data = JSON.parse(responseText);
 				fns.call(this,responseText,xhr,event);
-			},fnf]);
+			},fnf,header]);
 		},
 
 		sync: function(){
 			return this.fetch.apply(this,_.slice(arguments));
 		},
 
-		post: function(url,param,fns,fnf){
+		post: function(url,param,fns,fnf,header){
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
-		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf]);
+		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf,header]);
 		},
 
 		save: function(){
@@ -717,7 +719,7 @@
 			return JSON.parse(this.toJSON());
 		},
 
-		pipe : function(type,url,param,fns,fnf){
+		pipe : function(type,url,param,fns,fnf,header){
 			var _this = this,
 			//param must be object typeof
 			st = {
@@ -743,7 +745,7 @@
 				_fns = _.NULL;
 				_fnf = _.NULL;
 			}
-
+			st.header = header ||{};
 			st.success  = function(responseText,xhr,event){
 				_fns.call(_this,responseText,xhr,event);
 				_this.dispatch(type+":success",null,[responseText,xhr,event]);
@@ -759,13 +761,13 @@
 			return this.dispatch(type,null,[get_xhr]);
 		},
 
-		aget: function(url,param,fns,fnf){
+		aget: function(url,param,fns,fnf,header){
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
-			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf]);
+			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf,header]);
 		},
 
-		fetch: function(param,fns,fnf){
+		fetch: function(param,fns,fnf,header){
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 
@@ -777,17 +779,17 @@
 					},this);
 				this.data = data;
 				fns.call(this,responseText,xhr,event);
-			},fnf]);
+			},fnf,header]);
 		},
 
 		sync: function(){
 			return this.fetch.apply(this,_.slice(arguments));
 		},
 
-		post: function(url,param,fns,fnf){
+		post: function(url,param,fns,fnf,header){
 			fns = _.isFunction(fns) ?  fns : _.NULL;
 			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
-		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf]);
+		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf,header]);
 		},
 
 		save: function(){
