@@ -174,6 +174,7 @@
 
 	// Aix Model
 	aix.model = function(obj){
+		obj = obj || {};
 		var _this = this;
 
 		_.define(this,{
@@ -374,6 +375,7 @@
 
 	// Aix Collection
 	aix.collection = function(obj){
+		obj = obj||{};
 		var _this = this;
 
 		_.define(_this,{
@@ -931,7 +933,6 @@
 	// define route for SPA
 	aix.route = function(obj){
 		obj = obj || {};
-
 		var _this = this;
 
 		if(_.isObject(obj.events))

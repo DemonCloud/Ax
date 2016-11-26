@@ -2053,6 +2053,53 @@
 		]
 	},
 
+	"aix.view.extend" : {
+		"toptitle" : ["aix.view - [ extend ]"],
+		"api" : [
+			"aix.view.extend(setting)"
+		],
+		"param" : [
+			["setting","[ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["extend view constructor","[ 从aix.view中扩展出的自定义视图构造器 ]"]
+		],
+		"info" : [
+			"aix.view.extend 用于生成自定义的视图构造函数",
+			"通常生成视图我们使用 new aix.view() , 立即产生了一个实例化视图",
+			"而new aix.view.extend()则是返回了一个视图构造器"
+		],
+		"infowarning":[
+			"视图构造器的base属性指向了aix.view"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"创建一个视图构造器",
+				"code":[
+				"var mv = new aix.view.extend({",
+					"el : '#id'",
+				"  events:{",
+				"    init:function(){",
+				"      console.log('new view create')",
+				"    }",
+				"  }",
+				"})",
+				"",
+				"var view = new mv();"
+				],
+				"result":[
+					"mv视图构造器的实例对象"
+				]
+			}
+		
+		],
+		"exampledemo":[
+		]
+	},
+
 	"aix.view.events" : {
 		"toptitle" : ["aix.model - [ view ]"],
 		"api" : [
@@ -2147,7 +2194,161 @@
 		],
 		"exampledemo":[
 		]
-	}
+	},
 
+	"aix.model.pipe" : {
+		"toptitle" : ["aix.model - [ pipe ]"],
+		"api" : [
+			"model.pipe(type,url,param,success(response,xhr,event),fail(xhr,event),header)"
+		],
+		"param" : [
+			["type"," [ 类型: String ]"],
+			["url"," [ 类型: String,Null ]"],
+			["param"," [ 类型: Object,Null ]"],
+			["success"," [ 类型: Function,Null ]"],
+			["fail"," [ 类型: Function,Null ]"],
+			["header"," [ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+			["response","[ 通过pipe api调用的ajax请求,服务端返回的response响应结果 ]"],
+			["xhr","[ 发起ajax请求所创建xhr对象 ]"],
+			["event","[ 浏览器bom事件的event对象 ]"]
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"pipe是一个底层的api,封装依赖于_.aix的方法，通过他可以发送ajax请求，并且自定义参数"
+		],
+		"infowarning":[
+			"必须指定type参数，则为请求的方式，请求的方式会通过RESTFUL列表进行过滤，如果服务器端为实现restful,",
+			"则大部分的请求都将会以模拟的方式( get post )发送到服务器端,",
+			"如果服务器端完整实现了RESTFUL,请在框架加载后,设置aix.config.restful=true.",
+			"-",
+			"以下是RESTFUL仿真自动转化请求类型的列表:"
+		],
+		"table":[
+		 ["请求类型","仿真转化"],
+		 ["put","POST"],
+		 ["pull","POST"],
+		 ["fetch","GET"],
+		 ["update","POST"],
+		 ["delete","POST"]
+		],
+		"example":[
+			{ 
+				"info":"使用pipe发送ajax请求",
+				"code":[
+				"var m = new aix.model({",
+				"  events:{",
+				"    'get:success':function(responseText){",
+				"       console.log(responseText)",
+				"    }",
+				"  }",
+				"});",
+				"",
+				"m.pipe('get','url',null)"
+				],
+				"result":[
+					"输出了服务器返回的结果"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.aget" : {
+		"toptitle" : ["aix.model - [ aget ]"],
+		"api" : [
+			"model.aget(url,param,success(response,xhr,event),fail(xhr,event),header)"
+		],
+		"param" : [
+			["url"," [ 类型: String,Null ]"],
+			["param"," [ 类型: Object,Null ]"],
+			["success"," [ 类型: Function,Null ]"],
+			["fail"," [ 类型: Function,Null ]"],
+			["header"," [ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+			["response","[ 通过pipe api调用的ajax请求,服务端返回的response响应结果 ]"],
+			["xhr","[ 发起ajax请求所创建xhr对象 ]"],
+			["event","[ 浏览器bom事件的event对象 ]"]
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"aget 方式直接发起了get请求,参数url可以让你灵活定义请求地址,param为请求参数对象",
+			"success 和 fail 均为回调函数"
+		],
+		"infowarning":[
+			"和fetch方法有效的区分开",
+			"* 触发get事件"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"使用pipe发送ajax请求",
+				"code":[
+				"var m = new aix.model()",
+				"",
+				"m.aget('url',null,function(res){ console.log(res) })"
+				],
+				"result":[
+					"输出了服务器返回的结果"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.fetch" : {
+		"toptitle" : ["aix.model - [ fetch ]"],
+		"api" : [
+			"model.fetch(param,success(response,xhr,event),fail(xhr,event),header)"
+		],
+		"param" : [
+			["param"," [ 类型: Object,Null ]"],
+			["success"," [ 类型: Function,Null ]"],
+			["fail"," [ 类型: Function,Null ]"],
+			["header"," [ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+			["response","[ 通过pipe api调用的ajax请求,服务端返回的response响应结果 ]"],
+			["xhr","[ 发起ajax请求所创建xhr对象 ]"],
+			["event","[ 浏览器bom事件的event对象 ]"]
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"fetch 方式直接发起了fetch(仿真下为get),param为请求参数.",
+			"同时也可以设置header对象来设置请求时的httpheader"
+		],
+		"infowarning":[
+			"fetch事件与aget事件不同的地方在于,fetch会触发模型数据的更改，自动将请求成功后的数据转化成JSON对象，写如模型中",
+			"和aget方法有效的区分开",
+			"* 触发fetch事件"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"使用pipe发送ajax请求",
+				"code":[
+				"var m = new aix.model()",
+				"",
+				"m.fetch({ id : 1 },function(){ console.log(this.parse()) })"
+				],
+				"result":[
+					"//请求时附带 id=1 字段",
+					"请求成功后，模型数据被自动替换和写入"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	}
 }
 
