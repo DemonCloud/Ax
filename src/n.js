@@ -788,7 +788,10 @@
 				if(_.isString(type)){
 					if(cal != null){
 						if(elm._events[type] != null){
-							elm.removeEventListener(type,_.cat(elm._events[type],function(fn){ 
+							elm.removeEventListener(
+								type,
+								_.cat(elm._events[type],
+							function(fn){ 
 								return fn.fn===cal ;
 							})[0]||cal);
 
@@ -801,16 +804,17 @@
 
 						// live remove binder
 						if(elm._events["_"+type] != null){
-							document.documentElement.removeEventListener(type,
-								_.cat(elm._events["_"+type],function(fn){ 
-									return fn.fn===cal;
-								})[0].cal,true);
+							document
+							.documentElement
+							.removeEventListener(
+								type,
+								_.cat(elm._events["_"+type],
+								function(fn){ return fn.fn===cal;})[0].cal,true);
 
 							// If clean events
 							if(!elm._events["_"+type].length)
 								delete elm._events["_"+type];
 						}
-
 
 					}else{
 						_.foreach(elm._events[type],function(fn){
@@ -819,17 +823,21 @@
 
 						// live remove binder
 						_.foreach(elm._events["_"+type],function(fn){
-							document.documentElement.removeEventListener(type,fn.cal,true);
+							document
+							.documentElement
+							.removeEventListener(type,fn.cal,true);
 						});
 						delete elm._events["_"+type];
 						delete elm._events[type];
 					}
 				}else{
 					_.foreach(elm._events,function(fns,type){
-						if(type.search("_") != -1){
+						if(type.search("_") !== -1){
 							// live remove binder
 							_.foreach(fns,function(fn){
-								document.removeEventListener(type.slice(1),fn.cal,true);
+								document
+								.documentElement
+								.removeEventListener(type.slice(1),fn.cal,true);
 							});
 						}else{
 							_.foreach(fns,function(fn){
@@ -877,7 +885,9 @@
 					fn.elm = elm;
 
 					__(elm).reg("_"+type,fn,null);
-					document.documentElement.addEventListener(type,fn,true);
+					document
+					.documentElement
+					.addEventListener(type,fn,true);
 				}else{
 					__(elm).reg(type,sl,cal);
 				}

@@ -48,6 +48,7 @@
 	var RESTFUL_enable = {
 		get    : "GET",
 		put    : "PUT",
+		save   : "POST",
 		post   : "POST",
 		pull   : "PULL",
 		fetch  : "FETCH",
@@ -57,6 +58,7 @@
 	var RESTFUL_disable = {
 		get    : "GET",
 		put    : "POST",
+		save   : "POST",
 		post   : "POST",
 		pull   : "POST",
 		fetch  : "GET",
@@ -676,14 +678,10 @@
 		},
 
 		aget: function(url,param,fns,fnf,header){
-			fns = _.isFunction(fns) ?  fns : _.NULL;
-			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf,header]);
 		},
 
 		fetch: function(param,fns,fnf,header){
-			fns = _.isFunction(fns) ?  fns : _.NULL;
-			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 			return this.pipe.apply(this,["fetch",(this.url||""),param,function(responseText,xhr,event){
 				this.data = JSON.parse(responseText);
 				fns.call(this,responseText,xhr,event);
@@ -695,13 +693,11 @@
 		},
 
 		post: function(url,param,fns,fnf,header){
-			fns = _.isFunction(fns) ?  fns : _.NULL;
-			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf,header]);
 		},
 
-		save: function(){
-			return this.post.apply(this,_.slice(arguments));
+		save: function(fns,fnf,header){
+		  return this.pipe.apply(this,["save",(this.url||""),this.parse(),fns,fnf,header]);
 		}
 	});
 
@@ -764,15 +760,10 @@
 		},
 
 		aget: function(url,param,fns,fnf,header){
-			fns = _.isFunction(fns) ?  fns : _.NULL;
-			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf,header]);
 		},
 
 		fetch: function(param,fns,fnf,header){
-			fns = _.isFunction(fns) ?  fns : _.NULL;
-			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
-
 			return this.pipe.apply(this,["fetch",(this.url||""),param,function(responseText,xhr,event){
 				var data = JSON.parse(responseText);
 				if(this.model)
@@ -789,13 +780,11 @@
 		},
 
 		post: function(url,param,fns,fnf,header){
-			fns = _.isFunction(fns) ?  fns : _.NULL;
-			fnf = _.isFunction(fnf) ?  fnf : _.NULL;
 		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf,header]);
 		},
 
-		save: function(){
-			return this.post.apply(this,_.slice(arguments));
+		save: function(fns,fnf,header){
+		  return this.pipe.apply(this,["save",(this.url||""),this.parse(),fns,fnf,header]);
 		}
 	});
 
@@ -887,6 +876,26 @@
 				$(this.el).off(param[0],param[1],fn);
 			else
 				_.removeEvent(this,type,fn);
+			return this;
+		},
+
+		release : function(){
+			$(this.el).off();
+			return this;
+		},
+
+		destroy : function(withRoot){
+			$(this.el).off()[withRoot ? "remove" : "empty" ]();
+
+			//lock this.el prop
+			_.define(this,"el",{
+				value : null,
+				writable : false,
+				enumerable : false,
+				configurable : false
+			});
+
+			return _.removeEvent(this);
 		},
 
 		dispatch : function(type,fn,args){

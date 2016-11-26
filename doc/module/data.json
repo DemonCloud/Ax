@@ -2101,7 +2101,7 @@
 	},
 
 	"aix.view.events" : {
-		"toptitle" : ["aix.model - [ view ]"],
+		"toptitle" : ["aix.view - [ events ]"],
 		"api" : [
 			"view.addEvent(type,func)",
 			"view.removeEvent(type,func)",
@@ -2136,6 +2136,64 @@
 			"demo/aixview.html",
 			"demo/aixview2.html",
 			"demo/aixview3.html"
+		]
+	},
+
+	"aix.view.release" : {
+		"toptitle" : ["aix.view - [ release ]"],
+		"api" : [
+			"view.release()"
+		],
+		"param" : [
+			["无",""]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["view","this视图"]
+		],
+		"info" : [
+			"release方法用于移除视图上所有的dom事件"
+		],
+		"infowarning":[
+			"通过release所移除的dom事件,暂时无法还原,",
+			"后续api可能可以提供还原dom事件功能"
+		],
+		"table":[
+		],
+		"example":[
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.view.destroy" : {
+		"toptitle" : ["aix.view - [ destroy ]"],
+		"api" : [
+			"view.destroy(withRoot)"
+		],
+		"param" : [
+			["withRoot","[ 类型:Booleton,Null ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["view","this视图"]
+		],
+		"info" : [
+			"destory方法用于摧毁视图,包括dom事件的移除和dom节点的移除,",
+			"移除之后原视图将不再可用,包括其内置的自定义事件也不再可用"
+		],
+		"infowarning":[
+			"* 当参数withRoot设置为true是会同时移除视图的根节点 - view.el , 否则保留该节点",
+			"* 强制使用已经destroy的aix视图对象会报错",
+			"* 需要GC回收,请将原保存变量设置为null"
+		],
+		"table":[
+		],
+		"example":[
+		],
+		"exampledemo":[
 		]
 	},
 
@@ -2307,7 +2365,8 @@
 	"aix.model.fetch" : {
 		"toptitle" : ["aix.model - [ fetch ]"],
 		"api" : [
-			"model.fetch(param,success(response,xhr,event),fail(xhr,event),header)"
+			"model.fetch(param,success(response,xhr,event),fail(xhr,event),header)",
+			"model.sync(param,success(response,xhr,event),fail(xhr,event),header)"
 		],
 		"param" : [
 			["param"," [ 类型: Object,Null ]"],
@@ -2329,7 +2388,7 @@
 		],
 		"infowarning":[
 			"fetch事件与aget事件不同的地方在于,fetch会触发模型数据的更改，自动将请求成功后的数据转化成JSON对象，写如模型中",
-			"和aget方法有效的区分开",
+			"sync作用和fetch等同,和aget方法有效的区分开",
 			"* 触发fetch事件"
 		],
 		"table":[],
@@ -2344,6 +2403,106 @@
 				"result":[
 					"//请求时附带 id=1 字段",
 					"请求成功后，模型数据被自动替换和写入"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.post" : {
+		"toptitle" : ["aix.model - [ post ]"],
+		"api" : [
+			"model.post(url,param,success(response,xhr,event),fail(xhr,event),header)"
+		],
+		"param" : [
+			["url"," [ 类型: String,Null ]"],
+			["param"," [ 类型: Object,Null ]"],
+			["success"," [ 类型: Function,Null ]"],
+			["fail"," [ 类型: Function,Null ]"],
+			["header"," [ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+			["response","[ 通过pipe api调用的ajax请求,服务端返回的response响应结果 ]"],
+			["xhr","[ 发起ajax请求所创建xhr对象 ]"],
+			["event","[ 浏览器bom事件的event对象 ]"]
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"post为传统的post请求,如果设置了param参数为一个有效值(非Null),POST请求会忽略模型内部的数据,而改为将param作为数据提交,这样model也变成了一个有效的ajax发射器, 同时可以对数据做任意处理",
+			"同时也可以设置header对象来设置请求时的httpheader"
+		],
+		"infowarning":[
+			"* 触发post事件"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"使用POST发送模型到指定地址",
+				"code":[
+				"var m = new aix.model({",
+				"  url:'somewhere',",
+				"  data:{",
+				"    a:1,",
+				"    b:2",
+				"  }",
+				"});",
+				"",
+				"m.post('here')"
+				],
+				"result":[
+					"模型数据被直接post到了here地址,而非模型本身设置的somewhere地址"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"aix.model.save" : {
+		"toptitle" : ["aix.model - [ save ]"],
+		"api" : [
+			"model.save(success(response,xhr,event),fail(xhr,event),header)"
+		],
+		"param" : [
+			["success"," [ 类型: Function,Null ]"],
+			["fail"," [ 类型: Function,Null ]"],
+			["header"," [ 类型: Object,Null ]"]
+		],
+		"paramcall" : [
+			["response","[ 通过pipe api调用的ajax请求,服务端返回的response响应结果 ]"],
+			["xhr","[ 发起ajax请求所创建xhr对象 ]"],
+			["event","[ 浏览器bom事件的event对象 ]"]
+		],
+		"returnval" : [
+			["model","this模型"]
+		],
+		"info" : [
+			"save为传统的post请求,行为是将model模型数据提交到模型内置的url地址",
+			"同时也可以设置header对象来设置请求时的httpheader"
+		],
+		"infowarning":[
+			"* 触发save事件"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"使用save保存模型数据",
+				"code":[
+				"var m = new aix.model({",
+				"  url:'somewhere',",
+				"  data:{",
+				"    a:1,",
+				"    b:2",
+				"  }",
+				"});",
+				"",
+				"m.save(null,null,{ 'Content-type' : 'application/json' })"
+				],
+				"result":[
+					"模型数据将以MIME 标准JSON字符串的格式保存到后台"
 				]
 			}
 		],
