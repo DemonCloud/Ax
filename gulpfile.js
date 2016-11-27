@@ -4,7 +4,9 @@ var concat = require("gulp-concat");
 
 var path_js = "./src/*.js";
 var path_dis = "./dest/";
+var path_doc = "./docs/js/";
 var path_disjs = "./dest/*.js";
+
 
 gulp.task('concat',function(){
 	return gulp.src(['./src/_.js','./src/n.js','./src/aix.js'])
@@ -15,18 +17,16 @@ gulp.task('concat',function(){
 gulp.task('uglify',function(){
 	return gulp.src(path_disjs)
 				 .pipe(uglify())
-				 .pipe(gulp.dest(path_dis));
+				 .pipe(gulp.dest(path_dis))
+				 .pipe(gulp.dest(path_doc));
 });
 
 gulp.task('watch',function(){
 	gulp.watch(path_js,['default']);
 });
 
-gulp.task('make',['concat'],function(){
-	gulp.start('uglify');
-});
-
 gulp.task('default',['concat'],function(){
 	gulp.start('uglify');
 });
+
 
