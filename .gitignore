@@ -6,6 +6,12 @@
 .DS_Store
 .bower.json
 .sizecache.json
+_aix.html
+_dom.html
+
+.idea
+.idea/
+.idea/*
 
 npm-debug.log*
 
