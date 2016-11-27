@@ -300,7 +300,7 @@
 				"console.log(_.isObject(new Date))",
 				"console.log(_.isObject(function(){}))",
 				"console.log(_.isObject(new String('a')))",
-				"console.log(_.isObject(new uNumber(1)))"
+				"console.log(_.isObject(new Number(1)))"
 				],
 				"result":[
 				"&gt;  false",
