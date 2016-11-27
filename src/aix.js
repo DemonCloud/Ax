@@ -541,11 +541,19 @@
 		},
 
 		get : function(id){
-			if(_.isString(id)||_.isNumber(id))
-				return _.filter(this.data,function(one){
-					return one.aid === ("#"+id);
-				});
-			else
+			if(_.isNumber(id))
+				if(this.model)
+					return _.filter(this.data,function(one){
+						return one.aid === ("#"+id);
+					});
+				else
+					return this.data[id];
+			else if(_.isString(id)){
+				if(this.model)
+					return _.pluck(this.parse(),id);
+				else
+					return _.pluck(this.data,id);
+			}else
 				return _.slice(this.data);
 		},
 

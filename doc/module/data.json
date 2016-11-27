@@ -62,7 +62,7 @@
 			{ 
 				"info":"在 _ 扩展方法，使其可以随处调用",
 				"code":[
-				".extend({",
+				"_.extend({",
 				"  hello: function(data){",
 				"    console.log('hello '+data);",
 				"  }",
@@ -2503,6 +2503,69 @@
 				],
 				"result":[
 					"模型数据将以MIME 标准JSON字符串的格式保存到后台"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.reverse" : {
+		"toptitle" : ["_.reverse"],
+		"api" : [
+			"_.reverse(arr)"
+		],
+		"param" : [
+			["arr","[ 类型:Array ]"]
+		],
+		"paramcall" : [
+			[]
+		],
+		"returnval" : [
+			["reverse array","返回被逆序的数组"]
+		],
+		"info" : [
+			"reverse 和原生的array.reverse没有什么区别, 不过当传入参数不是真实数组的时候,会返回一个空的数组"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.pluck" : {
+		"toptitle" : ["_.pluck"],
+		"api" : [
+			"_.pluck(list,mapkey)"
+		],
+		"param" : [
+			["list","[ 类型:Array,Object ]"],
+			["mapkey","[ 类型:String,Number ]"]
+		],
+		"paramcall" : [
+			[]
+		],
+		"returnval" : [
+			["pluck array","返回对应mapkey的值集合"]
+		],
+		"info" : [
+			"_.pluck 用于获取数组对象集合中的某个键值对组"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"获取组内的所有成员姓名",
+				"code":[
+					"var stooges = [{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}];",
+					"_.pluck(stooges, 'name');"
+				],
+				"result":[
+					"['moe', 'larry', 'curly']"
 				]
 			}
 		],
