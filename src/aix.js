@@ -686,14 +686,28 @@
 		},
 
 		aget: function(url,param,fns,fnf,header){
-			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf,header]);
+			return this.pipe.apply(this,[
+				"get",
+				url||(this.url||""),
+				param,
+				fns,
+				fnf,
+				header
+			]);
 		},
 
 		fetch: function(param,fns,fnf,header){
-			return this.pipe.apply(this,["fetch",(this.url||""),param,function(responseText,xhr,event){
-				this.data = JSON.parse(responseText);
-				fns.call(this,responseText,xhr,event);
-			},fnf,header]);
+			return this.pipe.apply(this,[
+				"fetch",
+				(this.url||""),
+				param,
+				function(responseText,xhr,event){
+					this.data = JSON.parse(responseText);
+					(fns||_.NULL).call(this,responseText,xhr,event);
+				},
+				fnf,
+				header
+			]);
 		},
 
 		sync: function(){
@@ -701,7 +715,14 @@
 		},
 
 		post: function(url,param,fns,fnf,header){
-		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf,header]);
+		  return this.pipe.apply(this,[
+		  		"post",
+		  		url||(this.url||""),
+		  		param || this.parse(),
+		  		fns,
+		  		fnf,
+		  		header
+			]);
 		},
 
 		save: function(fns,fnf,header){
@@ -768,19 +789,33 @@
 		},
 
 		aget: function(url,param,fns,fnf,header){
-			return this.pipe.apply(this,["get",url||(this.url||""),param,fns,fnf,header]);
+			return this.pipe.apply(this,[
+				"get",
+				url||(this.url||""),
+				param,
+				fns,
+				fnf,
+				header
+			]);
 		},
 
 		fetch: function(param,fns,fnf,header){
-			return this.pipe.apply(this,["fetch",(this.url||""),param,function(responseText,xhr,event){
-				var data = JSON.parse(responseText);
-				if(this.model)
-					_.foreach(data,function(val,index){
-						data[index] = new this.model({ data : val });
-					},this);
-				this.data = data;
-				fns.call(this,responseText,xhr,event);
-			},fnf,header]);
+			return this.pipe.apply(this,[
+				"fetch",
+				(this.url||""),
+				param,
+				function(responseText,xhr,event){
+					var data = JSON.parse(responseText);
+					if(this.model)
+						_.foreach(data,function(val,index){
+							data[index] = new this.model({ data : val });
+						},this);
+					this.data = data;
+					(fns||_.NULL).call(this,responseText,xhr,event);
+				},
+				fnf,
+				header
+			]);
 		},
 
 		sync: function(){
@@ -788,11 +823,25 @@
 		},
 
 		post: function(url,param,fns,fnf,header){
-		  return this.pipe.apply(this,["post",url||(this.url||""),param || this.parse(),fns,fnf,header]);
+		  return this.pipe.apply(this,[
+				"post",
+				url||(this.url||""),
+				param || this.parse(),
+				fns,
+				fnf,
+				header
+			]);
 		},
 
 		save: function(fns,fnf,header){
-		  return this.pipe.apply(this,["save",(this.url||""),this.parse(),fns,fnf,header]);
+		  return this.pipe.apply(this,[
+				"save",
+				(this.url||""),
+				this.parse(),
+				fns,
+				fnf,
+				header
+			]);
 		}
 	});
 
