@@ -382,7 +382,7 @@
 				o[keys[i]] =obj[keys[i]];
 				ary[i] = o;
 			}
-			return ary;		
+			return ary;
 		},
 
 		pairs : function(obj){

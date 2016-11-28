@@ -2571,6 +2571,228 @@
 		],
 		"exampledemo":[
 		]
+	},
+
+	"_.groupby" : {
+		"toptitle" : [],
+		"api" : [
+			""
+		],
+		"param" : [
+			[]
+		],
+		"paramcall" : [
+			[]
+		],
+		"returnval" : [
+			[]
+		],
+		"info" : [
+			""
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"",
+				"code":[
+					""
+				],
+				"result":[
+					""
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.toarray" : {
+		"toptitle" : ["_.toarray"],
+		"api" : [
+			"_.toarray(obj)"
+		],
+		"param" : [
+			["obj","[ 类型:Object ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"抽取对象的值,集合成数组"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"对象转化为数组",
+				"code":[
+				"var o = {a:1,b:2,c:3};",
+				"",
+				"console.log(_.toarray(o));"
+				],
+				"result":[
+					"[1,2,3]"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.forarray" : {
+		"toptitle" : ["_.forarray"],
+		"api" : [
+			"_.forarray(obj)"
+		],
+		"param" : [
+			["obj","[ 类型:Object ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"和toarray 类似，同样是将对象转化成数组，此转化方法包含了对象的key(键)"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"对象转化为数组",
+				"code":[
+				"var o = {a:1,b:2,c:3};",
+				"",
+				"console.log(_.forarray(o));"
+				],
+				"result":[
+					"[{a:1},{b:2},{c:3}]"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.pairs" : {
+		"toptitle" : ["_.pairs"],
+		"api" : [
+			"_.pairs(obj)"
+		],
+		"param" : [
+			["obj","[ 类型:Object ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"类似forarray，将对象转化为数组，键值对存于数组中"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"对象转化为数组",
+				"code":[
+				"var o = {a:1,b:2,c:3};",
+				"",
+				"console.log(_.pairs(o));"
+				],
+				"result":[
+					"[['a',1],['b',2],['c',3]]"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.random" : {
+		"toptitle" : ["_.random"],
+		"api" : [
+			"_.random(min,max)"
+		],
+		"param" : [
+			["min","[ 类型:Number ]"],
+			["max","[ 类型:Number ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"random是一个用来生成随机整数的函数",
+			"生成限定范围内的随机整数，参数如果省略max则会将min自动变成最大值"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"生成1~10范围内的随机整数",
+				"code":[
+					"_.random(1,10)"
+				],
+				"result":[
+					"随机数(1-10)"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.bale" : {
+		"toptitle" : ["_.bale"],
+		"api" : [
+			"_.bale(extend1,extend2,notThisproperty)"
+		],
+		"param" : [
+			["extend1","[ 类型:Object ]"],
+			["extend2","[ 类型:Object ]"],
+			["notThisproperty","[ 类型:Array,String ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"和_.compose,_.extend一样,将extend2参数2的属性覆盖到extend1上",
+			"与之前不同的是，这种合并会产生一个新的对象，而不是在原有的对象extend1上做修改"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"合并生成一个新的对象",
+				"code":[
+				"var a = {a:1} , b = {b:1};",
+				"",
+				"var clone = _.bale(a,b);",
+				"",
+				"console.log(a);",
+				"console.log(b);",
+				"console.log(clone);",
+				"console.log(clone===a);"
+				],
+				"result":[
+					"{a:1}",
+					"{b:1}",
+					"{a:1,b:1}",
+					"false"
+				]
+			}
+		],
+		"exampledemo":[
+		]
 	}
+
 }
 
