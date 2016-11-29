@@ -42,9 +42,9 @@ var view = new aix.view({
 			__(this.el).find("#rv").fill(txt||"");
 		},
 
-		"keyup:#ri":function(event){
+		"input:#ri":function(event){
 			var view = event.data.self;
-			view.model.set(__(this).value());
+			view.model.set(_.encodeHTML(__(this).value()));
 		}
 	},
 });</pre>
@@ -89,8 +89,10 @@ var view = new aix.view({
 		events:{
 			init:function(){
 				__(this.el).find("#ri")
-									 .value("Hello Aix");
-				this.render({text:"Hello Aix"});
+									 .value("Hello World");
+				this.render({
+					text:"Hello World"
+				});
 
 				this.model = new model({
 					view : this
@@ -101,9 +103,9 @@ var view = new aix.view({
 				__(this.el).find("#rv").fill(txt||"");
 			},
 
-			"keyup:#ri":function(event){
+			"input:#ri":function(event){
 				var view = event.data.self;
-				view.model.set(__(this).value());
+				view.model.set(_.encodeHTML(__(this).value()));
 			}
 		},
 	});

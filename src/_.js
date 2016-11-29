@@ -209,8 +209,7 @@
 			if(_.isArray(list) || 
 				 _.isArguments(list) || 
 				 _.isNodeList(list) || 
-				 _.isHTMLCollection(list)
-				)
+				 _.isHTMLCollection(list))
 				// clone array
 				return _slice.call(list);
 			else if(_.isObject(list) && !_.isFunction(list)){
@@ -224,8 +223,7 @@
 				_.foreach(list, function(val,key){
 					if(!_.isString(val) && 
 						 !_.isNumber(val) && 
-						 !_.isFunction(val)
-						)
+						 !_.isFunction(val))
 						res[key] = _.clonedoom(val);
 					else 
 						res[key] = val;
