@@ -221,7 +221,8 @@
 		},
 
 		get : function(index){
-			return this.$el[( +index + ( index < 0 ? this.length : 0 ) )];
+			return this.$el[( +index + ( index < 0 ? this.length : 0 ) )] 
+					|| _.slice(this.$el);
 		},
 
 		at : function(index){
@@ -240,6 +241,10 @@
 
 		last : function(){
 			return this.at(-1);
+		},
+
+		add : function(){
+			return this.compose.apply(this,_.slice(arguments));
 		},
 
 		compose : function(sl){
@@ -852,16 +857,6 @@
 			});
 		},
 
-		off : function(type,param,fn){
-			return this.purge(type,fn);
-		},
-
-		// Agent and live elm events, 
-		// also it can use the purge for unbind event
-		on : function(){
-			return this.live.apply(this,_.slice(arguments));
-		},
-
 		live : function(type,sl,cal,context,ctbak){
 			var t = !_.isFunction(sl) , data;
 			if(!_.isFunction(cal)){
@@ -874,12 +869,18 @@
 				if(t){
 					var fn = function(event){
 						var fire = event.target || event.toElement;
+						var target = __(elm).find(sl);
 
-						if(_.has(__(elm).find(sl).$el,fire))
-							return cal.call(context||fire,
-															createEvent(fire,type,data,event),
-															type);
+						var aim = _.find(target.get(),function(elm){
+							return elm.contains(elm); 
+						}).pop();
 
+						if(_.has(target.find("*").add(target).get(),fire))
+							return cal.call(
+								aim||fire,
+								createEvent(fire,type,data,event),
+								type
+							);
 					}; 
 					fn.fn = cal; 
 					fn.elm = elm;
@@ -893,6 +894,16 @@
 				}
 			});
 
+		},
+
+		// Agent and live elm events, 
+		// also it can use the purge for unbind event
+		on : function(){
+			return this.live.apply(this,_.slice(arguments));
+		},
+
+		off : function(type,param,fn){
+			return this.purge(type,fn);
 		},
 
 		signet : function(name,val){
