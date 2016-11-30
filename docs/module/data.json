@@ -2792,6 +2792,147 @@
 		],
 		"exampledemo":[
 		]
+	},
+
+	"_.shuffle" : {
+		"toptitle" : ["_.shuffle"],
+		"api" : [
+			"_.shuffle(arr)"
+		],
+		"param" : [
+			["arr","[ 类型:Array ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"shuffle 是用了 Fisher-Yates shuffle 算法,通过随机数赋值进行乱序"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"数组乱序",
+				"code":[
+					"var a = [1,2,3,4,5,6,7,8,9]",
+					"console.log(_.shuffle(a))"
+				],
+				"result":[
+					"乱序的数组"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.trim" : {
+		"toptitle" : ["_.trim"],
+		"api" : [
+			"_.trim(str)"
+		],
+		"param" : [
+			["str","[ 类型:String ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"trim 用于去除字符串首尾空格"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"去除首尾空格",
+				"code":[
+					"var a = ' String  ';",
+					"console.log(_.trim(a))"
+				],
+				"result":[
+					"'String'"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.merge" : {
+		"toptitle" : ["_.merge"],
+		"api" : [
+			"_.merge(arg,arg1,...)"
+		],
+		"param" : [
+			["arg","[ 类型:Array ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"_.merge 用于合并多个数组，且没有重复的项目"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"合并数组",
+				"code":[
+					"var a = [1,2,3]",
+					"var a1 = [3,4,5]",
+					"var a2 = [2,6,7]",
+					"var a3 = [1,2,5]",
+					"var a4 = [6,4,1]",
+					"",
+					"_.merge(a,a1,a2,a3,a4)"
+				],
+				"result":[
+					"[1,2,3,4,5,6,7]"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.iseuqal" : {
+		"toptitle" : ["_.iseuqal"],
+		"api" : [
+			"_.iseuqal(a,b,strictmode)"
+		],
+		"param" : [
+			["a,b","[ 类型:任意类型 ]"],
+			["strictmode","[ 类型:Booleton ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			""
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"",
+				"code":[
+					""
+				],
+				"result":[
+					""
+				]
+			}
+		],
+		"exampledemo":[
+		]
 	}
 
 }

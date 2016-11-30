@@ -29,7 +29,7 @@
 
 }( this , function(){
 	// not use strict for eval
-	// 'use strict';
+	'use strict';
 
 	var VERSION = "0.1";
 
@@ -42,10 +42,8 @@
 		_slice  = _arr.slice,
 		_splice = _arr.splice;
 
-	// var root = (function(){ 
-	// 	return this || (0,eval)("this"); 
-	// }());
-	var root = this;
+	var root = (function(){ return this || (0,eval)("this"); }());
+	// var root = this;
 
 	var _ = {};
 	// _ extend other method
@@ -745,7 +743,7 @@
 			// try to build anmousyous function
 			try {
 				// var render = new Function(name||"_x","_",res);
-				var render = eval("(function("+(name||"_x") 
+				var render = (0,eval)("(function("+(name||"_x") 
 													+ ",_" 
 													+ ( args.length ? ","+args.toString() : "" ) 
 													+ "){" 

@@ -345,6 +345,26 @@
 			cp.length = cp.$el.length;
 
 			return cp;
+		},
+
+		parents : function(){
+			var cp = _.clonedoom(this);
+			var res = [];
+
+			_.foreach(cp.$el,function(e){
+				var parents = [];
+				var tmp = e;
+				while(tmp){
+					parents.push(tmp.parentNode);
+					tmp = tmp.parentNode;
+				}
+				res = res.concat(parents);
+			});
+
+			cp.$el = _.unique(res);
+			cp.length = cp.$el.length;
+			
+			return cp;
 		}
 	});
 
@@ -868,19 +888,26 @@
 			return this.each(function(elm){
 				if(t){
 					var fn = function(event){
-						var fire = event.target || event.toElement;
-						var target = __(elm).find(sl);
+						var fire = __(event.target || event.toElement);
+						var fireElms = fire.parents().add(fire).get();
 
-						var aim = _.find(target.get(),function(elm){
-							return elm.contains(elm); 
-						}).pop();
+						var relative = __(elm).find(sl).get();
+						var target;
 
-						if(_.has(target.find("*").add(target).get(),fire))
-							return cal.call(
-								aim||fire,
-								createEvent(fire,type,data,event),
-								type
-							);
+						for(var i=0,l=relative.length;i<l;i++){
+							if(_.has(fireElms,relative[i])){
+								target = relative[i];
+								break;
+							}
+						}
+
+						if(target)
+							if(target.nodeType === 1)
+								return cal.call(
+									target,
+									createEvent(fire.get(0),type,data,event),
+									type
+								);
 					}; 
 					fn.fn = cal; 
 					fn.elm = elm;
