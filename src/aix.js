@@ -936,6 +936,11 @@
 			return this;
 		},
 
+		empty : function(){
+			$(this.el).empty();
+			return this;
+		},
+
 		release : function(){
 			$(this.el).off();
 			return this;
