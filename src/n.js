@@ -459,7 +459,9 @@
 				if(args.length === 1)
 					return this.get(0).getAttribute(args[0]);
 				else
-					this.each(function(e){ e.setAttribute(args[0],_.parseString(args[1])); });
+					this.each(function(e){ 
+						e.setAttribute(args[0],args[1]!=null ? args[1].toString() : "");
+					});
 			}
 
 			return this;
@@ -976,6 +978,64 @@
 			});
 		}
 	
+	});
+
+	function xUpdateView(item){
+		var target = this;
+		switch(item.type){
+
+			case "props" :
+				_.foreach(item.props,function(val,prop){
+					target.attr(prop,val);
+				});
+				break;
+
+			case "remove" :
+				target.remove();
+				break;
+
+			case "text" :
+				target.text(item.content);
+				break;
+
+			case "append":
+				target.append(item.content.cloneNode(true));
+				break;
+
+			default:
+				break;
+
+		}
+	}
+
+	__.fn.extend({
+		xInit : function(){
+			return this.each(function(elm){
+				elm.innerHTML = _.virtualDOM(elm.innerHTML).innerHTML; 
+			});
+		},
+
+		// should init first
+		xRender:function(html,saver,name){
+			return this.each(function(elm){
+				var o = _.virtualDOM(elm.innerHTML);
+				var n = _.virtualDOM(html);
+				
+				if(_.isObject(saver))
+					saver[name||"@"] = n;
+
+				var diff = _.virtualDIFF(o,n);
+
+				_.foreach(diff,function(item){
+					xUpdateView.call(
+						item.aim === "root" ? 
+							__(this) : 
+							__(this).find("[x-aim='"+item.aim+"']"),
+						item
+					);
+				},elm);
+			});
+		}
 	});
 
 	return __;

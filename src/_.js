@@ -995,7 +995,7 @@
 	
 	// dom parser
 	var bdlevel = /<(\/)?(\w+)\s?([^>]+?)?\>{1}/gi;
-	var parseattr = function(str){
+	var parseattr = function(str,nodetarget){
 		var res = {};
 		var arr = str ? str.split(" "):[];
 		_.foreach(arr,function(prop,i){
@@ -1003,8 +1003,64 @@
 			res[pr[0]] = (pr[1]||"").replace(/[\'\"]/gm,"");
 		});
 
+		res["x-aim"] = nodetarget;
 		return res;
 	};
+
+	// domdiff status
+	var DIFF_CREATE = "create";
+	var DIFF_DESTORY = "destory";
+
+	// create Elm form node info
+	function createttreeElm(node){
+		var elm = document.createElement(node.tagname);
+		_.foreach(node.attributes,function(val,name){
+			elm.setAttribute(name,val);
+		});
+
+		if(!node.child)
+			elm.innerHTML= node.content;
+		else if(!node.child.length)
+			elm.innerHTML= node.content;
+	
+		return elm;
+	}
+
+	function converttree(tree){
+		// create top Element;
+		var wrap = document.createElement("x-tree");
+				wrap.id = "@";
+
+		var level1 = tree[1];
+		
+		for(var i=0,l=level1.length;i<l;i++){
+			wrap.appendChild(createttreeElm(level1[i]));
+		}
+
+		for(var i=2,l=tree.length;i<l;i++){
+			for(var j=0,k=tree[i].length;j<k;j++){
+				var node = tree[i][j];
+				var elm = createttreeElm(node); 
+				
+				wrap.querySelector("[x-aim='"+node.parent["@"]+"']")
+						.appendChild(elm);
+
+			}
+		}
+
+		return wrap;
+	}
+
+	function virtualupprops(prop1,prop2){
+		// old new
+		var props = _.bale(prop1,prop2);
+		_.foreach(prop1,function(val,key){
+			if(props[key]===val)
+				delete props[key];
+		});
+
+		return props;
+	}
 
 	_.extend({
 		// parse data require
@@ -1040,19 +1096,15 @@
 			// make a newtree default node
 			var newlevel = 1; 
 			var find = 1;
-			var newtree  = [
-				[{
-					tagname:"_",
-					html:str,
-					$ob:0,
-					$oe:str.length
-				}]
-			];
+			var newtree  = [];
 
 			var resentnode = [];
+			var nodeindex = 1;
 
 			str.replace(bdlevel,function($match,close,tag,attr,offset){
 				var node = {};
+						node["@"] = nodeindex++;
+
 				var level;
 
 				if(close !== "/"){
@@ -1069,25 +1121,23 @@
 
 					_.compose(node,{
 						tagname:tag,
-						attributes:parseattr(_.trim(attr||"")),
+						attributes:parseattr(_.trim(attr||""),node["@"]),
 						$ob:offset+$match.length
 					});
 					newtree[level].push(node);
 
-					if(tag === "input"){
-						--newlevel; --find;
+					if(tag === "input" || tag === "img"){
+						--newlevel; --find; --nodeindex;
 						node.$oe = 0;
-					}else{
+					}else
 						resentnode.push(node);
-					}
 
 		  	} else {
 		  		// find end
-					level = --newlevel; --find;
+					level = --newlevel; --find; --nodeindex;
 
 					var gtn = resentnode.pop();
 					gtn.$oe = offset-gtn.$ob;
-
 				}
 
 				return $match;
@@ -1102,21 +1152,117 @@
 				for(var j=0,k=np.length;j<k;j++){
 					var begin = np[j].$ob;
 					var end = np[j].$oe;
+
 					np[j].content = _.trim(str.substr(begin,end));
 
 					// find child
-					np[j].child = npc ? _.filter(npc,function(node){
+					np[j].child = npc ? _.filter(npc,function(node,index){
 						return node.$ob>begin && (node.$ob+node.$oe)<(begin+end);
-					}) : [];
+					}) : null;
 
 					// find parent
-					np[j].parent = npp ? _.combom(npp,function(node){
+					np[j].parent = npp ? _.combom(npp,function(node,index){
 						return begin>node.$ob && (begin+end)<(node.$ob+node.$oe);
 					}) : null;
 				}
 			}
 
 			return newtree;
+		},
+
+		// vitruldom
+		virtualDOM : function(html){
+			var parse = _.domparse(html||"");
+			var vDOM = converttree(parse);
+
+			vDOM.xdom = parse;
+			vDOM.xbase = html;
+			vDOM.xhtml = vDOM.innerHTML;
+
+			return vDOM;
+		},
+
+		// v1 old
+		// v2 new
+		virtualDIFF : function(v1,v2){
+			var res = []
+			var p1 = v1.xdom; //old
+			var p2 = v2.xdom; //new
+
+			if(_.strip(v1.xhtml) === _.strip(v2.xhtml))
+				return res;
+
+			if(p1.length&&p2.length){
+				for(var i=1,len = Math.max(p1.length,p2.length);i<len;i++){
+					var p1level = p1[i]||[];
+					var p2level = p2[i]||[];
+					
+					for(var j=0,jlen = Math.max(p1level.length,p2level.length); j<jlen; j++){
+						var hp1n = p1level[j];
+						var hp2n = p2level[j];
+
+						var hasp1j = ( hp1n != null);
+						var hasp2j = ( hp2n != null);
+
+						// has same level node
+						if(hasp1j&&hasp2j){
+							if(hp1n.tagname !== hp2n.tagname){
+								res.push({
+									type:"replace",
+									aim:hp1n["@"],
+									content: p2.querySelector("[x-aim='"+hp2n["@"]+"']")
+								});
+							} else {
+
+								if(!_.isequal(hp1n.attributes,hp2n.attributes)){
+									res.push({
+										type:"props",
+										aim:hp1n["@"],
+										props:virtualupprops(hp1n.attributes,hp2n.attributes)
+									});
+								}
+
+								var hp1nc = hp1n.child || [];
+								var hp2nc = hp2n.child || [];
+
+								if(!hp1nc.length&&!hp2nc.length){
+									if(hp1n.content !== hp2n.content){
+										res.push({
+											type:"text",
+											aim:hp1n["@"],
+											content: hp2n.content
+										});
+									}
+								}
+							}
+						// old elm exsit but remove in new level
+						}else if(hasp1j&&!hasp2j){
+							res.push({ 
+								type:"remove",
+								aim: hp1n["@"] 
+							});
+						// old elm not exsit but add in new level
+						}else if(!hasp1j&&hasp2j){
+							res.push({ 
+								type:"append",
+								aim: _.isObject(hp2n) ? (hp2n.parent !=null ? hp2n.parent["@"] : "root" ) : "root",
+								content: v2.querySelector("[x-aim='"+hp2n["@"]+"']")
+							});
+						}
+					}
+				}
+			}else{
+				if(p1.length === 0){
+					res.push({ type:DIFF_CREATE, content:v2.innerHTML })
+					return res;
+				}
+				if(p2.length === 0){
+					res.push({ type:DIFF_DESTORY, content:"" })
+					return res;
+				}
+			}
+
+			return res;
 		},
 
 		// cookies
