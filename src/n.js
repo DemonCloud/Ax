@@ -982,6 +982,7 @@
 
 	function xUpdateView(item){
 		var target = this;
+
 		switch(item.type){
 
 			case "props" :
@@ -1002,9 +1003,16 @@
 				target.append(item.content.cloneNode(true));
 				break;
 
-			default:
+			case "create":
+				target.fill(item.content);
 				break;
 
+			case "replace":
+				target.replacewith(item.content);
+				break;
+
+			default:
+				break;
 		}
 	}
 

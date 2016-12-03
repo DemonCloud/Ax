@@ -1007,9 +1007,17 @@
 		return res;
 	};
 
-	// domdiff status
-	var DIFF_CREATE = "create";
-	var DIFF_DESTORY = "destory";
+	// auto close tag
+	var htmlcstags = [
+		"input",
+		"hr",
+		"br",
+		"img",
+		"area",
+		"base",
+		"!DOCTYPE",
+		"!--"
+	];
 
 	// create Elm form node info
 	function createttreeElm(node){
@@ -1031,20 +1039,21 @@
 		var wrap = document.createElement("x-tree");
 				wrap.id = "@";
 
-		var level1 = tree[1];
-		
-		for(var i=0,l=level1.length;i<l;i++){
-			wrap.appendChild(createttreeElm(level1[i]));
-		}
+		if(tree.length){
+			var level1 = tree[1];
 
-		for(var i=2,l=tree.length;i<l;i++){
-			for(var j=0,k=tree[i].length;j<k;j++){
-				var node = tree[i][j];
-				var elm = createttreeElm(node); 
-				
-				wrap.querySelector("[x-aim='"+node.parent["@"]+"']")
+			for(var i=0,l=level1.length;i<l;i++){
+				wrap.appendChild(createttreeElm(level1[i]));
+			}
+
+			for(var i=2,l=tree.length;i<l;i++){
+				for(var j=0,k=tree[i].length;j<k;j++){
+					var node = tree[i][j];
+					var elm = createttreeElm(node); 
+
+					wrap.querySelector("[x-aim='"+node.parent["@"]+"']")
 						.appendChild(elm);
-
+				}
 			}
 		}
 
@@ -1082,16 +1091,15 @@
 			return _.paramstringify(param||{})
 		},
 
-		strip: function(str){
-			return _.isString(str) ? str
-									.replace(/[\t\r\n\f]/gm,'')
-									.replace(/<script\b[^>]*>(.*?)<\/script>/gi,'')
-								 : "";
+		strip: function(str,strict){
+			var s = _.isString(str) ? str
+							.replace(/<script\b[^>]*>(.*?)<\/script>/img,'') : "";
+			return strict ? s.replace(/[\t\r\n\f]/gm,'') : s;
 		},
 
 		// dom parse 
 		domparse : function(domstr){
-			var str = _.strip(domstr);
+			var str = _.trim(_.strip(domstr));
 
 			// make a newtree default node
 			var newlevel = 1; 
@@ -1126,11 +1134,12 @@
 					});
 					newtree[level].push(node);
 
-					if(tag === "input" || tag === "img"){
-						--newlevel; --find; --nodeindex;
+					if(_.has(htmlcstags,tag)){
+						--newlevel; --find;
 						node.$oe = 0;
-					}else
+					}else{
 						resentnode.push(node);
+					}
 
 		  	} else {
 		  		// find end
@@ -1152,13 +1161,19 @@
 				for(var j=0,k=np.length;j<k;j++){
 					var begin = np[j].$ob;
 					var end = np[j].$oe;
+					var child = null
 
 					np[j].content = _.trim(str.substr(begin,end));
 
 					// find child
-					np[j].child = npc ? _.filter(npc,function(node,index){
-						return node.$ob>begin && (node.$ob+node.$oe)<(begin+end);
-					}) : null;
+					if(npc){
+						child = _.filter(npc,function(node,index){
+							return node.$ob>begin && (node.$ob+node.$oe)<(begin+end);
+						}); 
+						if(child.length===0)
+							child = null
+					}
+					np[j].child = child
 
 					// find parent
 					np[j].parent = npp ? _.combom(npp,function(node,index){
@@ -1186,6 +1201,7 @@
 		// v2 new
 		virtualDIFF : function(v1,v2){
 			var res = []
+			var banlist = [];
 			var p1 = v1.xdom; //old
 			var p2 = v2.xdom; //new
 
@@ -1210,8 +1226,12 @@
 								res.push({
 									type:"replace",
 									aim:hp1n["@"],
-									content: p2.querySelector("[x-aim='"+hp2n["@"]+"']")
+									root:true,
+									content: v2.querySelector("[x-aim='"+hp2n["@"]+"']")
 								});
+
+								banlist.push(hp1n["@"]);
+
 							} else {
 
 								if(!_.isequal(hp1n.attributes,hp2n.attributes)){
@@ -1222,10 +1242,7 @@
 									});
 								}
 
-								var hp1nc = hp1n.child || [];
-								var hp2nc = hp2n.child || [];
-
-								if(!hp1nc.length&&!hp2nc.length){
+								if(!hp1n.child&&!hp2n.child){
 									if(hp1n.content !== hp2n.content){
 										res.push({
 											type:"text",
@@ -1253,12 +1270,26 @@
 				}
 			}else{
 				if(p1.length === 0){
-					res.push({ type:DIFF_CREATE, content:v2.innerHTML })
+					res.push({ type:"create", aim:"root", content:v2.innerHTML })
 					return res;
 				}
 				if(p2.length === 0){
-					res.push({ type:DIFF_DESTORY, content:"" })
+					res.push({ type:"destory", aim:"root" })
 					return res;
+				}
+			}
+
+			// cat ban list
+			res = _.filter(res,function(item){
+				return item.root || !_.has(banlist,item.aim);
+			});
+
+			// sort res operater
+			for(var i=0,l=res.length;i<l;i++){
+				if(res[i].type==="remove"){
+					res.unshift(res.splice(i,1).pop());
+				}else if(res[i].type==="replace"){
+					res.push(res.splice(i,1).pop());
 				}
 			}
 
