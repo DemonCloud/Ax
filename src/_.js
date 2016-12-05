@@ -7,7 +7,7 @@
  * *IE 9-Edge support
  *
  * @Author  : YIJUN
- * @Date    : 2016.6.22
+ * @Date    : 2016.6.22 - 2016.12.6
  * @Version : 0.1
  *
  * @License : Fuck any LISCENSE

@@ -10,7 +10,7 @@
  * * IE 9+ - Edge Support
  *
  * @Author  : YIJUN
- * @Date    : 2016.6.22
+ * @Date    : 2016.6.22 - 2016.12.6
  * @Version : 0.1
  *
  * @License : Fuck any LISCENSE
@@ -216,7 +216,7 @@
 	__.fn.extend({
 
 		each : function(fn,context){
-			_.foreach(this.$el,fn,context);
+			_.foreach(this.$el,fn,context||this);
 			return this;
 		},
 
@@ -844,20 +844,23 @@
 						}
 
 					}else{
-						_.foreach(elm._events[type],function(fn){
-							elm.removeEventListener(type,fn);
-						});
+						if(elm._events!=null){
+							_.foreach(elm._events[type],function(fn){
+								elm.removeEventListener(type,fn);
+							});
 
-						// live remove binder
-						_.foreach(elm._events["_"+type],function(fn){
-							document
-							.documentElement
-							.removeEventListener(type,fn.cal,true);
-						});
-						delete elm._events["_"+type];
-						delete elm._events[type];
+							// live remove binder
+							_.foreach(elm._events["_"+type],function(fn){
+								document
+									.documentElement
+									.removeEventListener(type,fn.cal,true);
+							});
+							delete elm._events["_"+type];
+							delete elm._events[type];
+						}
 					}
 				}else{
+					elm._events = elm._events || {};
 					_.foreach(elm._events,function(fns,type){
 						if(type.search("_") !== -1){
 							// live remove binder
@@ -872,8 +875,6 @@
 							});
 						}
 					});
-
-					elm._events = {};
 				}
 
 			});
@@ -1011,6 +1012,10 @@
 				target.replacewith(item.content);
 				break;
 
+			case "destory":
+				target.empty();
+				break;
+
 			default:
 				break;
 		}
@@ -1030,7 +1035,7 @@
 				var n = _.virtualDOM(html);
 				
 				if(_.isObject(saver))
-					saver[name||"@"] = n;
+					this[name||"@"] = n;
 
 				var diff = _.virtualDIFF(o,n);
 
@@ -1042,7 +1047,7 @@
 						item
 					);
 				},elm);
-			});
+			},saver);
 		}
 	});
 
