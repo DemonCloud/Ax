@@ -995,12 +995,15 @@
 	
 	// dom parser
 	var bdlevel = /<(\/)?(\w+)\s?([^>]+?)?\>{1}/gi;
+	var atreg = /([^<>\s]+)=[\'\"]?([^>\'\"]+)[\'\"]?\s/gi;
+
 	var parseattr = function(str,nodetarget){
 		var res = {};
-		var arr = str ? str.split(" "):[];
-		_.foreach(arr,function(prop,i){
-			var pr = prop.split("=");
-			res[pr[0]] = (pr[1]||"").replace(/[\'\"]/gm,"");
+		str = ' ' + (str||'') + ' ';
+		
+		str.replace(atreg,function($match,prop,val){
+			res[prop] = val;
+			return $match;
 		});
 
 		res["x-aim"] = nodetarget;
@@ -1188,6 +1191,7 @@
 		// vitruldom
 		virtualDOM : function(html){
 			var parse = _.domparse(html||"");
+
 			var vDOM = converttree(parse);
 
 			vDOM.xdom = parse;

@@ -226,13 +226,17 @@
 		},
 
 		at : function(index){
-			var cp = _.clonedoom(this);
+			if(this.length){
+				var cp = _.clonedoom(this);
 
-			index = +index + (index < 0 ? cp.length : 0);
-			cp.$el = [cp.$el[index]];
-			cp.length = 1;
+				index = +index + (index < 0 ? cp.length : 0);
+				cp.$el = [cp.$el[index]];
+				cp.$el.length = 1;
 
-			return cp;
+				return cp;
+			}
+
+			return this;
 		},
 
 		first : function(){
@@ -817,10 +821,9 @@
 						if(elm._events[type] != null){
 							elm.removeEventListener(
 								type,
-								_.cat(elm._events[type],
-							function(fn){ 
-								return fn.fn===cal ;
-							})[0]||cal);
+								_.cat(elm._events[type],function(fn){ 
+									return fn.fn===cal ;
+								})[0]||cal);
 
 							// If clean events
 							if(!elm._events[type].length)
@@ -836,7 +839,9 @@
 							.removeEventListener(
 								type,
 								_.cat(elm._events["_"+type],
-								function(fn){ return fn.fn===cal;})[0].cal,true);
+								function(fn){ 
+									return fn.fn===cal;
+								})[0].cal,true);
 
 							// If clean events
 							if(!elm._events["_"+type].length)
