@@ -1083,9 +1083,12 @@
 					switch(header["Content-type"]){
 						case "application/json":
 							return JSON.stringify(param||{});
+
 							break;
+
 						default : 
 							return _.paramstringify(param||{});
+
 							break;
 					}
 				}
@@ -1350,6 +1353,7 @@
 				url       : "",
 				type      : "GET",
 				param     : _.broken,
+				charset   : "utf-8",
 				aysnc     : true,
 				vaild     : true,
 				cache     : false,
@@ -1409,15 +1413,25 @@
 				xhr.open(_s.type,_s.url,_s.aysnc);
 
 			// typeof "POST" method
-			if( _s.type === "POST" && _s.param && !_.isObject(_s.header))
-				xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			if( _s.type === "POST" && _s.param && !_s.header["Content-type"])
+				xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded'+';charset='+_s.charset);
 			xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
 			xhr.setRequestHeader("Aix-Requested","AixHttpRequest");
 
-			if(_.isObject(_s.header) && _s.header !== _.broken)
+			if(_.isObject(_s.header) && _s.header !== _.broken){
+				var ct = _s.header["Content-type"];
+
+				if(ct!=null){
+					if(!(ct.search('charset')>-1) && !(ct.search('json')>-1))
+						_s.header["Content-type"] += ";charset=" + _s.charset;
+				}
+
 				_.foreach(_s.header,function(val,key){ 
 					xhr.setRequestHeader(key,val); 
 				});
+			}
+
+			// xhr.setRequestHeader("Content-type","charset=utf-8");
 
 			xhr.onreadystatechange = function(event){
 				// response HTTP response header 200 or lower 300
