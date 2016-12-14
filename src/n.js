@@ -382,6 +382,10 @@
 		"validate"
 	];
 
+	var unitList = [
+		"zIndex","lineHeight"
+	];
+
 	function styleFilter(style){
 		if(style.search("rgb") != -1){
 			var bg = style.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
@@ -398,6 +402,10 @@
 			return arr.join('');
 		}
 		return name;
+	}
+
+	function styleUnitParse(name){
+		return _.has(unitList,styleParse(name)) ? "": "px";
 	}
 
 	function hex(s){
@@ -660,10 +668,15 @@
 		draw : function(css,val){
 			if(_.isString(css))
 				if(val == null)
-					return styleFilter(window.getComputedStyle(this.get(0),null)[css]);
+					return styleFilter(
+						window.getComputedStyle(this.get(0),null)[css]
+					);
 				else
 					return this.each(function(e){ 
-						e.style[styleParse(css)] = (val||"")+"";
+						e.style[styleParse(css)] = 
+							_.isNumber(val) ? 
+							val + styleUnitParse(css) :
+							(val||"");
 					});
 			else if(_.isObject(css))
 				for(var key in css)
