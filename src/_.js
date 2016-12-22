@@ -1058,6 +1058,7 @@
 					}
 				}
 
+				// remove target
 				_.slice(wrap.querySelectorAll("*")).forEach(function(node){
 					node.removeAttribute("x-aim");
 				});
