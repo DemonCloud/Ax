@@ -11,12 +11,13 @@
  * *IE 9-Edge support
  *
  * @Author  : YIJUN
- * @Date    : 2016.6.22 - 2016.12.6
+ * @Date    : 2016.6.22 - now
  * @Version : 0.1
  *
  * @License : Fuck any LISCENSE
  *
  * require Lib [ _ , jQuery or Other DOM lib ]
+ *
  */
 
 (function(root,factory){

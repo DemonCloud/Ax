@@ -7,7 +7,7 @@
  * *IE 9-Edge support
  *
  * @Author  : YIJUN
- * @Date    : 2016.6.22 - 2016.12.6
+ * @Date    : 2016.6.22 - now
  * @Version : 0.1
  *
  * @License : Fuck any LISCENSE
@@ -937,7 +937,7 @@
 				},
 				//Desktop
 				function(root){
-					return root.devicePixelRatio == null || root.devicePixelRatio === 1;
+					return /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(root.navigator.userAgent) || root.devicePixelRatio == null;
 				}
 			])
 			.definePlatform([
@@ -1037,17 +1037,16 @@
 		return elm;
 	}
 
-	function converttree(tree){
+	function converttree(root,tree){
 		// create top Element;
-		var wrap = document.createElement("x-tree");
-				wrap.id = "@";
+		var wrap = (root||document.createElement("div")).cloneNode();
+		wrap.setAttribute("x-root","");
 
 		if(tree.length){
 			var level1 = tree[1];
 
-			for(var i=0,l=level1.length;i<l;i++){
+			for(var i=0,l=level1.length;i<l;i++)
 				wrap.appendChild(createttreeElm(level1[i]));
-			}
 
 			for(var i=2,l=tree.length;i<l;i++){
 				for(var j=0,k=tree[i].length;j<k;j++){
@@ -1192,116 +1191,110 @@
 		},
 
 		// vitruldom
-		virtualDOM : function(html){
+		virtualDOM : function(root,html){
 			var parse = _.domparse(html||"");
 
-			var vDOM = converttree(parse);
-
-			vDOM.xdom = parse;
-			vDOM.xbase = html;
-			vDOM.xhtml = vDOM.innerHTML;
-
-			return vDOM;
+			return converttree(root,parse);
 		},
 
 		// v1 old
 		// v2 new
-		virtualDIFF : function(v1,v2){
-			var res = []
-			var banlist = [];
-			var p1 = v1.xdom; //old
-			var p2 = v2.xdom; //new
+		// virtualDIFF : function(v1,v2){
+		// 	var res = [];
+		// 	var banlist = [];
+		// 	var p1 = v1.xdom; //old
+		// 	var p2 = v2.xdom; //new
 
-			if(_.strip(v1.xhtml) === _.strip(v2.xhtml))
-				return res;
+		// 	if(_.strip(v1.xhtml) === _.strip(v2.xhtml))
+		// 		return res;
 
-			if(p1.length&&p2.length){
-				for(var i=1,len = Math.max(p1.length,p2.length);i<len;i++){
-					var p1level = p1[i]||[];
-					var p2level = p2[i]||[];
+		// 	if(p1.length&&p2.length){
+		// 		for(var i=1,len = Math.max(p1.length,p2.length);i<len;i++){
+		// 			var p1level = p1[i]||[];
+		// 			var p2level = p2[i]||[];
 					
-					for(var j=0,jlen = Math.max(p1level.length,p2level.length); j<jlen; j++){
-						var hp1n = p1level[j];
-						var hp2n = p2level[j];
+		// 			for(var j=0,jlen = Math.max(p1level.length,p2level.length); j<jlen; j++){
+		// 				var hp1n = p1level[j];
+		// 				var hp2n = p2level[j];
 
-						var hasp1j = ( hp1n != null);
-						var hasp2j = ( hp2n != null);
+		// 				var hasp1j = ( hp1n != null);
+		// 				var hasp2j = ( hp2n != null);
 
-						// has same level node
-						if(hasp1j&&hasp2j){
-							if(hp1n.tagname !== hp2n.tagname){
-								res.push({
-									type:"replace",
-									aim:hp1n["@"],
-									root:true,
-									content: v2.querySelector("[x-aim='"+hp2n["@"]+"']")
-								});
+		// 				// has same level node
+		// 				if(hasp1j&&hasp2j){
+		// 					if(hp1n.tagname !== hp2n.tagname){
+		// 						res.push({
+		// 							type:"replace",
+		// 							aim:hp1n["@"],
+		// 							root:true,
+		// 							content: v2.querySelector("[x-aim='"+hp2n["@"]+"']")
+		// 						});
 
-								banlist.push(hp1n["@"]);
+		// 						banlist.push(hp1n["@"]);
 
-							} else {
+		// 					} else {
 
-								if(!_.isequal(hp1n.attributes,hp2n.attributes)){
-									res.push({
-										type:"props",
-										aim:hp1n["@"],
-										props:virtualupprops(hp1n.attributes,hp2n.attributes)
-									});
-								}
+		// 						if(!_.isequal(hp1n.attributes,hp2n.attributes)){
+		// 							res.push({
+		// 								type:"props",
+		// 								aim:hp1n["@"],
+		// 								props:virtualupprops(hp1n.attributes,hp2n.attributes)
+		// 							});
+		// 						}
 
-								if(!hp1n.child&&!hp2n.child){
-									if(hp1n.content !== hp2n.content){
-										res.push({
-											type:"text",
-											aim:hp1n["@"],
-											content: hp2n.content
-										});
-									}
-								}
-							}
-						// old elm exsit but remove in new level
-						}else if(hasp1j&&!hasp2j){
-							res.push({ 
-								type:"remove",
-								aim: hp1n["@"] 
-							});
-						// old elm not exsit but add in new level
-						}else if(!hasp1j&&hasp2j){
-							res.push({ 
-								type:"append",
-								aim: _.isObject(hp2n) ? (hp2n.parent !=null ? hp2n.parent["@"] : "root" ) : "root",
-								content: v2.querySelector("[x-aim='"+hp2n["@"]+"']")
-							});
-						}
-					}
-				}
-			}else{
-				if(p1.length === 0){
-					res.push({ type:"create", aim:"root", content:v2.innerHTML })
-					return res;
-				}
-				if(p2.length === 0){
-					res.push({ type:"destory", aim:"root" })
-					return res;
-				}
-			}
+		// 						if(!hp1n.child&&!hp2n.child){
+		// 							if(hp1n.content !== hp2n.content){
+		// 								res.push({
+		// 									type:"text",
+		// 									aim:hp1n["@"],
+		// 									content: hp2n.content
+		// 								});
+		// 							}
+		// 						}
+		// 					}
+		// 				// old elm exsit but remove in new level
+		// 				}else if(hasp1j&&!hasp2j){
+		// 					res.push({ 
+		// 						type:"remove",
+		// 						aim: hp1n["@"] 
+		// 					});
+		// 				// old elm not exsit but add in new level
+		// 				}else if(!hasp1j&&hasp2j){
+		// 					res.push({ 
+		// 						type:"append",
+		// 						aim: _.isObject(hp2n) ? (hp2n.parent !=null ? hp2n.parent["@"] : "root" ) : "root",
+		// 						content: v2.querySelector("[x-aim='"+hp2n["@"]+"']")
+		// 					});
+		// 				}
+		// 			}
+		// 		}
+		// 	}else{
+		// 		if(p1.length === 0){
+		// 			res.push({ type:"create", aim:"root", content:v2.innerHTML })
+		// 			return res;
+		// 		}
+		// 		if(p2.length === 0){
+		// 			res.push({ type:"destory", aim:"root" })
+		// 			return res;
+		// 		}
+		// 	}
 
-			// cat ban list
-			res = _.filter(res,function(item){
-				return item.root || !_.has(banlist,item.aim);
-			});
+		// 	// cat ban list
+		// 	res = _.filter(res,function(item){
+		// 		return item.root || !_.has(banlist,item.aim);
+		// 	});
 
-			// sort res operater
-			for(var i=0,l=res.length;i<l;i++){
-				if(res[i].type==="remove"){
-					res.unshift(res.splice(i,1).pop());
-				}else if(res[i].type==="replace"){
-					res.push(res.splice(i,1).pop());
-				}
-			}
+		// 	// sort res operater
+		// 	for(var i=0,l=res.length;i<l;i++){
+		// 		if(res[i].type==="remove"){
+		// 			res.unshift(res.splice(i,1).pop());
+		// 		}else if(res[i].type==="replace"){
+		// 			res.push(res.splice(i,1).pop());
+		// 		}
+		// 	}
 
-			return res;
-		},
+		// 	return res;
+		// },
 
 		// cookies
 		cookieparse : function(ckstr){
