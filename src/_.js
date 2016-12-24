@@ -134,10 +134,10 @@
 		
 			foreach : function(list,fn,ts){
 				if(list !=null ){
-					if(this.isArray(list))
-						return aloop(list,fn,ts);
+					if(_.isArray(list))
+						return aloop(list,fn,ts||_);
 					else if(_.isObject(list) && !_.isFunction(list))
-						return oloop(list,fn,ts);
+						return oloop(list,fn,ts||_);
 				}
 				return list;
 			},
@@ -215,7 +215,7 @@
 					// copy prototype
 					var ___ = function(){};
 					___.prototype = list.constructor.prototype;
-					var res = new ___;
+					var res = new ___();
 
 					// dist clone data
 					_.foreach(list, function(val,key){
@@ -308,7 +308,7 @@
 				var args = _slice.call(arguments,2),
 						isFn = _.isFunction(hook);
 					
-				return this.map(list, function(v){
+				return _.map(list, function(v){
 					return (isFn ? hook : v[hook]).apply(v,args);
 				});
 			},
@@ -319,7 +319,7 @@
 				_.foreach(obj,function(fn,k){
 					if(this.isFunction(fn))
 						obj[k] = Function.bind.apply(fn,args); 
-				},this);
+				});
 
 				return obj;
 			},
@@ -327,7 +327,7 @@
 			reverse : function(list){
 				if(!_.isArray(list))
 					return list;
-				return this.slice(list).reverse();
+				return _.slice(list).reverse();
 			},
 
 			pluck : function(list,mapkey){
@@ -406,7 +406,7 @@
 												k !== nothisproperty : true);
 						if(idf)
 							o1[k] = v; 
-					},this);
+					});
 				else
 					_.foreach(o2,function(v,k){
 						o1[k] = v; 
@@ -544,7 +544,7 @@
 			},
 
 			typeof : function(def){
-	  		//[
+	  		// [
 	  		//'Array',
 	  		//'Arguments',
 	  		//'Boolean',
@@ -557,7 +557,8 @@
 	  		//'NodeList',
 	  		//'Undefined',
 	  		//"HTMLCollection"
-	  		//]
+	  		// ]
+
 	  		var index,
 						types = [
 					_.isArray(def),
@@ -743,16 +744,15 @@
 				// try to build anmousyous function
 				try {
 					// var render = new Function(name||"_x","_",res);
-					var render = (0,eval)("(function("+(name||"_x") 
-														+ ",_" 
-														+ ( args.length ? ","+args.toString() : "" ) 
-														+ "){" 
+					var render = (0,eval)("(function("+(name||"_x") + ",_" 
+														+ ( args.length ? ","+args.toString() : "" ) + "){" 
+														// arguments end
 														+ res 
 														+ "})"
 												 	);
 				}catch(e){
 					e.res = res;
-					console.log(res);
+					console.error(res);
 					throw e;
 				}
 
@@ -879,11 +879,10 @@
 					this.browser = {};
 
 					for(var i = browserlist.length; i--; ){
-						if(identifylist[i].call(ua,_.root)){
+						if(identifylist[i].call(ua,_.root))
 							this.browser[browserlist[i]] = true;
-						} else {
+						else 
 							this.browser[browserlist[i]] = false;
-						}
 					}
 					return this;
 				},
@@ -986,8 +985,6 @@
 				]);
 
 		// about browser's api local
-		// ajax counter
-		var xhrcount = 0;
 		// ajax setcache
 		var ls = _.root.localStorage;
 		if(!ls.getItem("aixcache"))
@@ -1087,18 +1084,12 @@
 						switch(header["Content-type"]){
 							case "application/json":
 								return JSON.stringify(param||{});
-
-								break;
-
 							default : 
 								return _.paramstringify(param||{});
-
-								break;
 						}
 					}
 				}
-
-				return _.paramstringify(param||{})
+				return _.paramstringify(param||{});
 			},
 
 			strip: function(str,strict){
@@ -1171,22 +1162,22 @@
 					for(var j=0,k=np.length;j<k;j++){
 						var begin = np[j].$ob;
 						var end = np[j].$oe;
-						var child = null
+						var child = null;
 
 						np[j].content = _.trim(str.substr(begin,end));
 
 						// find child
 						if(npc){
-							child = _.filter(npc,function(node,index){
+							child = this.filter(npc,function(node,index){
 								return node.$ob>begin && (node.$ob+node.$oe)<(begin+end);
 							}); 
 							if(child.length===0)
-								child = null
+								child = null;
 						}
-						np[j].child = child
+						np[j].child = child;
 
 						// find parent
-						np[j].parent = npp ? _.combom(npp,function(node,index){
+						np[j].parent = npp ? this.combom(npp,function(node,index){
 							return begin>node.$ob && (begin+end)<(node.$ob+node.$oe);
 						}) : null;
 					}
@@ -1320,7 +1311,7 @@
 			// args :( name , value, expires, path, domain, secure)
 			var args = _.slice(arguments);
 			var len = args.length;
-			var parsec = _.cookieparse(_.root.document.cookie);
+			var parsec = _.cookieparse(document.cookie);
 
 
 			if(len){
@@ -1331,7 +1322,7 @@
 					var time = new Date();
 					time.setDate(time.getDate()+365);
 
-					return _.root.document.cookie = _.trim(
+					return this.root.document.cookie = this.trim(
 										  args[0]+"="+(args[1]||"") + ';' 
 										+  "expires="+(args[2]||time.toGMTString()) + ';'
 										+  "path="   +(args[3]||"/") + ';'
@@ -1383,7 +1374,7 @@
 			if( _s.type.toUpperCase() === "GET" && _s.param){
 				_s.url += (_s.url.search(/\?/g) === -1 ? 
 					(_.keys(_s.param).length ? "?" : "") : "&" )
-					+ _.paramstringify(_s.param);
+					+ this.paramstringify(_s.param);
 				_s.param = null;
 			}
 
@@ -1419,10 +1410,9 @@
 			if(_.isObject(_s.header) && _s.header !== _.broken){
 				var ct = _s.header["Content-type"];
 
-				if(ct!=null){
-					if(!(ct.search('charset')>-1) && !(ct.search('json')>-1))
+				if(ct!=null)
+					if(ct.search('charset')===-1 && ct.search('json')===-1)
 						_s.header["Content-type"] += ";charset=" + _s.charset;
-				}
 
 				_.foreach(_s.header,function(val,key){ 
 					xhr.setRequestHeader(key,val); 
@@ -1456,7 +1446,6 @@
 					_s.param : 
 					_.datamime(_s.header,_s.param))
 					:null);
-			xhrcount++;
 
 			// if set timeout for ajax , should abort after 
 			// trigger fail callee
@@ -1482,37 +1471,35 @@
 			}, option || {} );
 
 			var url = _s.url+"?"
-							+ _.paramstringify(_s.param)
-							+ (_.keys(_s.param).length ? "&" : "") 
+							+ this.paramstringify(_s.param)
+							+ (this.keys(_s.param).length ? "&" : "") 
 							+ _s.key + "=" + _s.fn;
 
-			var aixp_tag = _.root.document.createElement("script");
+			var aixp_tag = document.createElement("script");
 					aixp_tag.src = url;
 
 			// define callback
 			_.root[_s.fn] = function(res){
 				clearTimeout(_s.timesetup);
 				
-				_.root.document.body.removeChild(aixp_tag);
+				document.body.removeChild(aixp_tag);
 				_.root[_s.fn] = null;
 				_s.success.call(_.root,res);
 			};
 
 			// append elm
 			// send request
-			_.root.document.body.append(aixp_tag);
+			document.body.append(aixp_tag);
 
 			// if timeout will trigger failcall
 			if(_s.timeout){
 				_s.timesetup = setTimeout(function(){
-					_.root.document.body.removeChild(aixp_tag);
+					document.body.removeChild(aixp_tag);
 					_.root[_s.fn] = null;
 
 					_s.success.call(_.root);
 				},_s.timeout * 1000);
 			}
-
-			xhrcount++;
 		},
 
 		// HTML page info 
@@ -1614,9 +1601,7 @@
 				linklist : linklist.sort(),
 
 				cookies : _.cookie(),
-				localstorage : ls || {},
-
-				_aixxhr : xhrcount
+				localstorage : ls || {}
 			};
 		},
 
@@ -1643,7 +1628,7 @@
 				setTimeout(function(){ 
 					var nx = firelist.pop();
 					var tmp = fn.call(_.root,arg);
-					nx && nx.call(_.root,tmp);
+					if(nx!=null) nx.call(_.root,tmp);
 				},t*1000);
 			};
 
@@ -1687,7 +1672,7 @@
 					setTimeout(function(){ 
 						var nx = _this["="].pop();
 						var tmp = fn.call(_.root,arg);
-						nx && nx.call(_.root,tmp);
+						if(nx!=null) nx.call(_.root,tmp);
 					},t*1000);
 				};
 

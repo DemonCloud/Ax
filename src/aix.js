@@ -172,7 +172,7 @@
   			configurable: false
 			});
 			return extend;
-		}
+		};
 	}
 
 	// Aix Model
@@ -1080,7 +1080,7 @@
 
 		addRoute:function(route,fname){
 			if(_.isString(fname)||_.isArray(fnname))
-		 		this.routes[route] = fnname
+		 		this.routes[route] = fnname;
 		 	return this;
 		},
 

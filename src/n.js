@@ -274,13 +274,13 @@
 
 		even : function(){
 			return this.by(function(elm,i){
-				return i%2 != 0;
+				return i%2 !== 0;
 			});
 		},
 
 		odd : function(){
 			return this.by(function(elm,i){
-				return i%2 == 0;
+				return i%2 === 0;
 			});
 		},
 
@@ -1226,16 +1226,15 @@
           },
           i;
 
-      if (typeof options === "undefined") {
+      if (options == null) {
           options = {};
       }
 
       for (i in defaults) {
-          if (typeof options[i] === "undefined") {
-              this[i] = defaults[i];
-          } else {
-              this[i] = options[i];
-          }
+          if (options[i] == null)
+            this[i] = defaults[i];
+          else 
+            this[i] = options[i];
       }
 
   };
@@ -2286,7 +2285,7 @@
 		},
 
 		signet : function(name,val){
-			if(name != null)
+			if(name != null){
 				if(val != null)
 					return this.each(function(e){
 						if(e[name])
@@ -2302,6 +2301,7 @@
 					});
 				else
 					return this.get(0)[name];
+			}
 			return this;
 		},
 
@@ -2330,14 +2330,13 @@
 	
 	});
 
+	// virtual Render
 	__.fn.extend({
 
 		xRender:function(newhtml){
 			return this.each(function(elm){
-				this.apply(elm,
-					this.diff(elm,
-						_.virtualDOM(elm,newhtml.nodeType?newhtml.outerHTML : (newhtml||"") )
-					)
+				this.apply(elm,this.diff( elm,
+						_.virtualDOM(elm,newhtml.nodeType?newhtml.outerHTML : (newhtml||"")) )
 				);
 			},_DIFF);
 		}
