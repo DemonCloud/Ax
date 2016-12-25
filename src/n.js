@@ -191,7 +191,7 @@
 				this.$indicator = str;
 			}else if( str===document || str===_.root || str.nodeType ===1){
 				this.$el.push(str);
-				this.$indicator = "";
+				this.$indicator = str;
 			}
 		}
 
@@ -298,6 +298,7 @@
 			cp.$el = _.filter(res,function(c){
 				return c.nodeType !== 3 && c.nodeType !== 8 && c.nodeName !== "SCRIPT";
 			});
+
 			cp.length = cp.$el.length;
 			return cp;
 		},
@@ -2280,8 +2281,8 @@
 			return this.live.apply(this,_.slice(arguments));
 		},
 
-		off : function(type,param,fn){
-			return this.purge(type,fn);
+		off : function(){
+			return this.purge.apply(this,_.slice(arguments));
 		},
 
 		signet : function(name,val){

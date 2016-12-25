@@ -59,12 +59,15 @@ p {
 
 	overflow-x:hidden;
 	overflow-y:auto;
+
+	background-color: #f9f9f9;
   border-left: 3px solid #6d1818;
   border-right: 1px solid #6d1818;
 
-  z-index: 5;
 	-webkit-box-shadow: 3px 0 12px rgba(0, 0, 0, 0.18);
 	box-shadow: 3px 0 12px rgba(0, 0, 0, 0.18);
+
+  z-index: 5;
 }
 
 .contain .list-right{

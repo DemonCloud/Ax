@@ -2546,7 +2546,6 @@
 			["mapkey","[ 类型:String,Number ]"]
 		],
 		"paramcall" : [
-			[]
 		],
 		"returnval" : [
 			["pluck array","返回对应mapkey的值集合"]
@@ -2901,10 +2900,10 @@
 		]
 	},
 
-	"_.iseuqal" : {
-		"toptitle" : ["_.iseuqal"],
+	"_.isequal" : {
+		"toptitle" : ["_.isequal"],
 		"api" : [
-			"_.iseuqal(a,b,strictmode)"
+			"_.isequal(a,b,strictmode)"
 		],
 		"param" : [
 			["a,b","[ 类型:任意类型 ]"],
@@ -2915,21 +2914,318 @@
 		"returnval" : [
 		],
 		"info" : [
-			""
+			"_.isequal 是一个比较两变量是否相等的函数，和原生表达式不一样的地方在于",
+			"对象a{a:1} 和 对象b{a:1} ,在逻辑上是两个不同的变量，正常情况下是用==或者===都是不想等的，因为属于两个完全不同的对象指针,但是由于两个对象的键值对完全相同，所以isequal会判定两者相等",
+			"数组则同理, [1]其实和[1]并不相等，是两个完全不同的数组，但是从数值上来看是一摸一样的"
+		],
+		"infowarning":[
+			"_.isequal 赋予第三个参数 strictmode 为真值(true)时,比较结果相当于 a===b"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"比较变量",
+				"code":[
+					"var a = [1,2,3]",
+					"var b = [1,2,3]",
+					"",
+					"var c = {a:1,b:2}",
+					"var d = {a:1,b:2}",
+					"",
+					"console.log(a==b);",
+					"console.log(a===b);",
+					"console.log(_.isequal(a,b));",
+					"",
+					"console.log(c==d);",
+					"console.log(c===d);",
+					"console.log(_.isequal(c,d));"
+				],
+				"result":[
+					"false",
+					"false",
+					"true",
+					"",
+					"false",
+					"false",
+					"true"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.requery" : {
+		"toptitle" : ["_.requery"],
+		"api" : [
+			"_.requery(serilaizeArray)"
+		],
+		"param" : [
+			["serilaizeArray","[ 类型:Array ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"用于将通过jquery，zepto 或者自带的 __ DOM库api serilaizeArray所序列化出来的数组，转化成一个key->value的键值对对象."
 		],
 		"infowarning":[
 		],
 		"table":[],
 		"example":[
 			{ 
-				"info":"",
+				"info":"将jquery serilaizeArray的数据转化成标准对象",
 				"code":[
-					""
+					"var dataArray = [",
+					"   {name:'Jake',value:'?'},",
+					"   {name:'Cloud',value:2},",
+					"   {name:'Sam',value:3}",
+					"];",
+					"console.log(_.requery(dataArray))"
 				],
 				"result":[
-					""
+					"{",
+					"  Cloud:2",
+					"  Jake:'?'",
+					"  Sam:3",
+					"}"
 				]
 			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.async" : {
+		"toptitle" : ["_.async"],
+		"api" : [
+			"_.async(fn,time)"
+		],
+		"param" : [
+			["fn","[ 类型:Function ]"],
+			["time","[ 类型:Number,Null ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"和setTimeout作用等同，如果不传入time时间，则等于将函数设置成一个异步函数"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"异步执行",
+				"code":[
+					"console.log(1);",
+					"_.async(function(){console.log(3);});",
+					"console.log(2);"
+				],
+				"result":[
+					"1",
+					"2",
+					"3"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.combom" : {
+		"toptitle" : ["_.combom"],
+		"api" : [
+			"_.combom(list,fn)"
+		],
+		"param" : [
+			["list","[ 类型:Array,Object ]"],
+			["fn","[ 类型:Function ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"_.combom 作为一个查询条件，返回在List中满足条件的第一个数值,类似于findindex的作用"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"返回数组中寻找到的第一个满足4的倍数数值",
+				"code":[
+					"var list = [1,2,3,4,5,6,7,8];",
+					"console.log(_.combom(list,function(item){",
+					"  return item%4===0;",
+					"}));"
+				],
+				"result":[
+					"4"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.once" : {
+		"toptitle" : ["_.once"],
+		"api" : [
+			"_.once(fn)"
+		],
+		"param" : [
+			["fn","[ 类型:Function ]"]
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+			["once Func","只能执行一次的函数"]
+		],
+		"info" : [
+			"_.once的作用是将原本可以无限次反复调用执行的函数，设置成只能执行一次.",
+			" 传入的参数fn为目标函数, 返回该函数的变体，此函数仅能执行一次.",
+			"执行一次之后无效，反复调用不会执行，也不会报错."
+		],
+		"infowarning":[
+			"_.once 是基于 _.part 封装的，其效果等同于 _.part(fn,1)"
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"只执行一次的函数",
+				"code":[
+					"var a = 1;",
+					"var fn = function(){ a++ };",
+					"var onefn = _.once(fn);",
+					"",
+					"",
+					"onefn()",
+					"console.log(a)",
+					"",
+					"",
+					"// 再调用两次",
+					"onefn()",
+					"onefn()",
+					"console.log(a)"
+				],
+				"result":[
+					"2",
+					"// 发现还是2 ",
+					"2"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.part" : {
+		"toptitle" : ["_.part"],
+		"api" : [
+			"_.part(fn,times)"
+		],
+		"param" : [
+			["fn","[ 类型:Function ]"],
+			["times","[ 类型:Number,String ]"]
+		],
+		"paramcall" : [
+			["times Func","能执行times次的函数"]
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"_.part 作用是可以创建一个能执行n次的函数，执行n次之后，则不再执行",
+			"调用part则会返回该函数的变体"
+		],
+		"infowarning":[
+		],
+		"table":[],
+		"example":[
+			{ 
+				"info":"创建一个执行3次的函数",
+				"code":[
+					"var str = ''",
+					"var fn = function(){ str+=' look'; };",
+					"var tfn = _.part(fn,3)",
+					"",
+					"for(var i=0;i<100;i++){",
+					"  tfn();",
+					"}",
+					"",
+					"console.log(str);"
+				],
+				"result":[
+					" look look look"
+				]
+			}
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.ua" : {
+		"toptitle" : ["_.ua"],
+		"api" : [
+			"_.ua"
+		],
+		"param" : [
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"_.ua 返回浏览器 useragent 的高级封装。",
+			"里面包含浏览器的所有信息:",
+			"  - 浏览器类型",
+			"  - 浏览器版本 ",
+			"  - 设备类型",
+			"  - 设备平台",
+			"  - 操作系统",
+			"  - 当前默认语言(IE11+)"
+		],
+		"infowarning":[
+			"可发送到后台作为设备统计依据"
+		],
+		"table":[],
+		"example":[
+		],
+		"exampledemo":[
+		]
+	},
+
+	"_.pagepref" : {
+		"toptitle" : ["_.pagepref"],
+		"api" : [
+			"_.pagepref()"
+		],
+		"param" : [
+		],
+		"paramcall" : [
+		],
+		"returnval" : [
+		],
+		"info" : [
+			"直接调用后执行，返回当前HTML中的统计信息:",
+			"  - 该页面包含的所有样式列表 - 对应的元素",
+			"  - 该页面包含的所有ID列表 - 对应的元素",
+			"  - 该页面包含的所有图片 - 图片地址",
+			"  - 该页面包含的所有脚本 - 脚本数量以及链接",
+			"  - 该页面包含的所有链接 - 链接地址以及数量",
+			"  - cookies",
+			"  - 本地存储",
+			"  - HTML 标签数量",
+			"  - HTML 标签总和长度"
+		],
+		"infowarning":[
+			"一般用于检测样式规范，ID命名规范，快速查看cookie以及本地存储"
+		],
+		"table":[],
+		"example":[
 		],
 		"exampledemo":[
 		]

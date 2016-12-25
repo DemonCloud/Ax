@@ -505,7 +505,7 @@
 
 			// create function run once time
 			once: function(fn){
-				return _.part(fn,1);
+				return _.part(fn);
 			},
 
 			isequal : function(x,y,strictmode){
@@ -1669,7 +1669,7 @@
 				var t = _.isArray(item) ? (item[1]||0) : parseFloat(item||0);
 				 
 				var fire = function(arg){
-					setTimeout(function(){ 
+					_.async(function(){ 
 						var nx = _this["="].pop();
 						var tmp = fn.call(_.root,arg);
 						if(nx!=null) nx.call(_.root,tmp);
@@ -1715,7 +1715,7 @@
 			var t = _.isNumber(x[1]) ? x[1] : 0;
 			
 			var fire = function(){
-				setTimeout(function(){ 
+				_.async(function(){ 
 					var tmp = fn();
 					checklist[index] = (tmp||1) ;
 					if(!_.has(checklist)){
