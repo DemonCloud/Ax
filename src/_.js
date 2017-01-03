@@ -621,6 +621,8 @@
 			
 			// @ parse the queryString to JSON Object
 			paramparse : function(url){
+				url = (url || "").split("#").shift();
+
 				var findQuery = url.indexOf("?"),
 					reg = /([^&=]+)=?([^&]*)/g ,
 					param , match , x = {};
@@ -1299,9 +1301,13 @@
 			var pars = ckstr ? ckstr.split(";") : [];
 
 			pars.forEach(function(item){
-				tmp = (item||"").split("=");
-				if(tmp.length)
-					res[_.trim(tmp[0])] = _.trim(tmp[1]);
+				var index = (item||"").search("=");
+				if(index===-1)
+					return;
+
+				var rkey = _.trim(item.substr(0,index));
+				if(rkey.length)
+					res[rkey] = _.trim(item.substr(index+1));
 			});
 
 			return res;

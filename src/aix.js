@@ -880,8 +880,8 @@
 											 obj.build.call(_this,obj.template||""):
 											 _.doom(obj.template||"");
 		if(!obj.render || !_.isFunction(obj.render)){
-			obj.render = function(data){ 
-				return $(this.el).html(this.template(data)) && this;
+			obj.render = function(){ 
+				return $(this.el).html(this.template.apply(this,_.slice(arguments))) && this;
 			};
 		}
 			

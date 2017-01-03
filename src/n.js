@@ -352,6 +352,21 @@
 			return cp;
 		},
 
+		parent : function(){
+			var cp = _.clonedoom(this);
+			var res = [];
+
+			_.foreach(cp.$el,function(e){
+				if(e.parentNode)
+					res.push(e.parentNode);
+			});
+
+			cp.$el = _.unique(res);
+			cp.length = cp.$el.length;
+			
+			return cp;
+		},
+
 		parents : function(){
 			var cp = _.clonedoom(this);
 			var res = [];
