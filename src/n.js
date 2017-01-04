@@ -98,9 +98,9 @@
 
 	function inpage(sl){
 		return sl.$el.every(function(e){ 
-			return _.ua.browser.IE ? 
-						 document.body.contains(e) :
-						 document.contains(e); });
+			return document.body.contains(e) ||
+						 document.contains(e); 
+		});
 	}
 
 	// get childNodes and filter by selector
@@ -747,6 +747,7 @@
 		]
 	};
 
+	// Create X extend
 	var x = {};
 
 	x.Events = function(o,target){
@@ -763,13 +764,11 @@
 		});
 	};
 
-	x.Events.consoda = [
+	[
 		"stopImmediatePropagation",
 		"stopPropagation",
 		"preventDefault"
-	];
-
-	x.Events.consoda.forEach(function(api){
+	].forEach(function(api){
 		x.Events.prototype[api] = function(){
 			return this._event[api]();
 		};
@@ -2346,9 +2345,32 @@
 	
 	});
 
-	// virtual Render
 	__.fn.extend({
+		// form serializeArray
+		serializeArray:function(){
+			var res = [];
 
+			var finder = this.find(
+				"checkbox[checked]:not([disabled])," +
+				"input:not([disabled]):not([type='submit'])," +
+				"select:not([disabled])" 
+			).each(function(item){
+				var name = __(item).attr("name");
+				var value = __(item).value();
+
+				if(name && value)
+					res.push({ name:name,value:value });
+			});
+		
+			return res;
+		},
+
+		// form serialize
+		serialize:function(){
+			return _.paramstringify(_.requery(this.serializeArray()));
+		},
+
+		// virtual Render
 		xRender:function(newhtml){
 			return this.each(function(elm){
 				this.apply(elm,this.diff( elm,

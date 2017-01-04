@@ -864,127 +864,9 @@
 
 		});
 
-		
 		// about browser api
 		// support Browser eval struct
 		if(_.root.self){
-			// UserAgent
-			var checkUA = function(ng){
-				this.info = ng.userAgent;
-				this.language  = ng.language;
-				this.platform  = ng.platform;
-			};
-
-			_.extend(checkUA.prototype,{
-				defineBroswer : function(browserlist,identifylist){
-					var ua = this.info;
-					this.browser = {};
-
-					for(var i = browserlist.length; i--; ){
-						if(identifylist[i].call(ua,_.root))
-							this.browser[browserlist[i]] = true;
-						else 
-							this.browser[browserlist[i]] = false;
-					}
-					return this;
-				},
-
-				definePlatform : function(proplist,checklist){
-					var ua = this.info;
-					this.version = {};
-
-					for(var i = proplist.length ;i--;)
-						this.version[proplist[i]] = checklist[i].call(ua,_.root);
-					return this;
-				}
-
-			});
-
-			var _CHECKER = (new checkUA(_.root.navigator))
-				.defineBroswer([
-					"IE",				"Edge",
-					"Opera",		"Chrome",
-					"Safari",		"FireFox",
-
-					"Mobile",		"Desktop"
-				],[
-					//IE
-					function(){
-						return /(Trident|MSIE)/i.test(this);
-					},
-					//Edge
-					function(){
-						return /Edge/i.test(this) && /Webkit/i.test(this);
-					},
-					//Opera
-					function(){
-						return /Opera/i.test(this) && /Webkit/i.test(this);
-					},
-					//Chrome
-					function(root){
-						return root.chrome != null;
-					},
-					//Safari
-					function(){
-						return /Safari/i.test(this) && !/Chrome/i.test(this);
-					},
-					//FireFox
-					function(root){
-						return /Firefox/i.test(this) && root.netscape && /Gecko/.test(this);
-					},
-					//Mobile
-					function(root){
-						return root.devicePixelRatio > 1;
-					},
-					//Desktop
-					function(root){
-						return /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(root.navigator.userAgent) || root.devicePixelRatio == null;
-					}
-				])
-				.definePlatform([
-					"OS",
-					"RenderEnginner",
-					"Chrome",
-					"Firefox",
-					"IE"
-				],[
-					//Operating System
-					function(root){
-						if(/Windows/gi.test(this))
-							return "Windows";
-						if(/(Linux|Ubuntu|CentOS|Debian|Arach|RedHat|FreeBSD|Unix)/gi.test(this))
-							return "Linux";
-						if(/Macintosh/gi.test(this))
-							return "Mac OS X";
-						if(/iOS|iPad|iPhone/gi.test(this))
-							return "iOS";
-						if(/Android/gi.test(this))
-							return "Android";
-						return "UnKown";
-					},
-					//Render Enginner
-					function(root){
-						return /(Webkit|Gecko|Trident)/gi.exec(this)[0];
-					},
-					//Chrome Version
-					function(root){
-						if(/Chrome/gi.test(this))
-							return this.match(/(Chrome)\/([\d\.]+)/gi)[0].replace(/[^\d\.]/gi,"");
-						return false;
-					},
-					//FireFox Version
-					function(root){
-						if(/Firefox/gi.test(this))
-							return (/Firefox\/([\d\.]+)/gi.exec(this)[1]);
-						return false;
-					},
-					//IE version
-					function(root){
-						if(/IE/gi.test(this))
-							return parseInt(/MSIE\ ([\d\.]+)/gi.exec(this)[1]); 
-						return false;
-					}
-				]);
 
 		// about browser's api local
 		// ajax setcache
@@ -1609,10 +1491,7 @@
 				cookies : _.cookie(),
 				localstorage : ls || {}
 			};
-		},
-
-		// userAgent
-		ua: _CHECKER
+		}
 
 	});
 	}
