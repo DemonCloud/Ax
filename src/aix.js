@@ -25,10 +25,10 @@
 	if(typeof define === 'function' && define.amd)
 		// support AMD require.js
 		// ruler by UMD Javascript
-		define(['_','__'],factory);
+		define(['_','z'],factory);
 	else
 		// build on browser global object
-		root.aix = factory(_,__);
+		root.aix = factory(_,z);
 
 })( this , function(_,$){
 	"use strict";
