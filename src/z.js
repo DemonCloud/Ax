@@ -1,7 +1,7 @@
 /* 
- * n.js
+ * z.js
  *
- * Base Dom Lib
+ * Z Base Dom Lib
  *
  * support web browser 
  * * Chrome
@@ -20,10 +20,11 @@
 	if(typeof define === 'function' && define.amd)
 		// support AMD require.js
 		// ruler by UMD Javascript
+		// export [z]
 		define(['_'],factory);
 	else
 		// build on browser global object
-		root.__ = factory(_);
+		root.z = factory(_);
 
 })( this , function(_){
 	'use strict';
@@ -46,8 +47,8 @@
 	// DOOM selector cache
 	var dcache = [];
 
-	// __ interpolate
-	var __ = function(x,context){
+	// z interpolate
+	var z = function(x,context){
 		if(_.isFunction(x)){
 			if(rfire){
 				return setTimeout(function(){ x(context); } , 0);
@@ -83,7 +84,7 @@
 
 	// DOOM config
 	// support set Doom some behiver
-	__.config = {
+	z.config = {
 		// cache limit
 		limit : 4,
 
@@ -91,7 +92,7 @@
 	};
 
 	function pushcache(sl){
-		if(dcache.length >= __.config.limit)
+		if(dcache.length >= z.config.limit)
 			dcache.shift();
 		dcache.push(sl);
 	}
@@ -181,7 +182,7 @@
 	}
 
 
-	// DOOM constructor for __
+	// DOOM constructor for z
 	var DOOM = function(str){
 		this.$el = [];
 		
@@ -201,7 +202,7 @@
 	};
 
 	// Define base porperty
-	__.fn = DOOM.prototype = {
+	z.fn = DOOM.prototype = {
 
 		constructor : DOOM,
 
@@ -213,7 +214,7 @@
 	};
 
 	// DOOM selector wrap
-	__.fn.extend({
+	z.fn.extend({
 
 		each : function(fn,context){
 			_.foreach(this.$el,fn,context||this);
@@ -256,7 +257,7 @@
 				if(sl instanceof DOOM )
 					this.$el = _.unique(this.$el.concat(sl.$el||[]));
 				else if(_.isString(sl))
-					this.$el = _.unique(this.$el.concat(__(sl).$el));
+					this.$el = _.unique(this.$el.concat(z(sl).$el));
 			}
 			this.length = this.$el.length;
 
@@ -440,7 +441,7 @@
 			return getnext(sibling);
 	}
 
-	__.fn.extend({
+	z.fn.extend({
 		
 		addClass: function(style){
 			return this.each(function(e){
@@ -585,7 +586,7 @@
 		},
 
 		replacewith : function(str){
-			var $sl = __(str);
+			var $sl = z(str);
 			
 			this.each(function(elm){
 				$sl.each(function(dom){
@@ -598,7 +599,7 @@
 		},
 
 		insertbefore : function(str){
-			var $sl = __(str);
+			var $sl = z(str);
 
 			return this.each(function(elm){
 				$sl.each(function(dom){
@@ -608,7 +609,7 @@
 		},
 
 		insertafter : function(str){
-			var $sl = __(str);
+			var $sl = z(str);
 		
 			return this.each(function(elm){
 				$sl.each(function(dom){
@@ -623,7 +624,7 @@
 		},
 
 		append : function(str){
-			var $sl = __(str);
+			var $sl = z(str);
 		
 			return this.each(function(elm){
 				$sl.each(function(dom){
@@ -2131,7 +2132,7 @@
 		diffcap: 99999
 	});
 
-	__.fn.extend({
+	z.fn.extend({
 		reg : function(type,data,cal,context,capit){
 			if(_.isFunction(data)){
 				capit = context;
@@ -2254,10 +2255,10 @@
 			return this.each(function(elm){
 				if(t){
 					var fn = function(event){
-						var fire = __(event.target || event.toElement);
+						var fire = z(event.target || event.toElement);
 						var fireElms = fire.parents().add(fire).get();
 
-						var relative = __(elm).find(sl).get();
+						var relative = z(elm).find(sl).get();
 						var target;
 
 						for(var i=0,l=relative.length;i<l;i++){
@@ -2278,12 +2279,12 @@
 					fn.fn = cal; 
 					fn.elm = elm;
 
-					__(elm).reg("_"+type,fn,null);
+					z(elm).reg("_"+type,fn,null);
 					document
 					.documentElement
 					.addEventListener(type,fn,true);
 				}else{
-					__(elm).reg(type,sl,cal);
+					z(elm).reg(type,sl,cal);
 				}
 			});
 
@@ -2345,7 +2346,7 @@
 	
 	});
 
-	__.fn.extend({
+	z.fn.extend({
 		// form serializeArray
 		serializeArray:function(){
 			var res = [];
@@ -2355,8 +2356,8 @@
 				"input:not([disabled]):not([type='submit'])," +
 				"select:not([disabled])" 
 			).each(function(item){
-				var name = __(item).attr("name");
-				var value = __(item).value();
+				var name = z(item).attr("name");
+				var value = z(item).value();
 
 				if(name && value)
 					res.push({ name:name,value:value });
@@ -2381,5 +2382,5 @@
 
 	});
 
-	return __;
+	return z;
 });

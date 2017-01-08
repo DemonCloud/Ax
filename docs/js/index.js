@@ -1,13 +1,13 @@
 (function(){
 	'use strict';
 
-	var list = __("#list");
+	var list = z("#list");
 
 	var model = new aix.model({
 		url:"module/data.json",
 
 		render : function(data){
-			__(this.el).xRender(this.template(data));
+			z(this.el).xRender(this.template(data));
 		},
 
 		events:{

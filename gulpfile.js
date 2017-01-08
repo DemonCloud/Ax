@@ -9,7 +9,7 @@ var path_disjs = "./dest/*.js";
 
 
 gulp.task('concat',function(){
-	return gulp.src(['./src/_.js','./src/n.js','./src/aix.js'])
+	return gulp.src(['./src/_.js','./src/z.js','./src/aix.js'])
 				 .pipe(concat('aix.c.js'))
 				 .pipe(gulp.dest(path_dis));
 });

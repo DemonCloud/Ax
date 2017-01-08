@@ -19,7 +19,7 @@ var data = {
 
 var view = new aix.view({
 	el:"#render",
-	template:_.doom(__('#tmp').html(),"a"),
+	template:_.doom(z('#tmp').html(),"a"),
 
 	events:{
 		init:function(){
@@ -28,14 +28,14 @@ var view = new aix.view({
 
 		//自定义事件
 		drawDom:function(dom,color){
-			__(dom).draw("color",color);
+			z(dom).draw("color",color);
 		},
 
 		"click:li":function(event){
 			//点击事件会将视图放入event.data中以供调用
 			var view = event.data.self;
 
-			var newdom = __(this).replacewith("&lt;div&gt;"+ this.innerText +"&lt;/div&gt;");
+			var newdom = z(this).replacewith("&lt;div&gt;"+ this.innerText +"&lt;/div&gt;");
 
 			view.dispatch("drawDom",null,[newdom.get(0),"#e60000"])
 		}
@@ -80,7 +80,7 @@ var view = new aix.view({
 
 	var view = new aix.view({
 		el:"#render",
-		template:_.doom(__('#tmp').html(),"a"),
+		template:_.doom(z('#tmp').html(),"a"),
 
 		events:{
 			init:function(){
@@ -89,14 +89,14 @@ var view = new aix.view({
 
 			//自定义事件
 			drawDom:function(dom,color){
-				__(dom).draw("color",color);
+				z(dom).draw("color",color);
 			},
 
 			"click:li":function(event){
 				//点击事件会将视图放入event.data中以供调用
 				var view = event.data.self;
 
-				var newdom = __(this).replacewith("<div>"+ this.innerText +"</div>");
+				var newdom = z(this).replacewith("<div>"+ this.innerText +"</div>");
 
 				view.dispatch("drawDom",null,[newdom.get(0),"#e60000"]);
 			}

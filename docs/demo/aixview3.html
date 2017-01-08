@@ -22,14 +22,14 @@ var model = new aix.model.extend({
 var view = new aix.view({
 	el:"#render",
 
-	template:_.doom(__("#tmp").html()),
+	template:_.doom(z("#tmp").html()),
 	render:function(data){
-		__(this.el).append(this.template(data));
+		z(this.el).append(this.template(data));
 	},
 
 	events:{
 		init:function(){
-			__(this.el).find("#ri")
+			z(this.el).find("#ri")
 								 .value("Hello Aix")
 			this.render({text:"Hello Aix"});
 
@@ -39,12 +39,12 @@ var view = new aix.view({
 		},
 
 		upinput:function(txt){
-			__(this.el).find("#rv").fill(txt||"");
+			z(this.el).find("#rv").fill(txt||"");
 		},
 
 		"input:#ri":function(event){
 			var view = event.data.self;
-			view.model.set(_.encodeHTML(__(this).value()));
+			view.model.set(_.encodeHTML(z(this).value()));
 		}
 	},
 });</pre>
@@ -81,14 +81,14 @@ var view = new aix.view({
 	var view = new aix.view({
 		el:"#render",
 
-		template:_.doom(__("#tmp").html()),
+		template:_.doom(z("#tmp").html()),
 		render:function(data){
-			__(this.el).append(this.template(data));
+			z(this.el).append(this.template(data));
 		},
 
 		events:{
 			init:function(){
-				__(this.el).find("#ri")
+				z(this.el).find("#ri")
 									 .value("Hello World");
 				this.render({
 					text:"Hello World"
@@ -100,12 +100,12 @@ var view = new aix.view({
 			},
 
 			upinput:function(txt){
-				__(this.el).find("#rv").fill(txt||"");
+				z(this.el).find("#rv").fill(txt||"");
 			},
 
 			"input:#ri":function(event){
 				var view = event.data.self;
-				view.model.set(_.encodeHTML(__(this).value()));
+				view.model.set(_.encodeHTML(z(this).value()));
 			}
 		},
 	});
