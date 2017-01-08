@@ -143,7 +143,7 @@
 			},
 
 			loop : function(){
-				return this.foreach.apply(this,_.slice(arguments));
+				return this.foreach.apply(this,arguments);
 			},
 
 			keys : function(arr){
@@ -156,8 +156,8 @@
 				}
 			},
 
-			slice : function(obj){
-				return obj != null ? _slice.call(obj) : [];
+			slice : function(obj,at){
+				return obj != null ? _slice.call(obj,at) : [];
 			},
 
 			splice : function(list,index_key,offset){
@@ -250,7 +250,7 @@
 
 			// find the idf value
 			find : function(){
-				return this.filter.apply(this,_.slice(arguments));
+				return this.filter.apply(this,arguments);
 			},
 
 			filter : function(list,idf,reverse){
@@ -859,7 +859,7 @@
 			},
 
 			trigger : function(){
-				return _.dispatch(_.slice(arguments));
+				return _.dispatch(arguments);
 			}
 
 		});
@@ -1540,7 +1540,7 @@
 		},
 
 		add : function(){
-			return this.push.apply(this,_.slice(arguments));
+			return this.push.apply(this,arguments);
 		},
 
 		push : function(){

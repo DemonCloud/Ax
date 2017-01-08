@@ -712,7 +712,7 @@
 		},
 
 		sync: function(){
-			return this.fetch.apply(this,_.slice(arguments));
+			return this.fetch.apply(this,arguments);
 		},
 
 		post: function(url,param,fns,fnf,header){
@@ -820,7 +820,7 @@
 		},
 
 		sync: function(){
-			return this.fetch.apply(this,_.slice(arguments));
+			return this.fetch.apply(this,arguments);
 		},
 
 		post: function(url,param,fns,fnf,header){
@@ -881,7 +881,7 @@
 											 _.doom(obj.template||"");
 		if(!obj.render || !_.isFunction(obj.render)){
 			obj.render = function(){ 
-				return $(this.el).html(this.template.apply(this,_.slice(arguments))) && this;
+				return $(this.el).html(this.template.apply(this,arguments)) && this;
 			};
 		}
 			
@@ -966,7 +966,7 @@
 		},
 
 		trigger : function(){
-			return this.dispatch.apply(this,_.slice(arguments));
+			return this.dispatch.apply(this,arguments);
 		}
 	};
 

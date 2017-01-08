@@ -213,6 +213,14 @@
 		}
 	};
 
+	z.matchz = function(elm,selector){
+		if(elm==null) return elm;
+
+		return !_.isString(selector) ||
+			((elm.parentNode && elm !== document) &&
+			_.has(_.slice(elm.parentNode.querySelectorAll(selector)),elm));
+	};
+
 	// DOOM selector wrap
 	z.fn.extend({
 
@@ -222,8 +230,7 @@
 		},
 
 		get : function(index){
-			return this.$el[( +index + ( index < 0 ? this.length : 0 ) )] 
-					|| _.slice(this.$el);
+			return index!=null ? this.$el[( +index + ( index < 0 ? this.length : 0 ) )] : _.slice(this.$el);
 		},
 
 		at : function(index){
@@ -249,7 +256,7 @@
 		},
 
 		add : function(){
-			return this.compose.apply(this,_.slice(arguments));
+			return this.compose.apply(this,arguments);
 		},
 
 		compose : function(sl){
@@ -368,17 +375,19 @@
 			return cp;
 		},
 
-		parents : function(){
+		parents : function(selector){
 			var cp = _.clonedoom(this);
 			var res = [];
 
 			_.foreach(cp.$el,function(e){
 				var parents = [];
 				var tmp = e;
+
 				while(tmp){
-					parents.push(tmp.parentNode);
 					tmp = tmp.parentNode;
+					z.matchz(tmp,selector) && parents.push(tmp);
 				}
+
 				res = res.concat(parents);
 			});
 
@@ -582,7 +591,7 @@
 		},
 
 		html : function(){
-			return this.fill.apply(this,_.slice(arguments));
+			return this.fill.apply(this,arguments);
 		},
 
 		replacewith : function(str){
@@ -703,7 +712,7 @@
 		},
 
 		css : function(){
-			return this.draw.apply(this,_.slice(arguments));
+			return this.draw.apply(this,arguments);
 		},
 
 		redraw : function(){
@@ -712,96 +721,8 @@
 		
 	});
 
-	// Doom Events
-	// Dom fired api
-	var capEvents = [
-		"blur"       , "focus"       , "invalid"     ,
-		"abort"      , "afterprint"  , "beforeprint" ,
-		"checking"   , "downloading" ,
-		"load"       , "unload"      ,
-		"loadend"    , "loadstart"   ,
-		"mouseenter" , "mouseleave"  ,
-		"resize"     , "show"        , "select"
-	];
 
-	var capTypes = {
-		"UIEvent"       : [
-			"focus",
-			"blur",
-			"focusin",
-			"focusout"
-		],
-		"MouseEvent"    : [
-			"click",
-			"dbclick",
-			"mouseup",
-			"mousedown",
-			"mouseout",
-			"mouseover",
-			"mouseenter",
-			"mouseleave"
-		],
-		"KeyboardEvent" : [
-			"keydown",
-			"keypress",
-			"keyup"
-		]
-	};
-
-	// Create X extend
-	var x = {};
-
-	x.Events = function(o,target){
-		for(var key in o ){
-			if(!_.isFunction(o[key]) && key !== key.toUpperCase())
-				this[key] = o[key];
-		}
-		this.data = target.data;
-		_.define(this,"_event",{
-			value : o, 
-			writable : false, 
-			enumerable: false, 
-			configurable: true 
-		});
-	};
-
-	[
-		"stopImmediatePropagation",
-		"stopPropagation",
-		"preventDefault"
-	].forEach(function(api){
-		x.Events.prototype[api] = function(){
-			return this._event[api]();
-		};
-	});
-
-	function createEvent(elm,type,prop,Jevent){
-		var event = _.isObject(Jevent) ? 
-								Jevent : 
-								new CustomEvent(type,{
-									data : prop,
-									bubbles: true,
-									cancelable: true,
-									target: elm,
-									toElement: elm,
-									srcElement: elm,
-									currentTarget: elm
-								});
-
-		var eventInit;
-
-		if(_.isObject(Jevent)){
-			eventInit = {};
-			eventInit.data = prop;
-		}
-
-		// gc - the stack
-		if(eventInit != null)
-			return new x.Events(event,eventInit);
-		// as dispatchEvent
-		return event;
-	}
-
+	// DOMDIFF
   var diffcount;
 
   var Diff = function(options) {
@@ -2131,220 +2052,390 @@
 		debug: true,
 		diffcap: 99999
 	});
+	// end off domdiff
+
+	// Doom Events
+	// Dom fired api
+	var capEvents = [
+		"blur"       , "invalid"     ,
+		"focusin"    , "focusout"    , "focus",
+		"abort"      , "afterprint"  , "beforeprint" ,
+		"checking"   , "downloading" ,
+		"load"       , "unload"      ,
+		"loadend"    , "loadstart"   ,
+		"mouseenter" , "mouseleave"  ,
+		"resize"     , "show"        , "select"
+	];
+
+	var capTypes = {
+		"UIEvent"       : [
+			"focus",
+			"blur",
+			"focusin",
+			"focusout"
+		],
+		"MouseEvent"    : [
+			"click",
+			"dbclick",
+			"mouseup",
+			"mousedown",
+			"mouseout",
+			"mouseover",
+			"mouseenter",
+			"mouseleave"
+		],
+		"KeyboardEvent" : [
+			"keydown",
+			"keypress",
+			"keyup"
+		]
+	};
+
+	// Create z extend Event preview
+  var _zid = 1, undefined,
+      handlers = {},
+      focusinSupported = 'onfocusin' in window,
+      focus = { focus: 'focusin', blur: 'focusout' },
+      hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' };
+
+  var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
+      eventMethods = {
+        preventDefault: 'isDefaultPrevented',
+        stopImmediatePropagation: 'isImmediatePropagationStopped',
+        stopPropagation: 'isPropagationStopped'
+      };
+
+
+  function zid(element) {
+    return element._zid || (element._zid = _zid++);
+  }
+
+  function findHandlers(element, event, fn, selector) {
+    event = parse(event);
+
+    if (event.ns) 
+    	var matcher = matcherFor(event.ns);
+
+    return (handlers[zid(element)] || []).filter(function(handler) {
+      return handler
+        && (!event.e  || handler.e == event.e)
+        && (!event.ns || matcher.test(handler.ns))
+        && (!fn       || zid(handler.fn) === zid(fn))
+        && (!selector || handler.sel == selector);
+    });
+  }
+
+  function parse(event) {
+    var parts = ('' + event).split('.');
+    return {e: parts[0], ns: parts.slice(1).sort().join(' ')};
+  }
+
+  function matcherFor(ns) {
+    return new RegExp('(?:^| )' + ns.replace(' ', ' .* ?') + '(?: |$)');
+  }
+
+  function eventCapture(handler, captureSetting) {
+    return handler.del &&
+      (!focusinSupported && (handler.e in focus)) ||
+      !!captureSetting;
+  }
+
+  function realEvent(type) {
+    return hover[type] || (focusinSupported && focus[type]) || type;
+  }
+
+  function zaddEvent(element, events, fn, data, selector, delegator, capture){
+    var id = zid(element), set = (handlers[id] || (handlers[id] = []));
+
+    events.split(/\s/).forEach(function(event){
+      if (event == 'ready') 
+      	return z(fn);
+
+      var handler   = parse(event);
+      handler.fn    = fn;
+      handler.sel   = selector;
+      // emulate mouseenter, mouseleave
+      if (handler.e in hover) 
+      	fn = function(e){
+        	var related = e.relatedTarget;
+        	if (!related || (related !== this && ! this.contains(related)))
+          	return handler.fn.apply(this, arguments);
+      	};
+
+      handler.del   = delegator;
+      var callback  = delegator || fn;
+      handler.proxy = function(e){
+        e = compatible(e);
+
+        if (e.isImmediatePropagationStopped()) 
+        	return false;
+
+        e.data = data;
+        var result = callback.apply(element, e._args == undefined ? [e] : [e].concat(e._args));
+
+        if (result === false) 
+        	e.preventDefault(), e.stopPropagation();
+
+        return result;
+      };
+
+      handler.i = set.length;
+      set.push(handler);
+
+      element.addEventListener(realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+    });
+  }
+
+  function zremoveEvent(element, events, fn, selector, capture){
+    var id = zid(element);
+    (events || '').split(/\s/).forEach(function(event){
+      findHandlers(element, event, fn, selector).forEach(function(handler){
+        delete handlers[id][handler.i];
+
+    		element.removeEventListener(realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+    	});
+    });
+  }
+
+  function returnTrue(){
+  	return true;
+  }
+
+  function returnFalse(){
+  	return false;
+  }
+
+  function compatible(event, source) {
+    if (source || !event.isDefaultPrevented) {
+
+      source || (source = event)
+
+      _.loop(eventMethods, function(predicate, name) {
+        var sourceMethod = source[name];
+
+        event[name] = function(){
+          this[predicate] = returnTrue;
+          return sourceMethod && sourceMethod.apply(source, arguments);
+        };
+
+        event[predicate] = returnFalse;
+      });
+
+      try {
+        event.timeStamp || (event.timeStamp = Date.now());
+      } catch (ignored) { }
+
+      if (source.defaultPrevented !== undefined ? source.defaultPrevented :
+          'returnValue' in source ? source.returnValue === false :
+          source.getPreventDefault && source.getPreventDefault())
+        event.isDefaultPrevented = returnTrue;
+    }
+    return event;
+  }
+
+  function createProxy(event) {
+    var key, proxy = { originalEvent: event };
+    for (key in event)
+      if (!ignoreProperties.test(key) && event[key] !== undefined) proxy[key] = event[key];
+
+    return compatible(proxy, event);
+  }
+
+  z.event = { add: zaddEvent, remove: zremoveEvent };
+
+  z.proxy = function(fn, context) {
+    var args = (2 in arguments) && slice.call(arguments, 2);
+
+    if (_.isFunction(fn)) {
+      var proxyFn = function(){ 
+      	return fn.apply(
+      	context, args ? 
+      		args.concat(slice.call(arguments)) : arguments
+      	);
+      };
+
+      proxyFn._zid = zid(fn);
+      return proxyFn;
+
+    } else if (_.isString(context)) {
+      if (args) {
+        args.unshift(fn[context], fn);
+        return z.proxy.apply(null, args);
+      } else {
+        return z.proxy(fn[context], fn);
+      }
+    } else {
+      throw new TypeError("expected function");
+    }
+  };
+
+  z.Event = function(type, props) {
+    if (!_.isString(type)) 
+    	props = type, type = props.type;
+
+    var event = document.createEvent(
+    _.has(capTypes['MouseEvent'],type) ? 'MouseEvent' : 'Events'), bubbles = true;
+
+    if (props) 
+    	for (var name in props) 
+    		(name == 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name])
+
+    event.initEvent(type, bubbles, true);
+    return compatible(event);
+  };
 
 	z.fn.extend({
-		reg : function(type,data,cal,context,capit){
-			if(_.isFunction(data)){
-				capit = context;
-				context = cal;
-				cal = data;
-				data = null;
-			}
 
-			return this.each(function(elm){
-				if(elm._events == null){
-					_.define(elm,"_events",{
-						value : {},
-						writable : true,
-						enumerable: false,
-						configurable: true
-					});
-				}
+  	bind : function(event, data, callback){
+    	return this.on(event, data, callback);
+  	},
 
-				if(cal!=null){
-					var fn = function(event){
-						var xevent = createEvent(elm,type,data,event);
-						cal.call(context||elm,xevent,type,context);
-					};
+  	unbind : function(event, callback){
+    	return this.off(event, callback);
+  	},
 
-					fn.fn = cal.fn || cal;
-					fn.cal = cal;
+  	reg : function(){
+  		return this.bind.apply(this,arguments);
+  	},
 
-					// save events Type
-					if(elm._events[type] == null)
-						elm._events[type] = [];
-					elm._events[type].push(fn);
-					
-					// bind events
-					// elm real dispatch event here
-					elm.addEventListener(type,fn,!!capit);
-				}
-			});
+		purge : function(){
+			return this.off.apply(this,arguments);
 		},
 
-		purge : function(type,cal){
-			return this.each(function(elm){
-				// normal remove binder
-				if(_.isString(type)){
-					if(cal != null){
-						if(elm._events[type] != null){
-							elm.removeEventListener(
-								type,
-								_.cat(elm._events[type],function(fn){ 
-									return fn.fn===cal ;
-								})[0]||cal);
+  	once : function(event, selector, data, callback){
+    	return this.on(event, selector, data, callback, 1);
+  	},
 
-							// If clean events
-							if(!elm._events[type].length)
-								delete elm._events[type];
-						}else{
-							elm.removeEventListener(type,cal);
-						}
+  	one : function(){
+    	return this.once.apply(this,arguments);
+  	},
 
-						// live remove binder
-						if(elm._events["_"+type] != null){
-							document
-							.documentElement
-							.removeEventListener(
-								type,
-								_.cat(elm._events["_"+type],
-								function(fn){ 
-									return fn.fn===cal;
-								})[0].cal,true);
+  	on : function(event, selector, data, callback, one){
+    	var autoRemove, delegator, $this = this;
 
-							// If clean events
-							if(!elm._events["_"+type].length)
-								delete elm._events["_"+type];
-						}
+    	if (event && !_.isString(event)) {
+      	_.loop(event, function(fn, type){
+        	$this.on(type, selector, data, fn, one);
+      	});
 
-					}else{
-						if(elm._events!=null){
-							_.foreach(elm._events[type],function(fn){
-								elm.removeEventListener(type,fn);
-							});
+      	return $this;
+    	}
 
-							// live remove binder
-							_.foreach(elm._events["_"+type],function(fn){
-								document
-									.documentElement
-									.removeEventListener(type,fn.cal,true);
-							});
-							delete elm._events["_"+type];
-							delete elm._events[type];
-						}
-					}
-				}else{
-					elm._events = elm._events || {};
-					_.foreach(elm._events,function(fns,type){
-						if(type.search("_") !== -1){
-							// live remove binder
-							_.foreach(fns,function(fn){
-								document
-								.documentElement
-								.removeEventListener(type.slice(1),fn.cal,true);
-							});
-						}else{
-							_.foreach(fns,function(fn){
-								elm.removeEventListener(type,fn);
-							});
-						}
-					});
-				}
+    	if (!_.isString(selector) && 
+    			!_.isFunction(callback) && 
+    			callback !== false)
+      	callback = data, data = selector, selector = undefined;
+    	if (callback === undefined || data === false)
+      	callback = data, data = undefined;
 
-			});
-		},
+    	if (callback === false) 
+    		callback = returnFalse;
 
-		live : function(type,sl,cal,context,ctbak){
-			var t = !_.isFunction(sl) , data;
-			if(!_.isFunction(cal)){
-				data = cal;
-				cal = _.isFunction(context) ? context : _.NULL;
-				context = ctbak;
-			}
+    	return $this.each(function(element){
+      	if (one) 
+      		autoRemove = function(e){
+        		zremoveEvent(element, e.type, callback);
 
-			return this.each(function(elm){
-				if(t){
-					var fn = function(event){
-						var fire = z(event.target || event.toElement);
-						var fireElms = fire.parents().add(fire).get();
+        		return callback.apply(this, arguments);
+      		};
 
-						var relative = z(elm).find(sl).get();
-						var target;
+      	if (selector) 
+      		delegator = function(e){
+        		var evt, 
+        				match;
 
-						for(var i=0,l=relative.length;i<l;i++){
-							if(_.has(fireElms,relative[i])){
-								target = relative[i];
-								break;
-							}
-						}
+        		if(_.has(z(e.target).parents().get(),element) &&
+        		z.matchz(e.target,selector))
+        			match = e.target;
 
-						if(target)
-							if(target.nodeType === 1)
-								return cal.call(
-									target,
-									createEvent(fire.get(0),type,data,event),
-									type
-								);
-					}; 
-					fn.fn = cal; 
-					fn.elm = elm;
+        		if (match && match !== element){
+          		evt = _.extend(createProxy(e), {currentTarget: match, liveFired: element});
+          		return (autoRemove || callback).apply(match, [evt].concat(_.slice(arguments,1)));
+        		}
+      		};
 
-					z(elm).reg("_"+type,fn,null);
-					document
-					.documentElement
-					.addEventListener(type,fn,true);
-				}else{
-					z(elm).reg(type,sl,cal);
-				}
-			});
-
-		},
-
-		// Agent and live elm events, 
-		// also it can use the purge for unbind event
-		on : function(){
-			return this.live.apply(this,_.slice(arguments));
-		},
-
-		off : function(){
-			return this.purge.apply(this,_.slice(arguments));
-		},
-
-		signet : function(name,val){
-			if(name != null){
-				if(val != null)
-					return this.each(function(e){
-						if(e[name])
-							e.name = val;
-						else
-							_.define(e,name,{ 
-								value : val, 
-								writable : true, 
-								enumerable: false, 
-								configurable: true 
-							});
-
-					});
-				else
-					return this.get(0)[name];
-			}
-			return this;
-		},
-
-		once : function(type,data,cal,context){
-			if(_.isFunction(data)){
-				context = cal;
-				cal = data;
-				data = null;
-			}
-
-			return this.each(function(e){
-				var fn = function(event){
-					cal.call(e,createEvent(e,type,data,event),type);
-					e.removeEventListener(type,fn); fn = null;
-				};
-				e.addEventListener(type,fn);
-			});
-		},
-
-		dispatch : function(type,cal){
-			return this.each(function(e){
-				var event = createEvent(e,type);
-				return _.isFunction(cal) ? cal.call(e,event) : e.dispatchEvent(event);
-			});
-		}
+      	zaddEvent(element, event, callback, data, selector, delegator || autoRemove);
+    	});
+  	},
 	
+  	off : function(event, selector, callback){
+    	var $this = this;
+    	if (event && !isString(event)) {
+      	_.loop(event, function(fn, type){
+        	$this.off(type, selector, fn);
+      	});
+      	return $this;
+    	}
+
+    	if (!_.isString(selector) && 
+    			!_.isFunction(callback) && 
+    			callback !== false)
+      	callback = selector, selector = undefined;
+
+    	if (callback === false) 
+    		callback = returnFalse;
+
+    	return $this.each(function(element){
+      	zremoveEvent(element, event, callback, selector);
+    	});
+  	},
+
+  	delegate : function(selector, event, callback){
+    	return this.on(event, selector, callback);
+  	},
+
+  	undelegate : function(selector, event, callback){
+    	return this.off(event, selector, callback);
+  	},
+
+  	trigger : function(event, args){
+    	event = _.isString(event) ? z.Event(event) : compatible(event);
+    	event._args = args;
+
+    	return this.each(function(){
+      	// handle focus(), blur() by calling them directly
+      	if (event.type in focus && typeof this[event.type] == "function") 
+      		this[event.type]();
+      	// items in the collection might not be DOM elements
+      	else if ('dispatchEvent' in this) 
+      		this.dispatchEvent(event);
+      	else 
+      		z(this).triggerHandler(event, args);
+    	});
+  	},
+
+  	triggerHandler : function(event, args){
+    	var e, result;
+    	this.each(function(element){
+      	e = createProxy(_.isString(event) ? z.Event(event) : event);
+
+      	e._args = args;
+      	e.target = element;
+      	_.loop(findHandlers(element, event.type || event), function(handler){
+        	result = handler.proxy(e);
+        	if (e.isImmediatePropagationStopped()) return false;
+      	});
+    	});
+
+    	return result;
+  	},
+
+  	dispatch : function(){
+  		return this.trigger.apply(this,arguments);
+  	}
+
 	});
+
+  // shortcut methods for `.bind(event, fn)` for each event type
+  ('focusin focusout focus blur load resize scroll unload click dblclick '+
+  'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave '+
+  'change select keydown keypress keyup error').split(' ').forEach(function(event) {
+    z.fn[event] = function(callback) {
+      return (0 in arguments) ?
+        this.bind(event, callback) :
+        this.trigger(event);
+    };
+  });
 
 	z.fn.extend({
 		// form serializeArray
