@@ -28,7 +28,6 @@
 		root._ = factory();
 
 }( this , function(){
-	// not use strict for eval
 	'use strict';
 
 	var VERSION = "0.1";
@@ -40,9 +39,10 @@
 	// # Function Caller 
 	var _arr  = [],
 		_slice  = _arr.slice,
-		_splice = _arr.splice;
+		_splice = _arr.splice,
+		_eval   = eval;
 
-	var root = (function(){ return this || (0,eval)("this"); }());
+	var root = (function(){ return this || _eval("this"); }());
 	// var root = this;
 
 	var _ = {};
@@ -746,7 +746,7 @@
 				// try to build anmousyous function
 				try {
 					// var render = new Function(name||"_x","_",res);
-					var render = (0,eval)("(function("+(name||"_x") + ",_" 
+					var render = _eval("(function("+(name||"_x") + ",_" 
 														+ ( args.length ? ","+args.toString() : "" ) + "){" 
 														// arguments end
 														+ res 
