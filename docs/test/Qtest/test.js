@@ -1,4 +1,4 @@
-(function(Q,_,__,aix){
+(function(Q,_,z,aix){
 
 	Q.module("[ _ ]");
 
@@ -508,7 +508,7 @@
 		]
 		var l = _.requery(r);
 
-		a.equal(_.keys(l).length,4,"requery array to object form jquery or __ serialize -> "+JSON.stringify(l));
+		a.equal(_.keys(l).length,4,"requery array to object form jquery or z serialize -> "+JSON.stringify(l));
 		a.equal(_.isequal(l.a,"1"),false,"requery get true value number not string typeof ");
 		a.equal(_.isequal(l.b,2),true,"requery get true value number");
 		a.equal(_.isequal(l.d,"4"),true,"requery get true value equal the true type");
@@ -663,4 +663,4 @@
 		a.equal(o.data,5,"remove events the data value also equal "+o.data);
 	});
 
-})(QUnit,_,__,aix);
+})(QUnit,_,z,aix);
