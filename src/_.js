@@ -86,6 +86,7 @@
 		'Undefined',
 		'HTMLCollection'
 	];
+
 	typeArray.forEach(function(v,i){
 		_[ 'is' + v ] = function(e){
 			return OP.toString.call(e) === '[object ' + v + ']';
@@ -920,7 +921,7 @@
 
 		function converttree(root,tree){
 			// create top Element;
-			var wrap = (root||document.createElement("div")).cloneNode();
+			var wrap = document.createElement("div").cloneNode();
 			wrap.setAttribute("x-root","");
 
 			if(tree.length){
@@ -965,7 +966,7 @@
 			datamime : function(header,param){
 				if(_.isObject(header)){
 					if(header["Content-type"]){
-						switch(header["Content-type"]){
+						switch(header["Content-type"]||header["Content-Type"]){
 							case "application/json":
 								return JSON.stringify(param||{});
 							default : 
