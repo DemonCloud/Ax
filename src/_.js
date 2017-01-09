@@ -28,7 +28,7 @@
 		root._ = factory();
 
 }( this , function(){
-	'use strict';
+	// 'use strict';
 
 	var VERSION = "0.1";
 
@@ -42,8 +42,8 @@
 		_splice = _arr.splice,
 		_eval   = eval;
 
-	var root = (function(){ return this || _eval("this"); }());
-	// var root = this;
+	// var root = (function(){ return this || _eval("this"); }());
+	var root = this;
 
 	var _ = {};
 	// _ extend other method

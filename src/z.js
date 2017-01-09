@@ -69,8 +69,8 @@
 			return x;
 
 		}else if( _.isString(x)){
-
 			var cache;
+
 			dcache.forEach(function(sl){
 				if(sl.$indicator === x) cache = sl;
 			});
@@ -193,6 +193,9 @@
 			}else if( str===document || str===_.root || str.nodeType ===1){
 				this.$el.push(str);
 				this.$indicator = str;
+			}else if( _.isArray(str)){
+				this.$el = _.find(str,function(node){ return node.nodeType===1; });
+				this.$indicator = Math.random();
 			}
 		}
 
@@ -225,7 +228,7 @@
 	z.fn.extend({
 
 		each : function(fn,context){
-			_.foreach(this.$el,fn,context||this);
+			_.loop(this.$el,fn,context||this);
 			return this;
 		},
 
@@ -234,17 +237,9 @@
 		},
 
 		at : function(index){
-			if(this.length){
-				var cp = _.clonedoom(this);
+			var i = +index + (index < 0 ? cp.length : 0);
 
-				index = +index + (index < 0 ? cp.length : 0);
-				cp.$el = [cp.$el[index]];
-				cp.$el.length = 1;
-
-				return cp;
-			}
-
-			return this;
+			return z(this.$el[i]);
 		},
 
 		first : function(){
@@ -260,24 +255,28 @@
 		},
 
 		compose : function(sl){
+
 			if(sl != null){
+				var list = [];
+
 				if(sl instanceof DOOM )
-					this.$el = _.unique(this.$el.concat(sl.$el||[]));
+					list = sl.$el||[];
 				else if(_.isString(sl))
-					this.$el = _.unique(this.$el.concat(z(sl).$el));
+					list = z(sl).get();
+				else if(_.isArray(sl))
+					list = sl;
+				else if(sl.nodeType&&sl!==document&&sl.nodeType===1)
+					list.push(sl);
+
+				this.$el = _.unique(this.$el.concat(list));
+				this.length = this.$el.length;
 			}
-			this.length = this.$el.length;
 
 			return this;
 		},
 
 		by : function(idf){
-			var cp = _.clonedoom(this);
-
-			cp.$el = cp.$el.filter(idf);
-			cp.length = cp.$el.length;
-
-			return cp;
+			return z(this.get().filter(idf));
 		},
 
 		even : function(){
@@ -293,22 +292,19 @@
 		},
 
 		next : function(isPrev){
-			var cp = _.clonedoom(this);
-
 			var res = [],
-					api = isPrev ? "previousElementSibling" : "nextElementSibling";
-
-			_.foreach(cp.$el,function(e){
-				if(e[api]!=null) res.push(e[api]);
-			});
+					api = isPrev ? 
+								"previousElementSibling" : "nextElementSibling";
 
 			// not comment && document && script
-			cp.$el = _.filter(res,function(c){
-				return c.nodeType !== 3 && c.nodeType !== 8 && c.nodeName !== "SCRIPT";
+			this.get().forEach(function(e){
+				if(e[api]!=null){
+					if(e.nodeType !== 3 && e.nodeType !== 8 && e.nodeName !== "SCRIPT")
+						res.push(e[api]);
+				}
 			});
 
-			cp.length = cp.$el.length;
-			return cp;
+			return z(res);
 		},
 
 		prev : function(isNext){
@@ -316,85 +312,67 @@
 		},
 
 		find : function(sl){
-			var cp  = _.clonedoom(this);
 			var res = []; 
 			
-			_.foreach(cp.$el,function(e){
+			_.loop(this.$el,function(e){
 				res = _.slice(e.querySelectorAll(sl)).concat(res);
 			});
 
-			cp.$el = res;
-			cp.length = cp.$el.length;
-
-			return cp;
+			return z(res);
 		},
 
 		siblings : function(){
-			var cp = _.clonedoom(this);
 			var res = [];
-			var self = cp.$el;
+			var elms = this.$el;
 
-			_.foreach(cp.$el,function(e){
+			_.loop(elms,function(e){
 				res = _.slice(e.parentNode.children).concat(res);
 			});
 
-			cp.$el = _.filter(_.unique(res),function(e){ 
-				return !_.has(self,e);
-			});
-			cp.length = cp.$el.length;
-
-			return cp;
+			return z(_.filter(_.unique(res),function(e){ 
+				return !_.has(elms,e);
+			}));
 		},
 
-		childrens : function(){
-			var cp = _.clonedoom(this);
+		childrens : function(selector){
 			var res = [];
 
-			_.foreach(cp.$el,function(e){
-				res = _.slice(e.children).concat(res);
+			_.loop(this.$el,function(e){
+				res = _.slice(e.children).filter(function(e){
+					return z.matchz(e,selector);
+				}).concat(res);
 			});
 
-			cp.$el = _.unique(res);
-			cp.length = cp.$el.length;
-
-			return cp;
+			return z(_.unique(res));
 		},
 
 		parent : function(){
-			var cp = _.clonedoom(this);
 			var res = [];
 
-			_.foreach(cp.$el,function(e){
-				if(e.parentNode)
-					res.push(e.parentNode);
+			_.loop(this.$el,function(e){
+				if(e.parentNode) res.push(e.parentNode);
 			});
 
-			cp.$el = _.unique(res);
-			cp.length = cp.$el.length;
-			
-			return cp;
+			return z(res);
 		},
 
 		parents : function(selector){
-			var cp = _.clonedoom(this);
 			var res = [];
 
-			_.foreach(cp.$el,function(e){
+			_.loop(this.$el,function(e){
 				var parents = [];
 				var tmp = e;
 
 				while(tmp){
 					tmp = tmp.parentNode;
-					z.matchz(tmp,selector) && parents.push(tmp);
+					if(z.matchz(tmp,selector))
+						parents.push(tmp);
 				}
 
 				res = res.concat(parents);
 			});
 
-			cp.$el = _.unique(res);
-			cp.length = cp.$el.length;
-			
-			return cp;
+			return z(res);
 		}
 	});
 
@@ -563,6 +541,10 @@
 			}
 		},
 
+		val : function(v){
+			return this.value(v);
+		},
+
 		text : function(ct){
 			if(ct != null)
 				return this.each(function(e){ e.innerText = ct+""; });
@@ -727,7 +709,7 @@
 
   var Diff = function(options) {
       var diff = this;
-      Object.keys(options).forEach(function(option) {
+      _.keys(options).forEach(function(option) {
           diff[option] = options[option];
       });
   };
@@ -872,8 +854,8 @@
       }
 
       if (e1.attributes) {
-          e1Attributes = Object.keys(e1.attributes);
-          e2Attributes = Object.keys(e2.attributes);
+          e1Attributes = _.keys(e1.attributes);
+          e2Attributes = _.keys(e2.attributes);
 
           if (e1Attributes.length !== e2Attributes.length) {
               return false;
@@ -1305,8 +1287,8 @@
           }
 
 
-          attr1 = t1.attributes ? Object.keys(t1.attributes).sort() : [];
-          attr2 = t2.attributes ? Object.keys(t2.attributes).sort() : [];
+          attr1 = t1.attributes ? _.keys(t1.attributes).sort() : [];
+          attr2 = t2.attributes ? _.keys(t2.attributes).sort() : [];
 
           attr1.forEach(function(attr) {
               var pos = attr2.indexOf(attr);
@@ -1395,7 +1377,7 @@
                   node = document.createElement(objNode.nodeName);
               }
               if (objNode.attributes) {
-                  Object.keys(objNode.attributes).forEach(function(attribute) {
+                  _.keys(objNode.attributes).forEach(function(attribute) {
                       node.setAttribute(attribute, objNode.attributes[attribute]);
                   });
               }
@@ -1729,25 +1711,23 @@
               case 'removeAttribute':
                   delete node.attributes[diff.name];
 
-                  if (Object.keys(node.attributes).length === 0) {
+                  if (_.keys(node.attributes).length === 0)
                       delete node.attributes;
-                  }
 
-                  if (diff.name === 'checked') {
+                  if (diff.name === 'checked')
                       node.checked = false;
-                  } else if (diff.name === 'selected') {
+                  else if (diff.name === 'selected')
                       delete node.selected;
-                  } else if (node.nodeName === 'INPUT' && diff.name === 'value') {
+                  else if (node.nodeName === 'INPUT' && diff.name === 'value')
                       delete node.value;
-                  }
 
                   break;
               case 'modifyTextElement':
                   node.data = diff.newValue;
 
-                  if (parentNode.nodeName === 'TEXTAREA') {
+                  if (parentNode.nodeName === 'TEXTAREA')
                       parentNode.value = diff.newValue;
-                  }
+
                   break;
               case 'modifyValue':
                   node.value = diff.newValue;
