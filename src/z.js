@@ -50,11 +50,10 @@
 	// z interpolate
 	var z = function(x,context){
 		if(_.isFunction(x)){
-			if(rfire){
-				return setTimeout(function(){ x(context); } , 0);
-			} else {
+			if(rfire)
+				return _.async(function(){ x(context); });
+			else
 				rlist.push({ fn:x , ct:context });
-			}
 
 			if(document.readyState === 'complete')
 				setTimeout(domready,0);
@@ -200,8 +199,9 @@
 		}
 
 		this.length = this.$el.length;
-
-		pushcache(_.clonedoom(this));
+		
+		if(str && _.isString(str))
+			pushcache(_.clonedoom(this));
 	};
 
 	// Define base porperty
@@ -221,7 +221,7 @@
 
 		return !_.isString(selector) ||
 			((elm.parentNode && elm !== document) &&
-			_.has(_.slice(elm.parentNode.querySelectorAll(selector)),elm));
+			_.has(elm.parentNode.querySelectorAll(selector),elm));
 	};
 
 	// DOOM selector wrap
@@ -2249,6 +2249,7 @@
     }
   };
 
+	// z Custom Events
   z.Event = function(type, props) {
     if (!_.isString(type)) 
     	props = type, type = props.type;
@@ -2372,15 +2373,15 @@
     	event = _.isString(event) ? z.Event(event) : compatible(event);
     	event._args = args;
 
-    	return this.each(function(){
+    	return this.each(function(element){
       	// handle focus(), blur() by calling them directly
-      	if (event.type in focus && typeof this[event.type] == "function") 
-      		this[event.type]();
+      	if (event.type in focus && typeof element[event.type] == "function") 
+      		element[event.type]();
       	// items in the collection might not be DOM elements
-      	else if ('dispatchEvent' in this) 
-      		this.dispatchEvent(event);
+      	else if ('dispatchEvent' in element) 
+      		element.dispatchEvent(event);
       	else 
-      		z(this).triggerHandler(event, args);
+      		z(element).triggerHandler(event, args);
     	});
   	},
 
@@ -2424,14 +2425,15 @@
 
 			var finder = this.find(
 				"checkbox[checked]:not([disabled])," +
-				"input:not([disabled]):not([type='submit'])," +
-				"select:not([disabled])" 
+				"input:not([disabled]):not([type='submit']):not([type='file'])," +
+				"select:not([disabled]),"+
+				"textarea:not([disabled])"
 			).each(function(item){
 				var name = z(item).attr("name");
 				var value = z(item).value();
 
-				if(name && value)
-					res.push({ name:name,value:value });
+				if(name)
+					res.push({ name:name,value:(value||"") });
 			});
 		
 			return res;
@@ -2445,8 +2447,11 @@
 		// virtual Render
 		xRender:function(newhtml){
 			return this.each(function(elm){
-				this.apply(elm,this.diff( elm,
-						_.virtualDOM(elm,newhtml.nodeType?newhtml.outerHTML : (newhtml||"")) )
+				this.apply(elm,this.diff(elm,
+						_.virtualDOM(
+							elm,
+							newhtml.nodeType ? newhtml.outerHTML : (newhtml||"")
+						))
 				);
 			},_DIFF);
 		}

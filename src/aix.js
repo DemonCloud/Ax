@@ -36,6 +36,7 @@
 	var aix = {};
 	
 	var AIX_VIEW_COUNT = 0,
+			AIX_ROUTE_COUNT = 0,
 			AIX_MODELS_COUNT = 0,
 			AIX_COLLECTION_COUNT = 0,
 
@@ -182,22 +183,20 @@
 
 		_.define(this,{
 			aid : {
-				value : "#"+(++AIX_MODELS_COUNT),
-				writable : true,
-				enumerable : false
-			},
-			change : {
-				value : false,
-				writable : true,
+				value : (++AIX_MODELS_COUNT),
+				writable : false,
 				enumerable : false
 			}
 		});
 
+		// define change param
+		this.change = false;
+
 		// if userobj has more events
 		if(_.isObject(obj.events))
 			_.foreach(obj.events,function(v,k){
-				_.addEvent(_this,k,v);
-		});
+				_.addEvent(this,k,v);
+			},this);
 
 		if(_.isFunction(obj.validate)){
 			_.define(_this,"validate",{
@@ -213,45 +212,52 @@
 		delete obj.change;
 		delete obj.events;
 
-		_.extend(_this,_.extend(_.clone(AIX_MODELS_DEFAULT),obj));
+		_.extend(
+			this,
+			_.extend(
+				_.clone(AIX_MODELS_DEFAULT),obj
+			)
+		);
 
 		//add listen for object data change
-		_.watch(_this,"data",function(nv,ov){
+		_.watch(this,"data",function(nv,ov){
 			// Validate checker for change
-			if(_.isFunction(_this.validate)){
+			if(_.isFunction(this.validate)){
 				var vali = true;
 
-				if(_.isFunction(_this.validate) ? !_this.validate.call(_this,nv) : 0 )
+				// validate status check
+				if(_.isFunction(this.validate) ? 
+					!this.validate.call(this,nv) : 0 )
 					vali = false;
 
-				// validate status check
 				if(vali){
 					// trigger validate and success events
 					if(!_.isequal(nv,ov)){
-						_.dispatch(_this,"change",null,[nv,ov]);
-						_this.change = true;
+						_.dispatch(this,"change",null,[nv,ov]);
+						this.change = true;
 					}
-					_.dispatch(_this,"validate",null,[nv,ov]);
-					_.dispatch(_this,"validate:success",null,[nv,ov]);
+					_.dispatch(this,"validate",null,[nv,ov]);
+					_.dispatch(this,"validate:success",null,[nv,ov]);
 					return nv;
 				}else{
 					// trigger validate and fail events
-					_.dispatch(_this,"validate",null,[nv,ov]);
-					_.dispatch(_this,"validate:fail",null,[nv,ov]);
+					_.dispatch(this,"validate",null,[nv,ov]);
+					_.dispatch(this,"validate:fail",null,[nv,ov]);
 					return ov;
 				}
+
 			}else{
 				// No validate 
 				if(!_.isequal(nv,ov)){
-					_.dispatch(_this,"change",null,[nv,ov]);
-					_this.change = true;
+					_.dispatch(this,"change",null,[nv,ov]);
+					this.change = true;
 				}
 				return nv;
 			}
-		});
+		}.bind(this));
 
 		// first trgger "init" event
-		_.dispatch(_this,"init");
+		_.dispatch(this,"init");
 	};
 
 	// Extend aix model method 
@@ -381,27 +387,24 @@
 		obj = obj||{};
 		var _this = this;
 
-		_.define(_this,{
+		_.define(this,{
 			cid : {
-				value : "#"+(++AIX_COLLECTION_COUNT),
-				writable : true,
-				enumerable : false
-			},
-			change : {
-				value : false,
-				writable : true,
+				value : (++AIX_COLLECTION_COUNT),
+				writable : false,
 				enumerable : false
 			}
 		});
 
+		this.change = false;
+
 		// if userobj has more events
 		if(_.isObject(obj.events))
 			_.foreach(obj.events,function(v,k){
-				_.addEvent(_this,k,v);
-		});
+				_.addEvent(this,k,v);
+			},this);
 
 		if(_.isFunction(obj.validate)){
-			_.define(_this,"validate",{
+			_.define(this,"validate",{
 				value : obj.validate,
   			writable: false,
   			enumerable: false,
@@ -414,17 +417,23 @@
 		delete obj.change;
 		delete obj.events;
 
-		_.extend(_this,_.extend(_.clone(AIX_COLLECTION_DEFAULT),obj));
+		_.extend(
+			this,
+			_.extend(
+				_.clone(AIX_COLLECTION_DEFAULT)
+				,obj
+			)
+		);
 		
 		// filter init data as this.model type
-		if(_this.model){
-			_this.data = _.filter(_this.data,function(one){
-				return one.constructor === _this.model;
-			});
+		if(this.model){
+			this.data = _.filter(this.data,function(one){
+				return one.constructor === this.model;
+			}.bind(this));
 		}
 
 		//add listen for object data change
-		_.watch(_this,"data",function(nv,ov){
+		_.watch(this,"data",function(nv,ov){
 			// collection must be format as arr
 			if(!_.isArray(nv))
 				nv = [nv];
@@ -434,40 +443,42 @@
 				var vali = true;
 
 				_.foreach(nv,function(one){
-					if(_this.model ? (one.constructor !== _this.model) : 0 )
+					if(this.model ? (one.constructor !== this.model) : 0 )
 						vali = false;
-					if(_.isFunction(_this.validate) ? !_this.validate.call(_this,one) : 0 )
+
+					if(_.isFunction(this.validate) ? 
+						!this.validate.call(this,one) : 0 )
 						vali = false;
-				});
+				},this);
 
 				// validate status check
 				if(vali){
 					// trigger validate and success events
 					if(!_.isequal(nv,ov)){
-						_.dispatch(_this,"change",null,[nv,ov]);
-						_this.change = true;
+						_.dispatch(this,"change",null,[nv,ov]);
+						this.change = true;
 					}
-					_.dispatch(_this,"validate",null,[nv,ov]);
-					_.dispatch(_this,"validate:success",null,[nv,ov]);
+					_.dispatch(this,"validate",null,[nv,ov]);
+					_.dispatch(this,"validate:success",null,[nv,ov]);
 					return nv;
 				}else{
 					// trigger validate and fail events
-					_.dispatch(_this,"validate",null,[nv,ov]);
-					_.dispatch(_this,"validate:fail",null,[nv,ov]);
+					_.dispatch(this,"validate",null,[nv,ov]);
+					_.dispatch(this,"validate:fail",null,[nv,ov]);
 					return ov;
 				}
 			}else{
 				// No validate 
 				if(!_.isequal(nv,ov)){
-					_.dispatch(_this,"change",null,[nv,ov]);
-					_this.change = true;
+					_.dispatch(this,"change",null,[nv,ov]);
+					this.change = true;
 				}
 				return nv;
 			}
-		});
+		}.bind(this));
 
 		// first trgger "init" event
-		_.dispatch(_this,"init");
+		_.dispatch(this,"init");
 	};
 
 	aix.collection.prototype = {
@@ -856,10 +867,10 @@
 
 		var _this = this;
 
-		_.define(_this,{
+		_.define(this,{
 			vid : {
-				value : "#"+(++AIX_VIEW_COUNT),
-				writable : true,
+				value : (++AIX_VIEW_COUNT),
+				writable : false,
 				enumerable : false
 			}
 		});
@@ -871,17 +882,18 @@
 				if(type.length > 1)
 					$(obj.el).on(type[0],type[1],{self:this},v);
 				else
-					_.addEvent(_this,k,v);
+					_.addEvent(this,k,v);
 			},this);
 
 		// parse template
 		if(!obj.template || _.isString(obj.template))
 				obj.template = _.isFunction(obj.build)?
-											 obj.build.call(_this,obj.template||""):
+											 obj.build.call(this,obj.template||""):
 											 _.doom(obj.template||"");
 		if(!obj.render || !_.isFunction(obj.render)){
 			obj.render = function(){ 
-				return $(this.el).html(this.template.apply(this,arguments)) && this;
+				return $(this.el)
+								.html(this.template.apply(this,arguments)) && this;
 			};
 		}
 			
@@ -899,6 +911,7 @@
 					obj.template = _.isFunction(obj.build) ? 
 												 obj.build.call(_this,text):
 												 _.doom(text);
+
 					_.extend(_this,_.extend(_.clone(AIX_VIEW_DEFAULT),obj));
 					_.dispatch(_this,"init");
 				},
@@ -910,9 +923,15 @@
 			return this;
 		}
 
-		_.extend(_this,_.extend(_.clone(AIX_VIEW_DEFAULT),obj));
+		_.extend(this,
+			_.extend(
+				_.clone(AIX_VIEW_DEFAULT)
+				,obj
+			)
+		);
+
 		// first trgger "init" event
-		_.dispatch(_this,"init");
+		_.dispatch(this,"init");
 	};
 
 	aix.view.prototype = {
@@ -948,7 +967,7 @@
 		},
 
 		destroy : function(withRoot){
-			$(this.el).off()[withRoot ? "remove" : "empty" ]();
+			$(this.el).off()[ withRoot ? "remove" : "empty" ]();
 
 			//lock this.el prop
 			_.define(this,"el",{
@@ -1014,7 +1033,12 @@
 
 		delete obj.events;
 
-		_.extend(this,_.extend(_.clone(AIX_ROUTE_DEFAULT),obj));
+		_.extend(this,
+			_.extend(
+				_.clone(AIX_ROUTE_DEFAULT)
+				,obj
+				)
+		);
 
 		// addEvent for this route object
 		// use dispatch event to trigger
@@ -1022,16 +1046,8 @@
 
 		// cant change regular hash title
 		_.define(this, {
-			"history" : {
-				value : { 
-					old: "" , 
-					now: _.root.location.href
-				},
-				writable : true,
-				enumerable : false
-			},
 			"rid" : {
-				value : "aix-route-"+Math.random(),
+				value : (++AIX_ROUTE_COUNT),
 				writable : false,
 				enumerable : false,
 				configurable: false
@@ -1056,7 +1072,7 @@
 			}
 		});
 
-		_.dispatch(_this,"init");
+		_.dispatch(this,"init");
 	};
 
 	// Aix-Route for SPA Architecture

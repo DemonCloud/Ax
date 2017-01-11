@@ -29,7 +29,7 @@ var view = new aix.view({
 
 		//给元素绑定点击事件
 		"click:div":function(event){
-			alert(this.innerHTML);
+			z(this).text(+this.innerHTML+1)
 		}
 	}
 });</pre>
@@ -52,7 +52,7 @@ var view = new aix.view({
 <script id="tmp" type="aix/template">
 	<div>{{#a+b}}</div>
 	<div>{{#b+c}}</div>
-	<div class="a">{{#c+d}}</div>
+	<div>{{#c+d}}</div>
 	<div>{{#d+a}}</div>
 </script>
 
@@ -79,7 +79,7 @@ var view = new aix.view({
 			},
 
 			"click:div":function(event){
-				alert(this.innerHTML);
+				z(this).text(+this.innerHTML+1)
 			}
 		}
 	});
