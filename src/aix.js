@@ -967,7 +967,7 @@
 		},
 
 		destroy : function(withRoot){
-			$(this.el).off()[ withRoot ? "remove" : "empty" ]();
+			$(this.el).off()[withRoot ? "remove" : "empty" ]();
 
 			//lock this.el prop
 			_.define(this,"el",{
@@ -1028,16 +1028,16 @@
 
 		if(_.isObject(obj.events))
 			_.foreach(obj.events,function(v,k){
-				_.addEvent(_this,k,v);
-			});
+				_.addEvent(this,k,v);
+			},this);
 
 		delete obj.events;
 
 		_.extend(this,
 			_.extend(
-				_.clone(AIX_ROUTE_DEFAULT)
-				,obj
-				)
+				_.clone(AIX_ROUTE_DEFAULT),
+				obj
+			)
 		);
 
 		// addEvent for this route object
@@ -1046,8 +1046,16 @@
 
 		// cant change regular hash title
 		_.define(this, {
+			"history" : {
+				value : { 
+					old: "" , 
+					now: _.root.location.href
+				},
+				writable : true,
+				enumerable : false
+			},
 			"rid" : {
-				value : (++AIX_ROUTE_COUNT),
+				value : AIX_ROUTE_COUNT,
 				writable : false,
 				enumerable : false,
 				configurable: false
