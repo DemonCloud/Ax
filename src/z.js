@@ -1903,10 +1903,10 @@
               case 'replaceElement':
                   node.parentNode.replaceChild(this.objToNode(diff.newValue, node.namespaceURI === 'http://www.w3.org/2000/svg'), node);
                   break;
-              case 'relocateGroup':
-                  Array.apply(null, new Array(diff.groupLength)).map(function() {
+              	case 'relocateGroup':
+                  _.loop(Array.apply(null, new Array(diff.groupLength)).map(function() {
                       return node.removeChild(node.childNodes[diff.from]);
-                  }).forEach(function(childNode, index) {
+                  }),function(childNode, index) {
                       if (index === 0) {
                           reference = node.childNodes[diff.to];
                       }
