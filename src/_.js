@@ -460,7 +460,7 @@
 
 			merge : function(){
 				var tmp = [] , args = _slice.call(arguments);
-				args.forEach(function(arr){ 
+				_.loop(args,function(arr){ 
 					tmp = tmp.concat(arr); 
 				});
 
@@ -922,7 +922,7 @@
 		function converttree(root,tree){
 			// create top Element;
 			var wrap = document.createElement("div").cloneNode();
-			wrap.setAttribute("x-root","");
+					wrap.setAttribute("x-root","");
 
 			if(tree.length){
 				var level1 = tree[1];
@@ -941,7 +941,7 @@
 				}
 
 				// remove target
-				_.slice(wrap.querySelectorAll("*")).forEach(function(node){
+				_.loop(_.slice(wrap.querySelectorAll("*")),function(node){
 					node.removeAttribute("x-aim");
 				});
 			}
@@ -1084,7 +1084,7 @@
 			var res = {};
 			var pars = ckstr ? ckstr.split(";") : [];
 
-			pars.forEach(function(item){
+			_.loop(pars, function(item){
 				var index = (item||"").search("=");
 				if(index===-1)
 					return;

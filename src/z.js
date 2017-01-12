@@ -37,7 +37,7 @@
 	function domready(){
 		if(!rfire){
 			rfire = true;
-			rlist.forEach(function(v,i){
+			_.loop(rlist,function(v,i){
 				v.fn.call(_.root,v.ct);
 			});
 			rlist = [];
@@ -70,7 +70,7 @@
 		}else if( _.isString(x)){
 			var cache;
 
-			dcache.forEach(function(sl){
+			_.loop(dcache,function(sl){
 				if(sl.$indicator === x) cache = sl;
 			});
 
@@ -297,7 +297,7 @@
 								"previousElementSibling" : "nextElementSibling";
 
 			// not comment && document && script
-			this.get().forEach(function(e){
+			_.loop(this.get(),function(e){
 				if(e[api]!=null){
 					if(e.nodeType !== 3 && e.nodeType !== 8 && e.nodeName !== "SCRIPT")
 						res.push(e[api]);
@@ -709,7 +709,7 @@
 
   var Diff = function(options) {
       var diff = this;
-      _.keys(options).forEach(function(option) {
+      _.loop(_.keys(options),function(option) {
           diff[option] = options[option];
       });
   };
@@ -790,8 +790,8 @@
       var uniqueDescriptors = {},
           duplicateDescriptors = {};
 
-      li.forEach(function(node) {
-          elementDescriptors(node).forEach(function(descriptor) {
+      _.loop(li,function(node) {
+          _.loop(elementDescriptors(node),function(descriptor) {
               var inUnique = descriptor in uniqueDescriptors,
                   inDupes = descriptor in duplicateDescriptors;
               if (!inUnique && !inDupes) {
@@ -812,7 +812,7 @@
           l2Unique = findUniqueDescriptors(l2),
           inBoth = {};
 
-      _.keys(l1Unique).forEach(function(key) {
+      _.loop(_.keys(l1Unique),function(key) {
           if (l2Unique[key]) {
               inBoth[key] = true;
           }
@@ -990,8 +990,8 @@
       }
 
       // fill the matches with distance values
-      c1.forEach(function(c1Element, c1Index) {
-          c2.forEach(function(c2Element, c2Index) {
+      _.loop(c1,function(c1Element, c1Index) {
+          _.loop(c2,function(c2Element, c2Index) {
               if (!marked1[c1Index] && !marked2[c2Index] && roughlyEqual(c1Element, c2Element, uniqueDescriptors, subsetsSame)) {
                   matches[c1Index + 1][c2Index + 1] = (matches[c1Index][c2Index] ? matches[c1Index][c2Index] + 1 : 1);
                   if (matches[c1Index + 1][c2Index + 1] >= lcsSize) {
@@ -1049,7 +1049,7 @@
           group = 0;
 
       // give elements from the same subset the same group number
-      stable.forEach(function(subset) {
+      _.loop(stable,function(subset) {
           var i, endOld = subset.oldValue + subset.length,
               endNew = subset.newValue + subset.length;
           for (i = subset.oldValue; i < endOld; i += 1) {
@@ -1091,7 +1091,7 @@
           if (subset) {
               subsets.push(subset);
 
-              Array.apply(null, new Array(subset.length)).map(returnIndex).forEach(markBoth);
+              _.loop(Array.apply(null, new Array(subset.length)).map(returnIndex),markBoth);
 
           }
       }
@@ -1114,12 +1114,12 @@
       list: false,
       add: function(diffs) {
           var list = this.list;
-          diffs.forEach(function(diff) {
+          _.loop(diffs,function(diff) {
               list.push(diff);
           });
       },
       forEach: function(fn) {
-          this.list.forEach(fn);
+        _.loop(this.list,fn);
       }
   };
 
@@ -1290,7 +1290,7 @@
           attr1 = t1.attributes ? _.keys(t1.attributes).sort() : [];
           attr2 = t2.attributes ? _.keys(t2.attributes).sort() : [];
 
-          attr1.forEach(function(attr) {
+          _.loop(attr1,function(attr) {
               var pos = attr2.indexOf(attr);
               if (pos === -1) {
                   diffs.push(new Diff({
@@ -1313,7 +1313,7 @@
               }
           });
 
-          attr2.forEach(function(attr) {
+          _.loop(attr2,function(attr) {
               diffs.push(new Diff({
                   action: 'addAttribute',
                   route: route,
@@ -1333,7 +1333,7 @@
           } else {
               if (node.attributes && node.attributes.length > 0) {
                   objNode.attributes = {};
-                  Array.prototype.slice.call(node.attributes).forEach(
+                  _.loop(_.slice(node.attributes),
                       function(attribute) {
                           objNode.attributes[attribute.name] = attribute.value;
                       }
@@ -1341,7 +1341,7 @@
               }
               if (node.childNodes && node.childNodes.length > 0) {
                   objNode.childNodes = [];
-                  Array.prototype.slice.call(node.childNodes).forEach(
+                  _.loop(_.slice(node.childNodes),
                       function(childNode) {
                           objNode.childNodes.push(dobj.nodeToObj(childNode));
                       }
@@ -1377,12 +1377,12 @@
                   node = document.createElement(objNode.nodeName);
               }
               if (objNode.attributes) {
-                  _.keys(objNode.attributes).forEach(function(attribute) {
+                  _.loop(_.keys(objNode.attributes),function(attribute) {
                       node.setAttribute(attribute, objNode.attributes[attribute]);
                   });
               }
               if (objNode.childNodes) {
-                  objNode.childNodes.forEach(function(childNode) {
+                  _.loop(objNode.childNodes,function(childNode) {
                       node.appendChild(dobj.objToNode(childNode, insideSvg));
                   });
               }
@@ -1645,7 +1645,7 @@
           if (diffs.length === 0) {
               return true;
           }
-          diffs.forEach(function(diff) {
+          _.loop(diffs,function(diff) {
               dobj.applyVirtualDiff(tree, diff);
           });
           return true;
@@ -1749,8 +1749,7 @@
                   parentNode.childNodes[nodeIndex] = newNode;
                   break;
               case 'relocateGroup':
-                  node.childNodes.splice(diff.from, diff.groupLength).reverse()
-                      .forEach(function(movedNode) {
+                  _.loop(node.childNodes.splice(diff.from, diff.groupLength).reverse(),function(movedNode) {
                           node.childNodes.splice(diff.to, 0, movedNode);
                       });
                   break;
@@ -1819,7 +1818,7 @@
           if (diffs.length === 0) {
               return true;
           }
-          diffs.forEach(function(diff) {
+          _.loop(diffs,function(diff) {
               if (!dobj.applyDiff(tree, diff)) {
                   return false;
               }
@@ -1958,7 +1957,7 @@
               diffs = [diffs];
           }
           diffs.reverse();
-          diffs.forEach(function(diff) {
+          _.loop(diffs,function(diff) {
               dobj.undoDiff(tree, diff);
           });
       },
@@ -2127,7 +2126,7 @@
   function zaddEvent(element, events, fn, data, selector, delegator, capture){
     var id = zid(element), set = (handlers[id] || (handlers[id] = []));
 
-    events.split(/\s/).forEach(function(event){
+    _.loop(events.split(/\s/),function(event){
       if (event == 'ready') 
       	return z(fn);
 
@@ -2168,11 +2167,15 @@
 
   function zremoveEvent(element, events, fn, selector, capture){
     var id = zid(element);
-    (events || '').split(/\s/).forEach(function(event){
-      findHandlers(element, event, fn, selector).forEach(function(handler){
+    _.loop((events || '').split(/\s/),function(event){
+      _.loop(findHandlers(element, event, fn, selector),function(handler){
         delete handlers[id][handler.i];
 
-    		element.removeEventListener(realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+    		element.removeEventListener(
+    			realEvent(handler.e), 
+    			handler.proxy, 
+    			eventCapture(handler, capture)
+    		);
     	});
     });
   }
@@ -2408,9 +2411,9 @@
 	});
 
   // shortcut methods for `.bind(event, fn)` for each event type
-  ('focusin focusout focus blur load resize scroll unload click dblclick '+
+  _.loop(('focusin focusout focus blur load resize scroll unload click dblclick '+
   'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave '+
-  'change select keydown keypress keyup error').split(' ').forEach(function(event) {
+  'change select keydown keypress keyup error').split(' '),function(event) {
     z.fn[event] = function(callback) {
       return (0 in arguments) ?
         this.bind(event, callback) :
