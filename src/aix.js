@@ -1139,10 +1139,10 @@
 			return this;
 		},
 
-		stop: function(){
+		stoplisten: function(){
 			if(delete this._listen){
 				_.root.removeEventListener("hashchange",this.event);
-				this.dispatch("stop");
+				this.dispatch("stoplisten");
 			}
 			return this;
 		},
@@ -1168,10 +1168,125 @@
 
 	};
 
-	aix.model.extend      = createExtend("model");
-	aix.collection.extend = createExtend("collection");
+
+
+	// Aix-Component 
+	// Bind the connect aix plug with 
+	// -- aix.model
+	// -- aix.view
+	
+	function linkConect(type,fn){
+		var _link = function(){
+			var args = arguments;
+
+			// trigger _this bind fn;
+			fn.apply(this,args);
+
+			// if get connect list
+			if(this._connect.length){
+				_.loop(this._connect,function(component){
+					_.dispatch(
+						component,
+						this.name+":"+type,
+						null,
+						[this.data.parse()].concat(_.slice(args))
+					);
+				},this);
+			}
+		};
+
+		fn.link = _link;
+		return _link;
+	}
+	
+	aix.component = function(def){
+		if(!def.name&&!_.isString(def.name))
+			throw new TypeError("Aix-Comment must defined [name] property type to string.");
+
+		if(!def.el&&!_.isString(def.el))
+			throw new TypeError("Aix-Comment must defined [el] property bind to DOM element.");
+
+		var config = _.extend({
+			data : aix.model,
+			view : aix.view,
+			events : {} // define events for Component 
+		},def||{});
+		
+		// define propertise
+		_.define(this,{
+			data : {
+				value : _.isFunction(config.data) ? new config.data : config.data,
+				writable : false,
+				enumerable : true,
+				configurable : false
+			},
+			view : {
+				value : _.isFunction(config.view) ? new config.view({ el:config.el }) : config.view,
+				writable : false,
+				enumerable : true,
+				configurable : false
+			},
+			// connect Component Object
+			_connect :{
+				value : [],
+				writable : false,
+				enumerable : false,
+				configurable : false
+			}
+		});
+
+		// bind events
+		_.loop(config.events,function(fn,key){
+			_.addEvent(this,key,linkConect(key,fn));
+		},this);
+
+		delete config.el;
+		delete config.data;
+		delete config.view;
+		delete config.events;
+
+		// bind extra propertise;
+		_.compose(this,config);
+
+		_.dispatch(this,"init");
+	};
+
+	aix.component.prototype = {
+		addEvent:function(type,fn){
+			return _.addEvent(this,type,linkConect(type,fn));
+		},
+
+		removeEvent:function(type,fn){
+			return _.removeEvent(this,type,fn.link||fn);
+		},
+
+		dispatch:function(type,fn,args){
+			return _.dispatch(this,type,fn,args);
+		},
+
+		connect:function(aixc){
+			var list = _.isArray(aixc) ? aixc : [aixc];
+		
+			_.loop(list,function(component){
+				if(component!=null)
+					if(_.isObject(component)){
+						this._connect.push(component);
+						if(_.isArray(component._connect))
+							component._connect.push(this);
+					}
+			},this);
+
+			return this;
+		}
+	
+	};
+
+	// extend method
 	aix.view.extend       = createExtend("view");
+	aix.model.extend      = createExtend("model");
 	aix.route.extend      = createExtend("route");
+	aix.component.extend  = createExtend("component");
+	aix.collection.extend = createExtend("collection");
 
 	return aix;
 
