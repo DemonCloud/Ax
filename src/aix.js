@@ -70,17 +70,6 @@
 	// default with disable and emude RESTFUL_API
 	var RESTFUL_LIST = RESTFUL_disable;
 
-	// log the prefernce
-	aix.aixpref = function(){
-		return {
-			count:{
-				views : AIX_VIEW_COUNT,
-				models : AIX_MODELS_COUNT,
-				collections : AIX_COLLECTION_COUNT
-			}
-		};
-	};
-
 	// config for aix 
 	// default with disable and emude RESTFUL_API
 	aix.config = {
@@ -862,9 +851,6 @@
 
 	aix.view = function(obj){
 		obj = obj || {};
-		if(!_.isString(obj.el))
-			return console.error("view must define its 'el' prop bind with elm (custom string)");
-
 		var _this = this;
 
 		_.define(this,{
@@ -990,10 +976,10 @@
 	};
 
 	//get Hash param form URL
-	var getHash = aix.getHash = function(url){
+	function getHash(url){
 		var index = url.search("#");
 		return index>0?url.slice(index+1):"";
-	};
+	}
 
 	//if HashChange callee
 	function changeHash(hash,oldhash,event){
@@ -1210,11 +1196,10 @@
 	}
 	
 	aix.component = function(def){
+		def = def || {};
+
 		if(!def.name&&!_.isString(def.name))
 			throw new TypeError("Aix-Comment must defined [name] property type to string.");
-
-		if(!def.el&&!_.isString(def.el))
-			throw new TypeError("Aix-Comment must defined [el] property bind to DOM element.");
 
 		var config = _.extend({
 			model : aix.model,
@@ -1225,13 +1210,17 @@
 		// define propertise
 		_.define(this,{
 			model : {
-				value : _.isFunction(config.model) ? new config.model : config.model,
+				value : _.isFunction(config.model) ? 
+								new config.model :
+								config.model,
 				writable : false,
 				enumerable : true,
 				configurable : false
 			},
 			view : {
-				value : _.isFunction(config.view) ? new config.view({ el:config.el }) : config.view,
+				value : _.isFunction(config.view) ? 
+								new config.view : 
+								config.view,
 				writable : false,
 				enumerable : true,
 				configurable : false
@@ -1269,20 +1258,34 @@
 				var mtype = comand[0].substr(1,comand[0].length-2);
 				var ename = comand[1];
 
-				if(this[mtype]==null)
-					return;
-				else{
+				if(this[mtype]!=null){
 					if(_.isFunction(this[mtype].addEvent))
 						return this[mtype].addEvent(ename,fn.bind(this));
 					else
 						return _.addEvent(this[mtype],ename,fn.bind(this));
 				}
+				return;
 			}
 
 			return _.addEvent(this,type,linkConect(type,fn));
 		},
 
 		removeEvent:function(type,fn){
+			if(isSelfProp(type)){
+				var comand = type.split("|");
+				
+				var mtype = comand[0].substr(1,comand[0].length-2);
+				var ename = comand[1];
+
+				if(this[mtype]!=null){
+					if(_.isFunction(this[mtype].removeEvent))
+						return this[mtype].removeEvent(ename,fn.bind(this));
+					else
+						return _.removeEvent(this[mtype],ename,fn.bind(this));
+				}
+				return;
+			}
+
 			return _.removeEvent(this,type,fn.link||fn);
 		},
 
