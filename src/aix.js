@@ -302,8 +302,8 @@
 			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
 		},
 
-		trigger : function(type,fn,args){
-			return this.dispatch(type,fn,args);
+		trigger : function(){
+			return this.dispatch.apply(this,arguments);
 		},
 
 		listen : function(prop,handler){
@@ -981,7 +981,7 @@
 		},
 
 		dispatch : function(type,fn,args){
-			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
+			return _.dispatch(this,type, fn , args);
 		},
 
 		trigger : function(){
@@ -1102,6 +1102,10 @@
 			return _.dispatch(this,type,fn,args);
 		},
 
+		trigger:function(){
+			return this.dispatch.apply(this,arguments);
+		},
+
 		addRoute:function(route,fname){
 			if(_.isString(fname)||_.isArray(fnname))
 		 		this.routes[route] = fnname;
@@ -1189,7 +1193,9 @@
 						component,
 						this.name+":"+type,
 						null,
-						[this.data.parse()].concat(_.slice(args))
+						[ this.model.parse ? 
+							this.model.parse() :
+							this.model].concat(_.slice(args))
 					);
 				},this);
 			}
@@ -1197,6 +1203,10 @@
 
 		fn.link = _link;
 		return _link;
+	}
+
+	function isSelfProp(str){
+		return str.search("\\[")===0 && str.search("\\]")>-1;
 	}
 	
 	aix.component = function(def){
@@ -1207,15 +1217,15 @@
 			throw new TypeError("Aix-Comment must defined [el] property bind to DOM element.");
 
 		var config = _.extend({
-			data : aix.model,
+			model : aix.model,
 			view : aix.view,
 			events : {} // define events for Component 
 		},def||{});
 		
 		// define propertise
 		_.define(this,{
-			data : {
-				value : _.isFunction(config.data) ? new config.data : config.data,
+			model : {
+				value : _.isFunction(config.model) ? new config.model : config.model,
 				writable : false,
 				enumerable : true,
 				configurable : false
@@ -1237,11 +1247,11 @@
 
 		// bind events
 		_.loop(config.events,function(fn,key){
-			_.addEvent(this,key,linkConect(key,fn));
+			this.addEvent(key,fn);
 		},this);
 
 		delete config.el;
-		delete config.data;
+		delete config.model;
 		delete config.view;
 		delete config.events;
 
@@ -1253,6 +1263,22 @@
 
 	aix.component.prototype = {
 		addEvent:function(type,fn){
+			if(isSelfProp(type)){
+				var comand = type.split("|");
+				
+				var mtype = comand[0].substr(1,comand[0].length-2);
+				var ename = comand[1];
+
+				if(this[mtype]==null)
+					return;
+				else{
+					if(_.isFunction(this[mtype].addEvent))
+						return this[mtype].addEvent(ename,fn.bind(this));
+					else
+						return _.addEvent(this[mtype],ename,fn.bind(this));
+				}
+			}
+
 			return _.addEvent(this,type,linkConect(type,fn));
 		},
 
@@ -1262,6 +1288,10 @@
 
 		dispatch:function(type,fn,args){
 			return _.dispatch(this,type,fn,args);
+		},
+
+		trigger:function(){
+			return this.dispatch.apply(this,arguments);
 		},
 
 		connect:function(aixc){
