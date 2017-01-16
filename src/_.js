@@ -850,10 +850,10 @@
 				if(obj._events)
 					if(obj._events[type])
 						hasFn ? 
-						_.foreach(obj._events[type],function(f){
+						_.loop(obj._events[type],function(f){
 							if(f===fn) f.apply(obj,args||[]);
 						}) : 
-						_.foreach(obj._events[type],function(f){
+						_.loop(obj._events[type],function(f){
 							f.apply(obj,args||[]);
 						});
 				return obj;
@@ -879,19 +879,6 @@
 		var bdlevel = /<(\/)?(\w+)\s?([^>]+?)?\>{1}/gi;
 		var atreg = /([^<>\s]+)=[\'\"]?([^>\'\"]+)[\'\"]?\s/gi;
 
-		var parseattr = function(str,nodetarget){
-			var res = {};
-			str = ' ' + (str||'') + ' ';
-			
-			str.replace(atreg,function($match,prop,val){
-				res[prop] = val;
-				return $match;
-			});
-
-			res["x-aim"] = nodetarget;
-			return res;
-		};
-
 		// auto close tag
 		var htmlcstags = [
 			"input",
@@ -904,6 +891,19 @@
 			"!--"
 		];
 
+		function parseattr(str,nodetarget){
+			var res = {};
+			str = ' ' + (str||'') + ' ';
+			
+			str.replace(atreg,function($match,prop,val){
+				res[prop] = val;
+				return $match;
+			});
+
+			res["x-aim"] = nodetarget;
+			return res;
+		}
+
 		// create Elm form node info
 		function createttreeElm(node){
 			var elm = document.createElement(node.tagname);
@@ -911,9 +911,7 @@
 				elm.setAttribute(name,val);
 			});
 
-			if(!node.child)
-				elm.innerHTML= node.content;
-			else if(!node.child.length)
+			if(!node.child||!node.child.length)
 				elm.innerHTML= node.content;
 		
 			return elm;
@@ -949,17 +947,6 @@
 			return wrap;
 		}
 
-		function virtualupprops(prop1,prop2){
-			// old new
-			var props = _.bale(prop1,prop2);
-			_.foreach(prop1,function(val,key){
-				if(props[key]===val)
-					delete props[key];
-			});
-
-			return props;
-		}
-
 		_.extend({
 			// parse data require
 			// parse by http [ Content-type ]
@@ -970,7 +957,7 @@
 							case "application/json":
 								return JSON.stringify(param||{});
 							default : 
-								return _.paramstringify(param||{});
+								break;
 						}
 					}
 				}
@@ -1072,10 +1059,8 @@
 			},
 
 			// vitruldom
-			virtualDOM : function(root,html){
-				var parse = _.domparse(html||"");
-
-				return converttree(root,parse);
+		virtualDOM : function(root,html){
+			return converttree(root,_.domparse(html||""));
 		},
 
 		// cookies
