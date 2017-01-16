@@ -120,7 +120,7 @@
 		var $el=[] ,$1 = !cidSl.test(elm) ,$2 = !pitSl.test(elm);
 		if($1&&$2){
 			if(elm.search(",")>-1)
-				_.foreach(elm.split(","),function(sl){
+				_.loop(elm.split(","),function(sl){
 					$el = $el.concat(dsizzle(sl));
 				});
 
@@ -136,8 +136,8 @@
 			else if(isAttr.test(elm)){
 				var matcher = isAttr.exec(elm);
 				var parent = matcher[1],
-										attr   = matcher[2],
-										value  = matcher[3];
+						attr   = matcher[2],
+						value  = matcher[3];
 				if(parent == null){
 					return _.slice(document.getElementsByTagName("*")).filter(function(e){
 						return e.getAttribute(attr) === value;
@@ -177,6 +177,15 @@
 		return _.slice($el);
 	}
 
+	// Element match selector string
+	var matchz = Element.prototype.matches ||
+							 Element.prototype.webkitMatchesSelector ||
+							 Element.prototype.mozMatchesSelector ||
+							 Element.prototype.msMatchesSelector ||
+							 function(selector){
+								return (this.parentNode != null && this !== document) &&
+											 _.has(this.parentNode.querySelectorAll(selector),this);
+							 };
 
 	// DOOM constructor for z
 	var DOOM = function(str){
@@ -216,9 +225,7 @@
 	z.matchz = function(elm,selector){
 		if(elm==null) return elm;
 
-		return !_.isString(selector) ||
-			((elm.parentNode && elm !== document) &&
-			_.has(elm.parentNode.querySelectorAll(selector),elm));
+		return !_.isString(selector) || matchz.call(elm,selector);
 	};
 
 	// DOOM selector wrap
@@ -539,10 +546,18 @@
 		},
 
 		text : function(ct){
+			var str = "";
+
 			if(ct != null)
-				return this.each(function(e){ e.innerText = ct+""; });
+				return this.each(function(e){ 
+					e.innerText = ct+""; 
+				});
 			else 
-				return _.decodeHTML(this.get(0).innerText||"");
+				this.each(function(e){
+					str += _.decodeHTML(e.innerText||"");
+				});
+
+			return str
 		},
 
 		fill : function(ct){
@@ -570,16 +585,16 @@
 		},
 
 		replacewith : function(str){
-			var $sl = z(str);
+			var $z = z(str);
 			
 			this.each(function(elm){
-				$sl.each(function(dom){
+				$z.each(function(dom){
 					elm.parentNode.insertBefore(dom,elm);
 				});
 				elm.parentNode.removeChild(elm);
 			});
 
-			return $sl;
+			return $z;
 		},
 
 		insertbefore : function(str){
@@ -2220,7 +2235,10 @@
 		return compatible(proxy, event);
 	}
 
-	z.event = { add: zaddEvent, remove: zremoveEvent };
+	z.event = { 
+		add: zaddEvent, 
+		remove: zremoveEvent 
+	};
 	
 	z.proxy = function(fn, context) {
 		var args = (2 in arguments) && slice.call(arguments, 2);
@@ -2447,10 +2465,7 @@
 		xRender:function(newhtml){
 			return this.each(function(elm){
 				this.apply(elm,this.diff(elm,
-						_.virtualDOM(
-							elm,
-							newhtml.nodeType ? newhtml.outerHTML : (newhtml||"")
-						))
+					_.virtualDOM(elm,newhtml.nodeType ? newhtml.outerHTML : (newhtml||"")))
 				);
 			},_DIFF);
 		}
