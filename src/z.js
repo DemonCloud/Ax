@@ -1406,65 +1406,65 @@
 				/* One or more groups have been identified among the childnodes of t1
 				 * and t2.
 				 */
-							diffs = this.attemptGroupRelocation(t1, t2, subtrees, route);
-							if (diffs.length > 0) {
-									return diffs;
-							}
+				diffs = this.attemptGroupRelocation(t1, t2, subtrees, route);
+				if (diffs.length > 0) {
+					return diffs;
+				}
+			}
+
+			/* 0 or 1 groups of similar child nodes have been found
+			 * for t1 and t2. 1 If there is 1, it could be a sign that the
+			 * contents are the same. When the number of groups is below 2,
+			 * t1 and t2 are made to have the same length and each of the
+			 * pairs of child nodes are diffed.
+			 */
+
+
+			last = Math.max(t1ChildNodes.length, t2ChildNodes.length);
+			if (t1ChildNodes.length !== t2ChildNodes.length) {
+				childNodesLengthDifference = true;
+			}
+
+			for (i = 0; i < last; i += 1) {
+				e1 = t1ChildNodes[i];
+				e2 = t2ChildNodes[i];
+
+				if (childNodesLengthDifference) {
+					/* t1 and t2 have different amounts of childNodes. Add
+				 	 * and remove as necessary to obtain the same length */
+					if (e1 && !e2) {
+						if (e1.nodeName === '#text') {
+							diffs.push(new Diff({
+								action: 'removeTextElement',
+								route: route.concat(index),
+								value: e1.data
+							}));
+							index -= 1;
+						} else {
+							diffs.push(new Diff({
+								action: 'removeElement',
+								route: route.concat(index),
+								element: _.clonedoom(e1)
+							}));
+							index -= 1;
+						}
+
+					} else if (e2 && !e1) {
+						if (e2.nodeName === '#text') {
+							diffs.push(new Diff({
+								action: 'addTextElement',
+								route: route.concat(index),
+								value: e2.data
+							}));
+						} else {
+							diffs.push(new Diff({
+								action: 'addElement',
+								route: route.concat(index),
+								element: _.clonedoom(e2)
+							}));
+						}
 					}
-
-				/* 0 or 1 groups of similar child nodes have been found
-				 * for t1 and t2. 1 If there is 1, it could be a sign that the
-				 * contents are the same. When the number of groups is below 2,
-				 * t1 and t2 are made to have the same length and each of the
-				 * pairs of child nodes are diffed.
-				 */
-
-
-					last = Math.max(t1ChildNodes.length, t2ChildNodes.length);
-					if (t1ChildNodes.length !== t2ChildNodes.length) {
-							childNodesLengthDifference = true;
-					}
-
-					for (i = 0; i < last; i += 1) {
-							e1 = t1ChildNodes[i];
-							e2 = t2ChildNodes[i];
-
-							if (childNodesLengthDifference) {
-				/* t1 and t2 have different amounts of childNodes. Add
-				 * and remove as necessary to obtain the same length */
-									if (e1 && !e2) {
-											if (e1.nodeName === '#text') {
-													diffs.push(new Diff({
-															action: 'removeTextElement',
-															route: route.concat(index),
-															value: e1.data
-													}));
-													index -= 1;
-											} else {
-													diffs.push(new Diff({
-															action: 'removeElement',
-															route: route.concat(index),
-															element: _.clonedoom(e1)
-													}));
-													index -= 1;
-											}
-
-									} else if (e2 && !e1) {
-											if (e2.nodeName === '#text') {
-													diffs.push(new Diff({
-															action: 'addTextElement',
-															route: route.concat(index),
-															value: e2.data
-													}));
-											} else {
-													diffs.push(new Diff({
-															action: 'addElement',
-															route: route.concat(index),
-															element: _.clonedoom(e2)
-													}));
-											}
-									}
-							}
+				}
 				/* We are now guaranteed that childNodes e1 and e2 exist,
 				 * and that they can be diffed.
 				 */
@@ -1473,946 +1473,949 @@
 				 * diffs.
 				 */
 
-							if (e1 && e2) {
-									diffs = diffs.concat(this.findNextDiff(e1, e2, route.concat(index)));
+				if (e1 && e2) {
+					diffs = diffs.concat(this.findNextDiff(e1, e2, route.concat(index)));
+				}
+
+				index += 1;
+
+			}
+			t1.innerDone = true;
+			return diffs;
+
+		},
+
+		attemptGroupRelocation: function(t1, t2, subtrees, route) {
+			/* Either t1.childNodes and t2.childNodes have the same length, or
+			 * there are at least two groups of similar elements can be found.
+			 * attempts are made at equalizing t1 with t2. First all initial
+			 * elements with no group affiliation (gaps=true) are removed (if
+			 * only in t1) or added (if only in t2). Then the creation of a group
+			 * relocation diff is attempted.
+			 */
+
+			var gapInformation = getGapInformation(t1, t2, subtrees),
+				gaps1 = gapInformation.gaps1,
+				gaps2 = gapInformation.gaps2,
+				shortest = Math.min(gaps1.length, gaps2.length),
+				destinationDifferent, toGroup,
+				group, node, similarNode, testI, diffs = [],
+				index1, index2, j;
+
+
+			for (index2 = 0, index1 = 0; index2 < shortest; index1 += 1, index2 += 1) {
+				if (gaps1[index2] === true) {
+					node = t1.childNodes[index1];
+					if (node.nodeName === '#text') {
+						if (t2.childNodes[index2].nodeName === '#text' && node.data !== t2.childNodes[index2].data) {
+							testI = index1;
+							while (t1.childNodes.length > testI + 1 && t1.childNodes[testI + 1].nodeName === '#text') {
+								testI += 1;
+								if (t2.childNodes[index2].data === t1.childNodes[testI].data) {
+									similarNode = true;
+									break;
+								}
 							}
-
-							index += 1;
-
-					}
-					t1.innerDone = true;
-					return diffs;
-
-			},
-
-			attemptGroupRelocation: function(t1, t2, subtrees, route) {
-				/* Either t1.childNodes and t2.childNodes have the same length, or
-				 * there are at least two groups of similar elements can be found.
-				 * attempts are made at equalizing t1 with t2. First all initial
-				 * elements with no group affiliation (gaps=true) are removed (if
-				 * only in t1) or added (if only in t2). Then the creation of a group
-				 * relocation diff is attempted.
-				 */
-
-					var gapInformation = getGapInformation(t1, t2, subtrees),
-							gaps1 = gapInformation.gaps1,
-							gaps2 = gapInformation.gaps2,
-							shortest = Math.min(gaps1.length, gaps2.length),
-							destinationDifferent, toGroup,
-							group, node, similarNode, testI, diffs = [],
-							index1, index2, j;
-
-
-					for (index2 = 0, index1 = 0; index2 < shortest; index1 += 1, index2 += 1) {
-							if (gaps1[index2] === true) {
-									node = t1.childNodes[index1];
-									if (node.nodeName === '#text') {
-											if (t2.childNodes[index2].nodeName === '#text' && node.data !== t2.childNodes[index2].data) {
-													testI = index1;
-													while (t1.childNodes.length > testI + 1 && t1.childNodes[testI + 1].nodeName === '#text') {
-															testI += 1;
-															if (t2.childNodes[index2].data === t1.childNodes[testI].data) {
-																	similarNode = true;
-																	break;
-															}
-													}
-													if (!similarNode) {
-															diffs.push(new Diff({
-																	action: 'modifyTextElement',
-																	route: route.concat(index2),
-																	oldValue: node.data,
-																	newValue: t2.childNodes[index2].data
-															}));
-															return diffs;
-													}
-											}
-											diffs.push(new Diff({
-													action: 'removeTextElement',
-													route: route.concat(index2),
-													value: node.data
-											}));
-											gaps1.splice(index2, 1);
-											shortest = Math.min(gaps1.length, gaps2.length);
-											index2 -= 1;
-									} else {
-											diffs.push(new Diff({
-													action: 'removeElement',
-													route: route.concat(index2),
-													element: _.clonedoom(node)
-											}));
-											gaps1.splice(index2, 1);
-											shortest = Math.min(gaps1.length, gaps2.length);
-											index2 -= 1;
-									}
-
-							} else if (gaps2[index2] === true) {
-									node = t2.childNodes[index2];
-									if (node.nodeName === '#text') {
-											diffs.push(new Diff({
-													action: 'addTextElement',
-													route: route.concat(index2),
-													value: node.data
-											}));
-											gaps1.splice(index2, 0, true);
-											shortest = Math.min(gaps1.length, gaps2.length);
-											index1 -= 1;
-									} else {
-											diffs.push(new Diff({
-													action: 'addElement',
-													route: route.concat(index2),
-													element: _.clonedoom(node)
-											}));
-											gaps1.splice(index2, 0, true);
-											shortest = Math.min(gaps1.length, gaps2.length);
-											index1 -= 1;
-									}
-
-							} else if (gaps1[index2] !== gaps2[index2]) {
-									if (diffs.length > 0) {
-											return diffs;
-									}
-				// group relocation
-									group = subtrees[gaps1[index2]];
-									toGroup = Math.min(group.newValue, (t1.childNodes.length - group.length));
-									if (toGroup !== group.oldValue) {
-				// Check whether destination nodes are different than originating ones.
-											destinationDifferent = false;
-											for (j = 0; j < group.length; j += 1) {
-													if (!roughlyEqual(t1.childNodes[toGroup + j], t1.childNodes[group.oldValue + j], [], false, true)) {
-															destinationDifferent = true;
-													}
-											}
-											if (destinationDifferent) {
-													return [new Diff({
-															action: 'relocateGroup',
-															groupLength: group.length,
-															from: group.oldValue,
-															to: toGroup,
-															route: route
-													})];
-											}
-									}
+							if (!similarNode) {
+								diffs.push(new Diff({
+									action: 'modifyTextElement',
+									route: route.concat(index2),
+									oldValue: node.data,
+									newValue: t2.childNodes[index2].data
+								}));
+								return diffs;
 							}
-					}
-					return diffs;
-			},
-			findValueDiff: function(t1, t2, route) {
-				// Differences of value. Only useful if the value/selection/checked value
-				// differs from what is represented in the DOM. For example in the case
-				// of filled out forms, etc.
-					var diffs = [];
-
-					if (t1.selected !== t2.selected) {
-							diffs.push(new Diff({
-									action: 'modifySelected',
-									oldValue: t1.selected,
-									newValue: t2.selected,
-									route: route
-							}));
-					}
-
-					if ((t1.value || t2.value) && t1.value !== t2.value && t1.nodeName !== 'OPTION') {
-							diffs.push(new Diff({
-									action: 'modifyValue',
-									oldValue: t1.value,
-									newValue: t2.value,
-									route: route
-							}));
-					}
-					if (t1.checked !== t2.checked) {
-							diffs.push(new Diff({
-									action: 'modifyChecked',
-									oldValue: t1.checked,
-									newValue: t2.checked,
-									route: route
-							}));
+						}
+						diffs.push(new Diff({
+							action: 'removeTextElement',
+							route: route.concat(index2),
+							value: node.data
+						}));
+						gaps1.splice(index2, 1);
+						shortest = Math.min(gaps1.length, gaps2.length);
+						index2 -= 1;
+					} else {
+						diffs.push(new Diff({
+							action: 'removeElement',
+							route: route.concat(index2),
+							element: _.clonedoom(node)
+						}));
+						gaps1.splice(index2, 1);
+						shortest = Math.min(gaps1.length, gaps2.length);
+						index2 -= 1;
 					}
 
-					return diffs;
-			},
-
-				// ===== Apply a virtual diff =====
-
-				applyVirtual: function(tree, diffs) {
-					var dobj = this;
-					if (diffs.length === 0) {
-						return true;
+				} else if (gaps2[index2] === true) {
+					node = t2.childNodes[index2];
+					if (node.nodeName === '#text') {
+						diffs.push(new Diff({
+							action: 'addTextElement',
+							route: route.concat(index2),
+							value: node.data
+						}));
+						gaps1.splice(index2, 0, true);
+						shortest = Math.min(gaps1.length, gaps2.length);
+						index1 -= 1;
+					} else {
+						diffs.push(new Diff({
+							action: 'addElement',
+							route: route.concat(index2),
+							element: _.clonedoom(node)
+						}));
+						gaps1.splice(index2, 0, true);
+						shortest = Math.min(gaps1.length, gaps2.length);
+						index1 -= 1;
 					}
-					_.loop(diffs,function(diff) {
-						dobj.applyVirtualDiff(tree, diff);
-					});
-					return true;
-				},
-											getFromVirtualRoute: function(tree, route) {
-												var node = tree,
-													parentNode, nodeIndex;
 
-												route = route.slice();
-												while (route.length > 0) {
-													if (!node.childNodes) {
-														return false;
-													}
-													nodeIndex = route.splice(0, 1)[0];
-													parentNode = node;
-													node = node.childNodes[nodeIndex];
-												}
-												return {
-													node: node,
-													parentNode: parentNode,
-													nodeIndex: nodeIndex
-												};
-											},
-											applyVirtualDiff: function(tree, diff) {
-												var routeInfo = this.getFromVirtualRoute(tree, diff.route),
-													node = routeInfo.node,
-													parentNode = routeInfo.parentNode,
-													nodeIndex = routeInfo.nodeIndex,
-													newNode, route, c;
-
-												// pre-diff hook
-												var info = {
-													diff: diff,
-													node: node
-												};
-
-												if (this.preVirtualDiffApply(info))
-													return true;
-
-												switch (diff.action) {
-													case 'addAttribute':
-														if (!node.attributes) {
-															node.attributes = {};
-														}
-
-														node.attributes[diff.name] = diff.value;
-
-														if (diff.name === 'checked') {
-															node.checked = true;
-														} else if (diff.name === 'selected') {
-															node.selected = true;
-														} else if (node.nodeName === 'INPUT' && diff.name === 'value') {
-															node.value = diff.value;
-														}
-
-														break;
-													case 'modifyAttribute':
-														node.attributes[diff.name] = diff.newValue;
-														if (node.nodeName === 'INPUT' && diff.name === 'value') {
-															node.value = diff.value;
-														}
-														break;
-													case 'removeAttribute':
-														delete node.attributes[diff.name];
-
-														if (_.keys(node.attributes).length === 0)
-															delete node.attributes;
-
-														if (diff.name === 'checked')
-															node.checked = false;
-														else if (diff.name === 'selected')
-															delete node.selected;
-														else if (node.nodeName === 'INPUT' && diff.name === 'value')
-															delete node.value;
-
-														break;
-													case 'modifyTextElement':
-														node.data = diff.newValue;
-
-														if (parentNode.nodeName === 'TEXTAREA')
-															parentNode.value = diff.newValue;
-
-														break;
-													case 'modifyValue':
-														node.value = diff.newValue;
-														break;
-													case 'modifyComment':
-														node.data = diff.newValue;
-														break;
-													case 'modifyChecked':
-														node.checked = diff.newValue;
-														break;
-													case 'modifySelected':
-														node.selected = diff.newValue;
-														break;
-													case 'replaceElement':
-														newNode = _.clonedoom(diff.newValue);
-														newNode.outerDone = true;
-														newNode.innerDone = true;
-														newNode.valueDone = true;
-														parentNode.childNodes[nodeIndex] = newNode;
-														break;
-													case 'relocateGroup':
-														_.loop(node.childNodes.splice(diff.from, diff.groupLength).reverse(),function(movedNode) {
-															node.childNodes.splice(diff.to, 0, movedNode);
-														});
-														break;
-													case 'removeElement':
-														parentNode.childNodes.splice(nodeIndex, 1);
-														break;
-													case 'addElement':
-														route = diff.route.slice();
-														c = route.splice(route.length - 1, 1)[0];
-														node = this.getFromVirtualRoute(tree, route).node;
-														newNode = _.clonedoom(diff.element);
-														newNode.outerDone = true;
-														newNode.innerDone = true;
-														newNode.valueDone = true;
-
-														if (!node.childNodes) {
-															node.childNodes = [];
-														}
-
-														if (c >= node.childNodes.length) {
-															node.childNodes.push(newNode);
-														} else {
-															node.childNodes.splice(c, 0, newNode);
-														}
-														break;
-													case 'removeTextElement':
-														parentNode.childNodes.splice(nodeIndex, 1);
-														if (parentNode.nodeName === 'TEXTAREA') {
-															delete parentNode.value;
-														}
-														break;
-													case 'addTextElement':
-														route = diff.route.slice();
-														c = route.splice(route.length - 1, 1)[0];
-														newNode = {};
-														newNode.nodeName = '#text';
-														newNode.data = diff.value;
-														node = this.getFromVirtualRoute(tree, route).node;
-														if (!node.childNodes) {
-															node.childNodes = [];
-														}
-
-														if (c >= node.childNodes.length) {
-															node.childNodes.push(newNode);
-														} else {
-															node.childNodes.splice(c, 0, newNode);
-														}
-														if (node.nodeName === 'TEXTAREA') {
-															node.value = diff.newValue;
-														}
-														break;
-													default:
-														console.log('unknown action');
-												}
-												// capture newNode for the callback
-												info.newNode = newNode;
-												this.postVirtualDiffApply(info);
-												return;
-											},
-
-											// ===== Apply a diff =====
-
-											apply: function(tree, diffs) {
-												var dobj = this;
-
-												if (diffs.length === 0) {
-													return true;
-												}
-												_.loop(diffs,function(diff) {
-													if (!dobj.applyDiff(tree, diff)) {
-														return false;
-													}
-												});
-												return true;
-											},
-											getFromRoute: function(tree, route) {
-												route = route.slice();
-												var c, node = tree;
-												while (route.length > 0) {
-													if (!node.childNodes) {
-														return false;
-													}
-													c = route.splice(0, 1)[0];
-													node = node.childNodes[c];
-												}
-												return node;
-											},
-											applyDiff: function(tree, diff) {
-												var node = this.getFromRoute(tree, diff.route),
-													newNode, reference, route, c;
-
-												// pre-diff hook
-												var info = {
-													diff: diff,
-													node: node
-												};
-
-												if (this.preDiffApply(info)) {
-													return true;
-												}
-
-												switch (diff.action) {
-													case 'addAttribute':
-														if (!node || !node.setAttribute) {
-															return false;
-														}
-														node.setAttribute(diff.name, diff.value);
-														break;
-													case 'modifyAttribute':
-														if (!node || !node.setAttribute) {
-															return false;
-														}
-														node.setAttribute(diff.name, diff.newValue);
-														break;
-													case 'removeAttribute':
-														if (!node || !node.removeAttribute) {
-															return false;
-														}
-														node.removeAttribute(diff.name);
-														break;
-													case 'modifyTextElement':
-														if (!node || node.nodeType !== 3) {
-															return false;
-														}
-														this.textDiff(node, node.data, diff.oldValue, diff.newValue);
-														break;
-													case 'modifyValue':
-														if (!node || typeof node.value === 'undefined') {
-															return false;
-														}
-														node.value = diff.newValue;
-														break;
-													case 'modifyComment':
-														if (!node || typeof node.data === 'undefined') {
-															return false;
-														}
-														this.textDiff(node, node.data, diff.oldValue, diff.newValue);
-														break;
-													case 'modifyChecked':
-														if (!node || typeof node.checked === 'undefined') {
-															return false;
-														}
-														node.checked = diff.newValue;
-														break;
-													case 'modifySelected':
-														if (!node || typeof node.selected === 'undefined') {
-															return false;
-														}
-														node.selected = diff.newValue;
-														break;
-													case 'replaceElement':
-														node.parentNode.replaceChild(this.objToNode(diff.newValue, node.namespaceURI === 'http://www.w3.org/2000/svg'), node);
-														break;
-													case 'relocateGroup':
-														_.loop(Array.apply(null, new Array(diff.groupLength)).map(function() {
-															return node.removeChild(node.childNodes[diff.from]);
-														}),function(childNode, index) {
-															if (index === 0) {
-																reference = node.childNodes[diff.to];
-															}
-															node.insertBefore(childNode, reference);
-														});
-														break;
-													case 'removeElement':
-														node.parentNode.removeChild(node);
-														break;
-													case 'addElement':
-														route = diff.route.slice();
-														c = route.splice(route.length - 1, 1)[0];
-														node = this.getFromRoute(tree, route);
-														node.insertBefore(this.objToNode(diff.element, node.namespaceURI === 'http://www.w3.org/2000/svg'), node.childNodes[c]);
-														break;
-													case 'removeTextElement':
-														if (!node || node.nodeType !== 3) {
-															return false;
-														}
-														node.parentNode.removeChild(node);
-														break;
-													case 'addTextElement':
-														route = diff.route.slice();
-														c = route.splice(route.length - 1, 1)[0];
-														newNode = document.createTextNode(diff.value);
-														node = this.getFromRoute(tree, route);
-														if (!node || !node.childNodes) {
-															return false;
-														}
-														node.insertBefore(newNode, node.childNodes[c]);
-														break;
-													default:
-														console.log('unknown action');
-												}
-
-												// if a new node was created, we might be interested in it
-												// post diff hook
-												info.newNode = newNode;
-												this.postDiffApply(info);
-
-												return true;
-											},
-
-											undo: function(tree, diffs) {
-												diffs = _.slice(diffs);
-												var dobj = this;
-												if (!diffs.length) {
-													diffs = [diffs];
-												}
-												diffs.reverse();
-												_.loop(diffs,function(diff) {
-													dobj.undoDiff(tree, diff);
-												});
-											},
-
-											undoDiff: function(tree, diff) {
-												switch (diff.action) {
-													case 'addAttribute':
-														diff.action = 'removeAttribute';
-														this.applyDiff(tree, diff);
-														break;
-													case 'modifyAttribute':
-														swap(diff, 'oldValue', 'newValue');
-														this.applyDiff(tree, diff);
-														break;
-													case 'removeAttribute':
-														diff.action = 'addAttribute';
-														this.applyDiff(tree, diff);
-														break;
-													case 'modifyTextElement':
-														swap(diff, 'oldValue', 'newValue');
-														this.applyDiff(tree, diff);
-														break;
-													case 'modifyValue':
-														swap(diff, 'oldValue', 'newValue');
-														this.applyDiff(tree, diff);
-														break;
-													case 'modifyComment':
-														swap(diff, 'oldValue', 'newValue');
-														this.applyDiff(tree, diff);
-														break;
-													case 'modifyChecked':
-														swap(diff, 'oldValue', 'newValue');
-														this.applyDiff(tree, diff);
-														break;
-													case 'modifySelected':
-														swap(diff, 'oldValue', 'newValue');
-														this.applyDiff(tree, diff);
-														break;
-													case 'replaceElement':
-														swap(diff, 'oldValue', 'newValue');
-														this.applyDiff(tree, diff);
-														break;
-													case 'relocateGroup':
-														swap(diff, 'from', 'to');
-														this.applyDiff(tree, diff);
-														break;
-													case 'removeElement':
-														diff.action = 'addElement';
-														this.applyDiff(tree, diff);
-														break;
-													case 'addElement':
-														diff.action = 'removeElement';
-														this.applyDiff(tree, diff);
-														break;
-													case 'removeTextElement':
-														diff.action = 'addTextElement';
-														this.applyDiff(tree, diff);
-														break;
-													case 'addTextElement':
-														diff.action = 'removeTextElement';
-														this.applyDiff(tree, diff);
-														break;
-													default:
-														console.log('unknown action');
-												}
-
-											}
-									};
-
-				var _DIFF = new diffDOM({
-					debug: true,
-					diffcap: 99999
-				});
-				// end off domdiff
-
-				// Doom Events
-				// Dom fired api
-				var capEvents = [
-					"blur"       , "invalid"     ,
-					"focusin"    , "focusout"    , "focus",
-					"abort"      , "afterprint"  , "beforeprint" ,
-					"checking"   , "downloading" ,
-					"load"       , "unload"      ,
-					"loadend"    , "loadstart"   ,
-					"mouseenter" , "mouseleave"  ,
-					"resize"     , "show"        , "select"
-				];
-
-				var capTypes = {
-					"UIEvent"       : [
-						"focus",
-						"blur",
-						"focusin",
-						"focusout"
-					],
-					"MouseEvent"    : [
-						"click",
-						"dbclick",
-						"mouseup",
-						"mousedown",
-						"mouseout",
-						"mouseover",
-						"mouseenter",
-						"mouseleave"
-					],
-					"KeyboardEvent" : [
-						"keydown",
-						"keypress",
-						"keyup"
-					]
-				};
-
-				// Create z extend Event preview
-				var _zid = 1, undefined,
-					handlers = {},
-					focusinSupported = 'onfocusin' in window,
-					focus = { focus: 'focusin', blur: 'focusout' },
-					hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' };
-
-				var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
-					eventMethods = {
-						preventDefault: 'isDefaultPrevented',
-						stopImmediatePropagation: 'isImmediatePropagationStopped',
-						stopPropagation: 'isPropagationStopped'
-					};
-
-
-				function zid(element) {
-					return element._zid || (element._zid = _zid++);
+				} else if (gaps1[index2] !== gaps2[index2]) {
+					if (diffs.length > 0) {
+						return diffs;
+					}
+					// group relocation
+					group = subtrees[gaps1[index2]];
+					toGroup = Math.min(group.newValue, (t1.childNodes.length - group.length));
+					if (toGroup !== group.oldValue) {
+						// Check whether destination nodes are different than originating ones.
+						destinationDifferent = false;
+						for (j = 0; j < group.length; j += 1) {
+							if (!roughlyEqual(t1.childNodes[toGroup + j], t1.childNodes[group.oldValue + j], [], false, true)) {
+								destinationDifferent = true;
+							}
+						}
+						if (destinationDifferent) {
+							return [new Diff({
+								action: 'relocateGroup',
+								groupLength: group.length,
+								from: group.oldValue,
+								to: toGroup,
+								route: route
+							})];
+						}
+					}
 				}
+			}
+			return diffs;
+		},
+		findValueDiff: function(t1, t2, route) {
+			// Differences of value. Only useful if the value/selection/checked value
+			// differs from what is represented in the DOM. For example in the case
+			// of filled out forms, etc.
+			var diffs = [];
 
-				function findHandlers(element, event, fn, selector) {
-					event = parse(event);
+			if (t1.selected !== t2.selected) {
+				diffs.push(new Diff({
+					action: 'modifySelected',
+					oldValue: t1.selected,
+					newValue: t2.selected,
+					route: route
+				}));
+			}
 
-					if (event.ns) 
-						var matcher = matcherFor(event.ns);
+			if ((t1.value || t2.value) && t1.value !== t2.value && t1.nodeName !== 'OPTION') {
+				diffs.push(new Diff({
+					action: 'modifyValue',
+					oldValue: t1.value,
+					newValue: t2.value,
+					route: route
+				}));
+			}
+			if (t1.checked !== t2.checked) {
+				diffs.push(new Diff({
+					action: 'modifyChecked',
+					oldValue: t1.checked,
+					newValue: t2.checked,
+					route: route
+				}));
+			}
 
-					return (handlers[zid(element)] || []).filter(function(handler) {
-						return handler
-							&& (!event.e  || handler.e == event.e)
-							&& (!event.ns || matcher.test(handler.ns))
-							&& (!fn       || zid(handler.fn) === zid(fn))
-							&& (!selector || handler.sel == selector);
-					});
-				}
+			return diffs;
+		},
 
-				function parse(event) {
-					var parts = ('' + event).split('.');
-					return {e: parts[0], ns: parts.slice(1).sort().join(' ')};
-				}
+		// ===== Apply a virtual diff =====
 
-				function matcherFor(ns) {
-					return new RegExp('(?:^| )' + ns.replace(' ', ' .* ?') + '(?: |$)');
-				}
+		applyVirtual: function(tree, diffs) {
+			var dobj = this;
+			if (diffs.length === 0) {
+				return true;
+			}
+			_.loop(diffs,function(diff) {
+				dobj.applyVirtualDiff(tree, diff);
+			});
+			return true;
+		},
+		getFromVirtualRoute: function(tree, route) {
+			var node = tree,
+				parentNode, nodeIndex;
 
-				function eventCapture(handler, captureSetting) {
-					return handler.del &&
-						(!focusinSupported && (handler.e in focus)) ||
-						!!captureSetting;
-				}
-
-				function realEvent(type) {
-					return hover[type] || (focusinSupported && focus[type]) || type;
-				}
-
-				function zaddEvent(element, events, fn, data, selector, delegator, capture){
-					var id = zid(element), set = (handlers[id] || (handlers[id] = []));
-
-					_.loop(events.split(/\s/),function(event){
-						if (event == 'ready') 
-							return z(fn);
-
-						var handler   = parse(event);
-						handler.fn    = fn;
-						handler.sel   = selector;
-						// emulate mouseenter, mouseleave
-						if (handler.e in hover) 
-							fn = function(e){
-								var related = e.relatedTarget;
-								if (!related || (related !== this && ! this.contains(related)))
-									return handler.fn.apply(this, arguments);
-							};
-
-						handler.del   = delegator;
-						var callback  = delegator || fn;
-						handler.proxy = function(e){
-							e = compatible(e);
-
-							if (e.isImmediatePropagationStopped()) 
-								return false;
-
-							e.data = data;
-							var result = callback.apply(element, e._args == undefined ? [e] : [e].concat(e._args));
-
-							if (result === false) 
-								e.preventDefault(), e.stopPropagation();
-
-							return result;
-						};
-
-						handler.i = set.length;
-						set.push(handler);
-
-						element.addEventListener(realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-					});
-				}
-
-				function zremoveEvent(element, events, fn, selector, capture){
-					var id = zid(element);
-					_.loop((events || '').split(/\s/),function(event){
-						_.loop(findHandlers(element, event, fn, selector),function(handler){
-							delete handlers[id][handler.i];
-
-							element.removeEventListener(
-								realEvent(handler.e), 
-								handler.proxy, 
-								eventCapture(handler, capture)
-							);
-						});
-					});
-				}
-
-				function returnTrue(){
-					return true;
-				}
-
-				function returnFalse(){
+			route = route.slice();
+			while (route.length > 0) {
+				if (!node.childNodes) {
 					return false;
 				}
+				nodeIndex = route.splice(0, 1)[0];
+				parentNode = node;
+				node = node.childNodes[nodeIndex];
+			}
+			return {
+				node: node,
+				parentNode: parentNode,
+				nodeIndex: nodeIndex
+			};
+		},
+		applyVirtualDiff: function(tree, diff) {
+			var routeInfo = this.getFromVirtualRoute(tree, diff.route),
+				node = routeInfo.node,
+				parentNode = routeInfo.parentNode,
+				nodeIndex = routeInfo.nodeIndex,
+				newNode, route, c;
 
-				function compatible(event, source) {
-					if (source || !event.isDefaultPrevented) {
+			// pre-diff hook
+			var info = {
+				diff: diff,
+				node: node
+			};
 
-						source || (source = event)
+			if (this.preVirtualDiffApply(info))
+				return true;
 
-						_.loop(eventMethods, function(predicate, name) {
-							var sourceMethod = source[name];
-
-							event[name] = function(){
-								this[predicate] = returnTrue;
-								return sourceMethod && sourceMethod.apply(source, arguments);
-							};
-
-							event[predicate] = returnFalse;
-						});
-
-						try {
-							event.timeStamp || (event.timeStamp = Date.now());
-						} catch (ignored) { }
-
-						if (source.defaultPrevented !== undefined ? source.defaultPrevented :
-							'returnValue' in source ? source.returnValue === false :
-							source.getPreventDefault && source.getPreventDefault())
-							event.isDefaultPrevented = returnTrue;
+			switch (diff.action) {
+				case 'addAttribute':
+					if (!node.attributes) {
+						node.attributes = {};
 					}
-					return event;
-				}
 
-				function createProxy(event) {
-					var key, proxy = { originalEvent: event };
-					for (key in event)
-						if (!ignoreProperties.test(key) && event[key] !== undefined) proxy[key] = event[key];
+					node.attributes[diff.name] = diff.value;
 
-					return compatible(proxy, event);
-				}
+					if (diff.name === 'checked') {
+						node.checked = true;
+					} else if (diff.name === 'selected') {
+						node.selected = true;
+					} else if (node.nodeName === 'INPUT' && diff.name === 'value') {
+						node.value = diff.value;
+					}
 
-				z.event = { add: zaddEvent, remove: zremoveEvent };
+					break;
+				case 'modifyAttribute':
+					node.attributes[diff.name] = diff.newValue;
+					if (node.nodeName === 'INPUT' && diff.name === 'value') {
+						node.value = diff.value;
+					}
+					break;
+				case 'removeAttribute':
+					delete node.attributes[diff.name];
 
-				z.proxy = function(fn, context) {
-					var args = (2 in arguments) && slice.call(arguments, 2);
+					if (_.keys(node.attributes).length === 0)
+						delete node.attributes;
 
-					if (_.isFunction(fn)) {
-						var proxyFn = function(){ 
-							return fn.apply(
-								context, args ? 
-								args.concat(slice.call(arguments)) : arguments
-							);
-						};
+					if (diff.name === 'checked')
+						node.checked = false;
+					else if (diff.name === 'selected')
+						delete node.selected;
+					else if (node.nodeName === 'INPUT' && diff.name === 'value')
+						delete node.value;
 
-						proxyFn._zid = zid(fn);
-						return proxyFn;
+					break;
+				case 'modifyTextElement':
+					node.data = diff.newValue;
 
-					} else if (_.isString(context)) {
-						if (args) {
-							args.unshift(fn[context], fn);
-							return z.proxy.apply(null, args);
-						} else {
-							return z.proxy(fn[context], fn);
-						}
+					if (parentNode.nodeName === 'TEXTAREA')
+						parentNode.value = diff.newValue;
+
+					break;
+				case 'modifyValue':
+					node.value = diff.newValue;
+					break;
+				case 'modifyComment':
+					node.data = diff.newValue;
+					break;
+				case 'modifyChecked':
+					node.checked = diff.newValue;
+					break;
+				case 'modifySelected':
+					node.selected = diff.newValue;
+					break;
+				case 'replaceElement':
+					newNode = _.clonedoom(diff.newValue);
+					newNode.outerDone = true;
+					newNode.innerDone = true;
+					newNode.valueDone = true;
+					parentNode.childNodes[nodeIndex] = newNode;
+					break;
+				case 'relocateGroup':
+					_.loop(node.childNodes.splice(diff.from, diff.groupLength).reverse(),function(movedNode) {
+						node.childNodes.splice(diff.to, 0, movedNode);
+					});
+					break;
+				case 'removeElement':
+					parentNode.childNodes.splice(nodeIndex, 1);
+					break;
+				case 'addElement':
+					route = diff.route.slice();
+					c = route.splice(route.length - 1, 1)[0];
+					node = this.getFromVirtualRoute(tree, route).node;
+					newNode = _.clonedoom(diff.element);
+					newNode.outerDone = true;
+					newNode.innerDone = true;
+					newNode.valueDone = true;
+
+					if (!node.childNodes) {
+						node.childNodes = [];
+					}
+
+					if (c >= node.childNodes.length) {
+						node.childNodes.push(newNode);
 					} else {
-						throw new TypeError("expected function");
+						node.childNodes.splice(c, 0, newNode);
 					}
-				};
-
-				// z Custom Events
-				z.Event = function(type, props) {
-					if (!_.isString(type)) 
-						props = type, type = props.type;
-
-					var event = document.createEvent(
-						_.has(capTypes['MouseEvent'],type) ? 'MouseEvent' : 'Events'), bubbles = true;
-
-					if (props) 
-						for (var name in props) 
-							(name == 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name])
-
-					event.initEvent(type, bubbles, true);
-					return compatible(event);
-				};
-
-				z.fn.extend({
-
-					bind : function(event, data, callback){
-						return this.on(event, data, callback);
-					},
-
-					unbind : function(event, callback){
-						return this.off(event, callback);
-					},
-
-					reg : function(){
-						return this.bind.apply(this,arguments);
-					},
-
-					purge : function(){
-						return this.off.apply(this,arguments);
-					},
-
-					once : function(event, selector, data, callback){
-						return this.on(event, selector, data, callback, 1);
-					},
-
-					one : function(){
-						return this.once.apply(this,arguments);
-					},
-
-					on : function(event, selector, data, callback, one){
-						var autoRemove, delegator, $this = this;
-
-						if (event && !_.isString(event)) {
-							_.loop(event, function(fn, type){
-								$this.on(type, selector, data, fn, one);
-							});
-
-							return $this;
-						}
-
-						if (!_.isString(selector) && 
-							!_.isFunction(callback) && 
-							callback !== false)
-							callback = data, data = selector, selector = undefined;
-						if (callback === undefined || data === false)
-							callback = data, data = undefined;
-
-						if (callback === false) 
-							callback = returnFalse;
-
-						return $this.each(function(element){
-							if (one) 
-								autoRemove = function(e){
-									zremoveEvent(element, e.type, callback);
-
-									return callback.apply(this, arguments);
-								};
-
-							if (selector) 
-								delegator = function(e){
-									var evt, 
-										match;
-
-									if(_.has(z(e.target).parents().get(),element) &&
-										z.matchz(e.target,selector))
-										match = e.target;
-
-									if (match && match !== element){
-										evt = _.extend(createProxy(e), {currentTarget: match, liveFired: element});
-										return (autoRemove || callback).apply(match, [evt].concat(_.slice(arguments,1)));
-									}
-								};
-
-							zaddEvent(element, event, callback, data, selector, delegator || autoRemove);
-						});
-					},
-
-					off : function(event, selector, callback){
-						var $this = this;
-						if (event && !isString(event)) {
-							_.loop(event, function(fn, type){
-								$this.off(type, selector, fn);
-							});
-							return $this;
-						}
-
-						if (!_.isString(selector) && 
-							!_.isFunction(callback) && 
-							callback !== false)
-							callback = selector, selector = undefined;
-
-						if (callback === false) 
-							callback = returnFalse;
-
-						return $this.each(function(element){
-							zremoveEvent(element, event, callback, selector);
-						});
-					},
-
-					delegate : function(selector, event, callback){
-						return this.on(event, selector, callback);
-					},
-
-					undelegate : function(selector, event, callback){
-						return this.off(event, selector, callback);
-					},
-
-					trigger : function(event, args){
-						event = _.isString(event) ? z.Event(event) : compatible(event);
-						event._args = args;
-
-						return this.each(function(element){
-							// handle focus(), blur() by calling them directly
-							if (event.type in focus && typeof element[event.type] == "function") 
-								element[event.type]();
-							// items in the collection might not be DOM elements
-							else if ('dispatchEvent' in element) 
-								element.dispatchEvent(event);
-							else 
-								z(element).triggerHandler(event, args);
-						});
-					},
-
-					triggerHandler : function(event, args){
-						var e, result;
-						this.each(function(element){
-							e = createProxy(_.isString(event) ? z.Event(event) : event);
-
-							e._args = args;
-							e.target = element;
-							_.loop(findHandlers(element, event.type || event), function(handler){
-								result = handler.proxy(e);
-								if (e.isImmediatePropagationStopped()) return false;
-							});
-						});
-
-						return result;
-					},
-
-					dispatch : function(){
-						return this.trigger.apply(this,arguments);
+					break;
+				case 'removeTextElement':
+					parentNode.childNodes.splice(nodeIndex, 1);
+					if (parentNode.nodeName === 'TEXTAREA') {
+						delete parentNode.value;
+					}
+					break;
+				case 'addTextElement':
+					route = diff.route.slice();
+					c = route.splice(route.length - 1, 1)[0];
+					newNode = {};
+					newNode.nodeName = '#text';
+					newNode.data = diff.value;
+					node = this.getFromVirtualRoute(tree, route).node;
+					if (!node.childNodes) {
+						node.childNodes = [];
 					}
 
+					if (c >= node.childNodes.length) {
+						node.childNodes.push(newNode);
+					} else {
+						node.childNodes.splice(c, 0, newNode);
+					}
+					if (node.nodeName === 'TEXTAREA') {
+						node.value = diff.newValue;
+					}
+					break;
+				default:
+					console.log('unknown action');
+			}
+			// capture newNode for the callback
+			info.newNode = newNode;
+			this.postVirtualDiffApply(info);
+			return;
+		},
+
+		// ===== Apply a diff =====
+
+		apply: function(tree, diffs) {
+			var dobj = this;
+
+			if (diffs.length === 0) {
+				return true;
+			}
+			_.loop(diffs,function(diff) {
+				if (!dobj.applyDiff(tree, diff)) {
+					return false;
+				}
+			});
+			return true;
+		},
+		getFromRoute: function(tree, route) {
+			route = route.slice();
+			var c, node = tree;
+			while (route.length > 0) {
+				if (!node.childNodes) {
+					return false;
+				}
+				c = route.splice(0, 1)[0];
+				node = node.childNodes[c];
+			}
+			return node;
+		},
+		applyDiff: function(tree, diff) {
+			var node = this.getFromRoute(tree, diff.route),
+				newNode, reference, route, c;
+
+			// pre-diff hook
+			var info = {
+				diff: diff,
+				node: node
+			};
+
+			if (this.preDiffApply(info)) {
+				return true;
+			}
+
+			switch (diff.action) {
+				case 'addAttribute':
+					if (!node || !node.setAttribute) {
+						return false;
+					}
+					node.setAttribute(diff.name, diff.value);
+					break;
+				case 'modifyAttribute':
+					if (!node || !node.setAttribute) {
+						return false;
+					}
+					node.setAttribute(diff.name, diff.newValue);
+					break;
+				case 'removeAttribute':
+					if (!node || !node.removeAttribute) {
+						return false;
+					}
+					node.removeAttribute(diff.name);
+					break;
+				case 'modifyTextElement':
+					if (!node || node.nodeType !== 3) {
+						return false;
+					}
+					this.textDiff(node, node.data, diff.oldValue, diff.newValue);
+					break;
+				case 'modifyValue':
+					if (!node || typeof node.value === 'undefined') {
+						return false;
+					}
+					node.value = diff.newValue;
+					break;
+				case 'modifyComment':
+					if (!node || typeof node.data === 'undefined') {
+						return false;
+					}
+					this.textDiff(node, node.data, diff.oldValue, diff.newValue);
+					break;
+				case 'modifyChecked':
+					if (!node || typeof node.checked === 'undefined') {
+						return false;
+					}
+					node.checked = diff.newValue;
+					break;
+				case 'modifySelected':
+					if (!node || typeof node.selected === 'undefined') {
+						return false;
+					}
+					node.selected = diff.newValue;
+					break;
+				case 'replaceElement':
+					node.parentNode.replaceChild(this.objToNode(diff.newValue, node.namespaceURI === 'http://www.w3.org/2000/svg'), node);
+					break;
+				case 'relocateGroup':
+					_.loop(Array.apply(null, new Array(diff.groupLength)).map(function() {
+						return node.removeChild(node.childNodes[diff.from]);
+					}),function(childNode, index) {
+						if (index === 0) {
+							reference = node.childNodes[diff.to];
+						}
+						node.insertBefore(childNode, reference);
+					});
+					break;
+				case 'removeElement':
+					node.parentNode.removeChild(node);
+					break;
+				case 'addElement':
+					route = diff.route.slice();
+					c = route.splice(route.length - 1, 1)[0];
+					node = this.getFromRoute(tree, route);
+					node.insertBefore(this.objToNode(diff.element, node.namespaceURI === 'http://www.w3.org/2000/svg'), node.childNodes[c]);
+					break;
+				case 'removeTextElement':
+					if (!node || node.nodeType !== 3) {
+						return false;
+					}
+					node.parentNode.removeChild(node);
+					break;
+				case 'addTextElement':
+					route = diff.route.slice();
+					c = route.splice(route.length - 1, 1)[0];
+					newNode = document.createTextNode(diff.value);
+					node = this.getFromRoute(tree, route);
+					if (!node || !node.childNodes) {
+						return false;
+					}
+					node.insertBefore(newNode, node.childNodes[c]);
+					break;
+				default:
+					console.log('unknown action');
+			}
+
+			// if a new node was created, we might be interested in it
+			// post diff hook
+			info.newNode = newNode;
+			this.postDiffApply(info);
+
+			return true;
+		},
+
+		undo: function(tree, diffs) {
+			diffs = _.slice(diffs);
+			var dobj = this;
+			if (!diffs.length) {
+				diffs = [diffs];
+			}
+			diffs.reverse();
+			_.loop(diffs,function(diff) {
+				dobj.undoDiff(tree, diff);
+			});
+		},
+
+		undoDiff: function(tree, diff) {
+			switch (diff.action) {
+				case 'addAttribute':
+					diff.action = 'removeAttribute';
+					this.applyDiff(tree, diff);
+					break;
+				case 'modifyAttribute':
+					swap(diff, 'oldValue', 'newValue');
+					this.applyDiff(tree, diff);
+					break;
+				case 'removeAttribute':
+					diff.action = 'addAttribute';
+					this.applyDiff(tree, diff);
+					break;
+				case 'modifyTextElement':
+					swap(diff, 'oldValue', 'newValue');
+					this.applyDiff(tree, diff);
+					break;
+				case 'modifyValue':
+					swap(diff, 'oldValue', 'newValue');
+					this.applyDiff(tree, diff);
+					break;
+				case 'modifyComment':
+					swap(diff, 'oldValue', 'newValue');
+					this.applyDiff(tree, diff);
+					break;
+				case 'modifyChecked':
+					swap(diff, 'oldValue', 'newValue');
+					this.applyDiff(tree, diff);
+					break;
+				case 'modifySelected':
+					swap(diff, 'oldValue', 'newValue');
+					this.applyDiff(tree, diff);
+					break;
+				case 'replaceElement':
+					swap(diff, 'oldValue', 'newValue');
+					this.applyDiff(tree, diff);
+					break;
+				case 'relocateGroup':
+					swap(diff, 'from', 'to');
+					this.applyDiff(tree, diff);
+					break;
+				case 'removeElement':
+					diff.action = 'addElement';
+					this.applyDiff(tree, diff);
+					break;
+				case 'addElement':
+					diff.action = 'removeElement';
+					this.applyDiff(tree, diff);
+					break;
+				case 'removeTextElement':
+					diff.action = 'addTextElement';
+					this.applyDiff(tree, diff);
+					break;
+				case 'addTextElement':
+					diff.action = 'removeTextElement';
+					this.applyDiff(tree, diff);
+					break;
+				default:
+					console.log('unknown action');
+			}
+
+		}
+	};
+
+	var _DIFF = new diffDOM({
+		debug: true,
+		diffcap: 99999
+	});
+	// end off domdiff
+
+	// Doom Events
+	// Dom fired api
+	var capEvents = [
+		"blur"       , "invalid"     ,
+		"focusin"    , "focusout"    , "focus",
+		"abort"      , "afterprint"  , "beforeprint" ,
+		"checking"   , "downloading" ,
+		"load"       , "unload"      ,
+		"loadend"    , "loadstart"   ,
+		"mouseenter" , "mouseleave"  ,
+		"resize"     , "show"        , "select"
+	];
+
+	var capTypes = {
+		"UIEvent"       : [
+			"focus",
+			"blur",
+			"focusin",
+			"focusout"
+		],
+		"MouseEvent"    : [
+			"click",
+			"dbclick",
+			"mouseup",
+			"mousedown",
+			"mouseout",
+			"mouseover",
+			"mouseenter",
+			"mouseleave"
+		],
+		"KeyboardEvent" : [
+			"keydown",
+			"keypress",
+			"keyup"
+		]
+	};
+	
+	// Create z extend Event preview
+	var _zid = 1, undefined,
+		handlers = {},
+		focusinSupported = 'onfocusin' in window,
+		focus = { focus: 'focusin', blur: 'focusout' },
+		hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' };
+	
+	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
+		eventMethods = {
+			preventDefault: 'isDefaultPrevented',
+			stopImmediatePropagation: 'isImmediatePropagationStopped',
+			stopPropagation: 'isPropagationStopped'
+		};
+	
+	
+	function zid(element) {
+		return element._zid || (element._zid = _zid++);
+	}
+
+	function findHandlers(element, event, fn, selector) {
+		event = parse(event);
+	
+		if (event.ns) 
+			var matcher = matcherFor(event.ns);
+	
+		return (handlers[zid(element)] || []).filter(function(handler) {
+			return handler
+				&& (!event.e  || handler.e == event.e)
+				&& (!event.ns || matcher.test(handler.ns))
+				&& (!fn       || zid(handler.fn) === zid(fn))
+				&& (!selector || handler.sel == selector);
+		});
+	}
+
+	function parse(event) {
+		var parts = ('' + event).split('.');
+		return {e: parts[0], ns: parts.slice(1).sort().join(' ')};
+	}
+
+	function matcherFor(ns) {
+		return new RegExp('(?:^| )' + ns.replace(' ', ' .* ?') + '(?: |$)');
+	}
+
+	function eventCapture(handler, captureSetting) {
+		return handler.del &&
+			(!focusinSupported && (handler.e in focus)) ||
+			!!captureSetting;
+	}
+
+	function realEvent(type) {
+		return hover[type] || (focusinSupported && focus[type]) || type;
+	}
+
+	function zaddEvent(element, events, fn, data, selector, delegator, capture){
+		var id = zid(element), set = (handlers[id] || (handlers[id] = []));
+	
+		_.loop(events.split(/\s/),function(event){
+			if (event == 'ready') 
+				return z(fn);
+	
+			var handler   = parse(event);
+			handler.fn    = fn;
+			handler.sel   = selector;
+			// emulate mouseenter, mouseleave
+			if (handler.e in hover) 
+				fn = function(e){
+					var related = e.relatedTarget;
+					if (!related || (related !== this && ! this.contains(related)))
+						return handler.fn.apply(this, arguments);
+				};
+	
+			handler.del   = delegator;
+			var callback  = delegator || fn;
+			handler.proxy = function(e){
+				e = compatible(e);
+	
+				if (e.isImmediatePropagationStopped()) 
+					return false;
+	
+				e.data = data;
+				var result = callback.apply(element, e._args == undefined ? [e] : [e].concat(e._args));
+	
+				if (result === false) 
+					e.preventDefault(), e.stopPropagation();
+	
+				return result;
+			};
+	
+			handler.i = set.length;
+			set.push(handler);
+	
+			element.addEventListener(realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+		});
+	}
+
+
+	function zremoveEvent(element, events, fn, selector, capture){
+		var id = zid(element);
+		_.loop((events || '').split(/\s/),function(event){
+			_.loop(findHandlers(element, event, fn, selector),function(handler){
+				delete handlers[id][handler.i];
+	
+				element.removeEventListener(
+					realEvent(handler.e), 
+					handler.proxy, 
+					eventCapture(handler, capture)
+				);
+			});
+		});
+	}
+
+	function returnTrue(){
+		return true;
+	}
+
+	
+	function returnFalse(){
+		return false;
+	}
+
+	
+	function compatible(event, source) {
+		if (source || !event.isDefaultPrevented) {
+	
+			source || (source = event)
+	
+			_.loop(eventMethods, function(predicate, name) {
+				var sourceMethod = source[name];
+	
+				event[name] = function(){
+					this[predicate] = returnTrue;
+					return sourceMethod && sourceMethod.apply(source, arguments);
+				};
+	
+				event[predicate] = returnFalse;
+			});
+	
+			try {
+				event.timeStamp || (event.timeStamp = Date.now());
+			} catch (ignored) { }
+	
+			if (source.defaultPrevented !== undefined ? source.defaultPrevented :
+				'returnValue' in source ? source.returnValue === false :
+				source.getPreventDefault && source.getPreventDefault())
+				event.isDefaultPrevented = returnTrue;
+		}
+		return event;
+	}
+
+	function createProxy(event) {
+		var key, proxy = { originalEvent: event };
+		for (key in event)
+			if (!ignoreProperties.test(key) && event[key] !== undefined) proxy[key] = event[key];
+	
+		return compatible(proxy, event);
+	}
+
+	z.event = { add: zaddEvent, remove: zremoveEvent };
+	
+	z.proxy = function(fn, context) {
+		var args = (2 in arguments) && slice.call(arguments, 2);
+	
+		if (_.isFunction(fn)) {
+			var proxyFn = function(){ 
+				return fn.apply(
+					context, args ? 
+					args.concat(slice.call(arguments)) : arguments
+				);
+			};
+	
+			proxyFn._zid = zid(fn);
+			return proxyFn;
+	
+		} else if (_.isString(context)) {
+			if (args) {
+				args.unshift(fn[context], fn);
+				return z.proxy.apply(null, args);
+			} else {
+				return z.proxy(fn[context], fn);
+			}
+		} else {
+			throw new TypeError("expected function");
+		}
+	};
+
+	// z Custom Events
+	z.Event = function(type, props) {
+		if (!_.isString(type)) 
+			props = type, type = props.type;
+	
+		var event = document.createEvent(
+			_.has(capTypes['MouseEvent'],type) ? 'MouseEvent' : 'Events'), bubbles = true;
+	
+		if (props) 
+			for (var name in props) 
+				(name == 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name]);
+	
+		event.initEvent(type, bubbles, true);
+		return compatible(event);
+	};
+
+	z.fn.extend({
+	
+		bind : function(event, data, callback){
+			return this.on(event, data, callback);
+		},
+	
+		unbind : function(event, callback){
+			return this.off(event, callback);
+		},
+	
+		reg : function(){
+			return this.bind.apply(this,arguments);
+		},
+	
+		purge : function(){
+			return this.off.apply(this,arguments);
+		},
+	
+		once : function(event, selector, data, callback){
+			return this.on(event, selector, data, callback, 1);
+		},
+	
+		one : function(){
+			return this.once.apply(this,arguments);
+		},
+	
+		on : function(event, selector, data, callback, one){
+			var autoRemove, delegator, $this = this;
+	
+			if (event && !_.isString(event)) {
+				_.loop(event, function(fn, type){
+					$this.on(type, selector, data, fn, one);
 				});
+	
+				return $this;
+			}
+	
+			if (!_.isString(selector) && 
+				!_.isFunction(callback) && 
+				callback !== false)
+				callback = data, data = selector, selector = undefined;
+			if (callback === undefined || data === false)
+				callback = data, data = undefined;
+	
+			if (callback === false) 
+				callback = returnFalse;
+	
+			return $this.each(function(element){
+				if (one) 
+					autoRemove = function(e){
+						zremoveEvent(element, e.type, callback);
+	
+						return callback.apply(this, arguments);
+					};
+	
+				if (selector) 
+					delegator = function(e){
+						var evt, 
+							match;
+	
+						if(_.has(z(e.target).parents().get(),element) &&
+							z.matchz(e.target,selector))
+							match = e.target;
+	
+						if (match && match !== element){
+							evt = _.extend(createProxy(e), {currentTarget: match, liveFired: element});
+							return (autoRemove || callback).apply(match, [evt].concat(_.slice(arguments,1)));
+						}
+					};
+	
+				zaddEvent(element, event, callback, data, selector, delegator || autoRemove);
+			});
+		},
+	
+		off : function(event, selector, callback){
+			var $this = this;
+			if (event && !isString(event)) {
+				_.loop(event, function(fn, type){
+					$this.off(type, selector, fn);
+				});
+				return $this;
+			}
+	
+			if (!_.isString(selector) && 
+				!_.isFunction(callback) && 
+				callback !== false)
+				callback = selector, selector = undefined;
+	
+			if (callback === false) 
+				callback = returnFalse;
+	
+			return $this.each(function(element){
+				zremoveEvent(element, event, callback, selector);
+			});
+		},
+	
+		delegate : function(selector, event, callback){
+			return this.on(event, selector, callback);
+		},
+	
+		undelegate : function(selector, event, callback){
+			return this.off(event, selector, callback);
+		},
+	
+		trigger : function(event, args){
+			event = _.isString(event) ? z.Event(event) : compatible(event);
+			event._args = args;
+	
+			return this.each(function(element){
+				// handle focus(), blur() by calling them directly
+				if (event.type in focus && typeof element[event.type] == "function") 
+					element[event.type]();
+				// items in the collection might not be DOM elements
+				else if ('dispatchEvent' in element) 
+					element.dispatchEvent(event);
+				else 
+					z(element).triggerHandler(event, args);
+			});
+		},
+	
+		triggerHandler : function(event, args){
+			var e, result;
+			this.each(function(element){
+				e = createProxy(_.isString(event) ? z.Event(event) : event);
+	
+				e._args = args;
+				e.target = element;
+				_.loop(findHandlers(element, event.type || event), function(handler){
+					result = handler.proxy(e);
+					if (e.isImmediatePropagationStopped()) return false;
+				});
+			});
+	
+			return result;
+		},
+	
+		dispatch : function(){
+			return this.trigger.apply(this,arguments);
+		}
+
+	});
 
 				// shortcut methods for `.bind(event, fn)` for each event type
-				_.loop(('focusin focusout focus blur load resize scroll unload click dblclick '+
-					'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave '+
-					'change select keydown keypress keyup error').split(' '),function(event) {
-						z.fn[event] = function(callback) {
-							return (0 in arguments) ?
-								this.bind(event, callback) :
-								this.trigger(event);
-						};
-					});
+	_.loop(('focusin focusout focus blur load resize scroll unload click dblclick '+
+	'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave '+
+	'change select keydown keypress keyup error').split(' '),function(event) {
+		z.fn[event] = function(callback) {
+			return (0 in arguments) ?
+				this.bind(event, callback) :
+				this.trigger(event);
+		};
+	});
 
 	z.fn.extend({
 		// form serializeArray
