@@ -178,7 +178,7 @@
 	}
 
 	// Element match selector string
-	var matchz = Element.prototype.matches ||
+	var matchzx = Element.prototype.matches ||
 							 Element.prototype.webkitMatchesSelector ||
 							 Element.prototype.mozMatchesSelector ||
 							 Element.prototype.msMatchesSelector ||
@@ -223,9 +223,10 @@
 	};
 
 	z.matchz = function(elm,selector){
-		if(elm==null) return elm;
+		if(elm==null||elm===document||!_.isString(selector)) 
+			return false;
 
-		return !_.isString(selector) || matchz.call(elm,selector);
+		return matchzx.call(elm, selector);
 	};
 
 	// DOOM selector wrap
@@ -366,14 +367,33 @@
 
 				while(tmp){
 					tmp = tmp.parentNode;
-					if(z.matchz(tmp,selector))
-						parents.push(tmp);
+					if(z.matchz(tmp,selector)) parents.push(tmp);
 				}
 
 				res = res.concat(parents);
 			});
 
 			return z(res);
+		},
+
+		closest : function(selector,element){
+			var res = [];
+			var el = this.$el;
+			var find;
+			var tmp;
+
+			for(var i=0,l=el.length;i<l;i++){
+				tmp = el[i];
+
+				while(tmp&&!find&&tmp!==element){
+					tmp = tmp.parentNode;
+					if(z.matchz(tmp,selector)) find=tmp;
+				}
+
+				if(find) break;
+			}
+
+			return z(find ? [find] : find);
 		}
 	});
 
@@ -633,9 +653,12 @@
 		},
 
 		remove : function(){
-			this.off().each(function(elm){
+			this.off();
+				
+			this.each(function(elm){
 				elm.parentNode.removeChild(elm);
 			});
+
 			this.$el = [];
 			this.length = 0;
 			return this;
@@ -1050,6 +1073,7 @@
 	 * gaps1 = [1, true, 0, 0], gaps2 = [true, 0, 0, 1]
 	 *
 	 */
+
 	var getGapInformation = function(t1, t2, stable) {
 
 		var gaps1 = t1.childNodes ? makeArray(t1.childNodes.length, true) : [],
@@ -2340,12 +2364,10 @@
 				if (selector) 
 					delegator = function(e){
 						var evt, 
-							match;
-	
-						if(_.has(z(e.target).parents().get(),element) &&
-							z.matchz(e.target,selector))
-							match = e.target;
-	
+							match = !z.matchz(e.target,selector) ? 
+											z(e.target).closest(selector, element).get(0) :
+											e.target;
+
 						if (match && match !== element){
 							evt = _.extend(createProxy(e), {currentTarget: match, liveFired: element});
 							return (autoRemove || callback).apply(match, [evt].concat(_.slice(arguments,1)));
@@ -2362,7 +2384,7 @@
 				_.loop(event, function(fn, type){
 					$this.off(type, selector, fn);
 				});
-				return $this;
+				return this;
 			}
 	
 			if (!_.isString(selector) && 
@@ -2373,7 +2395,7 @@
 			if (callback === false) 
 				callback = returnFalse;
 	
-			return $this.each(function(element){
+			return this.each(function(element){
 				zremoveEvent(element, event, callback, selector);
 			});
 		},
