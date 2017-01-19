@@ -233,7 +233,8 @@
 	z.fn.extend({
 
 		each : function(fn,context){
-			return _.loop(this.$el,fn,context||this);
+			_.loop(this.$el,fn,context||this);
+			return this;
 		},
 
 		get : function(index){
@@ -549,6 +550,8 @@
 							if((o.getAttribute("value") || o.innerText) === val+"")
 								o.setAttribute("selected","");
 						});
+					else if(elm.type === "checkbox")
+						elm.checked = Boolean(val);
 					else
 						elm.setAttribute("value",val);
 				});
@@ -556,6 +559,8 @@
 					var elm = this.get(0);
 					if(elm.tagName.toUpperCase() === "SELECT")
 						return elm.options[elm.selectedIndex].value || elm.innerText;
+					else if(elm.type === "checkbox")
+						return elm.checked;
 					else 
 						return elm.value||"";
 			}
@@ -2307,7 +2312,7 @@
 	};
 
 	z.fn.extend({
-	
+
 		bind : function(event, data, callback){
 			return this.on(event, data, callback);
 		},
@@ -2380,10 +2385,11 @@
 	
 		off : function(event, selector, callback){
 			var $this = this;
-			if (event && !isString(event)) {
+
+			if (event && !_.isString(event)) {
 				_.loop(event, function(fn, type){
-					$this.off(type, selector, fn);
-				});
+					this.off(type, selector, fn);
+				},this);
 				return this;
 			}
 	
@@ -2470,8 +2476,11 @@
 			).each(function(item){
 				var name = z(item).attr("name");
 				var value = z(item).value();
+				var ischeck = (item.type === "checkbox");
 
-				if(name)
+				if(ischeck&&value)
+					res.push({ name:name,value:value });
+				else if(name&&!ischeck)
 					res.push({ name:name,value:(value||"") });
 			});
 		
