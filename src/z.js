@@ -44,10 +44,7 @@
 		}
 	}
 
-	// DOOM selector cache
-	var dcache = [];
-	// z interpolate
-	var z = function(x,context){
+	function zInit(x,context){
 		if(_.isFunction(x)){
 			if(rfire)
 				return _.async(function(){ x(context); });
@@ -76,6 +73,14 @@
 		}
 
 		return new DOOM(x);
+	}
+
+	// DOOM selector cache
+	var dcache = [];
+
+	// z interpolate
+	var z = function(x,context){
+		return zInit.call(context||_.root,x,context);
 	};
 
 	// DOOM config
