@@ -2448,8 +2448,11 @@
 	
 		dispatch : function(){
 			return this.trigger.apply(this,arguments);
-		}
+		},
 
+		emit : function(){
+			return this.trigger.apply(this,arguments);
+		}
 	});
 
 				// shortcut methods for `.bind(event, fn)` for each event type

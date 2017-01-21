@@ -295,6 +295,10 @@
 			return this.dispatch.apply(this,arguments);
 		},
 
+		emit : function(){
+			return this.dispatch.apply(this,arguments);
+		},
+
 		listen : function(prop,handler){
 			if(_.isObject(this.data))
 				_.watch(this.data,prop,handler);
@@ -567,9 +571,13 @@
 			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
 		},
 	
-		trigger : function(type,fn,args){
-			return this.dispatch(type,fn,args);
-		}
+		trigger : function(){
+			return this.dispatch.apply(this,arguments);
+		},
+
+		emit:function(){
+			return this.dispatch.apply(this,arguments);
+		},
 
 	};
 
@@ -972,7 +980,11 @@
 
 		trigger : function(){
 			return this.dispatch.apply(this,arguments);
-		}
+		},
+
+		emit:function(){
+			return this.dispatch.apply(this,arguments);
+		},
 	};
 
 	//get Hash param form URL
@@ -1089,6 +1101,10 @@
 		},
 
 		trigger:function(){
+			return this.dispatch.apply(this,arguments);
+		},
+
+		emit:function(){
 			return this.dispatch.apply(this,arguments);
 		},
 
@@ -1294,6 +1310,10 @@
 		},
 
 		trigger:function(){
+			return this.dispatch.apply(this,arguments);
+		},
+
+		emit:function(){
 			return this.dispatch.apply(this,arguments);
 		},
 
