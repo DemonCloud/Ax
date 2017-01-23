@@ -37,9 +37,11 @@
 	function domready(){
 		if(!rfire){
 			rfire = true;
+
 			_.loop(rlist,function(v,i){
 				v.fn.call(_.root,v.ct);
 			});
+
 			rlist = [];
 		}
 	}
@@ -63,7 +65,7 @@
 
 			return x;
 
-		}else if( _.isString(x)){
+		}else if(_.isString(x)){
 			var cache = _.combom(dcache,function(sl){
 				return sl.$indicator === x;
 			});
@@ -663,15 +665,11 @@
 		},
 
 		remove : function(){
-			this.off();
-				
-			this.each(function(elm){
+			this.off().each(function(elm){
 				elm.parentNode.removeChild(elm);
 			});
 
-			this.$el = [];
-			this.length = 0;
-			return this;
+			return z();
 		},
 
 		empty : function(){
@@ -746,6 +744,7 @@
 
 
 	// DOMDIFF
+	// create virtual DOM
 	var diffcount;
 
 	var Diff = function(options) {
@@ -759,38 +758,6 @@
 		toString: function() {
 			return JSON.stringify(this);
 		}
-
-		// TODO: compress diff output by replacing these keys with numbers or alike:
-		/*        'addAttribute' = 0,
-							'modifyAttribute' = 1,
-							'removeAttribute' = 2,
-							'modifyTextElement' = 3,
-							'relocateGroup' = 4,
-							'removeElement' = 5,
-							'addElement' = 6,
-							'removeTextElement' = 7,
-							'addTextElement' = 8,
-							'replaceElement' = 9,
-							'modifyValue' = 10,
-							'modifyChecked' = 11,
-							'modifySelected' = 12,
-							'modifyComment' = 13,
-							'action' = 14,
-							'route' = 15,
-							'oldValue' = 16,
-							'newValue' = 17,
-							'element' = 18,
-							'group' = 19,
-							'from' = 20,
-							'to' = 21,
-							'name' = 22,
-							'value' = 23,
-							'data' = 24,
-							'attributes' = 25,
-							'nodeName' = 26,
-							'childNodes' = 27,
-							'checked' = 28,
-							'selected' = 29;*/
 	};
 
 	var SubsetMapping = function SubsetMapping(a, b) {
@@ -1221,6 +1188,7 @@
 			this.tracker = new DiffTracker();
 			return this.findDiffs(t1, t2);
 		},
+
 		findDiffs: function(t1, t2) {
 			var diffs;
 			do {
@@ -1249,6 +1217,7 @@
 			} while (diffs.length > 0);
 			return this.tracker.list;
 		},
+
 		findNextDiff: function(t1, t2, route) {
 			var diffs, fdiffs;
 
@@ -1294,6 +1263,7 @@
 			// no differences
 			return [];
 		},
+
 		findOuterDiff: function(t1, t2, route) {
 
 			var diffs = [],
@@ -1366,6 +1336,7 @@
 
 			return diffs;
 		},
+
 		nodeToObj: function(node) {
 			var objNode = {},
 				dobj = this;
@@ -1404,6 +1375,7 @@
 
 			return objNode;
 		},
+
 		objToNode: function(objNode, insideSvg) {
 			var node, dobj = this;
 			if (objNode.nodeName === '#text') {
@@ -1442,6 +1414,7 @@
 			}
 			return node;
 		},
+
 		findInnerDiff: function(t1, t2, route) {
 
 			var subtrees = (t1.childNodes && t2.childNodes) ? markSubTrees(t1, t2) : [],
@@ -1645,6 +1618,7 @@
 			}
 			return diffs;
 		},
+
 		findValueDiff: function(t1, t2, route) {
 			// Differences of value. Only useful if the value/selection/checked value
 			// differs from what is represented in the DOM. For example in the case
@@ -1692,6 +1666,7 @@
 			});
 			return true;
 		},
+
 		getFromVirtualRoute: function(tree, route) {
 			var node = tree,
 				parentNode, nodeIndex;
@@ -1711,6 +1686,7 @@
 				nodeIndex: nodeIndex
 			};
 		},
+
 		applyVirtualDiff: function(tree, diff) {
 			var routeInfo = this.getFromVirtualRoute(tree, diff.route),
 				node = routeInfo.node,
@@ -1867,6 +1843,7 @@
 			});
 			return true;
 		},
+
 		getFromRoute: function(tree, route) {
 			route = route.slice();
 			var c, node = tree;
@@ -1879,6 +1856,7 @@
 			}
 			return node;
 		},
+
 		applyDiff: function(tree, diff) {
 			var node = this.getFromRoute(tree, diff.route),
 				newNode, reference, route, c;
@@ -2065,14 +2043,13 @@
 				default:
 					console.log('unknown action');
 			}
-
 		}
 	};
 
 	var _DIFF = new diffDOM({
-		debug: true,
-		diffcap: 99999
+		diffcap: 999999
 	});
+
 	// end off domdiff
 
 	// Doom Events
@@ -2316,6 +2293,7 @@
 		return compatible(event);
 	};
 
+	// bind Event API
 	z.fn.extend({
 
 		bind : function(event, data, callback){
@@ -2460,7 +2438,7 @@
 		}
 	});
 
-				// shortcut methods for `.bind(event, fn)` for each event type
+	// shortcut methods for `.bind(event, fn)` for each event type
 	_.loop(('focusin focusout focus blur load resize scroll unload click dblclick '+
 	'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave '+
 	'change select keydown keypress keyup error').split(' '),function(event) {
@@ -2471,6 +2449,7 @@
 		};
 	});
 
+	// DOM EASY API zoom
 	z.fn.extend({
 		// form serializeArray
 		serializeArray:function(){
