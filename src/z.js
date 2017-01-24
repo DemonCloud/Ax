@@ -112,7 +112,7 @@
 	var isId      = /^#[^\s\=\+\.\#\[\]]+/i														// "#idname"
 		 ,isClass   = /^\.[^\s\=\+\.\#\[\]]+$/i													// ".className"
 		 ,isTag     = /^[^\[\]\+\-\.#\s\=]+$/i													// "p" "div" "DIV"
-		 ,isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i 		// div[id="nami"]
+		 ,isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i		// div[id="nami"]
 		 ,mreSl     = /^[^\s]+,[^\s]+/gi
 		 ,cidSl     = /[\s|\r]+/im
 		 ,pitSl     = /[>|\+|\~]+/im
@@ -186,13 +186,13 @@
 
 	// Element match selector string
 	var matchzx = Element.prototype.matches ||
-							 Element.prototype.webkitMatchesSelector ||
-							 Element.prototype.mozMatchesSelector ||
-							 Element.prototype.msMatchesSelector ||
-							 function(selector){
-								return (this.parentNode != null && this !== document) &&
+								Element.prototype.webkitMatchesSelector ||
+								Element.prototype.mozMatchesSelector ||
+								Element.prototype.msMatchesSelector ||
+								function(selector){
+									return (this.parentNode != null && this !== document) &&
 											 _.has(this.parentNode.querySelectorAll(selector),this);
-							 };
+								};
 
 	// DOOM constructor for z
 	var DOOM = function(str){
@@ -244,8 +244,8 @@
 			return this;
 		},
 
-		get : function(index){
-			return index!=null ? this.$el[( +index + ( index < 0 ? this.length : 0 ) )] : _.slice(this.$el);
+		get : function(){
+			return 0 in arguments ? this.$el[( +index + ( index < 0 ? this.length : 0 ) )] : _.slice(this.$el);
 		},
 
 		at : function(index){
@@ -475,7 +475,7 @@
 				var sarr = e.getAttribute("class");
 				if(sarr){
 					sarr = sarr.split(' ');
-					_.foreach(style.split(' '),function(v){ _.not(sarr,v); });
+					_.loop(style.split(' '),function(v){ _.not(sarr,v); });
 					e.setAttribute("class",sarr.join(' '));
 				}
 			});
@@ -486,7 +486,7 @@
 				var sarr = e.getAttribute("class");
 				if(sarr){
 					sarr = sarr.split(' ');
-					_.foreach(_.unique(style.split(' ')),function(s){ 
+					_.loop(_.unique(style.split(' ')),function(s){ 
 						_.has(sarr,s) ? _.not(sarr,s) : sarr.push(s);
 					});
 					e.setAttribute("class",sarr.join(' '));
@@ -821,9 +821,8 @@
 			inBoth = {};
 
 		_.loop(_.keys(l1Unique),function(key) {
-			if (l2Unique[key]) {
+			if (l2Unique[key])
 				inBoth[key] = true;
-			}
 		});
 
 		return inBoth;
@@ -1453,7 +1452,7 @@
 
 				if (childNodesLengthDifference) {
 					/* t1 and t2 have different amounts of childNodes. Add
-				 	 * and remove as necessary to obtain the same length */
+					 * and remove as necessary to obtain the same length */
 					if (e1 && !e2) {
 						if (e1.nodeName === '#text') {
 							diffs.push(new Diff({
@@ -2470,7 +2469,7 @@
 				else if(name&&!ischeck)
 					res.push({ name:name,value:(value||"") });
 			});
-		
+
 			return res;
 		},
 

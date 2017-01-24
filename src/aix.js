@@ -288,7 +288,9 @@
 		},
 
 		dispatch : function(type,fn,args){
-			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
+			if(_.isArray(fn))
+				args = fn, fn = null;
+			return _.dispatch(this,type,fn,args);
 		},
 
 		trigger : function(){
@@ -568,7 +570,9 @@
 		},
 
 		dispatch : function(type,fn,args){
-			return _.dispatch(this,type,_.isFunction(fn) ? fn : null , args);
+			if(_.isArray(fn))
+				args = fn, fn = null;
+			return _.dispatch(this,type,fn,args);
 		},
 	
 		trigger : function(){
@@ -964,18 +968,13 @@
 			$(this.el).off()[withRoot ? "remove" : "empty" ]();
 
 			//lock this.el prop
-			_.define(this,"el",{
-				value : null,
-				writable : false,
-				enumerable : false,
-				configurable : false
-			});
-
-			return _.removeEvent(this);
+			return Object.freeze(_.removeEvent(this));
 		},
 
 		dispatch : function(type,fn,args){
-			return _.dispatch(this,type, fn , args);
+			if(_.isArray(fn))
+				args = fn, fn = null;
+			return _.dispatch(this,type,fn,args);
 		},
 
 		trigger : function(){
@@ -1097,6 +1096,8 @@
 		},
 
 		dispatch:function(type,fn,args){
+			if(_.isArray(fn))
+				args = fn, fn = null;
 			return _.dispatch(this,type,fn,args);
 		},
 
@@ -1220,7 +1221,8 @@
 		var config = _.extend({
 			model : aix.model,
 			view : aix.view,
-			events : {} // define events for Component 
+			// define events for Component 
+			events : {} 
 		},def||{});
 		
 		// define propertise
@@ -1233,6 +1235,7 @@
 				enumerable : true,
 				configurable : false
 			},
+
 			view : {
 				value : _.isFunction(config.view) ? 
 								new config.view : 
@@ -1241,6 +1244,7 @@
 				enumerable : true,
 				configurable : false
 			},
+
 			// connect Component Object
 			_connect :{
 				value : [],
@@ -1280,6 +1284,7 @@
 					else
 						return _.addEvent(this[mtype],ename,fn.bind(this));
 				}
+
 				return;
 			}
 
@@ -1306,6 +1311,8 @@
 		},
 
 		dispatch:function(type,fn,args){
+			if(_.isArray(fn))
+				args = fn, fn = null;
 			return _.dispatch(this,type,fn,args);
 		},
 
@@ -1334,7 +1341,8 @@
 	
 	};
 
-	// extend method
+	// Extend method
+	// Create Aix Pack extends
 	aix.view.extend       = createExtend("view");
 	aix.model.extend      = createExtend("model");
 	aix.route.extend      = createExtend("route");
@@ -1342,6 +1350,5 @@
 	aix.collection.extend = createExtend("collection");
 
 	return aix;
-
 });
 
