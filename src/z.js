@@ -244,7 +244,7 @@
 			return this;
 		},
 
-		get : function(){
+		get : function(index){
 			return 0 in arguments ? this.$el[( +index + ( index < 0 ? this.length : 0 ) )] : _.slice(this.$el);
 		},
 
