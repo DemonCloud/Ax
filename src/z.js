@@ -2251,13 +2251,13 @@
 	};
 	
 	z.proxy = function(fn, context) {
-		var args = (2 in arguments) && slice.call(arguments, 2);
+		var args = (2 in arguments) && _.slice(arguments, 2);
 	
 		if (_.isFunction(fn)) {
 			var proxyFn = function(){ 
 				return fn.apply(
 					context, args ? 
-					args.concat(slice.call(arguments)) : arguments
+					args.concat(_.slice(arguments)) : arguments
 				);
 			};
 	

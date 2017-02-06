@@ -72,6 +72,38 @@
 		return typeof e === "function" || typeof e === "object" && !!e;
 	};
 
+	_.isPrimitive = function(e){
+		return e == null || e === true || e === false || 
+					typeof e === "string" || typeof val === "number";
+	};
+
+	var rident = /^[a-z$_][a-z$_0-9]*$/i;
+	_.isIdentifier = function(e){
+		return rident.test(e);
+	};
+
+	_.isError = function(obj){
+		return obj !== null &&
+			typeof obj === "object" &&
+			typeof obj.message === "string" &&
+			typeof obj.name === "string";
+	};
+
+	_.isNode = typeof process !== "undefined" && OP.toString.call(process).toLowerCase() === "[object process]";
+
+	// with bluebird.js
+	_.v8Object = function(obj){
+		function _$() {}
+		_$.prototype = obj;
+		var l = 8;
+		while (l--) new _$();
+		return obj;
+		// Prevent the function from being optimized through dead code elimination
+		// or further optimizations. This code is never reached but even using eval
+		// in unreachable code causes v8 to not optimize functions.
+		eval(obj);
+	};
+
 	var typeArray =[
 		'Array',
 		'Arguments',
@@ -89,7 +121,7 @@
 
 	typeArray.forEach(function(v,i){
 		_[ 'is' + v ] = function(e){
-			return OP.toString.call(e) === '[object ' + v + ']';
+			return _.toString.call(e) === '[object ' + v + ']';
 		};
 	});
 
@@ -132,8 +164,8 @@
 		broken : {},
 
 		version : VERSION,
-		
-			foreach : function(list,fn,ts){
+
+			loop : function(list,fn,ts){
 				if(list !=null ){
 					if(_.isArray(list))
 						return aloop(list,fn,ts||_);
@@ -142,9 +174,9 @@
 				}
 				return list;
 			},
-
-			loop : function(){
-				return this.foreach.apply(this,arguments);
+		
+			foreach : function(list,fn,ts){
+				return this.loop.apply(this,arguments);
 			},
 
 			keys : function(arr){
@@ -214,19 +246,19 @@
 				else if(_.isObject(list) && !_.isFunction(list)){
 					// clone object
 					// copy prototype
-					var ___ = function(){};
-					___.prototype = list.constructor.prototype;
-					var res = new ___();
+					var __ = function(){};
+					__.prototype = list.constructor.prototype;
+					var res = new __();
 
 					// dist clone data
-					_.foreach(list, function(val,key){
+					_.loop(list, function(val,key){
 						if(!_.isString(val) && 
 						 	!_.isNumber(val) && 
 						 	!_.isFunction(val))
-							res[key] = _.clonedoom(val);
+							this[key] = _.clonedoom(val);
 						else 
-							res[key] = val;
-					});
+							this[key] = val;
+					},res);
 						
 					return res;
 				}
@@ -256,7 +288,7 @@
 
 			filter : function(list,idf,reverse){
 				var res = [];
-				_.foreach(_.clonedoom(list),function(elm,i){ 
+				_.loop(_.clonedoom(list),function(elm,i){ 
 					if(idf.call(this,elm,i,this)&&!reverse) this.push(elm) ; 
 				},res);
 				return res;
@@ -264,7 +296,7 @@
 
 			reject : function(list,idf){
 				var res = [];
-				_.foreach(_.clonedoom(list),function(elm,i){ 
+				_.loop(_.clonedoom(list),function(elm,i){ 
 					if(!idf.call(this,elm,i,this)) this.push(elm) ; 
 				},res);
 				return res;
@@ -747,12 +779,7 @@
 				// try to build anmousyous function
 				try {
 					// var render = new Function(name||"_x","_",res);
-					var render = _eval("(function("+(name||"_x") + ",_" 
-														+ ( args.length ? ","+args.toString() : "" ) + "){" 
-														// arguments end
-														+ res 
-														+ "})"
-												 	);
+					var render = _eval("(function("+(name||"_x") + ",_" + ( args.length ? ","+args.toString() : "" ) + "){" + res + "})");
 				}catch(e){
 					e.res = res;
 					console.error(res);
@@ -763,9 +790,7 @@
       	// @ the you build once template that use diff Data, not use diff to build function again
 				// @ protect your template code other can observe it?
 				return function(data){
-					return render.apply(this , 
-						[data,_].concat(_slice.call(arguments,1))
-					);
+					return render.apply(this , [data,_].concat(_slice.call(arguments,1)));
 				};
 			}
 
@@ -773,7 +798,6 @@
 
 		// Object watcher
 		// Most important part in javascript
-		// Don't use it on IE8
 		_.extend({
 			
 			watch : function(obj,prop,handler){
@@ -939,7 +963,9 @@
 				}
 
 				// remove target
-				_.loop(_.slice(wrap.querySelectorAll("*")),function(node){
+				_.loop(
+				_.slice(wrap.querySelectorAll("*")),
+				function(node){
 					node.removeAttribute("x-aim");
 				});
 			}
@@ -947,20 +973,25 @@
 			return wrap;
 		}
 
+		// define key for DATAMIME
+		var MIME = {
+			"application/json" : 1
+		};
+
 		_.extend({
 			// parse data require
 			// parse by http [ Content-type ]
 			datamime : function(header,param){
 				if(_.isObject(header)){
-					if(header["Content-type"]){
-						switch(header["Content-type"]||header["Content-Type"]){
-							case "application/json":
-								return JSON.stringify(param||{});
-							default : 
-								break;
-						}
+					switch(MIME(header["Content-type"]||header["Content-Type"])){
+						// JSON type
+						case 1:
+							return JSON.stringify(param||{});
+						default : 
+							break;
 					}
 				}
+
 				return _.paramstringify(param||{});
 			},
 
@@ -1059,225 +1090,225 @@
 			},
 
 			// vitruldom
-		virtualDOM : function(root,html){
-			return converttree(root,_.domparse(html||""));
-		},
-
-		// cookies
-		cookieparse : function(ckstr){
-			var tmp ;
-			var res = {};
-			var pars = ckstr ? ckstr.split(";") : [];
-
-			_.loop(pars, function(item){
-				var index = (item||"").search("=");
-				if(index===-1)
-					return;
-
-				var rkey = _.trim(item.substr(0,index));
-				if(rkey.length)
-					res[rkey] = _.trim(item.substr(index+1));
-			});
-
-			return res;
-		},
-
-		cookie : function(param){
-			// args :( name , value, expires, path, domain, secure)
-			var args = _.slice(arguments);
-			var len = args.length;
-			var parsec = _.cookieparse(document.cookie);
-
-
-			if(len){
-				// get cookie
-				if(len === 1)
-					return parsec[param];
-				else{
-					var time = new Date();
-					time.setDate(time.getDate()+365);
-
-					return this.root.document.cookie = this.trim(
-										  args[0]+"="+(args[1]||"") + ';' 
-										+  "expires="+(args[2]||time.toGMTString()) + ';'
-										+  "path="   +(args[3]||"/") + ';'
-										+  "domain=" +(args[4]||"") + ';'
-										+  ( args[5] ? "secure":"" ));
-				}
-			}
-
-			return parsec;
-		},
-
-		// ajax, 
-		// aix-pipe require api
-		aix : function(options){
-			var _s = _.compose({
-				// default
-				url       : "",
-				type      : "GET",
-				param     : _.broken,
-				charset   : "utf-8",
-				aysnc     : true,
-				vaild     : true,
-				cache     : false,
-				success   : _.NULL,
-				fail      : _.NULL,
-				loading   : null,
-				loaded    : null,
-				header    : _.broken,
-				username  : null,
-				password  : null,
-				timeout   : 0
-			} , options || {} );
-
-
-			// if use cache assign
-			if(_s.cache){
-				var aixcache = JSON.parse(ls.getItem("aixcache"));
-				var key = _s.url || _.root.location.href.split("#")[0];
-
-				if(aixcache[key])
-					return _s.success.call(_.root,aixcache[key]);
-			}
-
-			// create AJAX XMLHttpRequest constructor
-			var xhr = new XMLHttpRequest();
-
-			// typeof "GET" method
-			// do not send param , compose param in url
-			if( _s.type.toUpperCase() === "GET" && _s.param){
-				_s.url += (_s.url.search(/\?/g) === -1 ? 
-					(_.keys(_s.param).length ? "?" : "") : "&" )
-					+ this.paramstringify(_s.param);
-				_s.param = null;
-			}
-
-			if(_.isFunction(_s.loading)){
-				var lfn = function(event){ _s.loading.call(_.root,event); };
-				xhr.addEventListener("loadstart",function(event){
-					lfn(event);
-					xhr.removeEventListener("loadstart",lfn);
-					lfn = null;
+			virtualDOM : function(root,html){
+				return converttree(root,_.domparse(html||""));
+			},
+	
+			// cookies
+			cookieparse : function(ckstr){
+				var tmp ;
+				var res = {};
+				var pars = ckstr ? ckstr.split(";") : [];
+	
+				_.loop(pars, function(item){
+					var index = (item||"").search("=");
+					if(index===-1)
+						return;
+	
+					var rkey = _.trim(item.substr(0,index));
+					if(rkey.length)
+						res[rkey] = _.trim(item.substr(index+1));
 				});
-			}
-
-			if(_.isFunction(_s.loaded)){
-				var rfn = function(event){ _s.loaded.call(_.root,event); };
-				xhr.addEventListener("loadend",function(event){
-					rfn(event);
-					xhr.removeEventListener("loadend",rfn);
-					rfn = null;
-				});
-			}
-
-			if(_s.username != null)
-				xhr.open(_s.type,_s.url,_s.aysnc, _s.username , _s.password||"");
-			else
-				xhr.open(_s.type,_s.url,_s.aysnc);
-
-			// typeof "POST" method
-			if( _s.type === "POST" && _s.param && !_s.header["Content-type"])
-				xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded'+';charset='+_s.charset);
-			xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
-			xhr.setRequestHeader("Aix-Requested","AixHttpRequest");
-
-			if(_.isObject(_s.header) && _s.header !== _.broken){
-				var ct = _s.header["Content-type"];
-
-				if(ct!=null)
-					if(ct.search('charset')===-1 && ct.search('json')===-1)
-						_s.header["Content-type"] += ";charset=" + _s.charset;
-
-				_.foreach(_s.header,function(val,key){ 
-					xhr.setRequestHeader(key,val); 
-				});
-			}
-
-			// xhr.setRequestHeader("Content-type","charset=utf-8");
-
-			xhr.onreadystatechange = function(event){
-				// response HTTP response header 200 or lower 300
-				// 304 not modifined
-				if(xhr.readyState === 4 && xhr.responseText){
-					var status = xhr.status;
-
-					if(( status >= 200 && status < 300) || status === 304){
-						_s.success.call(_.root,xhr.responseText,xhr,event);
-						// if cache been set writeJSON in chache
-						if(_s.cache){
-							var aixcache = JSON.parse(ls.getItem("aixcache"));
-							aixcache[_s.url||_.root.location.href.split("#")[0]] = xhr.responseText;
-							ls.setItem("aixcache",JSON.stringify(aixcache));
-						}
-					} else {
-						_s.fail.call(_.root,xhr,event);
+	
+				return res;
+			},
+	
+			cookie : function(param){
+				// args :( name , value, expires, path, domain, secure)
+				var args = _.slice(arguments);
+				var len = args.length;
+				var parsec = _.cookieparse(document.cookie);
+	
+	
+				if(len){
+					// get cookie
+					if(len === 1)
+						return parsec[param];
+					else{
+						var time = new Date();
+						time.setDate(time.getDate()+365);
+	
+						return this.root.document.cookie = this.trim(
+											  args[0]+"="+(args[1]||"") + ';' 
+											+  "expires="+(args[2]||time.toGMTString()) + ';'
+											+  "path="   +(args[3]||"/") + ';'
+											+  "domain=" +(args[4]||"") + ';'
+											+  ( args[5] ? "secure":"" ));
 					}
 				}
-			};
-
-			xhr.send(_s.param ? 
-				(!_.isObject(_s.param) ? 
-					_s.param : 
-					_.datamime(_s.header,_s.param))
-					:null);
-
-			// if set timeout for ajax , should abort after 
-			// trigger fail callee
-			if(_s.timeout){
-				_.async(function(){ 
-					xhr.abort(); _s.fail.call(_.root,xhr);
-				},_s.timeout*1000||5000);
-			}
-
-			return xhr;
-		},
-
-		// jsonp api
-		aixp : function(option){
-			var _s = _.compose({
-				url : "",
-				param : _.broken,
-				key : "callback",
-				fn : ("jsonp"+Math.random()).replace(".",""),
-				timeout: 5,
-				success : _.NULL,
-				fail : _.NULL
-			}, option || {} );
-
-			var url = _s.url+"?"
-							+ this.paramstringify(_s.param)
-							+ (this.keys(_s.param).length ? "&" : "") 
-							+ _s.key + "=" + _s.fn;
-
-			var aixp_tag = document.createElement("script");
-					aixp_tag.src = url;
-
-			// define callback
-			_.root[_s.fn] = function(res){
-				clearTimeout(_s.timesetup);
-				
-				document.body.removeChild(aixp_tag);
-				_.root[_s.fn] = null;
-				_s.success.call(_.root,res);
-			};
-
-			// append elm
-			// send request
-			document.body.append(aixp_tag);
-
-			// if timeout will trigger failcall
-			if(_s.timeout){
-				_s.timesetup = setTimeout(function(){
+	
+				return parsec;
+			},
+	
+			// ajax, 
+			// aix-pipe require api
+			aix : function(options){
+				var _s = _.compose({
+					// default
+					url       : "",
+					type      : "GET",
+					param     : _.broken,
+					charset   : "utf-8",
+					aysnc     : true,
+					vaild     : true,
+					cache     : false,
+					success   : _.NULL,
+					fail      : _.NULL,
+					loading   : null,
+					loaded    : null,
+					header    : _.broken,
+					username  : null,
+					password  : null,
+					timeout   : 0
+				} , options || {} );
+	
+	
+				// if use cache assign
+				if(_s.cache){
+					var aixcache = JSON.parse(ls.getItem("aixcache"));
+					var key = _s.url || _.root.location.href.split("#")[0];
+	
+					if(aixcache[key])
+						return _s.success.call(_.root,aixcache[key]);
+				}
+	
+				// create AJAX XMLHttpRequest constructor
+				var xhr = new XMLHttpRequest();
+	
+				// typeof "GET" method
+				// do not send param , compose param in url
+				if( _s.type.toUpperCase() === "GET" && _s.param){
+					_s.url += (_s.url.search(/\?/g) === -1 ? 
+						(_.keys(_s.param).length ? "?" : "") : "&" )
+						+ this.paramstringify(_s.param);
+					_s.param = null;
+				}
+	
+				if(_.isFunction(_s.loading)){
+					var lfn = function(event){ _s.loading.call(_.root,event); };
+					xhr.addEventListener("loadstart",function(event){
+						lfn(event);
+						xhr.removeEventListener("loadstart",lfn);
+						lfn = null;
+					});
+				}
+	
+				if(_.isFunction(_s.loaded)){
+					var rfn = function(event){ _s.loaded.call(_.root,event); };
+					xhr.addEventListener("loadend",function(event){
+						rfn(event);
+						xhr.removeEventListener("loadend",rfn);
+						rfn = null;
+					});
+				}
+	
+				if(_s.username != null)
+					xhr.open(_s.type,_s.url,_s.aysnc, _s.username , _s.password||"");
+				else
+					xhr.open(_s.type,_s.url,_s.aysnc);
+	
+				// typeof "POST" method
+				if( _s.type === "POST" && _s.param && !_s.header["Content-type"])
+					xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded'+';charset='+_s.charset);
+				xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
+				xhr.setRequestHeader("Aix-Requested","AixHttpRequest");
+	
+				if(_.isObject(_s.header) && _s.header !== _.broken){
+					var ct = _s.header["Content-type"];
+	
+					if(ct!=null)
+						if(ct.search('charset')===-1 && ct.search('json')===-1)
+							_s.header["Content-type"] += ";charset=" + _s.charset;
+	
+					_.foreach(_s.header,function(val,key){ 
+						xhr.setRequestHeader(key,val); 
+					});
+				}
+	
+				// xhr.setRequestHeader("Content-type","charset=utf-8");
+	
+				xhr.onreadystatechange = function(event){
+					// response HTTP response header 200 or lower 300
+					// 304 not modifined
+					if(xhr.readyState === 4 && xhr.responseText){
+						var status = xhr.status;
+	
+						if(( status >= 200 && status < 300) || status === 304){
+							_s.success.call(_.root,xhr.responseText,xhr,event);
+							// if cache been set writeJSON in chache
+							if(_s.cache){
+								var aixcache = JSON.parse(ls.getItem("aixcache"));
+								aixcache[_s.url||_.root.location.href.split("#")[0]] = xhr.responseText;
+								ls.setItem("aixcache",JSON.stringify(aixcache));
+							}
+						} else {
+							_s.fail.call(_.root,xhr,event);
+						}
+					}
+				};
+	
+				xhr.send(_s.param ? 
+					(!_.isObject(_s.param) ? 
+						_s.param : 
+						_.datamime(_s.header,_s.param))
+						:null);
+	
+				// if set timeout for ajax , should abort after 
+				// trigger fail callee
+				if(_s.timeout){
+					_.async(function(){ 
+						xhr.abort(); _s.fail.call(_.root,xhr);
+					},_s.timeout*1000||5000);
+				}
+	
+				return xhr;
+			},
+	
+			// jsonp api
+			aixp : function(option){
+				var _s = _.compose({
+					url : "",
+					param : _.broken,
+					key : "callback",
+					fn : ("jsonp"+Math.random()).replace(".",""),
+					timeout: 5,
+					success : _.NULL,
+					fail : _.NULL
+				}, option || {} );
+	
+				var url = _s.url+"?"
+								+ this.paramstringify(_s.param)
+								+ (this.keys(_s.param).length ? "&" : "") 
+								+ _s.key + "=" + _s.fn;
+	
+				var aixp_tag = document.createElement("script");
+						aixp_tag.src = url;
+	
+				// define callback
+				_.root[_s.fn] = function(res){
+					clearTimeout(_s.timesetup);
+					
 					document.body.removeChild(aixp_tag);
 					_.root[_s.fn] = null;
-
-					_s.success.call(_.root);
-				},_s.timeout * 1000);
+					_s.success.call(_.root,res);
+				};
+	
+				// append elm
+				// send request
+				document.body.append(aixp_tag);
+	
+				// if timeout will trigger failcall
+				if(_s.timeout){
+					_s.timesetup = _.async(function(){
+						document.body.removeChild(aixp_tag);
+						_.root[_s.fn] = null;
+	
+						_s.success.call(_.root);
+					},_s.timeout * 1000);
+				}
 			}
-		}
-
-	});
+	
+		});
 	}
 
 	// _.stack
@@ -1288,13 +1319,13 @@
 		//[[fn:func,time:0]]
 		
 		var firelist = [];
-		_.foreach(ram,function(g){
+		_.loop(ram,function(g){
 			var x = _.isObject(g) ? _.toarray(g) : (g||[]);
 			var fn = _.isFunction(x[0]) ? x[0] : _.NULL;
 			var t = _.isNumber(x[1]) ? x[1] : 0;
 			
 			var fire = function(arg){
-				setTimeout(function(){ 
+				_.async(function(){ 
 					var nx = firelist.pop();
 					var tmp = fn.call(_.root,arg);
 					if(nx!=null) nx.call(_.root,tmp);
@@ -1377,7 +1408,7 @@
 			}
 		});
 
-		_.foreach(ram,function(g,i){
+		_.loop(ram,function(g,i){
 			var index = i;
 			var x = _.isObject(g) ? _.toarray(g) : (g||[]);
 			var fn = _.isFunction(x[0]) ? x[0] : _.NULL;
@@ -1414,6 +1445,6 @@
 
 	});
 
-	return _;
+	return root.chrome ? _.v8Object(_) : _;
 
 }));
