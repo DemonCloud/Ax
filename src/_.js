@@ -48,9 +48,8 @@
 	var _ = {};
 	// _ extend other method
 	_.extend = function(protos){
-		var args = _slice.call(arguments);
-		if(args.length>1){
-			_.compose(protos,args[1],args[2]);
+		if(1 in arguments){
+			this.compose(protos,arguments[1],arguments[2]);
 		}else{
 			for (var chain in protos)
 				if(protos.hasOwnProperty(chain))
@@ -74,7 +73,7 @@
 
 	_.isPrimitive = function(e){
 		return e == null || e === true || e === false || 
-					typeof e === "string" || typeof val === "number";
+					typeof e === "string" || typeof e === "number" || typeof e === "function";
 	};
 
 	var rident = /^[a-z$_][a-z$_0-9]*$/i;
@@ -155,11 +154,11 @@
 
 	_.extend({
 		// empty pointer
+		root : root,
+
 		NULL : function(){},
 
 		cool : function(a){ return a; },
-
-		root : root,
 
 		broken : {},
 
@@ -243,18 +242,16 @@
 				 	_.isHTMLCollection(list))
 					// clone array
 					return _slice.call(list);
-				else if(_.isObject(list) && !_.isFunction(list)){
+				else if(!_.isPrimitive(list)){
 					// clone object
 					// copy prototype
 					var __ = function(){};
 					__.prototype = list.constructor.prototype;
-					var res = new __();
+					var res = new __;
 
 					// dist clone data
 					_.loop(list, function(val,key){
-						if(!_.isString(val) && 
-						 	!_.isNumber(val) && 
-						 	!_.isFunction(val))
+						if(!_.isPrimitive(list))
 							this[key] = _.clonedoom(val);
 						else 
 							this[key] = val;
@@ -303,7 +300,7 @@
 			},
 
 			map : function(list,fn){
-				return _.foreach(list,function(val,key){
+				return _.loop(list,function(val,key){
 					this[key] = fn.call(this,val,key,this);
 				},list);
 			},
@@ -331,7 +328,7 @@
 			// find the idf index
 			findindex : function(list,idf){
 				var res = [];
-				_.foreach(list,function(elm,i){ 
+				_.loop(list,function(elm,i){ 
 					if(idf.call(this,elm,i,this)) this.push(i); 
 				},res);
 				return res;
@@ -349,7 +346,7 @@
 			// Object ready binding
 			bind : function(obj){
 				var args = _slice.call(arguments,1);
-				_.foreach(obj,function(fn,k){
+				_.loop(obj,function(fn,k){
 					if(this.isFunction(fn))
 						obj[k] = Function.bind.apply(fn,args); 
 				});
@@ -366,7 +363,7 @@
 			pluck : function(list,mapkey){
 				var res = [];
 
-				_.foreach(list,function(item){
+				_.loop(list,function(item){
 					var keys = _.keys(item);
 					for( var i=keys.length; i--; )
 						if(keys[i]===mapkey+'')
@@ -380,7 +377,7 @@
 				if(_.isArray(ary)){
 					var group = {},
 							isFn  = _.isFunction(by);
-					_.foreach(ary,function(val){
+					_.loop(ary,function(val){
 						var key = isFn ? by(val) : val[by];
 						if(!this[key])
 							// first time should init group check
@@ -432,7 +429,7 @@
 
 			compose : function(o1,o2,nothisproperty){
 				if(nothisproperty)
-					_.foreach(o2,function(v,k){
+					_.loop(o2,function(v,k){
 						var idf = this.isArray(nothisproperty) ? 
 											!this.has(nothisproperty,k) :
 											(nothisproperty != null ?
@@ -441,7 +438,7 @@
 							o1[k] = v; 
 					});
 				else
-					_.foreach(o2,function(v,k){
+					_.loop(o2,function(v,k){
 						o1[k] = v; 
 					});
 				return o1;
@@ -449,7 +446,7 @@
 
 			has : function(list,n){
 				var idf = 0;
-				_.foreach(list,function(v){
+				_.loop(list,function(v){
 					if(v===n) idf = 1;
 				});
 				return !!idf;
@@ -543,7 +540,7 @@
 
 			isequal : function(x,y,strictmode){
 				if((strictmode||(x==null||y==null))||
-					((_.isFunction(x)||_.isFunction(y))||x===y))
+					(_.isPrimitive(x)&&_.isPrimitive(y)))
 					return x===y;
 
 				if(_.typeof(x) !== _.typeof(y))
@@ -556,11 +553,10 @@
 								if(x[i]!==y[i])
 									return false;
 							return true;
-						}else{
+						}else
 							return false;
-						}
 
-					} else if(_.isObject(x)){
+					}else if(_.isObject(x)){
 						var xkeys = _.keys(x);
 						var ykeys = _.keys(y);
 						if(xkeys.length === ykeys.length){
@@ -570,7 +566,6 @@
 							return true;
 						}
 						return false;
-
 					}
 				}
 				return false;
@@ -616,7 +611,7 @@
 			// make the __.formdataArray to Object
 			requery : function(arr){
 				var res = {};
-				_.foreach(arr,function(elm){
+				_.loop(arr,function(elm){
 					res[elm.name] = elm.value;
 				});
 				return res;
@@ -668,7 +663,7 @@
 				return x;
 			},
 
-			// @ make its Param Object to queryString
+			// @ make param object to queryString
 			paramstringify : function(param){
 				var Cparam = _.clone(param);
 
@@ -883,8 +878,12 @@
 				return obj;
 			},
 
+			emit : function(){
+				return _.dispatch.apply(this,arguments);
+			},
+
 			trigger : function(){
-				return _.dispatch(arguments);
+				return _.dispatch.apply(this,arguments);
 			}
 
 		});
@@ -931,7 +930,7 @@
 		// create Elm form node info
 		function createttreeElm(node){
 			var elm = document.createElement(node.tagname);
-			_.foreach(node.attributes,function(val,name){
+			_.loop(node.attributes,function(val,name){
 				elm.setAttribute(name,val);
 			});
 
@@ -1125,7 +1124,7 @@
 					if(len === 1)
 						return parsec[param];
 					else{
-						var time = new Date();
+						var time = new Date;
 						time.setDate(time.getDate()+365);
 	
 						return this.root.document.cookie = this.trim(
@@ -1166,7 +1165,7 @@
 				// if use cache assign
 				if(_s.cache){
 					var aixcache = JSON.parse(ls.getItem("aixcache"));
-					var key = _s.url || _.root.location.href.split("#")[0];
+					var key = _s.url || _.root.location.href.split("#").shift();
 	
 					if(aixcache[key])
 						return _s.success.call(_.root,aixcache[key]);
@@ -1220,7 +1219,7 @@
 						if(ct.search('charset')===-1 && ct.search('json')===-1)
 							_s.header["Content-type"] += ";charset=" + _s.charset;
 	
-					_.foreach(_s.header,function(val,key){ 
+					_.loop(_s.header,function(val,key){ 
 						xhr.setRequestHeader(key,val); 
 					});
 				}
@@ -1362,7 +1361,7 @@
 			var _this = this;
 			var args = _.slice(arguments);
 
-			_.foreach(args,function(item){
+			_.loop(args,function(item){
 				if(!_.isFunction(item)&&!_.isArray(item))
 					return console.error("add/push arguments error when assign to stack!");
 				var fn = _.isArray(item) ? item[0] : item;
@@ -1438,7 +1437,7 @@
 		},
 
 		fire: function(){
-			return !this["-"].length ? 0 : _.foreach(this["-"],function(fn){
+			return !this["-"].length ? 0 : _.loop(this["-"],function(fn){
 				return fn.call(_.root);
 			});
 		}

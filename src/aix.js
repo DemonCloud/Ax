@@ -2,11 +2,13 @@
  * aix.js
  *
  * pure Javascript MVC framwork
- * include:
+ *
+ * Include:
  * [ model ]
- * [ collection ]
  * [ view ]
- * [ events ]
+ * [ collection ]
+ * [ router ]
+ * [ components ]
  *
  * *IE 9-Edge support
  *
@@ -57,6 +59,7 @@
 		update : "UPDATE",
 		delete : "DELETE"
 	};
+
 	var RESTFUL_disable = {
 		get    : "GET",
 		put    : "POST",
@@ -67,6 +70,7 @@
 		update : "POST",
 		delete : "POST"
 	};
+
 	// default with disable and emude RESTFUL_API
 	var RESTFUL_LIST = RESTFUL_disable;
 
@@ -1174,8 +1178,6 @@
 		},
 
 	};
-
-
 
 	// Aix-Component 
 	// Bind the connect aix plug with 
