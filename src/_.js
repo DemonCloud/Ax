@@ -972,14 +972,6 @@
 			return wrap;
 		}
 
-		function domparser(root,tree){
-			var vdom = (root!=null ? root.cloneNode() : document.createElement("div"));
-			// strip and zip
-			vdom.innerHTML = _.strip(tree,true);
-			
-			return vdom;
-		}
-
 		// define key for DATAMIME
 		var MIME = {
 			"application/json" : 1
@@ -1098,7 +1090,11 @@
 
 			// vitruldom
 			virtualDOM : function(root,html){
-				return domparser(root,html||"");
+				var vdom = (root!=null ? root.cloneNode() : document.createElement("div"));
+				// strip and zip
+				vdom.innerHTML = _.strip(html,true);
+
+				return vdom;
 			},
 	
 			// cookies
