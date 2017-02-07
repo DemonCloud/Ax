@@ -974,7 +974,8 @@
 
 		function domparser(root,tree){
 			var vdom = (root!=null ? root.cloneNode() : document.createElement("div"));
-			vdom.innerHTML = tree;
+			// strip and zip
+			vdom.innerHTML = _.strip(tree,true);
 			
 			return vdom;
 		}
