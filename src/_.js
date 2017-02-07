@@ -34,9 +34,9 @@
 
 	// # DEFINE some useful varible
 	// # Cache global object
-	var OP = Object.prototype;
-
 	// # Function Caller 
+
+	var toString = Object.prototype.toString;
 	var _arr  = [],
 		_slice  = _arr.slice,
 		_splice = _arr.splice,
@@ -89,7 +89,7 @@
 			typeof obj.name === "string";
 	};
 
-	_.isNode = typeof process !== "undefined" && OP.toString.call(process).toLowerCase() === "[object process]";
+	_.isNode = typeof process !== "undefined" && toString.call(process).toLowerCase() === "[object process]";
 
 	// with bluebird.js
 	_.v8Object = function(obj){
