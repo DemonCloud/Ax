@@ -942,7 +942,7 @@
 
 		function converttree(root,tree){
 			// create top Element;
-			var wrap = document.createElement("div").cloneNode();
+			var wrap = (root!=null ? root.cloneNode() : document.createElement("div"));
 					wrap.setAttribute("x-root","");
 
 			if(tree.length){
@@ -970,6 +970,13 @@
 			}
 
 			return wrap;
+		}
+
+		function domparser(root,tree){
+			var vdom = (root!=null ? root.cloneNode() : document.createElement("div"));
+			vdom.innerHTML = tree;
+			
+			return vdom;
 		}
 
 		// define key for DATAMIME
@@ -1090,7 +1097,7 @@
 
 			// vitruldom
 			virtualDOM : function(root,html){
-				return converttree(root,_.domparse(html||""));
+				return domparser(root,html||"");
 			},
 	
 			// cookies
