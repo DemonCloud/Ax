@@ -1,7 +1,7 @@
 /* 
  * _ js
  *
- * its a javascript until 
+ * Javascript untils tools
  * support web browser and node.js
  *
  * *IE 9-Edge support
