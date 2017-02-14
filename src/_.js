@@ -126,10 +126,10 @@
 	});
 
 	_.isArrayLike = function(e){
-		return _.isArray(list) || 
-					_.isArguments(list) || 
-					_.isNodeList(list) || 
-					_.isHTMLCollection(list);
+		return _.isArray(e) || 
+					_.isArguments(e) || 
+					_.isNodeList(e) || 
+					_.isHTMLCollection(e);
 	};
 
 	// Loop for Array

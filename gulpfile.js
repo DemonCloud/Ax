@@ -1,11 +1,12 @@
-var gulp = require("gulp");
-var uglify = require("gulp-uglify");
-var concat = require("gulp-concat");
+const gulp = require("gulp");
+const uglify = require("gulp-uglify");
+const concat = require("gulp-concat");
+const optimizejs = require('gulp-optimize-js');
 
-var path_js = "./src/*.js";
-var path_dis = "./dest/";
-var path_doc = "./docs/js/";
-var path_disjs = "./dest/*.js";
+const path_js = "./src/*.js";
+const path_dis = "./dest/";
+const path_doc = "./docs/js/";
+const path_disjs = "./dest/*.js";
 
 
 gulp.task('concat',function(){
@@ -17,6 +18,7 @@ gulp.task('concat',function(){
 gulp.task('uglify',function(){
 	return gulp.src(path_disjs)
 				 .pipe(uglify())
+				 .pipe(optimizejs())
 				 .pipe(gulp.dest(path_dis))
 				 .pipe(gulp.dest(path_doc));
 });
