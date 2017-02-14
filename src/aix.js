@@ -1146,7 +1146,7 @@
 				_.root.addEventListener("hashchange",this.event);
 				this.dispatch("listen");
 				if(hash)
-					this.assign(hash);
+					this.go(hash);
 				else
 					this.dispatch("hashchange",null,[getHash(window.location.href)]);
 			}
@@ -1161,7 +1161,7 @@
 			return this;
 		},
 
-		assign : function(hash){
+		go : function(hash){
 			if(this._listen){			
 				var url = _.root.location.href; 
 				var hashindex = url.search("#");
