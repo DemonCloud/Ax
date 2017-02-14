@@ -40,7 +40,7 @@
 							init:function(){
 								route.view = this;
 								route.listen(
-									window.location.hash ? "aix.model" : ""
+									!window.location.hash ? "aix.model" : ""
 								);
 							}
 						}
