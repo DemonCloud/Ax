@@ -1135,7 +1135,7 @@
 			return this;
 		},
 
-		listen: function(){
+		listen: function(hash){
 			if(!this._listen){
 				_.define(this,"_listen",{
 					value:1,
@@ -1145,7 +1145,10 @@
 				});
 				_.root.addEventListener("hashchange",this.event);
 				this.dispatch("listen");
-				this.dispatch("hashchange",null,[getHash(window.location.href)]);
+				if(hash)
+					this.assign(hash);
+				else
+					this.dispatch("hashchange",null,[getHash(window.location.href)]);
 			}
 			return this;
 		},

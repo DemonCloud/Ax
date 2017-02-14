@@ -20,7 +20,9 @@
 						events:{
 							init:function(){
 								route.view = this;
-								route.listen();
+								route.listen(
+									window.location.hash ? "aix.model" : ""
+								);
 							}
 						}
 					});
