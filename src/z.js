@@ -419,6 +419,7 @@
 	];
 
 	function styleFilter(style){
+		// HSB
 		if(style.search("rgb") != -1){
 			var bg = style.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 			return "#" + hex(bg[1]) + hex(bg[2]) + hex(bg[3]);

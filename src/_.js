@@ -125,6 +125,13 @@
 		};
 	});
 
+	_.isArrayLike = function(e){
+		return _.isArray(list) || 
+					_.isArguments(list) || 
+					_.isNodeList(list) || 
+					_.isHTMLCollection(list);
+	};
+
 	// Loop for Array
 	// fuck any Array.forEach method
 	function aloop(ary,fn,ts){
@@ -237,11 +244,8 @@
 		// Only use deep clone to custom model & collection
 		// cloneDoom reduce each element
 		clonedoom : function(list){
-			if(_.isArray(list) || 
-			 	_.isArguments(list) || 
-			 	_.isNodeList(list) || 
-			 	_.isHTMLCollection(list))
-				// clone array
+			if(_.isArrayLike(list))
+				// clone array 
 				return _slice.call(list);
 			else if(!_.isPrimitive(list)){
 				// clone object
@@ -263,17 +267,29 @@
 		},
 
 		sort : function(arr,fn){
-			if(!_.isArray(arr))
-				return arr;
-			return arr.sort(fn);
+			return !_.isArray(arr) ? arr : arr.sort(fn);
 		},
 
-		unique : function(ary){
-			for(var i = 0 , ol = ary.length; i<ol; i++)
-				if(i !== ary.length-1)
-			  	for(var j=i+1; j<ary.length; j++)
-			    	if( ary[i] === ary[j] ) 
-			    		ary.splice(j--,1);
+		unique : function(ary,isFast){
+			if(isFast){
+				var n = typeof ary[0] === 'number';
+				var u = {};
+
+				for(var i = 0 ; i<ary.length; i++){
+					if(u[ary[i]])
+						continue
+					u[ary[i]] = 1;
+				}
+
+				return _.map(_.keys(u),function(i){ 
+					return n ? i>>0 : i;
+				});
+			}else{
+				for(var i = 0 ; i<ary.length; i++)
+					if(i !== ary.length-1)
+						for(var j=i+1; j<ary.length; j++)
+							if( ary[i] === ary[j] ) ary.splice(j--,1);
+			}
 			return ary;
 		},
 
