@@ -998,7 +998,7 @@
 			// parse by http [ Content-type ]
 			datamime : function(header,param){
 				if(_.isObject(header)){
-					switch(MIME(header["Content-type"]||header["Content-Type"])){
+					switch(MIME[ header["Content-type"]||header["Content-Type"] ]){
 						// JSON type
 						case 1:
 							return JSON.stringify(param||{});
