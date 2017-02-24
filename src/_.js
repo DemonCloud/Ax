@@ -1149,7 +1149,7 @@
 	
 						return this.root.document.cookie = this.trim(
 											  args[0]+"="+(args[1]||"") + ';' 
-											+  "expires="+(args[2]||time.toGMTString()) + ';'
+											+  "expires="+(args[2]||time.toUTCString()) + ';'
 											+  "path="   +(args[3]||"/") + ';'
 											+  "domain=" +(args[4]||"") + ';'
 											+  ( args[5] ? "secure":"" ));
@@ -1225,19 +1225,20 @@
 					xhr.open(_s.type,_s.url,_s.aysnc, _s.username , _s.password||"");
 				else
 					xhr.open(_s.type,_s.url,_s.aysnc);
-	
-				// typeof "POST" method
-				if( _s.type === "POST" && _s.param && !_s.header["Content-type"])
-					xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded'+';charset='+_s.charset);
+
 				xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
 				xhr.setRequestHeader("Aix-Requested","AixHttpRequest");
 	
+				// typeof "POST" method
+				if( _s.type === "POST" && _s.param && (!_s.header["Content-Type"]))
+					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'+';charset='+_s.charset);
+
 				if(_.isObject(_s.header) && _s.header !== _.broken){
-					var ct = _s.header["Content-type"];
+					var ct = _s.header["Content-Type"];
 	
 					if(ct!=null)
 						if(ct.search('charset')===-1 && ct.search('json')===-1)
-							_s.header["Content-type"] += ";charset=" + _s.charset;
+							_s.header["Content-Type"] += ";charset=" + _s.charset;
 	
 					_.loop(_s.header,function(val,key){ 
 						xhr.setRequestHeader(key,val); 

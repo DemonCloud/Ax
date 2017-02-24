@@ -201,12 +201,14 @@
 		if(str!=null){
 			if(_.isString(str)){
 				this.$el = dsizzle(str);
-				this.$indicator = str;
+				this.$indicator = isHTML.test(str) ? Math.random() : str;
 			}else if( str===document || str===_.root || str.nodeType ===1){
 				this.$el.push(str);
 				this.$indicator = str;
 			}else if( _.isArray(str)){
-				this.$el = _.find(str,function(node){ return node.nodeType===1; });
+				this.$el = _.find(str,function(node){ 
+					return node.nodeType===1; 
+				});
 				this.$indicator = Math.random();
 			}
 		}
@@ -411,7 +413,8 @@
 		"disabled",
 		"readonly",
 		"required",
-		"validate"
+		"validate",
+		"contenteditable"
 	];
 
 	var unitList = [
@@ -495,6 +498,16 @@
 					e.setAttribute("class",style);
 				}
 			});
+		},
+
+		hasClass: function(style){
+			var elm = this.get(0);
+			var res = false;
+			
+			if(elm!=null)
+				res = _.has(elm.getAttribute("class").split(' '),style||NaN);
+
+			return res;
 		},
 
 		attr: function(){
