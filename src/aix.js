@@ -418,10 +418,7 @@
 
 		_.extend(
 			this,
-			_.extend(
-				_.clone(AIX_COLLECTION_DEFAULT)
-				,obj
-			)
+			_.extend(_.clone(AIX_COLLECTION_DEFAULT),obj)
 		);
 		
 		// filter init data as this.model type
@@ -926,10 +923,7 @@
 		}
 
 		_.extend(this,
-			_.extend(
-				_.clone(AIX_VIEW_DEFAULT)
-				,obj
-			)
+			_.extend(_.clone(AIX_VIEW_DEFAULT),obj)
 		);
 
 		// first trgger "init" event
@@ -978,6 +972,10 @@
 		dispatch : function(type,fn,args){
 			if(_.isArray(fn))
 				args = fn, fn = null;
+
+			var k = (type||"").split(":");
+			if(k[1])
+				return $(this.el).find(k[1]).trigger(k[0],args||[]);
 			return _.dispatch(this,type,fn,args);
 		},
 
