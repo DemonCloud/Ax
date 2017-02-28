@@ -996,18 +996,20 @@
 		_.extend({
 			// parse data require
 			// parse by http [ Content-type ]
-			datamime : function(header,param){
-				if(_.isObject(header)){
-					switch(MIME[ header["Content-type"]||header["Content-Type"] ]){
-						// JSON type
-						case 1:
-							return JSON.stringify(param||{});
-						default : 
-							break;
+			datamime : function(enable,header,param){
+				if(enable){
+					if(_.isObject(header)){
+						switch(MIME[ header["Content-type"]||header["Content-Type"] ]){
+								// JSON type
+							case 1:
+								return JSON.stringify(param||{});
+							default : 
+								return _.paramstringify(param||{});
+						}
 					}
 				}
 
-				return _.paramstringify(param||{});
+				return param;
 			},
 
 			strip: function(str,strict){
@@ -1168,7 +1170,6 @@
 					type      : "GET",
 					param     : _.broken,
 					charset   : "utf-8",
-					aysnc     : true,
 					vaild     : true,
 					cache     : false,
 					success   : _.NULL,
@@ -1178,7 +1179,9 @@
 					header    : _.broken,
 					username  : null,
 					password  : null,
-					timeout   : 0
+					timeout   : 0,
+					aysnc     : true,
+					contentType : true
 				} , options || {} );
 	
 	
@@ -1230,8 +1233,14 @@
 				xhr.setRequestHeader("Aix-Requested","AixHttpRequest");
 	
 				// typeof "POST" method
-				if( _s.type === "POST" && _s.param && (!_s.header["Content-Type"]))
-					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'+';charset='+_s.charset);
+				if( _s.type === "POST" && 
+						_s.param && 
+						!_s.header["Content-Type"] && 
+						_s.contentType)
+					xhr.setRequestHeader(
+						'Content-Type', 
+						'application/x-www-form-urlencoded'+';charset='+_s.charset
+					);
 
 				if(_.isObject(_s.header) && _s.header !== _.broken){
 					var ct = _s.header["Content-Type"];
@@ -1268,9 +1277,9 @@
 				};
 	
 				xhr.send(_s.param ? 
-					(!_.isObject(_s.param) ? 
-						_s.param : 
-						_.datamime(_s.header,_s.param))
+					(_.isObject(_s.param) ? 
+						_.datamime(_s.contentType,_s.header,_s.param) :
+						_s.param )
 						:null);
 	
 				// if set timeout for ajax , should abort after 
