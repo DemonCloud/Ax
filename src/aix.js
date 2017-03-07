@@ -1142,11 +1142,11 @@
 					configurable: true,
 				});
 				_.root.addEventListener("hashchange",this.event);
-				this.dispatch("listen");
+				this.emit("listen");
 				if(hash)
 					this.go(hash);
 				else
-					this.dispatch("hashchange",null,[getHash(window.location.href)]);
+					this.emit("hashchange",[getHash(window.location.href)]);
 			}
 			return this;
 		},
@@ -1154,7 +1154,7 @@
 		stoplisten: function(){
 			if(delete this._listen){
 				_.root.removeEventListener("hashchange",this.event);
-				this.dispatch("stoplisten");
+				this.emit("stoplisten");
 			}
 			return this;
 		},

@@ -89,7 +89,8 @@
 			typeof obj.name === "string";
 	};
 
-	_.isNode = typeof process !== "undefined" && toString.call(process).toLowerCase() === "[object process]";
+	_.isNode = typeof process !== "undefined" && 
+						 toString.call(process).toLowerCase() === "[object process]";
 
 	// with bluebird.js
 	_.v8Object = function(obj){
