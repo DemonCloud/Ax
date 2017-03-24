@@ -1684,16 +1684,13 @@ function negate(fn,context){
 // var c = function(t){ return "<c>"+t+"<c>"}
 // var w = wrap(a,b,c);
 // w("tag") => "<c><b><a>tag<a><b><c>"
-function wrap(){
-	var stk = slice(arguments)
-	.filter(function(fn){ return isFn(fn); })
-	.map(function(fn,index){
-		return function(){
-			var next = stk[index+1], res=fn.apply(null,arguments);
-			return isFn(next) ? next(res) : res;
-		};
-	});
-	return first(stk) || noop;
+function wrap(){ 
+	var arg = slice(arguments); 
+	return function(x){ 
+		return arg.reduce(function(val,fn){ 
+			return fn(val);
+		},x);
+	}; 
 }
 
 // _ chain stack [ method ]
