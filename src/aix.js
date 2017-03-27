@@ -61,6 +61,7 @@
 	// *use struct utils list
 	var root = struct.root, 
 		v8 = struct.v8(),
+		_keys = struct.keys(),
 		_noop = struct.noop(), 
 		_define = struct.define(), 
 		_slice = struct.slice(),
@@ -478,7 +479,7 @@
 	var Diff = function(options) {
 		var diff = this;
 		if (options) {
-			Object.keys(options).forEach(function(option) {
+			_fal(_keys(options),function(option) {
 				diff[option] = options[option];
 			});
 		}
@@ -532,8 +533,8 @@
 		var uniqueDescriptors = {},
 			duplicateDescriptors = {};
 
-		li.forEach(function(node) {
-			elementDescriptors(node).forEach(function(descriptor) {
+		_fal(li,function(node) {
+			_fal(elementDescriptors(node),function(descriptor) {
 				var inUnique = descriptor in uniqueDescriptors,
 					inDupes = descriptor in duplicateDescriptors;
 				if (!inUnique && !inDupes) {
@@ -554,10 +555,9 @@
 			l2Unique = findUniqueDescriptors(l2),
 			inBoth = {};
 
-		Object.keys(l1Unique).forEach(function(key) {
-			if (l2Unique[key]) {
+		_fal(_keys(l1Unique),function(key) {
+			if (l2Unique[key])
 				inBoth[key] = true;
-			}
 		});
 
 		return inBoth;
@@ -579,9 +579,8 @@
 		var e1Attributes, e2Attributes;
 
 		if (!['nodeName', 'value', 'checked', 'selected', 'data'].every(function(element) {
-			if (e1[element] !== e2[element]) {
+			if (e1[element] !== e2[element])
 				return false;
-			}
 			return true;
 		})) {
 			return false;
@@ -596,8 +595,8 @@
 		}
 
 		if (e1.attributes) {
-			e1Attributes = Object.keys(e1.attributes);
-			e2Attributes = Object.keys(e2.attributes);
+			e1Attributes = _keys(e1.attributes);
+			e2Attributes = _keys(e2.attributes);
 
 			if (e1Attributes.length !== e2Attributes.length) {
 				return false;
@@ -662,9 +661,8 @@
 			}
 			if (e1.attributes['class'] && e1.attributes['class'] === e2.attributes['class']) {
 				var classDescriptor = e1.nodeName + '.' + e1.attributes['class'].replace(/ /g, '.');
-				if (classDescriptor in uniqueDescriptors) {
+				if (classDescriptor in uniqueDescriptors)
 					return true;
-				}
 			}
 		}
 
@@ -739,8 +737,8 @@
 		}
 
 		// fill the matches with distance values
-		c1.forEach(function(c1Element, c1Index) {
-			c2.forEach(function(c2Element, c2Index) {
+		_fal(c1,function(c1Element, c1Index) {
+			_fal(c2,function(c2Element, c2Index) {
 				if (!marked1[c1Index] && !marked2[c2Index] && roughlyEqual(c1Element, c2Element, uniqueDescriptors, subsetsSame)) {
 					matches[c1Index + 1][c2Index + 1] = (matches[c1Index][c2Index] ? matches[c1Index][c2Index] + 1 : 1);
 					if (matches[c1Index + 1][c2Index + 1] >= lcsSize) {
@@ -798,15 +796,13 @@
 			group = 0;
 
 		// give elements from the same subset the same group number
-		stable.forEach(function(subset) {
+		_fal(stable,function(subset) {
 			var i, endOld = subset.oldValue + subset.length,
 				endNew = subset.newValue + subset.length;
-			for (i = subset.oldValue; i < endOld; i += 1) {
+			for (i = subset.oldValue; i < endOld; i += 1)
 				gaps1[i] = group;
-			}
-			for (i = subset.newValue; i < endNew; i += 1) {
+			for (i = subset.newValue; i < endNew; i += 1)
 				gaps2[i] = group;
-			}
 			group += 1;
 		});
 
@@ -840,7 +836,7 @@
 			if (subset) {
 				subsets.push(subset);
 
-				Array.apply(null, new Array(subset.length)).map(returnIndex).forEach(markBoth);
+				_fal(Array.apply(null, new Array(subset.length)).map(returnIndex),markBoth);
 
 			}
 		}
@@ -849,10 +845,13 @@
 
 
 	function swap(obj, p1, p2) {
-		(function(_) {
-			obj[p1] = obj[p2];
-			obj[p2] = _;
-		}(obj[p1]));
+		// (function(_) {
+		// 	obj[p1] = obj[p2];
+		// 	obj[p2] = _;
+		// }(obj[p1]));
+		obj[p1] ^= obj[p2];
+		obj[p2] ^= obj[p1];
+		obj[p1] ^= obj[p2];
 	}
 
 
@@ -864,12 +863,12 @@
 		list: false,
 		add: function(diffs) {
 			var list = this.list;
-			diffs.forEach(function(diff) {
+			_fal(diffs,function(diff) {
 				list.push(diff);
 			});
 		},
 		forEach: function(fn) {
-			this.list.forEach(fn);
+			_fal(this.list,fn);
 		}
 	};
 
@@ -900,11 +899,10 @@
 		}
 
 		for (i in defaults) {
-			if (typeof options[i] === "undefined") {
+			if (typeof options[i] === "undefined")
 				this[i] = defaults[i];
-			} else {
+			else
 				this[i] = options[i];
-			}
 		}
 
 		this._const = {
@@ -1070,10 +1068,10 @@
 			}
 
 
-			attr1 = t1.attributes ? Object.keys(t1.attributes).sort() : [];
-			attr2 = t2.attributes ? Object.keys(t2.attributes).sort() : [];
+			attr1 = t1.attributes ? _keys(t1.attributes).sort() : [];
+			attr2 = t2.attributes ? _keys(t2.attributes).sort() : [];
 
-			attr1.forEach(function(attr) {
+			_fal(attr1,function(attr) {
 				var pos = attr2.indexOf(attr);
 				if (pos === -1) {
 					diffs.push(new Diff()
@@ -1098,7 +1096,7 @@
 			});
 
 
-			attr2.forEach(function(attr) {
+			_fal(attr2,function(attr) {
 				diffs.push(new Diff()
 					.setValue(t._const.action, t._const.addAttribute)
 					.setValue(t._const.route, route)
@@ -1119,7 +1117,7 @@
 			} else {
 				if (aNode.attributes && aNode.attributes.length > 0) {
 					objNode.attributes = {};
-					Array.prototype.slice.call(aNode.attributes).forEach(
+					_fal(_slice(aNode.attributes),
 						function(attribute) {
 							objNode.attributes[attribute.name] = attribute.value;
 						}
@@ -1127,7 +1125,7 @@
 				}
 				if (aNode.childNodes && aNode.childNodes.length > 0) {
 					objNode.childNodes = [];
-					Array.prototype.slice.call(aNode.childNodes).forEach(
+					_fal(_slice(aNode.childNodes),
 						function(childNode) {
 							objNode.childNodes.push(dobj.nodeToObj(childNode));
 						}
@@ -1163,25 +1161,22 @@
 					node = document.createElement(objNode.nodeName);
 				}
 				if (objNode.attributes) {
-					Object.keys(objNode.attributes).forEach(function(attribute) {
+					_fal(_keys(objNode.attributes),function(attribute) {
 						node.setAttribute(attribute, objNode.attributes[attribute]);
 					});
 				}
 				if (objNode.childNodes) {
-					objNode.childNodes.forEach(function(childNode) {
+					_fal(objNode.childNodes,function(childNode) {
 						node.appendChild(dobj.objToNode(childNode, insideSvg));
 					});
 				}
 				if (this.valueDiffing) {
-					if (objNode.value) {
+					if (objNode.value)
 						node.value = objNode.value;
-					}
-					if (objNode.checked) {
+					if (objNode.checked)
 						node.checked = objNode.checked;
-					}
-					if (objNode.selected) {
+					if (objNode.selected)
 						node.selected = objNode.selected;
-					}
 				}
 			}
 			return node;
@@ -1200,9 +1195,8 @@
 				 * and t2.
 				 */
 				diffs = this.attemptGroupRelocation(t1, t2, subtrees, route);
-				if (diffs.length > 0) {
+				if (diffs.length > 0)
 					return diffs;
-				}
 			}
 
 			/* 0 or 1 groups of similar child nodes have been found
@@ -1214,9 +1208,8 @@
 
 
 			last = Math.max(t1ChildNodes.length, t2ChildNodes.length);
-			if (t1ChildNodes.length !== t2ChildNodes.length) {
+			if (t1ChildNodes.length !== t2ChildNodes.length)
 				childNodesLengthDifference = true;
-			}
 
 			for (i = 0; i < last; i += 1) {
 				e1 = t1ChildNodes[i];
@@ -1430,10 +1423,9 @@
 
 		applyVirtual: function(tree, diffs) {
 			var dobj = this;
-			if (diffs.length === 0) {
+			if (diffs.length === 0)
 				return true;
-			}
-			diffs.forEach(function(diff) {
+			_fal(diffs,function(diff) {
 				dobj.applyVirtualDiff(tree, diff);
 			});
 			return true;
@@ -1471,9 +1463,8 @@
 				node: node
 			};
 
-			if (this.preVirtualDiffApply(info)) {
+			if (this.preVirtualDiffApply(info))
 				return true;
-			}
 
 			switch (diff[this._const.action]) {
 				case this._const.addAttribute:
@@ -1502,7 +1493,7 @@
 
 					delete node.attributes[diff[this._const.name]];
 
-					if (Object.keys(node.attributes).length === 0) {
+					if (_keys(node.attributes).length === 0) {
 						delete node.attributes;
 					}
 
@@ -1542,10 +1533,10 @@
 					parentNode.childNodes[nodeIndex] = newNode;
 					break;
 				case this._const.relocateGroup:
-					node.childNodes.splice(diff[this._const.from], diff.groupLength).reverse()
-						.forEach(function(movedNode) {
+					_fal(node.childNodes.splice(diff[this._const.from], diff.groupLength).reverse(),
+					function(movedNode) {
 							node.childNodes.splice(diff[t._const.to], 0, movedNode);
-						});
+					});
 					break;
 				case this._const.removeElement:
 					parentNode.childNodes.splice(nodeIndex, 1);
@@ -1613,10 +1604,9 @@
 			if (diffs.length === 0) {
 				return true;
 			}
-			diffs.forEach(function(diff) {
-				if (!dobj.applyDiff(tree, diff)) {
+			_fal(diffs,function(diff) {
+				if (!dobj.applyDiff(tree, diff))
 					return false;
-				}
 			});
 			return true;
 		},
@@ -1624,9 +1614,8 @@
 			route = route.slice();
 			var c, node = tree;
 			while (route.length > 0) {
-				if (!node.childNodes) {
+				if (!node.childNodes)
 					return false;
-				}
 				c = route.splice(0, 1)[0];
 				node = node.childNodes[c];
 			}
@@ -1673,25 +1662,25 @@
 					this.textDiff(node, node.data, diff[this._const.oldValue], diff[this._const.newValue]);
 					break;
 				case this._const.modifyValue:
-					if (!node || typeof node.value === 'undefined') {
+					if (!node || node.value === void 0) {
 						return false;
 					}
 					node.value = diff[this._const.newValue];
 					break;
 				case this._const.modifyComment:
-					if (!node || typeof node.data === 'undefined') {
+					if (!node || node.data === void 0) {
 						return false;
 					}
 					this.textDiff(node, node.data, diff[this._const.oldValue], diff[this._const.newValue]);
 					break;
 				case this._const.modifyChecked:
-					if (!node || typeof node.checked === 'undefined') {
+					if (!node || node.checked === void 0) {
 						return false;
 					}
 					node.checked = diff[this._const.newValue];
 					break;
 				case this._const.modifySelected:
-					if (!node || typeof node.selected === 'undefined') {
+					if (!node || node.selected === void 0) {
 						return false;
 					}
 					node.selected = diff[this._const.newValue];
@@ -1700,12 +1689,11 @@
 					node.parentNode.replaceChild(this.objToNode(diff[this._const.newValue], node.namespaceURI === 'http://www.w3.org/2000/svg'), node);
 					break;
 				case this._const.relocateGroup:
-					Array.apply(null, new Array(diff.groupLength)).map(function() {
+					_fal(Array.apply(null, new Array(diff.groupLength)).map(function() {
 						return node.removeChild(node.childNodes[diff[t._const.from]]);
-					}).forEach(function(childNode, index) {
-						if (index === 0) {
+					}),function(childNode, index) {
+						if (index === 0)
 							reference = node.childNodes[diff[t._const.to]];
-						}
 						node.insertBefore(childNode, reference);
 					});
 					break;
@@ -1755,7 +1743,7 @@
 				diffs = [diffs];
 			}
 			diffs.reverse();
-			diffs.forEach(function(diff) {
+			_fal(diffs,function(diff) {
 				dobj.undoDiff(tree, diff);
 			});
 		},
