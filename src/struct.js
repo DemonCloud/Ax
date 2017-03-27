@@ -408,16 +408,17 @@ function clone(l,deep){
 
 // Deeping Clone [ fast , complicated ]
 function depclone(l){
-	var res;
 	if(isArrayLike(l)){
 		// clone array 
 		return slice(l).map(citd(depclone,negate(isPrimitive)));
 	}else if(!isPrimitive(l) && !(l instanceof Node)){
+		var res = {};
 		// clone object ^ with copy prototype
-		var _ = function(){};
-		_.prototype = l.constructor.prototype;
-		res = new _;
-		// dist clone data
+		if(l.constructor.prototype !== Object.prototype){
+			var _ = function(){};
+			_.prototype = l.constructor.prototype;
+			res = new _();
+		}
 		ol(l, function(val,key){
 			this[key] = isPrimitive(val) ? val : depclone(val);
 		},res);
@@ -1720,7 +1721,7 @@ function chain(args){
 
 // building the Run method
 // @emit *run
-chain.prototype.run = function(){
+chain.prototype.value = function(){
 	return wrap.apply(null,this["="].splice(0,size(this['='])))
 						 .apply(null,this['-']===void 0 ? arguments : this['-']);
 };
@@ -2007,7 +2008,7 @@ function $doom(config){
 
 // signet API
 var nublist = {
-	_         : _,
+	chain     : _,
 	define    : define,
 	extend    : extend,
 	depextend : depextend,
