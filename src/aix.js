@@ -35,8 +35,9 @@
 })( this , {} , function(aix,struct){
 	"use strict";
 
-	// define DOM frame
+	// Define DOM frame
 	var z,Z;
+	// Define Setting
 	var AIX_VIEW_COUNT = 0,
 			AIX_ROUTE_COUNT = 0,
 			AIX_MODELS_COUNT = 0,
@@ -59,37 +60,37 @@
 	};
 
 	// *use struct utils list
-	var root = struct.root, 
-		v8 = struct.v8(),
-		_keys = struct.keys(),
-		_noop = struct.noop(), 
-		_define = struct.define(), 
-		_slice = struct.slice(),
-		_clone = struct.clone(),
-		_dpclone = struct.depclone(),
-		_extend = struct.extend(),
-		_eq = struct.eq(),
+	var root    = struct.root,
+		v8        = struct.v8(),
+		_keys     = struct.keys(),
+		_noop     = struct.noop(),
+		_define   = struct.define(),
+		_slice    = struct.slice(),
+		_clone    = struct.clone(),
+		_dpclone  = struct.depclone(),
+		_extend   = struct.extend(),
+		_eq       = struct.eq(),
 		_toString = struct.convert('string'),
-		_type = struct.type(),
-		_isObj = struct.type('object'),
-		_isFn = struct.type('function'),
-		_isInt = struct.type('int'),
-		_isAry = struct.type('array'),
-		_isPrim = struct.type('primitive'),
-		_loop = struct.op(),
-		_fol = struct.op('object'),
-		_fal = struct.op('array'),
-		_on = struct.event('on'),
-		_unbind = struct.event('unbind'),
-		_emit = struct.event('emit'),
-		_watch = struct.prop('watch'),
-		_unwatch = struct.prop('unwatch'),
-		_trim = struct.string('trim'),
-		_one = struct.index('one'),
-		_has = struct.has(),
-		_find = struct.find(),
-		_ajax = struct.ajax(),
-		_doom = struct.doom();
+		_type     = struct.type(),
+		_isObj    = struct.type('object'),
+		_isFn     = struct.type('function'),
+		_isInt    = struct.type('int'),
+		_isAry    = struct.type('array'),
+		_isPrim   = struct.type('primitive'),
+		_loop     = struct.op(),
+		_fol      = struct.op('object'),
+		_fal      = struct.op('array'),
+		_on       = struct.event('on'),
+		_unbind   = struct.event('unbind'),
+		_emit     = struct.event('emit'),
+		_watch    = struct.prop('watch'),
+		_unwatch  = struct.prop('unwatch'),
+		_trim     = struct.string('trim'),
+		_one      = struct.index('one'),
+		_has      = struct.has(),
+		_find     = struct.find(),
+		_ajax     = struct.ajax(),
+		_doom     = struct.doom();
 
 	// aix genertor function
 	function genertor_(api){
@@ -97,10 +98,8 @@
 			var tmp = _dpclone(this.data);
 			var args = [tmp].concat(_slice(arguments));
 			tmp = (struct[api]()).apply(tmp,args);
-			if(!_eq(tmp,this.data)){
-				this.data = tmp;
-				this.emit(api,null,args);
-			}
+			if(!_eq(tmp,this.data))
+				this.emit((this.data = tmp,api),null,args);
 			return this;
 		};
 	}
@@ -154,14 +153,14 @@
 	}
 	// get childNodes and filter by selector
 	// cant use Global matcher
-	var isId      = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
-			isClass   = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
-			isTag     = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
-			isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
-			mreSl     = /^[^\s]+,[^\s]+/gi,
-			cidSl     = /[\s|\r]+/im,
-			pitSl     = /[>|\+|\~]+/im,
-			isHTML    = /<[a-zA-Z][\s\S]*>/;
+	var isId     = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
+			isClass  = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
+			isTag    = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
+			isAttr   = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
+			mreSl    = /^[^\s]+,[^\s]+/gi,
+			cidSl    = /[\s|\r]+/im,
+			pitSl    = /[>|\+|\~]+/im,
+			isHTML   = /<[a-zA-Z][\s\S]*>/;
 
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
@@ -1749,7 +1748,6 @@
 			});
 		},
 		undoDiff: function(tree, diff) {
-
 			switch (diff[this._const.action]) {
 				case this._const.addAttribute:
 					diff[this._const.action] = this._const.removeAttribute;
@@ -2117,7 +2115,9 @@
 		},
 
 		emit : function(type,fn,args){
-			return _emit(this,type,fn,args);
+			return _fal((type||"").split(","),function(t){
+				_emit(this,t,fn,args);
+			},this),this;
 		},
 
 		listen : function(prop,handler){
@@ -2251,8 +2251,8 @@
 		// parse template
 		if(typeof config.template === "string")
 				config.template = _isFn(config.build)?
-											 config.build.call(this,config.template):
-											 _doom(config.template);
+						config.build.call(this,config.template):
+						_doom(config.template);
 		if(!_isFn(config.render)){
 			config.render = function(){ 
 				return z(this.el).render(this.template.apply(this,arguments)),this;
@@ -2359,10 +2359,7 @@
 		// cant change regular hash title
 		_define(this, {
 			"history" : {
-				value : { 
-					old: "" , 
-					now: root.location.href
-				},
+				value : { old: "", now: root.location.href },
 				writable : true,
 				enumerable : false
 			},
@@ -2398,8 +2395,7 @@
 	// auto trigger regex event when route change
 	aix.route.prototype = {
 		on : function(type,fn){
-			if(_isFn(fn))
-				_on(this,type,fn);
+			if(_isFn(fn)) _on(this,type,fn);
 			return this;
 		},
 
@@ -2535,4 +2531,3 @@
 
 	return Object.freeze(v8(aix));
 });
-
