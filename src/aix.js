@@ -88,7 +88,8 @@
 		_one = struct.index('one'),
 		_has = struct.has(),
 		_find = struct.find(),
-		_ajax = struct.ajax();
+		_ajax = struct.ajax(),
+		_doom = struct.doom();
 
 	// aix genertor function
 	function genertor_(api){
@@ -1881,6 +1882,14 @@
 			return this;
 		},
 
+		find : function(sl){
+			var res = []; 
+			_fal(this.$el,function(e){
+				res = _slice(e.querySelectorAll(sl)).concat(res);
+			});
+			return z(res);
+		},
+
 		closest : function(selector,element){
 			var el = this.$el ,find ,tmp;
 
@@ -2017,7 +2026,7 @@
 	// Aix Model
 	aix.model = function(obj){
 		var _this = this,
-			config = _dpclone(obj||{}),
+			config = _extend({},obj),
 			events = config.events,
 			validate = config.validate;
 
@@ -2224,7 +2233,7 @@
 	// bind selector
 	aix.view = function(obj){
 		var _this = this,
-			config = _dpclone(obj||{}),
+			config = _extend({},obj),
 			events = config.events;
 
 		delete config.events;
@@ -2241,7 +2250,7 @@
 
 		// parse template
 		if(typeof config.template === "string")
-				config.template = _isFN(config.build)?
+				config.template = _isFn(config.build)?
 											 config.build.call(this,config.template):
 											 _doom(config.template);
 		if(!_isFn(config.render)){
@@ -2286,8 +2295,17 @@
 				args = fn,fn = null;
 
 			var k = (type||"").split(":");
+
+			if(k.length>2){
+				return _fal((type||"").split(","),function(mk){
+					var mkf = mk.split(":");
+					z(this.el).find(mkf[1]).trigger(mkf[0],args);
+				},this),this;
+			}
+
 			if(k.length>1)
-				return z(this.el).find(k[1]).trigger(k[0],args);
+				return z(this.el).find(k[1]).trigger(k[0],args),this;
+
 			return _emit(this,type,fn,args);
 		}
 	};
@@ -2323,7 +2341,7 @@
 	// define route for SPA
 	aix.route = function(obj){
 		var _this = this,
-			config = _dpclone(obj||{}),
+			config = _extend({},obj),
 			events = config.events;
 
 		delete config.events;
@@ -2506,7 +2524,7 @@
 	// Create Aix Pack extends
 	// Prepare for component
 	aix.VERSION = struct.VERSION;
-
+
 	aix.view.extend  = createExtend("view");
 	aix.model.extend = createExtend("model");
 	aix.route.extend = createExtend("route");
