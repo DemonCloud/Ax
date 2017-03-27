@@ -25,10 +25,10 @@
     "url": "https://github.com/DemonCloud/aix/issues"
   },
   "homepage": "https://github.com/DemonCloud/aix#readme",
-	"dependencies" :{ 
-		"gulp" : "latest",
-		"gulp-uglify" : "latest",
-		"gulp-concat" : "latest",
-		"gulp-optimize-js":"latest"
+  "dependencies": {
+    "gulp": "latest",
+    "gulp-concat": "latest",
+    "gulp-optimize-js": "latest",
+    "gulp-uglify": "latest"
   }
 }
