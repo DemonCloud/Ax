@@ -38,13 +38,13 @@
 	// Define DOM frame
 	var z,Z;
 	// Define Setting
-	var AIX_VIEW_COUNT = 0,
-			AIX_ROUTE_COUNT = 0,
-			AIX_MODELS_COUNT = 0,
+	var VIEW_COUNT = 0,
+			ROUTE_COUNT = 0,
+			MODEL_COUNT = 0,
 
-			AIX_VIEW_DEFAULT = { el:"", template:"" },
-			AIX_ROUTE_DEFAULT = { routes:{}, actions:{} },
-			AIX_MODELS_DEFAULT = { data:{} },
+			VIEW_DEFAULT = { template:"" },
+			ROUTE_DEFAULT = { routes:{}, actions:{} },
+			MODEL_DEFAULT = { data:{} },
 
 	// resetful list 
 	// use for aix ajax-api
@@ -90,6 +90,7 @@
 		_has      = struct.has(),
 		_find     = struct.find(),
 		_ajax     = struct.ajax(),
+		_size     = struct.size(),
 		_doom     = struct.doom();
 
 	// aix genertor function
@@ -2019,7 +2020,7 @@
 		delete config.validate;
 
 		_define(this,"aid",{
-			value : (++AIX_MODELS_COUNT),
+			value : (++MODEL_COUNT),
 			writable : false,
 			enumerable : false,
 			configurable : false
@@ -2046,7 +2047,7 @@
 		// compose other attr for aix.model
 		_extend(
 			this,
-			_extend(_clone(AIX_MODELS_DEFAULT),config)
+			_extend(_clone(MODEL_DEFAULT),config)
 		);
 
 		//add listen for object data change
@@ -2221,33 +2222,29 @@
 		var _this = this,
 			config = _extend({},obj),
 			events = config.events;
+			this.root = config.root||"_aix";
 
+		delete config.root;
 		delete config.events;
 
 		// if userobj has more events
-		if(_isObj(events))
-			_fol(events,function(v,k){
-				var type = k.split(":");
-				if(type.length > 1)
-					z(config.el).on(type[0],type[1],{self:this},v);
-				else
-					_on(this,k,v);
-			},this);
+		if(_isObj(events)&&_size(events))
+			_fol(events,this.uon,this);
 
 		// parse template
-		if(typeof config.template === "string")
-				config.template = _isFn(config.build)?
-						config.build.call(this,config.template):
-						_doom(config.template);
+		config.template = _isFn(config.build)?
+			config.build.call(this,config.template||""):
+			_doom(config.template||"");
+
 		if(!_isFn(config.render)){
 			config.render = function(){ 
-				return z(this.el).render(this.template.apply(this,arguments)),this;
+				return z(this.root).render(this.template.apply(this,arguments)),this;
 			};
 		}
 
 		_extend(
 			this,
-			_extend(_clone(AIX_VIEW_DEFAULT),config)
+			_extend(_clone(VIEW_DEFAULT),config)
 		);
 
 		// first trgger "init" event
@@ -2256,23 +2253,29 @@
 
 	aix.view.prototype = {
 		on : function(type,fn){
-			var param = type.split(":");
-			// DOM Element events
-			if(param.length > 1)
-				z(this.el).on(param[0],param[1],{self:this},fn);
-			else
-				_on(this,type,fn);
-			return this;
+			return _fal((type||"").split(","),function(mk){
+				var param = mk.split(":");
+				// DOM Element events
+				if(param.length > 1)
+					z(this.root).on(param[0],param[1],{self:this},fn);
+				else
+					_on(this,mk,fn);
+			},this),this;
+		},
+
+		uon : function(fn,type){
+			return this.on(type,fn);
 		},
 
 		unbind : function(type,fn){
-			var param = type.split(":");
-			// DOM Element events
-			if(param.length > 1)
-				z(this.el).off(param[0],param[1],fn);
-			else
-				_unbind(this,type,fn);
-			return this;
+			return _fal((type||"").split(","),function(mk){
+				var param = mk.split(":");
+				// DOM Element events
+				if(param.length > 1)
+					z(this.root).off(param[0],param[1],fn);
+				else
+					_unbind(this,mk,fn);
+			},this),this;
 		},
 
 		emit : function(type,fn,args){
@@ -2284,12 +2287,12 @@
 			if(k.length>2){
 				return _fal((type||"").split(","),function(mk){
 					var mkf = mk.split(":");
-					z(this.el).find(mkf[1]).trigger(mkf[0],args);
+					z(this.root).find(mkf[1]).trigger(mkf[0],args);
 				},this),this;
 			}
 
 			if(k.length>1)
-				return z(this.el).find(k[1]).trigger(k[0],args),this;
+				return z(this.root).find(k[1]).trigger(k[0],args),this;
 
 			return _emit(this,type,fn,args);
 		}
@@ -2367,7 +2370,7 @@
 
 		_extend(
 			this,
-			_extend(_clone(AIX_ROUTE),config)
+			_extend(_clone(ROUTE_DEFAULT),config)
 		);
 
 		_emit(this,"init");
@@ -2400,7 +2403,7 @@
 		},
 
 		addAction:function(name,fn){
-			if(name!=null&&_isFn(fn))
+			if(name&&_isFn(fn))
 				this.actions[_toString(name)] = fn;
 			return this;
 		},
@@ -2413,7 +2416,7 @@
 		listen: function(hash){
 			if(!this._listen){
 				_define(this,"_listen",{
-					value:1,
+					value:true,
 					writable : false,
 					enumerable : false,
 					configurable: true,
@@ -2446,14 +2449,8 @@
 				root.location.href = url + (hash.toString().slice(0,1)==="#"?"":"#") + hash;
 			}
 			return this;
-		},
-
-		addhash : function(hash){
-			var now = root.location.href + (hash||"").toString();
-			if(now!==root.location.href)
-				root.location.href = now;
-			return this;
 		}
+
 	};
 
 	// #genertor api
