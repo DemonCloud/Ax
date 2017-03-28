@@ -407,7 +407,8 @@
 	function createProxy(event) {
 		var key, proxy = { originalEvent: event };
 		for (key in event)
-			if (!ignoreProperties.test(key) && event[key] !== undefined) proxy[key] = event[key];
+			if (!ignoreProperties.test(key) && event[key] !== undefined) 
+				proxy[key] = event[key];
 	
 		return compatible(proxy, event);
 	}
@@ -567,11 +568,10 @@
 		delete tree.outerDone;
 		delete tree.innerDone;
 		delete tree.valueDone;
-		if (tree.childNodes) {
+		if (tree.childNodes)
 			return tree.childNodes.every(removeDone);
-		} else {
+		else
 			return true;
-		}
 	};
 
 	var isEqual = function(e1, e2) {
@@ -586,13 +586,11 @@
 			return false;
 		}
 
-		if (Boolean(e1.attributes) !== Boolean(e2.attributes)) {
+		if (Boolean(e1.attributes) !== Boolean(e2.attributes))
 			return false;
-		}
 
-		if (Boolean(e1.childNodes) !== Boolean(e2.childNodes)) {
+		if (Boolean(e1.childNodes) !== Boolean(e2.childNodes))
 			return false;
-		}
 
 		if (e1.attributes) {
 			e1Attributes = _keys(e1.attributes);
@@ -611,45 +609,36 @@
 		}
 
 		if (e1.childNodes) {
-			if (e1.childNodes.length !== e2.childNodes.length) {
+			if (e1.childNodes.length !== e2.childNodes.length)
 				return false;
-			}
 			if (!e1.childNodes.every(function(childNode, index) {
 				return isEqual(childNode, e2.childNodes[index]);
-			})) {
-
+			})) 
 				return false;
-			}
-
 		}
 
 		return true;
-
 	};
 
 
 	var roughlyEqual = function(e1, e2, uniqueDescriptors, sameSiblings, preventRecursion) {
 		var childUniqueDescriptors, nodeList1, nodeList2;
 
-		if (!e1 || !e2) {
+		if (!e1 || !e2)
 			return false;
-		}
 
-		if (e1.nodeName !== e2.nodeName) {
+		if (e1.nodeName !== e2.nodeName)
 			return false;
-		}
 
-		if (e1.nodeName === '#text') {
+		if (e1.nodeName === '#text')
 			// Note that we initially don't care what the text content of a node is,
 			// the mere fact that it's the same tag and "has text" means it's roughly
 			// equal, and then we can find out the true text difference later.
 			return preventRecursion ? true : e1.data === e2.data;
-		}
 
 
-		if (e1.nodeName in uniqueDescriptors) {
+		if (e1.nodeName in uniqueDescriptors)
 			return true;
-		}
 
 		if (e1.attributes && e2.attributes) {
 
@@ -666,16 +655,14 @@
 			}
 		}
 
-		if (sameSiblings) {
+		if (sameSiblings)
 			return true;
-		}
 
 		nodeList1 = e1.childNodes ? e1.childNodes.slice().reverse() : [];
 		nodeList2 = e2.childNodes ? e2.childNodes.slice().reverse() : [];
 
-		if (nodeList1.length !== nodeList2.length) {
+		if (nodeList1.length !== nodeList2.length)
 			return false;
-		}
 
 		if (preventRecursion) {
 			return nodeList1.every(function(element, index) {
@@ -1011,11 +998,10 @@
 			// inner differences?
 			if (!t1.innerDone) {
 				diffs = this.findInnerDiff(t1, t2, route);
-				if (diffs.length > 0) {
+				if (diffs.length > 0)
 					return diffs;
-				} else {
+				else
 					t1.innerDone = true;
-				}
 			}
 
 			if (this.valueDiffing && !t1.valueDone) {
@@ -2269,7 +2255,6 @@
 	};
 
 	aix.view.prototype = {
-		
 		on : function(type,fn){
 			var param = type.split(":");
 			// DOM Element events
@@ -2313,7 +2298,7 @@
 	//get Hash param form URL
 	function getHash(url){
 		var index = url.search("#");
-		return index>0?url.slice(index+1):"";
+		return index>0 ? url.slice(index+1) : "";
 	}
 
 	//if HashChange callee
@@ -2326,15 +2311,12 @@
 
 	// detect args callback
 	function changeHashReg(fn,args){
-		switch(_type(fn)){
-			case "function":
-				fn.apply(this,args);
-				break;
-			default:
-				// array or string
-				_fal(typeof fn === "string" ? fn.split(",") : fn,
+		if(_isFn(fn)){
+			fn.apply(this,args);
+		} else {
+			// array or string
+			_fal(typeof fn === "string" ? fn.split(",") : fn,
 				function(reg){ this.actions[reg].apply(this,args); },this);
-				break;
 		}
 	}
 
@@ -2418,7 +2400,7 @@
 		},
 
 		addAction:function(name,fn){
-			if(name!=null&&isFn(fn))
+			if(name!=null&&_isFn(fn))
 				this.actions[_toString(name)] = fn;
 			return this;
 		},
@@ -2525,8 +2507,8 @@
 	aix.model.extend = createExtend("model");
 	aix.route.extend = createExtend("route");
 
-	Object.freeze(aix.model),
-	Object.freeze(aix.view),
+	Object.freeze(aix.model);
+	Object.freeze(aix.view);
 	Object.freeze(aix.route);
 
 	return Object.freeze(v8(aix));
