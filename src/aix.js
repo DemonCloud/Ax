@@ -128,7 +128,7 @@
 		eargs = eargs.slice(eargs.indexOf('(')+1, eargs.indexOf(')'))
 								 .match(/([^\s,]+)/g)[0];
   	
-  	return [oargs||"",eargs||"",body];
+  	return [_toString(oargs),_toString(eargs),body];
 	}
 
 	function createExtend(origin){
@@ -519,14 +519,11 @@
 		if (el.nodeName !== '#text' && el.nodeName !== '#comment') {
 			output.push(el.nodeName);
 			if (el.attributes) {
-				if (el.attributes['class']) {
+				if (el.attributes['class'])
 					output.push(el.nodeName + '.' + el.attributes['class'].replace(/ /g, '.'));
-				}
-				if (el.attributes.id) {
+				if (el.attributes.id)
 					output.push(el.nodeName + '#' + el.attributes.id);
-				}
 			}
-
 		}
 		return output;
 	};
@@ -2028,11 +2025,7 @@
 
 		// if userobj has more events
 		if(_isObj(events))
-			_fol(
-				events,
-				function(v,k){_on(this,k,v);},
-				this
-			);
+			_fol(events,this.uon,this);
 
 		if(_isFn(validate)){
 			_define(this,"validate",{
@@ -2095,6 +2088,10 @@
 		on: function(type,fn){
 			if(_isFn(fn)) _on(this,type,fn);
 			return this;
+		},
+
+		uon: function(fn,type){
+			return this.on(type,fn);
 		},
 
 		unbind : function(type,fn){
@@ -2332,11 +2329,7 @@
 		delete config.events;
 		// if userobj has more events
 		if(_isObj(events))
-			_fol(
-				events,
-				function(v,k){_on(this,k,v);},
-				this
-			);
+			_fol(events, this.uon, this);
 
 		// addEvent for this route object
 		// use dispatch event to trigger
@@ -2382,6 +2375,10 @@
 		on : function(type,fn){
 			if(_isFn(fn)) _on(this,type,fn);
 			return this;
+		},
+
+		uon : function(fn,type){
+			return this.on(type,fn);
 		},
 
 		unbind : function(type,fn){

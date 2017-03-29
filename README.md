@@ -1,4 +1,4 @@
-[Aix] is a smart fast MVC javascript framework
+[Aix] is a fast event pack MVC javascript framework
 
 With test by Qunit
 
