@@ -36,15 +36,11 @@
 	"use strict";
 
 	// Define DOM frame
-	var z,Z;
+	var z,Z,
 	// Define Setting
-	var VIEW_COUNT = 0,
-			ROUTE_COUNT = 0,
-			MODEL_COUNT = 0,
-
-			VIEW_DEFAULT = { template:"" },
-			ROUTE_DEFAULT = { routes:{}, actions:{} },
-			MODEL_DEFAULT = { data:{} },
+		VIEW_DEFAULT = { root:"[__aix__]", events:{} },
+		MODEL_DEFAULT = { data:{}, events:{}, validate:{} },
+		ROUTE_DEFAULT = { routes:{}, actions:{} },
 
 	// resetful list 
 	// use for aix ajax-api
@@ -83,6 +79,8 @@
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
 		_emit     = struct.event('emit'),
+		_prop     = struct.prop(),
+		_setProp  = struct.prop("set"),
 		_watch    = struct.prop('watch'),
 		_unwatch  = struct.prop('unwatch'),
 		_trim     = struct.string('trim'),
@@ -1799,9 +1797,9 @@
 	var _DIFF = new diffDOM({
 		diffcap: 999999
 	});
+	// end off domdiff
 
 	var supportTemplate = "content" in document.createElement("template");
-
 	function createDOM(rootElm,html){
 		var r = rootElm.cloneNode();
 		if(supportTemplate){
@@ -1813,8 +1811,6 @@
 		}
 		return r;
 	}
-	// end off domdiff
-
 	// Doom Events
 	// Dom fired api
 	var capEvents = [
@@ -2005,62 +2001,66 @@
 		}
 	};
 
+	function checkValidate(olddata,newdata,validate){
+		var res = false,key;
+		if(!_eq(olddata,newdata)){
+			key = _keys(validate); res = true;
+			for(var i=0,isRequired; i<key.length; i++){
+				// get validate funtion
+				isRequired = validate[key[i]];
+				if(!isRequired(_prop(newdata,key[i]))){
+					res = false; break;
+				}
+			}
+		}
+		return res;
+	}
+
 	// Aix Model
 	aix.model = function(obj){
-		var _this = this,
-			config = _extend({},obj),
+		var config = _extend(_clone(MODEL_DEFAULT),obj),
+			data = config.data,
 			events = config.events,
 			validate = config.validate;
 
+		delete config.data;
 		delete config.change;
 		delete config.events;
 		delete config.validate;
 
-		_define(this,"aid",{
-			value : (++MODEL_COUNT),
-			writable : false,
-			enumerable : false,
-			configurable : false
+		_extend(this,config);
+		// if userobj has more events
+		_fol(events,this.uon,this);
+
+		// define data
+		_define(this,"data",{
+			get : function(){
+				return _clone(data);
+			},
+			set : function(newdata){
+				var args = [_clone(newdata)];
+				this.emit("validate",args);
+
+				if(_isPrim(newdata)){
+					if(validate(newdata)&&!_eq(data,newdata))
+						return data=newdata,
+							this.emit("change,validate:success",args),
+							this.change=true,
+							newdata;
+				}else{
+					if(checkValidate(data,newdata,validate))
+						return data=newdata,
+							this.emit("change,validate:success",args),
+							this.change=true,
+							newdata;
+				}
+				return this.emit("validate:fail"),data;
+			},
+			enumerable:true,
+			configurable:false
 		});
 
-		// if userobj has more events
-		if(_isObj(events))
-			_fol(events,this.uon,this);
-
-		if(_isFn(validate)){
-			_define(this,"validate",{
-				value : validate,
-  			writable: false,
-  			enumerable: false,
-  			configurable: false
-			});
-		}
-
-		// set default option
-		// compose other attr for aix.model
-		_extend(
-			this,
-			_extend(_clone(MODEL_DEFAULT),config)
-		);
-
-		//add listen for object data change
-		_watch(this,"data",function(nv,ov){
-			// Validate checker for change
-			if(_isFn(this.validate)){
-				// validate status check
-				if(!this.validate.call(this,nv))
-					// trigger validate and fail events
-					return _emit(this,"validate,validate:fail",[nv,ov]),ov;
-				// trigger validate and success events
-				_emit(this,"validate,validate:success",[nv,ov]);
-			}
-			// detect if change value
-			return !_eq(nv,ov) ? 
-						 (_emit(this,"change",[nv,ov]),this.change = true)&&nv : ov;
-		}.bind(this));
-
-		// first trgger "init" event
-		_emit(this,"init");
+		this.emit("init",[this.parse()]);
 	};
 
 	// Extend aix model method 
@@ -2070,18 +2070,15 @@
 	aix.model.prototype = {
 		get : function(key){
 			if(key!=null)
-				return _clone(this.data[key]);
-			return _clone(this.data);
+				return _prop(this.data,key);
+			return this.data;
 		},
 
 		set : function(){
-			var args = arguments;
-			if(args.length>1){
-				this.emit("change",[args[1],this.data[args[0]]]);
-				this.data[args[0]] = args[1];
-			}else
-				this.data = args[0];
-			return this.emit("set",args);
+			this.data = arguments.length > 1 ?
+				_setProp(this.parse(),arguments[0],arguments[1]) : 
+				arguments[0];
+			return this.emit("set",_slice(arguments));
 		},
 
 		// API event
@@ -2104,22 +2101,12 @@
 			},this),this;
 		},
 
-		listen : function(prop,handler){
-			if(_isObj(this.data))
-				_watch(this.data,prop,handler);
-			return this;
-		},
-
-		unlisten : function(prop){
-			if(_isObj(this.data))
-				_unwatch(this.data,prop);
-			return this;
-		},
-
 		// Aix Restful API design for
 		// [Aix Model] data format serialize
 		toJSON : function(){
-			return _isPrim(this.data) ? this.data : JSON.stringify(this.data);
+			return _isPrim(this.data) ? 
+				this.data : 
+				JSON.stringify(this.data);
 		},
 
 		parse : function(deep){
@@ -2212,40 +2199,40 @@
 		  		header
 			]);
 		},
+
+		toString: function(){
+			return this.data;
+		}
 	};
 
 	// bind selector
 	aix.view = function(obj){
-		var _this = this,
-			config = _extend({},obj),
+		var config = _extend(_clone(VIEW_DEFAULT),obj),
 			events = config.events;
-			this.root = config.root||"_aix";
 
-		delete config.root;
 		delete config.events;
-
-		// if userobj has more events
-		if(_isObj(events)&&_size(events))
-			_fol(events,this.uon,this);
-
 		// parse template
-		config.template = _isFn(config.build)?
-			config.build.call(this,config.template||""):
-			_doom(config.template||"");
-
+		// building the render function
 		if(!_isFn(config.render)){
+			var template = typeof config.template === "string" ? 
+				_doom(config.template) :
+				(config.template || _noop);
+
 			config.render = function(){ 
-				return z(this.root).render(this.template.apply(this,arguments)),this;
+				return (template !== _noop && 
+					z(this.root).render(
+					template.apply(this,arguments))),this;
 			};
+
+			delete config.template;
 		}
 
-		_extend(
-			this,
-			_extend(_clone(VIEW_DEFAULT),config)
-		);
+		_extend(this,config);
+		// if userobj has more events
+		_fol(events,this.uon,this);
 
 		// first trgger "init" event
-		_emit(this,"init");
+		this.emit("init");
 	};
 
 	aix.view.prototype = {
@@ -2323,7 +2310,7 @@
 	// define route for SPA
 	aix.route = function(obj){
 		var _this = this,
-			config = _extend({},obj),
+			config = _extend(_clone(ROUTE_DEFAULT),obj),
 			events = config.events;
 
 		delete config.events;
@@ -2361,12 +2348,8 @@
 			}
 		});
 
-		_extend(
-			this,
-			_extend(_clone(ROUTE_DEFAULT),config)
-		);
-
-		_emit(this,"init");
+		_extend(this,config);
+		this.emit("init");
 	};
 
 	// Aix-Route for SPA Architecture

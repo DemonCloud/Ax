@@ -1089,7 +1089,7 @@ var encodeReg = /[&<">'](?:(amp|lt|quot|gt|#39);)?/g,
 		tagCenterReg = new RegExp('>'+sReg+'<','g'),
 		tagLeftReg = new RegExp('<'+sReg,'g'),
 		tagRightReg = new RegExp(sReg+'>','g'),
-		tagCloseReg = new RegExp('<'+sReg+'\/'+sReg,'g');
+		tagCloseReg = new RegExp('<\/'+sReg,'g');
 
 // String Methods 
 // @use trim
@@ -1129,7 +1129,7 @@ function capitalize(s){
 }
 
 function collapse(s){
-	return s.replace(zipReg,'')
+	return trim(s).replace(zipReg,'')
 					.replace(collapseReg,' ')
 					.replace(tagCenterReg,'><')
 					.replace(tagLeftReg,'<')
@@ -1137,10 +1137,11 @@ function collapse(s){
 					.replace(tagCloseReg,'</');
 }
 
-function rize(s,and){
-	and = toString(and) || '-'; 
+function rize(s,and,upper){
+	var cmd = upper ? "toUpperCase" : "toLowerCase",
+		c = toString(and) || '-'; 
 	return s.replace(upperReg,function(charz,index){
-		return (index>0 ? and : '') + charz.toLowerCase();
+		return (index>0 ? c : '') + charz[cmd]();
 	});
 }
 
@@ -1201,7 +1202,7 @@ function DOOM(txt,name){
 						"|" + (this.evaluate||no) +"|$","g");
 
 	// start replace
-	stripHTML(txt).replace( exp, function(match,escape,interpolate,evaluate,offset){
+	zipHTML(txt).replace(exp, function(match,escape,interpolate,evaluate,offset){
 		res += txt.slice(position,offset).replace(escaper,c_escape);
 		// refresh index where to find text string
 		position = offset + match.length;
@@ -1248,7 +1249,7 @@ function DOOM(txt,name){
 function cookieParse(ckstr){
 	var tmp, res={}, pars = ckstr ? ckstr.split(";") : [];
 
-	fov(pars, function(item){
+	al(pars, function(item){
 		var ind = (item||"").search("=");
 
 		if(!~ind) return;
@@ -1562,9 +1563,39 @@ function fireEvent(obj,type,fn,args){
 // @use watch [ listen ]
 // @use unwatch [ unlisten ]
 // @exprot prop
+
+// define deeping getProp method
 function getProp(obj,prop){
-	if(obj.hasOwnProperty(prop))
-		return obj[prop];
+	var tmp,keygen = (prop||"").split(".");
+	if(keygen.length === 1){
+		if(obj.hasOwnProperty(prop))
+			tmp = obj[prop];
+	}else{
+		// [a.b.2]
+		tmp = obj;
+		for(var i=0;i<keygen.length;i++){
+			tmp = tmp[keygen[i]]; 
+			if(isPrimitive(tmp)) 
+				break;
+		}
+	}
+	return tmp;
+}
+
+function setProp(obj,prop,value){
+	var tmp,end,keygen = (prop||"").split(".");
+	if(keygen.length === 1){
+		if(obj.hasOwnProperty(prop))
+			obj[prop] = value;
+	}else{
+		// [a.b.2]
+		tmp = obj;
+		end = keygen.pop();
+		for(var i=0;i<keygen.length;i++)
+			tmp = tmp[keygen[i]]; 
+		tmp[end] = value;
+	}
+	return obj;
 }
 
 function watch(obj,prop,handle){
@@ -1940,7 +1971,6 @@ function $string(c){
 		case "camelize":
 			return camelize;
 		case "capit":
-		case "capital":
 		case "capitalize":
 			return capitalize;
 		case "collapse":
@@ -1985,6 +2015,10 @@ function $event(c){
 
 function $prop(c){
 	switch((c||"").toLowerCase()){
+		case "get":
+			return getProp;
+		case "set":
+			return setProp;
 		case "watch":
 		case "listen":
 			return watch;
