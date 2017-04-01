@@ -11,7 +11,7 @@
  * *IE 9-Edge support
  *
  * @Author  : YIJUN
- * @Date    : 2016.6.22 - now
+ * @Date    : 2017.4.1 - now
  * @Version : 0.1
  *
  * @License : FAL
@@ -38,7 +38,7 @@
 	// Define DOM frame
 	var z,Z,
 	// Define Setting
-		VIEW_DEFAULT = { root:"[__aix__]", events:{} },
+		VIEW_DEFAULT  = { root:"[__aix__]", events:{} },
 		MODEL_DEFAULT = { data:{}, events:{}, validate:{} },
 		ROUTE_DEFAULT = { char:"@", routes:{}, actions:{} },
 
@@ -53,10 +53,10 @@
 		fetch  : "GET",
 		update : "POST",
 		delete : "POST"
-	};
+	},
 
 	// *use struct utils list
-	var root    = struct.root,
+		root      = struct.root,
 		v8        = struct.v8(),
 		_keys     = struct.keys(),
 		_noop     = struct.noop(),
@@ -142,25 +142,19 @@
 
 			_extend(extend.prototype,aix[origin].prototype);
 			extend.prototype.constructor = extend;
-			_define(extend,"base",{
-				value: aix[origin],
-  			writable: false,
-  			enumerable: false,
-  			configurable: false
-			});
 			return extend;
 		};
 	}
 	// get childNodes and filter by selector
 	// cant use Global matcher
-	var isId     = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
-			isClass  = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
-			isTag    = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
-			isAttr   = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
-			mreSl    = /^[^\s]+,[^\s]+/gi,
-			cidSl    = /[\s|\r]+/im,
-			pitSl    = /[>|\+|\~]+/im,
-			isHTML   = /<[a-zA-Z][\s\S]*>/;
+	var isId    = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
+			isClass = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
+			isTag   = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
+			isAttr  = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
+			mreSl   = /^[^\s]+,[^\s]+/gi,
+			cidSl   = /[\s|\r]+/im,
+			pitSl   = /[>|\+|\~]+/im,
+			isHTML  = /<[a-zA-Z][\s\S]*>/;
 
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
@@ -2286,18 +2280,18 @@
 		return _param(!~charindex ? void 0 : url.slice(charindex+1));
 	}
 
-	//if HashChange callee
-	function changeHash(url,char,event){
+	//if hashChange call
+	function hashChange(url,char,event){
 		var hash = hashGet(url,char), param = hashParam(url,char); 
 		_fol(this.routes,function(fn,key){
 			if(RegExp(key,"i").test(hash))
-				changeHashReg.call(this,fn,
+				hashChangeReg.call(this,fn,
 					[hash,param,event]);
 		},this);
 	}
 
 	// detect args callback
-	function changeHashReg(fn,args){
+	function hashChangeReg(fn,args){
 		if(_isFn(fn))
 			fn.apply(this,args);
 		else
@@ -2335,7 +2329,7 @@
 		});
 
 		_extend(this,config);
-		this.on("hashchange",changeHash);
+		this.on("hashchange",hashChange);
 		this.emit("init");
 	};
 
