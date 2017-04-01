@@ -15,6 +15,10 @@
 	<div id="app">
 	
 	</div>
+
+	<div id="app2">
+	
+	</div>
 	<!-- <script src="./src/struct.js"></script> -->
 	<!-- <script src="./src/aix.js"></script> -->
 	<script src="./dest/aix.c.js"></script>
@@ -37,6 +41,26 @@ var view = new aix.view({
 	template:"<div>name: {{-name}}</div>"+
 					 "<div>score: {{-score}}</div>"
 });
+
+var model2 = new aix.model({
+		data:[5,1,3,4,2,6]
+});
+
+var view2 = new aix.view({
+	root:"#app2",
+	template: "{{ var al = struct.op('array') }}"+
+						"<ul>"+
+						"{{ al(numbers,function(num){ }}"+
+						"<li>{{#num}}</li>"+
+						"{{ }) }}"+
+						"</ul>"
+});
+
+model2.on("change",function(){
+	view2.render({ numbers: model2.parse() });
+});
+
+view2.render({ numbers: model2.parse() });
 
 var route = new aix.route({
 	routes:{

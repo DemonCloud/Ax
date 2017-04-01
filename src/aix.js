@@ -95,10 +95,10 @@
 	// aix genertor function
 	function genertor_(api){
 		return function(){
-			var tmp = _dpclone(this.data);
-			var args = [tmp].concat(_slice(arguments));
-			tmp = (struct[api]()).apply(tmp,args);
-			if(!_eq(tmp,this.data))
+			var fn = struct[api](),
+					tmp = this.parse(),
+					args = [tmp].concat(_slice(arguments));
+			if(!_eq(tmp = fn.apply(tmp,args),this.data))
 				this.emit((this.data = tmp,api),null,args);
 			return this;
 		};
@@ -107,9 +107,10 @@
 	// not change rebase data
 	function genertor_$(api){
 		return function(){
-			var tmp = _dpclone(this.data);
-			var args = [tmp].concat(_slice(arguments));
-			return struct[api]().apply(tmp,args);
+			var fn = struct[api](),
+					tmp = this.parse(),
+					args = [tmp].concat(_slice(arguments));
+			return fn.apply(tmp,args);
 		};
 	}
 
@@ -2096,7 +2097,7 @@
 		},
 
 		parse : function(deep){
-			return _clone(this.data,deep);
+			return deep?_dpclone(this.data):this.data;
 		},
 
 		// Fetch mean Restful "GET"
@@ -2138,7 +2139,7 @@
 			}.bind(this);
 			st.fail = function(xhr,event){
 				_fnf.call(this,xhr,event);
-				_this.emit(type+":fail",[xhr,event]);
+				this.emit(type+":fail",[xhr,event]);
 			}.bind(this);
 
 			// trigger ajax events
@@ -2147,7 +2148,9 @@
 		},
 
 		aget: function(url,param,fns,fnf,header){
-			return this.pipe.apply(this,["get"].concat(_clone(arguments)));
+			return this.pipe.apply(this,
+				["get"].concat(_clone(arguments))
+			);
 		},
 
 		fetch: function(param,fns,fnf,header){
@@ -2409,7 +2412,9 @@
 		"flat",
 		"merge",
 		"map",
-		"unique"
+		"sort",
+		"unique",
+		"concat"
 	],function(api){
 		aix.model.prototype[api]= genertor_(api);
 	});
