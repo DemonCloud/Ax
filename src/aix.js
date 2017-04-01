@@ -513,11 +513,14 @@
 		if (el.nodeName !== '#text' && el.nodeName !== '#comment') {
 			output.push(el.nodeName);
 			if (el.attributes) {
-				if (el.attributes['class'])
+				if (el.attributes['class']) {
 					output.push(el.nodeName + '.' + el.attributes['class'].replace(/ /g, '.'));
-				if (el.attributes.id)
+				}
+				if (el.attributes.id) {
 					output.push(el.nodeName + '#' + el.attributes.id);
+				}
 			}
+
 		}
 		return output;
 	};
@@ -549,8 +552,9 @@
 			inBoth = {};
 
 		_fal(_keys(l1Unique),function(key) {
-			if (l2Unique[key])
+			if (l2Unique[key]) {
 				inBoth[key] = true;
+			}
 		});
 
 		return inBoth;
@@ -560,10 +564,11 @@
 		delete tree.outerDone;
 		delete tree.innerDone;
 		delete tree.valueDone;
-		if (tree.childNodes)
+		if (tree.childNodes) {
 			return tree.childNodes.every(removeDone);
-		else
+		} else {
 			return true;
+		}
 	};
 
 	var isEqual = function(e1, e2) {
@@ -571,18 +576,21 @@
 		var e1Attributes, e2Attributes;
 
 		if (!['nodeName', 'value', 'checked', 'selected', 'data'].every(function(element) {
-			if (e1[element] !== e2[element])
+			if (e1[element] !== e2[element]) {
 				return false;
+			}
 			return true;
 		})) {
 			return false;
 		}
 
-		if (Boolean(e1.attributes) !== Boolean(e2.attributes))
+		if (Boolean(e1.attributes) !== Boolean(e2.attributes)) {
 			return false;
+		}
 
-		if (Boolean(e1.childNodes) !== Boolean(e2.childNodes))
+		if (Boolean(e1.childNodes) !== Boolean(e2.childNodes)) {
 			return false;
+		}
 
 		if (e1.attributes) {
 			e1Attributes = _keys(e1.attributes);
@@ -601,36 +609,45 @@
 		}
 
 		if (e1.childNodes) {
-			if (e1.childNodes.length !== e2.childNodes.length)
+			if (e1.childNodes.length !== e2.childNodes.length) {
 				return false;
+			}
 			if (!e1.childNodes.every(function(childNode, index) {
 				return isEqual(childNode, e2.childNodes[index]);
-			})) 
+			})) {
+
 				return false;
+			}
+
 		}
 
 		return true;
+
 	};
 
 
 	var roughlyEqual = function(e1, e2, uniqueDescriptors, sameSiblings, preventRecursion) {
 		var childUniqueDescriptors, nodeList1, nodeList2;
 
-		if (!e1 || !e2)
+		if (!e1 || !e2) {
 			return false;
+		}
 
-		if (e1.nodeName !== e2.nodeName)
+		if (e1.nodeName !== e2.nodeName) {
 			return false;
+		}
 
-		if (e1.nodeName === '#text')
+		if (e1.nodeName === '#text') {
 			// Note that we initially don't care what the text content of a node is,
 			// the mere fact that it's the same tag and "has text" means it's roughly
 			// equal, and then we can find out the true text difference later.
 			return preventRecursion ? true : e1.data === e2.data;
+		}
 
 
-		if (e1.nodeName in uniqueDescriptors)
+		if (e1.nodeName in uniqueDescriptors) {
 			return true;
+		}
 
 		if (e1.attributes && e2.attributes) {
 
@@ -642,19 +659,22 @@
 			}
 			if (e1.attributes['class'] && e1.attributes['class'] === e2.attributes['class']) {
 				var classDescriptor = e1.nodeName + '.' + e1.attributes['class'].replace(/ /g, '.');
-				if (classDescriptor in uniqueDescriptors)
+				if (classDescriptor in uniqueDescriptors) {
 					return true;
+				}
 			}
 		}
 
-		if (sameSiblings)
+		if (sameSiblings) {
 			return true;
+		}
 
 		nodeList1 = e1.childNodes ? e1.childNodes.slice().reverse() : [];
 		nodeList2 = e2.childNodes ? e2.childNodes.slice().reverse() : [];
 
-		if (nodeList1.length !== nodeList2.length)
+		if (nodeList1.length !== nodeList2.length) {
 			return false;
+		}
 
 		if (preventRecursion) {
 			return nodeList1.every(function(element, index) {
@@ -668,6 +688,11 @@
 				return roughlyEqual(element, nodeList2[index], childUniqueDescriptors, true, true);
 			});
 		}
+	};
+
+
+	var cloneObj = function(obj) {
+		return JSON.parse(JSON.stringify(obj));
 	};
 
 	/**
@@ -741,26 +766,6 @@
 		});
 	};
 
-	/**
-	 * Generate arrays that indicate which node belongs to which subset,
-	 * or whether it's actually an orphan node, existing in only one
-	 * of the two trees, rather than somewhere in both.
-	 *
-	 * So if t1 = <img><canvas><br>, t2 = <canvas><br><img>.
-	 * The longest subset is "<canvas><br>" (length 2), so it will group 0.
-	 * The second longest is "<img>" (length 1), so it will be group 1.
-	 * gaps1 will therefore be [1,0,0] and gaps2 [0,0,1].
-	 *
-	 * If an element is not part of any group, it will stay being 'true', which
-	 * is the initial value. For example:
-	 * t1 = <img><p></p><br><canvas>, t2 = <b></b><br><canvas><img>
-	 *
-	 * The "<p></p>" and "<b></b>" do only show up in one of the two and will
-	 * therefore be marked by "true". The remaining parts are parts of the
-	 * groups 0 and 1:
-	 * gaps1 = [1, true, 0, 0], gaps2 = [true, 0, 0, 1]
-	 *
-	 */
 	var getGapInformation = function(t1, t2, stable) {
 
 		var gaps1 = t1.childNodes ? makeArray(t1.childNodes.length, true) : [],
@@ -771,10 +776,12 @@
 		_fal(stable,function(subset) {
 			var i, endOld = subset.oldValue + subset.length,
 				endNew = subset.newValue + subset.length;
-			for (i = subset.oldValue; i < endOld; i += 1)
+			for (i = subset.oldValue; i < endOld; i += 1) {
 				gaps1[i] = group;
-			for (i = subset.newValue; i < endNew; i += 1)
+			}
+			for (i = subset.newValue; i < endNew; i += 1) {
 				gaps2[i] = group;
+			}
 			group += 1;
 		});
 
@@ -821,9 +828,9 @@
 		// 	obj[p1] = obj[p2];
 		// 	obj[p2] = _;
 		// }(obj[p1]));
-		obj[p1] ^= obj[p2];
-		obj[p2] ^= obj[p1];
-		obj[p1] ^= obj[p2];
+		obj[p1]^=obj[p2];
+		obj[p2]^=obj[p1];
+		obj[p1]^=obj[p2];
 	}
 
 
@@ -871,10 +878,11 @@
 		}
 
 		for (i in defaults) {
-			if (typeof options[i] === "undefined")
+			if (typeof options[i] === "undefined") {
 				this[i] = defaults[i];
-			else
+			} else {
 				this[i] = options[i];
+			}
 		}
 
 		this._const = {
@@ -983,10 +991,11 @@
 			// inner differences?
 			if (!t1.innerDone) {
 				diffs = this.findInnerDiff(t1, t2, route);
-				if (diffs.length > 0)
+				if (diffs.length > 0) {
 					return diffs;
-				else
+				} else {
 					t1.innerDone = true;
+				}
 			}
 
 			if (this.valueDiffing && !t1.valueDone) {
@@ -1012,8 +1021,8 @@
 			if (t1.nodeName !== t2.nodeName) {
 				return [new Diff()
 					.setValue(t._const.action, t._const.replaceElement)
-					.setValue(t._const.oldValue, _clone(t1))
-					.setValue(t._const.newValue, _clone(t2))
+					.setValue(t._const.oldValue, cloneObj(t1))
+					.setValue(t._const.newValue, cloneObj(t2))
 					.setValue(t._const.route, route)
 				];
 			}
@@ -1088,7 +1097,7 @@
 			} else {
 				if (aNode.attributes && aNode.attributes.length > 0) {
 					objNode.attributes = {};
-					_fal(_slice(aNode.attributes),
+					_fal(Array.prototype.slice.call(aNode.attributes),
 						function(attribute) {
 							objNode.attributes[attribute.name] = attribute.value;
 						}
@@ -1096,7 +1105,7 @@
 				}
 				if (aNode.childNodes && aNode.childNodes.length > 0) {
 					objNode.childNodes = [];
-					_fal(_slice(aNode.childNodes),
+					_fal(Array.prototype.slice.call(aNode.childNodes),
 						function(childNode) {
 							objNode.childNodes.push(dobj.nodeToObj(childNode));
 						}
@@ -1142,12 +1151,15 @@
 					});
 				}
 				if (this.valueDiffing) {
-					if (objNode.value)
+					if (objNode.value) {
 						node.value = objNode.value;
-					if (objNode.checked)
+					}
+					if (objNode.checked) {
 						node.checked = objNode.checked;
-					if (objNode.selected)
+					}
+					if (objNode.selected) {
 						node.selected = objNode.selected;
+					}
 				}
 			}
 			return node;
@@ -1166,8 +1178,9 @@
 				 * and t2.
 				 */
 				diffs = this.attemptGroupRelocation(t1, t2, subtrees, route);
-				if (diffs.length > 0)
+				if (diffs.length > 0) {
 					return diffs;
+				}
 			}
 
 			/* 0 or 1 groups of similar child nodes have been found
@@ -1179,8 +1192,9 @@
 
 
 			last = Math.max(t1ChildNodes.length, t2ChildNodes.length);
-			if (t1ChildNodes.length !== t2ChildNodes.length)
+			if (t1ChildNodes.length !== t2ChildNodes.length) {
 				childNodesLengthDifference = true;
+			}
 
 			for (i = 0; i < last; i += 1) {
 				e1 = t1ChildNodes[i];
@@ -1201,7 +1215,7 @@
 							diffs.push(new Diff()
 								.setValue(t._const.action, t._const.removeElement)
 								.setValue(t._const.route, route.concat(index))
-								.setValue(t._const.element, _clone(e1))
+								.setValue(t._const.element, cloneObj(e1))
 							);
 							index -= 1;
 						}
@@ -1217,7 +1231,7 @@
 							diffs.push(new Diff()
 								.setValue(t._const.action, t._const.addElement)
 								.setValue(t._const.route, route.concat(index))
-								.setValue(t._const.element, _clone(e2))
+								.setValue(t._const.element, cloneObj(e2))
 							);
 						}
 					}
@@ -1295,7 +1309,7 @@
 						diffs.push(new Diff()
 							.setValue(t._const.action, t._const.removeElement)
 							.setValue(t._const.route, route.concat(index2))
-							.setValue(t._const.element, _clone(node))
+							.setValue(t._const.element, cloneObj(node))
 						);
 						gaps1.splice(index2, 1);
 						shortest = Math.min(gaps1.length, gaps2.length);
@@ -1317,7 +1331,7 @@
 						diffs.push(new Diff()
 							.setValue(t._const.action, t._const.addElement)
 							.setValue(t._const.route, route.concat(index2))
-							.setValue(t._const.element, _clone(node))
+							.setValue(t._const.element, cloneObj(node))
 						);
 						gaps1.splice(index2, 0, true);
 						shortest = Math.min(gaps1.length, gaps2.length);
@@ -1394,8 +1408,9 @@
 
 		applyVirtual: function(tree, diffs) {
 			var dobj = this;
-			if (diffs.length === 0)
+			if (diffs.length === 0) {
 				return true;
+			}
 			_fal(diffs,function(diff) {
 				dobj.applyVirtualDiff(tree, diff);
 			});
@@ -1434,8 +1449,9 @@
 				node: node
 			};
 
-			if (this.preVirtualDiffApply(info))
+			if (this.preVirtualDiffApply(info)) {
 				return true;
+			}
 
 			switch (diff[this._const.action]) {
 				case this._const.addAttribute:
@@ -1497,7 +1513,7 @@
 					node.selected = diff[this._const.newValue];
 					break;
 				case this._const.replaceElement:
-					newNode = _clone(diff[this._const.newValue]);
+					newNode = cloneObj(diff[this._const.newValue]);
 					newNode.outerDone = true;
 					newNode.innerDone = true;
 					newNode.valueDone = true;
@@ -1505,9 +1521,9 @@
 					break;
 				case this._const.relocateGroup:
 					_fal(node.childNodes.splice(diff[this._const.from], diff.groupLength).reverse(),
-					function(movedNode) {
+						function(movedNode) {
 							node.childNodes.splice(diff[t._const.to], 0, movedNode);
-					});
+						});
 					break;
 				case this._const.removeElement:
 					parentNode.childNodes.splice(nodeIndex, 1);
@@ -1516,7 +1532,7 @@
 					route = diff[this._const.route].slice();
 					c = route.splice(route.length - 1, 1)[0];
 					node = this.getFromVirtualRoute(tree, route).node;
-					newNode = _clone(diff[this._const.element]);
+					newNode = cloneObj(diff[this._const.element]);
 					newNode.outerDone = true;
 					newNode.innerDone = true;
 					newNode.valueDone = true;
@@ -1568,7 +1584,11 @@
 			return;
 		},
 
+
+
+
 		// ===== Apply a diff =====
+
 		apply: function(tree, diffs) {
 			var dobj = this;
 
@@ -1576,8 +1596,9 @@
 				return true;
 			}
 			_fal(diffs,function(diff) {
-				if (!dobj.applyDiff(tree, diff))
+				if (!dobj.applyDiff(tree, diff)) {
 					return false;
+				}
 			});
 			return true;
 		},
@@ -1585,8 +1606,9 @@
 			route = route.slice();
 			var c, node = tree;
 			while (route.length > 0) {
-				if (!node.childNodes)
+				if (!node.childNodes) {
 					return false;
+				}
 				c = route.splice(0, 1)[0];
 				node = node.childNodes[c];
 			}
@@ -1633,25 +1655,25 @@
 					this.textDiff(node, node.data, diff[this._const.oldValue], diff[this._const.newValue]);
 					break;
 				case this._const.modifyValue:
-					if (!node || node.value === void 0) {
+					if (!node || typeof node.value === 'undefined') {
 						return false;
 					}
 					node.value = diff[this._const.newValue];
 					break;
 				case this._const.modifyComment:
-					if (!node || node.data === void 0) {
+					if (!node || typeof node.data === 'undefined') {
 						return false;
 					}
 					this.textDiff(node, node.data, diff[this._const.oldValue], diff[this._const.newValue]);
 					break;
 				case this._const.modifyChecked:
-					if (!node || node.checked === void 0) {
+					if (!node || typeof node.checked === 'undefined') {
 						return false;
 					}
 					node.checked = diff[this._const.newValue];
 					break;
 				case this._const.modifySelected:
-					if (!node || node.selected === void 0) {
+					if (!node || typeof node.selected === 'undefined') {
 						return false;
 					}
 					node.selected = diff[this._const.newValue];
@@ -1663,8 +1685,9 @@
 					_fal(Array.apply(null, new Array(diff.groupLength)).map(function() {
 						return node.removeChild(node.childNodes[diff[t._const.from]]);
 					}),function(childNode, index) {
-						if (index === 0)
+						if (index === 0) {
 							reference = node.childNodes[diff[t._const.to]];
+						}
 						node.insertBefore(childNode, reference);
 					});
 					break;
@@ -1719,6 +1742,7 @@
 			});
 		},
 		undoDiff: function(tree, diff) {
+
 			switch (diff[this._const.action]) {
 				case this._const.addAttribute:
 					diff[this._const.action] = this._const.removeAttribute;
@@ -1978,6 +2002,11 @@
 			return this.trigger.apply(this,arguments);
 		},
 
+		html : function(html){
+			return this.each(function(elm){
+				elm.innerHTML = html;
+			});
+		},
 		// virtual render
 		render : function(newhtml){
 			return this.each(function(elm){
@@ -2208,9 +2237,13 @@
 				(config.template || _noop);
 
 			config.render = function(){ 
-				return (template !== _noop && 
-					z(config.root).render(
-						template.apply(this,arguments))),this;
+				var rt = z(config.root);
+				return (template !== _noop && (
+					(_trim(rt.get(0).innerHTML)==="" ? 
+						rt.html(template.apply(this,arguments)) : 
+						rt.render(template.apply(this,arguments))
+					))
+				),this;
 			};
 
 			delete config.template;

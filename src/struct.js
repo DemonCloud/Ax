@@ -1202,7 +1202,7 @@ function DOOM(txt,name){
 						"|" + (this.evaluate||no) +"|$","g");
 
 	// start replace
-	zipHTML(txt).replace(exp, function(match,escape,interpolate,evaluate,offset){
+	txt.replace(exp, function(match,escape,interpolate,evaluate,offset){
 		res += txt.slice(position,offset).replace(escaper,c_escape);
 		// refresh index where to find text string
 		position = offset + match.length;
@@ -1221,7 +1221,7 @@ function DOOM(txt,name){
 	// End wrap res@ String
 	res += "';";
 	if(!name) res = "with(_x||{}){\n" + res + "\n}";
-	res = "var _t,_= struct.html('encode'),_p='';" + res + "\nreturn _p;";
+	res = "var _t,_= struct.html('encode'),_p='';\n" + res + "\nreturn _p;";
 
 	// Complete building Function string
 	// try to build anmousyous function
