@@ -24,7 +24,7 @@
 	if(typeof define === 'function' && define.amd)
 		// support AMD require.js
 		// ruler by UMD Javascript
-		define(['struct'],function(struct){ return factory(aix,struct); });
+		define('aix',['struct'],function(struct){ return factory(aix,struct); });
 	else if(typeof exports === "object" && typeof module !== "undefined")
 		// support CommonJS exports
 		module.exports = factory(aix,struct);

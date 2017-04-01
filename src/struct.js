@@ -28,7 +28,7 @@
 	if(typeof define === 'function' && define.amd)
 		// Ruler by UMD Javascript
 		// support AMD define
-		define(function(){ return factory(struct); });
+		define('struct',[],function(){ return factory(struct); });
 	else if(typeof exports === "object" && typeof module !== "undefined")
 		// support CommonJS exports
 		module.exports = factory(struct);
