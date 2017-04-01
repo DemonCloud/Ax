@@ -32,7 +32,7 @@
 		// build on browser global object
 		root.aix = factory(aix,struct);
 
-})( this , {} , function(aix,struct){
+})(this, {}, function(aix,struct){
 	"use strict";
 
 	// Define DOM frame
@@ -40,7 +40,7 @@
 	// Define Setting
 		VIEW_DEFAULT = { root:"[__aix__]", events:{} },
 		MODEL_DEFAULT = { data:{}, events:{}, validate:{} },
-		ROUTE_DEFAULT = { routes:{}, actions:{} },
+		ROUTE_DEFAULT = { char:"@", routes:{}, actions:{} },
 
 	// resetful list 
 	// use for aix ajax-api
@@ -83,6 +83,7 @@
 		_setProp  = struct.prop("set"),
 		_watch    = struct.prop('watch'),
 		_unwatch  = struct.prop('unwatch'),
+		_param    = struct.param(),
 		_trim     = struct.string('trim'),
 		_one      = struct.index('one'),
 		_has      = struct.has(),
@@ -674,13 +675,6 @@
 		}
 	};
 
-
-	var cloneObj = function(obj) {
-		//  TODO: Do we really need to clone here? Is it not enough to just return the original object?
-		return JSON.parse(JSON.stringify(obj));
-		//return obj;
-	};
-
 	/**
 	 * based on https://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Longest_common_substring#JavaScript
 	 */
@@ -1023,8 +1017,8 @@
 			if (t1.nodeName !== t2.nodeName) {
 				return [new Diff()
 					.setValue(t._const.action, t._const.replaceElement)
-					.setValue(t._const.oldValue, cloneObj(t1))
-					.setValue(t._const.newValue, cloneObj(t2))
+					.setValue(t._const.oldValue, _clone(t1))
+					.setValue(t._const.newValue, _clone(t2))
 					.setValue(t._const.route, route)
 				];
 			}
@@ -1212,7 +1206,7 @@
 							diffs.push(new Diff()
 								.setValue(t._const.action, t._const.removeElement)
 								.setValue(t._const.route, route.concat(index))
-								.setValue(t._const.element, cloneObj(e1))
+								.setValue(t._const.element, _clone(e1))
 							);
 							index -= 1;
 						}
@@ -1228,7 +1222,7 @@
 							diffs.push(new Diff()
 								.setValue(t._const.action, t._const.addElement)
 								.setValue(t._const.route, route.concat(index))
-								.setValue(t._const.element, cloneObj(e2))
+								.setValue(t._const.element, _clone(e2))
 							);
 						}
 					}
@@ -1306,7 +1300,7 @@
 						diffs.push(new Diff()
 							.setValue(t._const.action, t._const.removeElement)
 							.setValue(t._const.route, route.concat(index2))
-							.setValue(t._const.element, cloneObj(node))
+							.setValue(t._const.element, _clone(node))
 						);
 						gaps1.splice(index2, 1);
 						shortest = Math.min(gaps1.length, gaps2.length);
@@ -1328,7 +1322,7 @@
 						diffs.push(new Diff()
 							.setValue(t._const.action, t._const.addElement)
 							.setValue(t._const.route, route.concat(index2))
-							.setValue(t._const.element, cloneObj(node))
+							.setValue(t._const.element, _clone(node))
 						);
 						gaps1.splice(index2, 0, true);
 						shortest = Math.min(gaps1.length, gaps2.length);
@@ -1508,7 +1502,7 @@
 					node.selected = diff[this._const.newValue];
 					break;
 				case this._const.replaceElement:
-					newNode = cloneObj(diff[this._const.newValue]);
+					newNode = _clone(diff[this._const.newValue]);
 					newNode.outerDone = true;
 					newNode.innerDone = true;
 					newNode.valueDone = true;
@@ -1527,7 +1521,7 @@
 					route = diff[this._const.route].slice();
 					c = route.splice(route.length - 1, 1)[0];
 					node = this.getFromVirtualRoute(tree, route).node;
-					newNode = cloneObj(diff[this._const.element]);
+					newNode = _clone(diff[this._const.element]);
 					newNode.outerDone = true;
 					newNode.innerDone = true;
 					newNode.valueDone = true;
@@ -2002,10 +1996,11 @@
 	};
 
 	function checkValidate(olddata,newdata,validate){
-		var res = false,key;
+		var res = false,key,s=_size(validate);
+		if(!s) return true;
 		if(!_eq(olddata,newdata)){
 			key = _keys(validate); res = true;
-			for(var i=0,isRequired; i<key.length; i++){
+			for(var i=0,isRequired; i<s; i++){
 				// get validate funtion
 				isRequired = validate[key[i]];
 				if(!isRequired(_prop(newdata,key[i]))){
@@ -2018,7 +2013,7 @@
 
 	// Aix Model
 	aix.model = function(obj){
-		var config = _extend(_clone(MODEL_DEFAULT),obj),
+		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
 			data = config.data,
 			events = config.events,
 			validate = config.validate;
@@ -2038,22 +2033,19 @@
 				return _clone(data);
 			},
 			set : function(newdata){
-				var args = [_clone(newdata)];
-				this.emit("validate",args);
+				if(_eq(data,newdata))
+					return data;
 
-				if(_isPrim(newdata)){
-					if(validate(newdata)&&!_eq(data,newdata))
-						return data=newdata,
-							this.emit("change,validate:success",args),
-							this.change=true,
-							newdata;
-				}else{
-					if(checkValidate(data,newdata,validate))
-						return data=newdata,
-							this.emit("change,validate:success",args),
-							this.change=true,
-							newdata;
-				}
+				var args = [_clone(newdata)];
+
+				if((this.emit("validate",args),
+					_isPrim(newdata)?
+					validate(newdata):
+					checkValidate(data,newdata,validate)))
+					return data=newdata,
+					this.emit("validate:success,change",args),
+					this.change=true,
+					newdata;
 				return this.emit("validate:fail"),data;
 			},
 			enumerable:true,
@@ -2075,10 +2067,12 @@
 		},
 
 		set : function(){
+			var param;
 			this.data = arguments.length > 1 ?
-				_setProp(this.parse(),arguments[0],arguments[1]) : 
+				(param = arguments[0],
+				_setProp(this.parse(),arguments[0],arguments[1])) : 
 				arguments[0];
-			return this.emit("set",_slice(arguments));
+			return param ? this.emit("change:"+param,[arguments[1]]) : this;
 		},
 
 		// API event
@@ -2207,7 +2201,7 @@
 
 	// bind selector
 	aix.view = function(obj){
-		var config = _extend(_clone(VIEW_DEFAULT),obj),
+		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
 			events = config.events;
 
 		delete config.events;
@@ -2221,7 +2215,7 @@
 			config.render = function(){ 
 				return (template !== _noop && 
 					z(this.root).render(
-					template.apply(this,arguments))),this;
+						template.apply(this,arguments))),this;
 			};
 
 			delete config.template;
@@ -2283,34 +2277,42 @@
 	};
 
 	//get Hash param form URL
-	function getHash(url){
-		var index = url.search("#");
-		return index>0 ? url.slice(index+1) : "";
+	function hashGet(url,char){
+		var index = url.search("#"),
+			charindex = url.search(char);
+		return index>0 ? url.slice(index+1,!~charindex?void 0:charindex) : "";
+	}
+
+	function hashParam(url,char){
+		var charindex = url.search(char);
+		return _param(!~charindex ? void 0 : url.slice(charindex+1));
 	}
 
 	//if HashChange callee
-	function changeHash(hash,oldhash,event){
+	function changeHash(url,char,event){
+		var hash = hashGet(url,char), param = hashParam(url,char); 
 		_fol(this.routes,function(fn,key){
 			if(RegExp(key,"i").test(hash))
-				changeHashReg.call(this,fn,[event,hash,oldhash,key]);
+				changeHashReg.call(this,fn,
+					[hash,param,event]);
 		},this);
 	}
 
 	// detect args callback
 	function changeHashReg(fn,args){
-		if(_isFn(fn)){
+		if(_isFn(fn))
 			fn.apply(this,args);
-		} else {
+		else
 			// array or string
 			_fal(typeof fn === "string" ? fn.split(",") : fn,
 				function(reg){ this.actions[reg].apply(this,args); },this);
-		}
 	}
 
 	// define route for SPA
 	aix.route = function(obj){
 		var _this = this,
-			config = _extend(_clone(ROUTE_DEFAULT),obj),
+			history = { old: "", now: root.location.href },
+			config = _extend(_clone(ROUTE_DEFAULT),obj||{}),
 			events = config.events;
 
 		delete config.events;
@@ -2320,35 +2322,23 @@
 
 		// addEvent for this route object
 		// use dispatch event to trigger
-		_on(this,"hashchange",changeHash);
 		// cant change regular hash title
-		_define(this, {
-			"history" : {
-				value : { old: "", now: root.location.href },
-				writable : true,
-				enumerable : false
+		_define(this, "event" ,{
+			value : function(event){
+				if(root.location.href === history.now)
+					return event.preventDefault();
+				// change the save hash url
+				history.old = history.now; 
+				return _this.emit("hashchange",
+					[history.now = root.location.href,config.char,event]);
 			},
-			"event" : {
-				value : function(event){
-					if(root.location.href===_this.history.now)
-						return event.preventDefault();
-					
-					// change the save hash url
-					_this.history.old = _this.history.now; 
-					_this.history.now = root.location.href;
-
-					return _emit(_this,"hashchange",
-						[getHash(root.location.href),
-						 getHash(_this.history.old),
-						 event]);
-				},
-				writable : false,
-				enumerable : false,
-				configurable: false
-			}
+			writable : false,
+			enumerable : false,
+			configurable: false
 		});
 
 		_extend(this,config);
+		this.on("hashchange",changeHash);
 		this.emit("init");
 	};
 
@@ -2372,27 +2362,6 @@
 			return _emit(this,type,fn,args);
 		},
 
-		addRoute:function(route,fname){
-		 	this.routes[_toString(route)] = fname;
-		 	return this;
-		},
-
-		removeRoute:function(route){
-			delete this.routes[_toString(route)];
-			return this;
-		},
-
-		addAction:function(name,fn){
-			if(name&&_isFn(fn))
-				this.actions[_toString(name)] = fn;
-			return this;
-		},
-
-		removeAction:function(name){
-			delete this.actions[_toString(name)];
-			return this;
-		},
-
 		listen: function(hash){
 			if(!this._listen){
 				_define(this,"_listen",{
@@ -2401,21 +2370,18 @@
 					enumerable : false,
 					configurable: true,
 				});
-				root.addEventListener("hashchange",this.event);
 
-				if(hash)
-					this.go(hash);
-				else
-					this.emit("hashchange",[getHash(window.location.href)]);
+				root.addEventListener("hashchange",this.event);
+				return hash ? 
+					this.go(hash) : 
+					this.emit("hashchange",[root.location.href,this.char]);
 			}
-			this.emit("listen");
 			return this;
 		},
 
-		stoplisten: function(){
+		stop: function(){
 			if(delete this._listen)
 				root.removeEventListener("hashchange",this.event);
-			this.emit("stoplisten");
 			return this;
 		},
 

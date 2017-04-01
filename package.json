@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "start": "browser-sync start --server --files *.*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,6 +27,7 @@
   },
   "homepage": "https://github.com/DemonCloud/aix#readme",
   "dependencies": {
+  	"browser-sync":"latest",
     "gulp": "latest",
     "gulp-concat": "latest",
     "gulp-optimize-js": "latest",

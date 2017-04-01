@@ -1541,7 +1541,7 @@ function emit(obj,type,fn,args){
 		toString(type).split(","),
 		function(t){ fireEvent(this,trim(t),fn,args) },
 		obj
-	);
+	),obj;
 }
 
 function fireEvent(obj,type,fn,args){
