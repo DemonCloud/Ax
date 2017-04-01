@@ -53,7 +53,7 @@ var or = {},
     cot = ar.concat,
   	ev = eval,
 
-  	broken = {};
+  	broken = Object.freeze({});
 
 // strict mode hack this
 // hack* =>

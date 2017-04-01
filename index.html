@@ -8,11 +8,58 @@
 	</style>
 </head>
 <body>
-	<a href="#abc">hash #abc</a>
-	<a href="#buke@a=1&b=2&c=3">hash #buke</a>
-	<a href="#moon@sum=adc&ear=1">hash #moon</a>
+	<a href="#abc@name=sam&score=8">hash #abc</a>
+	<a href="#buke@name=buke&score=99">hash #buke</a>
+	<a href="#moon@name=leon&score=68">hash #moon</a>
+
+	<div id="app">
+	
+	</div>
 	<!-- <script src="./src/struct.js"></script> -->
 	<!-- <script src="./src/aix.js"></script> -->
 	<script src="./dest/aix.c.js"></script>
+
+	<script>
+var model = new aix.model({
+	data:{
+		name:"cloudy",
+		score:80
+	},
+	validate:{
+		name:function(name){
+			return name.length>3;
+		}
+	}
+});
+
+var view = new aix.view({
+	root:"#app",
+	template:"<div>name: {{-name}}</div>"+
+					 "<div>score: {{-score}}</div>"
+});
+
+var route = new aix.route({
+	routes:{
+		".":"ac"
+	},
+	actions:{
+		ac:function(hash,param){
+			model.set(param);
+		}
+	},
+	events:{
+		init:function(){
+			view.render(model.parse());
+		}
+	}
+});
+
+model.on("change",view.render);
+model.on("validate:fail",function(json){
+	alert("name as: "+json.name+" length greater than 3");
+});
+
+route.listen();
+	</script>
 </body>
 </html>

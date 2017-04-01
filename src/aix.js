@@ -2035,9 +2035,7 @@
 			set : function(newdata){
 				if(_eq(data,newdata))
 					return data;
-
 				var args = [_clone(newdata)];
-
 				if((this.emit("validate",args),
 					_isPrim(newdata)?
 					validate(newdata):
@@ -2046,7 +2044,7 @@
 					this.emit("validate:success,change",args),
 					this.change=true,
 					newdata;
-				return this.emit("validate:fail"),data;
+				return this.emit("validate:fail",args),data;
 			},
 			enumerable:true,
 			configurable:false
@@ -2214,7 +2212,7 @@
 
 			config.render = function(){ 
 				return (template !== _noop && 
-					z(this.root).render(
+					z(config.root).render(
 						template.apply(this,arguments))),this;
 			};
 
@@ -2317,8 +2315,7 @@
 
 		delete config.events;
 		// if userobj has more events
-		if(_isObj(events))
-			_fol(events, this.uon, this);
+		_fol(events, this.uon, this);
 
 		// addEvent for this route object
 		// use dispatch event to trigger
