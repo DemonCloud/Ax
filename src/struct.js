@@ -1337,7 +1337,7 @@ function aix(option){
 		timeout   : 0,
 		aysnc     : true,
 		contentType : true
-	} , options || {} );
+	} , option || {} );
 
 	var ls = root.localStorage;
 

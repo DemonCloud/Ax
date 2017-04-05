@@ -2134,7 +2134,7 @@
 		pipe : function(type,url,param,fns,fnf,header){
 			//param must be object typeof
 			var st = {
-				type  : RESTFUL[toString(type).toLowerCase()],
+				type  : RESTFUL[_toString(type).toLowerCase()]||"GET",
 				aysnc : true
 			},
 			_fns,
@@ -2198,23 +2198,23 @@
 
 		post: function(url,param,fns,fnf,header){
 		  return this.pipe.apply(this,[
-		  		"post",
-		  		url,
-		  		param || this.parse(),
-		  		fns,
-		  		fnf,
-		  		header
+		  	"post",
+		  	url,
+		  	param || this.parse(),
+		  	fns,
+		  	fnf,
+		  	header
 			]);
 		},
 
 		save: function(url,param,fns,fnf,header){
 		  return this.pipe.apply(this,[
-		  		"save",
-		  		url,
-		  		param || this.parse(),
-		  		fns,
-		  		fnf,
-		  		header
+		  	"save",
+		  	url,
+		  	param || this.parse(),
+		  	fns,
+		  	fnf,
+		  	header
 			]);
 		},
 
