@@ -2237,13 +2237,14 @@
 				(config.template || _noop);
 
 			config.render = function(){ 
-				var rt = z(config.root);
-				return (template !== _noop && (
-					(_trim(rt.get(0).innerHTML)==="" ? 
-						rt.html(template.apply(this,arguments)) : 
-						rt.render(template.apply(this,arguments))
-					))
-				),this;
+				var rt = z(config.root),args = _slice(arguments);
+				return this.emit("beforeRender",args),
+					(template !== _noop && (
+						(_trim(rt.get(0).innerHTML)==="" ? 
+							rt.html(template.apply(this,args)) : 
+							rt.render(template.apply(this,args))
+						) && this.emit("afterRender",args))),
+					this;
 			};
 
 			delete config.template;
