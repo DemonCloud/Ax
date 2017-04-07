@@ -471,6 +471,20 @@
 		return compatible(event);
 	};
 
+	function SubsetMapping(a, b) {
+		this.oldValue = a;
+		this.newValue = b;
+	}
+
+	/**
+	 * This should really be a predefined function in Array...
+	 */
+	function makeArray(n, v) {
+		return Array.apply(null, new Array(n)).map(function() {
+			return v;
+		});
+	}
+
 	var diffcount;
 
 	var Diff = function(options) {
@@ -492,11 +506,6 @@
 		}
 	};
 
-	var SubsetMapping = function SubsetMapping(a, b) {
-		this.oldValue = a;
-		this.newValue = b;
-	};
-
 	SubsetMapping.prototype = {
 		contains: function contains(subset) {
 			if (subset.length < this.length) {
@@ -511,17 +520,14 @@
 
 	var elementDescriptors = function(el) {
 		var output = [];
-		if (el.nodeName !== '#text' && el.nodeName !== '#comment') {
+		if(el.nodeName !== '#text' && el.nodeName !== '#comment'){
 			output.push(el.nodeName);
 			if (el.attributes) {
-				if (el.attributes['class']) {
+				if(el.attributes['class'])
 					output.push(el.nodeName + '.' + el.attributes['class'].replace(/ /g, '.'));
-				}
-				if (el.attributes.id) {
+				if(el.attributes.id)
 					output.push(el.nodeName + '#' + el.attributes.id);
-				}
 			}
-
 		}
 		return output;
 	};
@@ -534,16 +540,12 @@
 			_fal(elementDescriptors(node),function(descriptor) {
 				var inUnique = descriptor in uniqueDescriptors,
 					inDupes = descriptor in duplicateDescriptors;
-				if (!inUnique && !inDupes) {
+				if (!inUnique && !inDupes)
 					uniqueDescriptors[descriptor] = true;
-				} else if (inUnique) {
-					delete uniqueDescriptors[descriptor];
-					duplicateDescriptors[descriptor] = true;
-				}
+				else if (inUnique)
+					duplicateDescriptors[descriptor] = (delete uniqueDescriptors[descriptor]);
 			});
-
 		});
-
 		return uniqueDescriptors;
 	};
 
@@ -553,9 +555,8 @@
 			inBoth = {};
 
 		_fal(_keys(l1Unique),function(key) {
-			if (l2Unique[key]) {
+			if(l2Unique[key])
 				inBoth[key] = true;
-			}
 		});
 
 		return inBoth;
@@ -565,60 +566,39 @@
 		delete tree.outerDone;
 		delete tree.innerDone;
 		delete tree.valueDone;
-		if (tree.childNodes) {
+		if (tree.childNodes)
 			return _ey(tree.childNodes,removeDone);
-		} else {
-			return true;
-		}
+		return true;
 	};
 
 	var isEqual = function(e1, e2) {
-
-		var e1Attributes, e2Attributes;
-
-		if (!_ey(['nodeName', 'value', 'checked', 'selected', 'data'],function(element) {
-			if (e1[element] !== e2[element]) {
-				return false;
-			}
-			return true;
-		})) {
+		if (!_ey(['nodeName', 'value', 'checked', 'selected', 'data'],function(element){
+			return e1[element] === e2[element];
+		}))
 			return false;
-		}
 
-		if (Boolean(e1.attributes) !== Boolean(e2.attributes)) {
+		if ((Boolean(e1.attributes) !== Boolean(e2.attributes)) ||
+				 Boolean(e1.childNodes) !== Boolean(e2.childNodes))
 			return false;
-		}
-
-		if (Boolean(e1.childNodes) !== Boolean(e2.childNodes)) {
-			return false;
-		}
 
 		if (e1.attributes) {
+			var e1Attributes, e2Attributes;
 			e1Attributes = _keys(e1.attributes);
 			e2Attributes = _keys(e2.attributes);
 
-			if (e1Attributes.length !== e2Attributes.length) {
+			if (e1Attributes.length !== e2Attributes.length)
 				return false;
-			}
-			if (!_ey(e1Attributes,function(attribute) {
-				if (e1.attributes[attribute] !== e2.attributes[attribute]) {
-					return false;
-				}
-			})) {
-				return false;
-			}
+			if (!_ey(e1Attributes,function(attribute){
+				return e1.attributes[attribute] === e2.attributes[attribute];
+			})) return false;
 		}
 
 		if (e1.childNodes) {
-			if (e1.childNodes.length !== e2.childNodes.length) {
+			if (e1.childNodes.length !== e2.childNodes.length)
 				return false;
-			}
-			if (!_ey(e1.childNodes,function(childNode, index) {
+			if (!_ey(e1.childNodes,function(childNode, index){
 				return isEqual(childNode, e2.childNodes[index]);
-			})) {
-
-				return false;
-			}
+			})) return false;
 		}
 
 		return true;
@@ -627,52 +607,40 @@
 	var roughlyEqual = function(e1, e2, uniqueDescriptors, sameSiblings, preventRecursion) {
 		var childUniqueDescriptors, nodeList1, nodeList2;
 
-		if (!e1 || !e2) {
+		if ((!e1 || !e2)||(e1.nodeName !== e2.nodeName))
 			return false;
-		}
 
-		if (e1.nodeName !== e2.nodeName) {
-			return false;
-		}
-
-		if (e1.nodeName === '#text') {
+		if (e1.nodeName === '#text')
 			// Note that we initially don't care what the text content of a node is,
 			// the mere fact that it's the same tag and "has text" means it's roughly
 			// equal, and then we can find out the true text difference later.
 			return preventRecursion ? true : e1.data === e2.data;
-		}
 
 
-		if (e1.nodeName in uniqueDescriptors) {
+		if (e1.nodeName in uniqueDescriptors)
 			return true;
-		}
 
 		if (e1.attributes && e2.attributes) {
-
 			if (e1.attributes.id && e1.attributes.id === e2.attributes.id) {
 				var idDescriptor = e1.nodeName + '#' + e1.attributes.id;
-				if (idDescriptor in uniqueDescriptors) {
+				if (idDescriptor in uniqueDescriptors)
 					return true;
-				}
 			}
 			if (e1.attributes['class'] && e1.attributes['class'] === e2.attributes['class']) {
 				var classDescriptor = e1.nodeName + '.' + e1.attributes['class'].replace(/ /g, '.');
-				if (classDescriptor in uniqueDescriptors) {
+				if (classDescriptor in uniqueDescriptors) 
 					return true;
-				}
 			}
 		}
 
-		if (sameSiblings) {
+		if (sameSiblings)
 			return true;
-		}
 
 		nodeList1 = e1.childNodes ? e1.childNodes.slice().reverse() : [];
 		nodeList2 = e2.childNodes ? e2.childNodes.slice().reverse() : [];
 
-		if (nodeList1.length !== nodeList2.length) {
+		if (nodeList1.length !== nodeList2.length)
 			return false;
-		}
 
 		if (preventRecursion) {
 			return _ey(nodeList1,function(element, index) {
@@ -718,9 +686,8 @@
 						return true;
 					}
 				});
-				if (!subsetsSame) {
+				if(!subsetsSame)
 					return true;
-				}
 			});
 		}
 
@@ -738,23 +705,13 @@
 				}
 			});
 		});
-		if (lcsSize === 0) {
+		if (lcsSize === 0)
 			return false;
-		}
 		origin = [index[0] - lcsSize, index[1] - lcsSize];
 		ret = new SubsetMapping(origin[0], origin[1]);
 		ret.length = lcsSize;
 
 		return ret;
-	};
-
-	/**
-	 * This should really be a predefined function in Array...
-	 */
-	var makeArray = function(n, v) {
-		return Array.apply(null, new Array(n)).map(function() {
-			return v;
-		});
 	};
 
 	var getGapInformation = function(t1, t2, stable) {
@@ -767,13 +724,11 @@
 		_fal(stable,function(subset) {
 			var i, endOld = subset.oldValue + subset.length,
 				endNew = subset.newValue + subset.length;
-			for (i = subset.oldValue; i < endOld; i += 1) {
+			for (i=subset.oldValue; i < endOld; i++)
 				gaps1[i] = group;
-			}
-			for (i = subset.newValue; i < endNew; i += 1) {
+			for (i=subset.newValue; i < endNew; i++)
 				gaps2[i] = group;
-			}
-			group += 1;
+			group++;
 		});
 
 		return {
@@ -793,9 +748,7 @@
 			marked2 = makeArray(newChildren.length, false),
 			subsets = [],
 			subset = true,
-			returnIndex = function() {
-				return arguments[1];
-			},
+			returnIndex = function(x,index) { return index; },
 			markBoth = function(i) {
 				marked1[subset.oldValue + i] = true;
 				marked2[subset.newValue + i] = true;
@@ -803,12 +756,10 @@
 
 		while (subset) {
 			subset = findCommonSubsets(oldChildren, newChildren, marked1, marked2);
-			if (subset) {
-				subsets.push(subset);
-
-				_fal(Array.apply(null, new Array(subset.length)).map(returnIndex),markBoth);
-
-			}
+			if (subset)
+				_fal((subsets.push(subset),
+					Array.apply(null, new Array(subset.length)).map(returnIndex)),
+					markBoth);
 		}
 		return subsets;
 	};
@@ -822,6 +773,7 @@
 		obj[p1]^=obj[p2];
 		obj[p2]^=obj[p1];
 		obj[p1]^=obj[p2];
+		return obj;
 	}
 
 
@@ -832,10 +784,9 @@
 	DiffTracker.prototype = {
 		list: false,
 		add: function(diffs) {
-			var list = this.list;
 			_fal(diffs,function(diff) {
-				list.push(diff);
-			});
+				this.push(diff);
+			},this.list);
 		},
 		forEach: function(fn) {
 			_fal(this.list,fn);
@@ -862,16 +813,14 @@
 			filterOuterDiff: null
 		},i;
 
-		if (typeof options === "undefined") {
+		if (typeof options === "undefined")
 			options = {};
-		}
 
 		for (i in defaults) {
-			if (typeof options[i] === "undefined") {
+			if (typeof options[i] === "undefined")
 				this[i] = defaults[i];
-			} else {
+			else
 				this[i] = options[i];
-			}
 		}
 
 		this._const = {
@@ -929,23 +878,13 @@
 		findDiffs: function(t1, t2) {
 			var diffs;
 			do {
-				if (this.debug) {
-					diffcount += 1;
-					if (diffcount > this.diffcap) {
-						window.diffError = [this.t1Orig, this.t2Orig];
-						throw new Error("surpassed diffcap:" + JSON.stringify(this.t1Orig) + " -> " + JSON.stringify(this.t2Orig));
-					}
-				}
 				diffs = this.findNextDiff(t1, t2, []);
-				if (diffs.length === 0) {
-					// Last check if the elements really are the same now.
-					// If not, remove all info about being done and start over.
-					// Somtimes a node can be marked as done, but the creation of subsequent diffs means that it has to be changed anyway.
-					if (!isEqual(t1, t2)) {
-						removeDone(t1);
-						diffs = this.findNextDiff(t1, t2, []);
-					}
-				}
+				// Last check if the elements really are the same now.
+				// If not, remove all info about being done and start over.
+				// Somtimes a node can be marked as done, but the creation of subsequent diffs means that it has to be changed anyway.
+				if (diffs.length === 0)
+					if (!isEqual(t1, t2))
+						diffs = (removeDone(t1),this.findNextDiff(t1, t2, []));
 
 				if (diffs.length > 0) {
 					this.tracker.add(diffs);
@@ -957,9 +896,8 @@
 		findNextDiff: function(t1, t2, route) {
 			var diffs, fdiffs;
 
-			if (this.maxDepth && route.length > this.maxDepth) {
+			if (this.maxDepth && route.length > this.maxDepth)
 				return [];
-			}
 			// outer differences?
 			if (!t1.outerDone) {
 				diffs = this.findOuterDiff(t1, t2, route);
@@ -967,35 +905,29 @@
 					fdiffs = this.filterOuterDiff(t1, t2, diffs);
 					if (fdiffs) diffs = fdiffs;
 				}
-				if (diffs.length > 0) {
+				if (diffs.length > 0)
+					return t1.outerDone = true,diffs;
+				else
 					t1.outerDone = true;
-					return diffs;
-				} else {
-					t1.outerDone = true;
-				}
 			}
+
 			// inner differences?
 			if (!t1.innerDone) {
 				diffs = this.findInnerDiff(t1, t2, route);
-				if (diffs.length > 0) {
+				if (diffs.length > 0)
 					return diffs;
-				} else {
+				else
 					t1.innerDone = true;
-				}
 			}
 
 			if (this.valueDiffing && !t1.valueDone) {
 				// value differences?
 				diffs = this.findValueDiff(t1, t2, route);
-
-				if (diffs.length > 0) {
+				if (diffs.length > 0)
+					return t1.valueDone = true,diffs;
+				else
 					t1.valueDone = true;
-					return diffs;
-				} else {
-					t1.valueDone = true;
-				}
 			}
-
 			// no differences
 			return [];
 		},
@@ -1033,7 +965,6 @@
 
 			}
 
-
 			attr1 = t1.attributes ? _keys(t1.attributes).sort() : [];
 			attr2 = t2.attributes ? _keys(t2.attributes).sort() : [];
 
@@ -1061,7 +992,6 @@
 
 			});
 
-
 			_fal(attr2,function(attr) {
 				diffs.push(new Diff()
 					.setValue(t._const.action, t._const.addAttribute)
@@ -1075,8 +1005,7 @@
 			return diffs;
 		},
 		nodeToObj: function(aNode) {
-			var objNode = {},
-				dobj = this;
+			var objNode = {};
 			objNode.nodeName = aNode.nodeName;
 			if (objNode.nodeName === '#text' || objNode.nodeName === '#comment') {
 				objNode.data = aNode.data;
@@ -1091,32 +1020,26 @@
 				}
 				if (aNode.childNodes && aNode.childNodes.length > 0) {
 					objNode.childNodes = [];
-					_fal(Array.prototype.slice.call(aNode.childNodes),
-						function(childNode) {
-							objNode.childNodes.push(dobj.nodeToObj(childNode));
-						}
-					);
+					_fal(Array.prototype.slice.call(aNode.childNodes),function(childNode) {
+							objNode.childNodes.push(this.nodeToObj(childNode));
+					},this);
 				}
 				if (this.valueDiffing) {
-					if (aNode.value !== undefined) {
+					if (aNode.value !== void 0)
 						objNode.value = aNode.value;
-					}
-					if (aNode.checked !== undefined) {
+					if (aNode.checked !== void 0)
 						objNode.checked = aNode.checked;
-					}
-					if (aNode.selected !== undefined) {
+					if (aNode.selected !== void 0)
 						objNode.selected = aNode.selected;
-					}
 				}
 			}
 
 			return objNode;
 		},
 		objToNode: function(objNode, insideSvg) {
-			var node, dobj = this;
+			var node;
 			if (objNode.nodeName === '#text') {
 				node = document.createTextNode(objNode.data);
-
 			} else if (objNode.nodeName === '#comment') {
 				node = document.createComment(objNode.data);
 			} else {
@@ -1133,19 +1056,16 @@
 				}
 				if (objNode.childNodes) {
 					_fal(objNode.childNodes,function(childNode) {
-						node.appendChild(dobj.objToNode(childNode, insideSvg));
-					});
+						node.appendChild(this.objToNode(childNode, insideSvg));
+					},this);
 				}
 				if (this.valueDiffing) {
-					if (objNode.value) {
+					if (objNode.value)
 						node.value = objNode.value;
-					}
-					if (objNode.checked) {
+					if (objNode.checked)
 						node.checked = objNode.checked;
-					}
-					if (objNode.selected) {
+					if (objNode.selected)
 						node.selected = objNode.selected;
-					}
 				}
 			}
 			return node;
@@ -1159,14 +1079,13 @@
 				index = 0,
 				last, e1, e2, i;
 
+			/* One or more groups have been identified among the childnodes of t1
+			 * and t2.
+			 */
 			if (subtrees.length > 0) {
-				/* One or more groups have been identified among the childnodes of t1
-				 * and t2.
-				 */
 				diffs = this.attemptGroupRelocation(t1, t2, subtrees, route);
-				if (diffs.length > 0) {
+				if (diffs.length > 0)
 					return diffs;
-				}
 			}
 
 			/* 0 or 1 groups of similar child nodes have been found
@@ -1176,9 +1095,8 @@
 			 * pairs of child nodes are diffed.
 			 */
 			last = Math.max(t1ChildNodes.length, t2ChildNodes.length);
-			if (t1ChildNodes.length !== t2ChildNodes.length) {
+			if (t1ChildNodes.length !== t2ChildNodes.length)
 				childNodesLengthDifference = true;
-			}
 
 			for (i = 0; i < last; i += 1) {
 				e1 = t1ChildNodes[i];
@@ -1228,16 +1146,13 @@
 				 * diffs.
 				 */
 
-				if (e1 && e2) {
+				if (e1 && e2)
 					diffs = diffs.concat(this.findNextDiff(e1, e2, route.concat(index)));
-				}
 
-				index += 1;
-
+				index++;
 			}
 			t1.innerDone = true;
 			return diffs;
-
 		},
 
 		attemptGroupRelocation: function(t1, t2, subtrees, route) {
@@ -1297,7 +1212,7 @@
 						);
 						gaps1.splice(index2, 1);
 						shortest = Math.min(gaps1.length, gaps2.length);
-						index2 -= 1;
+						index2--;
 					}
 
 				} else if (gaps2[index2] === true) {
@@ -1310,7 +1225,7 @@
 						);
 						gaps1.splice(index2, 0, true);
 						shortest = Math.min(gaps1.length, gaps2.length);
-						index1 -= 1;
+						index1--;
 					} else {
 						diffs.push(new Diff()
 							.setValue(t._const.action, t._const.addElement)
@@ -1319,13 +1234,12 @@
 						);
 						gaps1.splice(index2, 0, true);
 						shortest = Math.min(gaps1.length, gaps2.length);
-						index1 -= 1;
+						index1--;
 					}
 
 				} else if (gaps1[index2] !== gaps2[index2]) {
-					if (diffs.length > 0) {
+					if (diffs.length > 0)
 						return diffs;
-					}
 					// group relocation
 					group = subtrees[gaps1[index2]];
 					toGroup = Math.min(group.newValue, (t1.childNodes.length - group.length));
@@ -1384,20 +1298,15 @@
 					.setValue(t._const.route, route)
 				);
 			}
-
 			return diffs;
 		},
 
 		// ===== Apply a virtual diff =====
 
 		applyVirtual: function(tree, diffs) {
-			var dobj = this;
-			if (diffs.length === 0) {
-				return true;
-			}
 			_fal(diffs,function(diff) {
-				dobj.applyVirtualDiff(tree, diff);
-			});
+				this.applyVirtualDiff(tree, diff);
+			},this);
 			return true;
 		},
 		getFromVirtualRoute: function(tree, route) {
@@ -1406,9 +1315,8 @@
 
 			route = route.slice();
 			while (route.length > 0) {
-				if (!node.childNodes) {
+				if (!node.childNodes)
 					return false;
-				}
 				nodeIndex = route.splice(0, 1)[0];
 				parentNode = node;
 				node = node.childNodes[nodeIndex];
@@ -1433,9 +1341,8 @@
 				node: node
 			};
 
-			if (this.preVirtualDiffApply(info)) {
+			if (this.preVirtualDiffApply(info))
 				return true;
-			}
 
 			switch (diff[this._const.action]) {
 				case this._const.addAttribute:
@@ -1456,33 +1363,27 @@
 					break;
 				case this._const.modifyAttribute:
 					node.attributes[diff[this._const.name]] = diff[this._const.newValue];
-					if (node.nodeName === 'INPUT' && diff[this._const.name] === 'value') {
+					if (node.nodeName === 'INPUT' && diff[this._const.name] === 'value')
 						node.value = diff[this._const.value];
-					}
 					break;
 				case this._const.removeAttribute:
-
 					delete node.attributes[diff[this._const.name]];
 
-					if (_keys(node.attributes).length === 0) {
+					if (_keys(node.attributes).length === 0)
 						delete node.attributes;
-					}
 
-					if (diff[this._const.name] === 'checked') {
+					if (diff[this._const.name] === 'checked')
 						node.checked = false;
-					} else if (diff[this._const.name] === 'selected') {
+					else if (diff[this._const.name] === 'selected')
 						delete node.selected;
-					} else if (node.nodeName === 'INPUT' && diff[this._const.name] === 'value') {
+					else if (node.nodeName === 'INPUT' && diff[this._const.name] === 'value')
 						delete node.value;
-					}
-
 					break;
 				case this._const.modifyTextElement:
 					node.data = diff[this._const.newValue];
 
-					if (parentNode.nodeName === 'TEXTAREA') {
+					if (parentNode.nodeName === 'TEXTAREA')
 						parentNode.value = diff[this._const.newValue];
-					}
 					break;
 				case this._const.modifyValue:
 					node.value = diff[this._const.newValue];
@@ -1521,21 +1422,18 @@
 					newNode.innerDone = true;
 					newNode.valueDone = true;
 
-					if (!node.childNodes) {
+					if (!node.childNodes)
 						node.childNodes = [];
-					}
 
-					if (c >= node.childNodes.length) {
+					if (c >= node.childNodes.length)
 						node.childNodes.push(newNode);
-					} else {
+					else
 						node.childNodes.splice(c, 0, newNode);
-					}
 					break;
 				case this._const.removeTextElement:
 					parentNode.childNodes.splice(nodeIndex, 1);
-					if (parentNode.nodeName === 'TEXTAREA') {
+					if (parentNode.nodeName === 'TEXTAREA')
 						delete parentNode.value;
-					}
 					break;
 				case this._const.addTextElement:
 					route = diff[this._const.route].slice();
@@ -1544,18 +1442,16 @@
 					newNode.nodeName = '#text';
 					newNode.data = diff[this._const.value];
 					node = this.getFromVirtualRoute(tree, route).node;
-					if (!node.childNodes) {
+					if (!node.childNodes)
 						node.childNodes = [];
-					}
 
-					if (c >= node.childNodes.length) {
+					if (c >= node.childNodes.length)
 						node.childNodes.push(newNode);
-					} else {
+					else
 						node.childNodes.splice(c, 0, newNode);
-					}
-					if (node.nodeName === 'TEXTAREA') {
+
+					if (node.nodeName === 'TEXTAREA')
 						node.value = diff[this._const.newValue];
-					}
 					break;
 				default:
 					console.log('unknown action');
@@ -1568,31 +1464,19 @@
 			return;
 		},
 
-
-
-
 		// ===== Apply a diff =====
-
 		apply: function(tree, diffs) {
-			var dobj = this;
-
-			if (diffs.length === 0) {
-				return true;
-			}
-			_fal(diffs,function(diff) {
-				if (!dobj.applyDiff(tree, diff)) {
-					return false;
-				}
-			});
+			_fal(diffs,function(diff){
+				this.applyDiff(tree, diff)
+			},this);
 			return true;
 		},
 		getFromRoute: function(tree, route) {
 			route = route.slice();
 			var c, node = tree;
 			while (route.length > 0) {
-				if (!node.childNodes) {
+				if (!node.childNodes)
 					return false;
-				}
 				c = route.splice(0, 1)[0];
 				node = node.childNodes[c];
 			}
@@ -1609,57 +1493,48 @@
 				node: node
 			};
 
-			if (this.preDiffApply(info)) {
+			if (this.preDiffApply(info))
 				return true;
-			}
 
 			switch (diff[this._const.action]) {
 				case this._const.addAttribute:
-					if (!node || !node.setAttribute) {
+					if (!node || !node.setAttribute)
 						return false;
-					}
 					node.setAttribute(diff[this._const.name], diff[this._const.value]);
 					break;
 				case this._const.modifyAttribute:
-					if (!node || !node.setAttribute) {
+					if (!node || !node.setAttribute)
 						return false;
-					}
 					node.setAttribute(diff[this._const.name], diff[this._const.newValue]);
 					break;
 				case this._const.removeAttribute:
-					if (!node || !node.removeAttribute) {
+					if (!node || !node.removeAttribute)
 						return false;
-					}
 					node.removeAttribute(diff[this._const.name]);
 					break;
 				case this._const.modifyTextElement:
-					if (!node || node.nodeType !== 3) {
+					if (!node || node.nodeType !== 3)
 						return false;
-					}
 					this.textDiff(node, node.data, diff[this._const.oldValue], diff[this._const.newValue]);
 					break;
 				case this._const.modifyValue:
-					if (!node || typeof node.value === 'undefined') {
+					if (!node || node.value === void 0)
 						return false;
-					}
 					node.value = diff[this._const.newValue];
 					break;
 				case this._const.modifyComment:
-					if (!node || typeof node.data === 'undefined') {
+					if (!node || node.data === void 0)
 						return false;
-					}
 					this.textDiff(node, node.data, diff[this._const.oldValue], diff[this._const.newValue]);
 					break;
 				case this._const.modifyChecked:
-					if (!node || typeof node.checked === 'undefined') {
+					if (!node || node.checked === void 0)
 						return false;
-					}
 					node.checked = diff[this._const.newValue];
 					break;
 				case this._const.modifySelected:
-					if (!node || typeof node.selected === 'undefined') {
+					if (!node || node.selected === void 0)
 						return false;
-					}
 					node.selected = diff[this._const.newValue];
 					break;
 				case this._const.replaceElement:
@@ -1669,9 +1544,8 @@
 					_fal(Array.apply(null, new Array(diff.groupLength)).map(function() {
 						return node.removeChild(node.childNodes[diff[t._const.from]]);
 					}),function(childNode, index) {
-						if (index === 0) {
+						if (index === 0)
 							reference = node.childNodes[diff[t._const.to]];
-						}
 						node.insertBefore(childNode, reference);
 					});
 					break;
@@ -1685,9 +1559,8 @@
 					node.insertBefore(this.objToNode(diff[this._const.element], node.namespaceURI === 'http://www.w3.org/2000/svg'), node.childNodes[c]);
 					break;
 				case this._const.removeTextElement:
-					if (!node || node.nodeType !== 3) {
+					if (!node || node.nodeType !== 3)
 						return false;
-					}
 					node.parentNode.removeChild(node);
 					break;
 				case this._const.addTextElement:
@@ -1695,9 +1568,8 @@
 					c = route.splice(route.length - 1, 1)[0];
 					newNode = document.createTextNode(diff[this._const.value]);
 					node = this.getFromRoute(tree, route);
-					if (!node || !node.childNodes) {
+					if (!node || !node.childNodes)
 						return false;
-					}
 					node.insertBefore(newNode, node.childNodes[c]);
 					break;
 				default:
@@ -1716,14 +1588,11 @@
 
 		undo: function(tree, diffs) {
 			diffs = diffs.slice();
-			var dobj = this;
-			if (!diffs.length) {
+			if (!diffs.length)
 				diffs = [diffs];
-			}
-			diffs.reverse();
-			_fal(diffs,function(diff) {
-				dobj.undoDiff(tree, diff);
-			});
+			_fal(diffs.reverse(),function(diff) {
+				this.undoDiff(tree, diff);
+			},this);
 		},
 		undoDiff: function(tree, diff) {
 			switch (diff[this._const.action]) {
@@ -1732,40 +1601,32 @@
 					this.applyDiff(tree, diff);
 					break;
 				case this._const.modifyAttribute:
-					swap(diff, this._const.oldValue, this._const.newValue);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
 					break;
 				case this._const.removeAttribute:
 					diff[this._const.action] = this._const.addAttribute;
 					this.applyDiff(tree, diff);
 					break;
 				case this._const.modifyTextElement:
-					swap(diff, this._const.oldValue, this._const.newValue);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
 					break;
 				case this._const.modifyValue:
-					swap(diff, this._const.oldValue, this._const.newValue);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
 					break;
 				case this._const.modifyComment:
-					swap(diff, this._const.oldValue, this._const.newValue);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
 					break;
 				case this._const.modifyChecked:
-					swap(diff, this._const.oldValue, this._const.newValue);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
 					break;
 				case this._const.modifySelected:
-					swap(diff, this._const.oldValue, this._const.newValue);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
 					break;
 				case this._const.replaceElement:
-					swap(diff, this._const.oldValue, this._const.newValue);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
 					break;
 				case this._const.relocateGroup:
-					swap(diff, this._const.from, this._const.to);
-					this.applyDiff(tree, diff);
+					this.applyDiff(tree, swap(diff, this._const.from, this._const.to));
 					break;
 				case this._const.removeElement:
 					diff[this._const.action] = this._const.addElement;
@@ -1797,16 +1658,18 @@
 
 	var supportTemplate = "content" in document.createElement("template");
 	function createDOM(rootElm,html){
-		var r = rootElm.cloneNode();
-		if(supportTemplate){
-			var t = document.createElement("template");
-			t.innerHTML = html;
-			r.appendChild(t.content);
-		}else{
+		var r = rootElm.cloneNode(),t;
+		if(supportTemplate)
+			r.appendChild((
+				t=document.createElement("template"),
+				t.innerHTML=html,
+				t.content)
+			);
+		else
 			r.innerHTML = html;
-		}
 		return r;
 	}
+
 	// Doom Events
 	// Dom fired api
 	var capEvents = [
@@ -2018,6 +1881,10 @@
 		return res;
 	}
 
+	function uon(fn,type){
+		return this.on(type,fn);
+	}
+
 	// Aix Model
 	aix.model = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
@@ -2032,7 +1899,7 @@
 
 		_extend(this,config);
 		// if userobj has more events
-		_fol(events,this.uon,this);
+		_fol(events,uon,this);
 
 		// define data
 		_define(this,"data",{
@@ -2084,10 +1951,6 @@
 		on: function(type,fn){
 			if(_isFn(fn)) _on(this,type,fn);
 			return this;
-		},
-
-		uon: function(fn,type){
-			return this.on(type,fn);
 		},
 
 		unbind : function(type,fn){
@@ -2235,7 +2098,7 @@
 
 		_extend(this,config);
 		// if userobj has more events
-		_fol(events,this.uon,this);
+		_fol(events,uon,this);
 
 		// first trgger "init" event
 		this.emit("init");
@@ -2251,10 +2114,6 @@
 				else
 					_on(this,mk,fn);
 			},this),this;
-		},
-
-		uon : function(fn,type){
-			return this.on(type,fn);
 		},
 
 		unbind : function(type,fn){
@@ -2333,7 +2192,7 @@
 
 		delete config.events;
 		// if userobj has more events
-		_fol(events, this.uon, this);
+		_fol(events,uon,this);
 
 		// addEvent for this route object
 		// use dispatch event to trigger
@@ -2363,10 +2222,6 @@
 		on : function(type,fn){
 			if(_isFn(fn)) _on(this,type,fn);
 			return this;
-		},
-
-		uon : function(fn,type){
-			return this.on(type,fn);
 		},
 
 		unbind : function(type,fn){
