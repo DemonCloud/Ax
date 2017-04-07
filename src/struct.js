@@ -20,7 +20,6 @@
  * @Author  : YiJun
  * @Date    : 2017.2.28 - now
  * @License : FAL
- *
  */
 
 (function(root,struct,factory){
@@ -498,6 +497,22 @@ function filter(list,idf,reskey){
 
 function reject(list,idf,reskey){
 	return filter(list,negate(idf),reskey);
+}
+
+function every(list,idf){
+	var res = true;
+	for(var key = keys(list),i=keys.length;i--;)
+		if(!(res=idf(list[key[i]],key[i],list)))
+			break;
+	return res;
+}
+
+function some(list,idf){
+	var res = false;
+	for(var key = keys(list),i=keys.length;i--;)
+		if((res=idf(list[key[i]],key[i],list)))
+			break;
+	return res;
 }
 
 // filter indexkey
@@ -2085,6 +2100,7 @@ function $event(c){
 		case "unbind":
 			return removeEvent;
 		case "dispatch":
+		case "trigger":
 		case "emit":
 			return emit;
 		default:
@@ -2133,6 +2149,8 @@ var nublist = {
 	find      : filter,
 	filter    : filter,
 	reject    : reject,
+	every     : every,
+	some      : some,
 	diff      : diff,
 	intsec    : intersection,
 	hook      : hook,

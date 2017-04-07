@@ -76,6 +76,7 @@
 		_loop     = struct.op(),
 		_fol      = struct.op('object'),
 		_fal      = struct.op('array'),
+		_ey       = struct.every(),
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
 		_emit     = struct.event('emit'),
@@ -211,7 +212,7 @@
 	}
 
 	function inpage(sl){
-		return sl.$el.every(function(e){ 
+		return _ey(sl.$el,function(e){ 
 			return e === document.body ? false : 
 				(document.body.contains(e) || document.contains(e)); 
 		});
@@ -565,7 +566,7 @@
 		delete tree.innerDone;
 		delete tree.valueDone;
 		if (tree.childNodes) {
-			return tree.childNodes.every(removeDone);
+			return _ey(tree.childNodes,removeDone);
 		} else {
 			return true;
 		}
@@ -575,7 +576,7 @@
 
 		var e1Attributes, e2Attributes;
 
-		if (!['nodeName', 'value', 'checked', 'selected', 'data'].every(function(element) {
+		if (!_ey(['nodeName', 'value', 'checked', 'selected', 'data'],function(element) {
 			if (e1[element] !== e2[element]) {
 				return false;
 			}
@@ -599,7 +600,7 @@
 			if (e1Attributes.length !== e2Attributes.length) {
 				return false;
 			}
-			if (!e1Attributes.every(function(attribute) {
+			if (!_ey(e1Attributes,function(attribute) {
 				if (e1.attributes[attribute] !== e2.attributes[attribute]) {
 					return false;
 				}
@@ -612,19 +613,16 @@
 			if (e1.childNodes.length !== e2.childNodes.length) {
 				return false;
 			}
-			if (!e1.childNodes.every(function(childNode, index) {
+			if (!_ey(e1.childNodes,function(childNode, index) {
 				return isEqual(childNode, e2.childNodes[index]);
 			})) {
 
 				return false;
 			}
-
 		}
 
 		return true;
-
 	};
-
 
 	var roughlyEqual = function(e1, e2, uniqueDescriptors, sameSiblings, preventRecursion) {
 		var childUniqueDescriptors, nodeList1, nodeList2;
@@ -677,22 +675,25 @@
 		}
 
 		if (preventRecursion) {
-			return nodeList1.every(function(element, index) {
+			return _ey(nodeList1,function(element, index) {
 				return element.nodeName === nodeList2[index].nodeName;
 			});
 		} else {
 			// note: we only allow one level of recursion at any depth. If 'preventRecursion'
 			// was not set, we must explicitly force it to true for child iterations.
 			childUniqueDescriptors = uniqueInBoth(nodeList1, nodeList2);
-			return nodeList1.every(function(element, index) {
+			return _ey(nodeList1,function(element, index) {
 				return roughlyEqual(element, nodeList2[index], childUniqueDescriptors, true, true);
 			});
 		}
 	};
 
 
-	var cloneObj = function(obj) {
-		return JSON.parse(JSON.stringify(obj));
+	// var cloneObj = function(obj) {
+	// 	return JSON.parse(JSON.stringify(obj));
+	// };
+	var cloneObj = function(obj){
+		return obj;
 	};
 
 	/**
@@ -852,7 +853,6 @@
 	};
 
 	var diffDOM = function(options) {
-
 		var defaults = {
 			debug: false,
 			diffcap: 10, // Limit for how many diffs are accepting when debugging. Inactive when debug is false.
@@ -870,8 +870,7 @@
 			preDiffApply: function() {},
 			postDiffApply: function() {},
 			filterOuterDiff: null
-		},
-			i;
+		},i;
 
 		if (typeof options === "undefined") {
 			options = {};
@@ -922,9 +921,6 @@
 	diffDOM.Diff = Diff;
 
 	diffDOM.prototype = {
-
-		// ===== Create a diff =====
-
 		diff: function(t1Node, t2Node) {
 
 			var t1 = this.nodeToObj(t1Node),
@@ -1189,8 +1185,6 @@
 			 * t1 and t2 are made to have the same length and each of the
 			 * pairs of child nodes are diffed.
 			 */
-
-
 			last = Math.max(t1ChildNodes.length, t2ChildNodes.length);
 			if (t1ChildNodes.length !== t2ChildNodes.length) {
 				childNodesLengthDifference = true;
@@ -1742,7 +1736,6 @@
 			});
 		},
 		undoDiff: function(tree, diff) {
-
 			switch (diff[this._const.action]) {
 				case this._const.addAttribute:
 					diff[this._const.action] = this._const.removeAttribute;
@@ -1808,7 +1801,7 @@
 	};
 
 	var _DIFF = new diffDOM({
-		diffcap: 999999
+		diffcap: 998
 	});
 	// end off domdiff
 
@@ -2302,6 +2295,10 @@
 				return z(this.root).find(k[1]).trigger(k[0],args),this;
 
 			return _emit(this,type,fn,args);
+		},
+
+		toString : function(){
+			return this.root;
 		}
 	};
 
@@ -2423,8 +2420,11 @@
 				root.location.href = url + (hash.toString().slice(0,1)==="#"?"":"#") + hash;
 			}
 			return this;
-		}
+		},
 
+		toString : function(){
+			return this;
+		}
 	};
 
 	// #genertor api
