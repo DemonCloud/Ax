@@ -440,13 +440,9 @@ function regCheck(reg,n){
 function has(list,n,ueq){
 	var compare = isDefine(n,"RegExp") ? regCheck : (ueq ? eq : seq),
 			idf = false , key = isPrimitive(list) ? [] : keys(list);
-
-	for(var i=key.length; i--;){
-		if(compare(n,list[key[i]])){
-			idf = true; break;
-		}
-	}
-
+	for(var i=key.length; i--;)
+		if((idf=compare(n,list[key[i]])))
+			break;
 	return idf;
 }
 
@@ -469,12 +465,10 @@ function not(list,n,useq){
 	var check = isDefine(n,"RegExp") ? regCheck : (useq ? eq : seq),
 			isarr = isArray(list),
 			p = keys(list);
-
 	for(var i=0 ; i<p.length ; i++)
 		if(check(n,list[p[i]]))
 			if(notdel(list,p[i],isarr) && isarr)
 				p.pop(i--);
-	
 	return list;
 }
 
@@ -984,10 +978,8 @@ function once(fn){
 
 // slim equal [ method ]
 function eq(x,y){
-	if(x===y || (isPrimitive(x) && isPrimitive(y)))
+	if(x===y || ts.call(x) !== ts.call(y)|| (isPrimitive(x) && isPrimitive(y)))
 		return x===y;
-	if(ts.call(x) !== ts.call(y))
-		return false;
 	if(x.toString() === y.toString()){
 		var xkeys = keys(x) , ykeys = keys(y);
 		if(xkeys.length === ykeys.length){
@@ -1090,21 +1082,21 @@ var escapes = {
 	"\u2029" : "u2029"
 };
 
-var encodeReg = /[&<">'](?:(amp|lt|quot|gt|#39);)?/g,
-		decodeReg = /&((g|l|quo)t|amp|#39);/g,
-		stripReg = /<script\b[^>]*>(.*?)<\/script>/gim,
-		commentReg = /<!--[\s\S]*?-->/gim,
-		zipReg = /[\t\r\n\f]/gim,
-		upperReg = /[A-Z]/g,
-		sReg = '[\\s\\x20\\xA0\\uFEFF]+',
+var encodeReg    = /[&<">'](?:(amp|lt|quot|gt|#39);)?/g,
+		decodeReg    = /&((g|l|quo)t|amp|#39);/g,
+		stripReg     = /<script\b[^>]*>(.*?)<\/script>/gim,
+		commentReg   = /<!--[\s\S]*?-->/gim,
+		zipReg       = /[\t\r\n\f]/gim,
+		upperReg     = /[A-Z]/g,
+		sReg         = '[\\s\\x20\\xA0\\uFEFF]+',
 
-		collapseReg = new RegExp(sReg,'g'),
-		trimLReg = new RegExp('^'+sReg,'g'),
-		trimRReg = new RegExp(sReg+'$','g'),
+		collapseReg  = new RegExp(sReg,'g'),
+		trimLReg     = new RegExp('^'+sReg,'g'),
+		trimRReg     = new RegExp(sReg+'$','g'),
 		tagCenterReg = new RegExp('>'+sReg+'<','g'),
-		tagLeftReg = new RegExp('<'+sReg,'g'),
-		tagRightReg = new RegExp(sReg+'>','g'),
-		tagCloseReg = new RegExp('<\/'+sReg,'g');
+		tagLeftReg   = new RegExp('<'+sReg,'g'),
+		tagRightReg  = new RegExp(sReg+'>','g'),
+		tagCloseReg  = new RegExp('<\/'+sReg,'g');
 
 // String Methods 
 // @use trim

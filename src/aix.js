@@ -688,14 +688,6 @@
 		}
 	};
 
-
-	// var cloneObj = function(obj) {
-	// 	return JSON.parse(JSON.stringify(obj));
-	// };
-	var cloneObj = function(obj){
-		return obj;
-	};
-
 	/**
 	 * based on https://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Longest_common_substring#JavaScript
 	 */
@@ -713,7 +705,6 @@
 			origin, ret;
 
 		if (subsetsSame) {
-
 			c1.some(function(element, i) {
 				var c1Desc = elementDescriptors(element),
 					c2Desc = elementDescriptors(c2[i]);
@@ -730,7 +721,6 @@
 				if (!subsetsSame) {
 					return true;
 				}
-
 			});
 		}
 
@@ -1017,8 +1007,8 @@
 			if (t1.nodeName !== t2.nodeName) {
 				return [new Diff()
 					.setValue(t._const.action, t._const.replaceElement)
-					.setValue(t._const.oldValue, cloneObj(t1))
-					.setValue(t._const.newValue, cloneObj(t2))
+					.setValue(t._const.oldValue, t1)
+					.setValue(t._const.newValue, t2)
 					.setValue(t._const.route, route)
 				];
 			}
@@ -1209,7 +1199,7 @@
 							diffs.push(new Diff()
 								.setValue(t._const.action, t._const.removeElement)
 								.setValue(t._const.route, route.concat(index))
-								.setValue(t._const.element, cloneObj(e1))
+								.setValue(t._const.element, e1)
 							);
 							index -= 1;
 						}
@@ -1225,7 +1215,7 @@
 							diffs.push(new Diff()
 								.setValue(t._const.action, t._const.addElement)
 								.setValue(t._const.route, route.concat(index))
-								.setValue(t._const.element, cloneObj(e2))
+								.setValue(t._const.element, e2)
 							);
 						}
 					}
@@ -1303,7 +1293,7 @@
 						diffs.push(new Diff()
 							.setValue(t._const.action, t._const.removeElement)
 							.setValue(t._const.route, route.concat(index2))
-							.setValue(t._const.element, cloneObj(node))
+							.setValue(t._const.element, node)
 						);
 						gaps1.splice(index2, 1);
 						shortest = Math.min(gaps1.length, gaps2.length);
@@ -1325,7 +1315,7 @@
 						diffs.push(new Diff()
 							.setValue(t._const.action, t._const.addElement)
 							.setValue(t._const.route, route.concat(index2))
-							.setValue(t._const.element, cloneObj(node))
+							.setValue(t._const.element, node)
 						);
 						gaps1.splice(index2, 0, true);
 						shortest = Math.min(gaps1.length, gaps2.length);
@@ -1507,7 +1497,7 @@
 					node.selected = diff[this._const.newValue];
 					break;
 				case this._const.replaceElement:
-					newNode = cloneObj(diff[this._const.newValue]);
+					newNode = diff[this._const.newValue];
 					newNode.outerDone = true;
 					newNode.innerDone = true;
 					newNode.valueDone = true;
@@ -1526,7 +1516,7 @@
 					route = diff[this._const.route].slice();
 					c = route.splice(route.length - 1, 1)[0];
 					node = this.getFromVirtualRoute(tree, route).node;
-					newNode = cloneObj(diff[this._const.element]);
+					newNode = diff[this._const.element];
 					newNode.outerDone = true;
 					newNode.innerDone = true;
 					newNode.valueDone = true;
