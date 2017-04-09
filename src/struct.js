@@ -1549,14 +1549,6 @@ function removeEvent(obj,type,fn){
 	return obj;
 }
 
-function emit(obj,type,fn,args){
-	return al(
-		toString(type).split(","),
-		function(t){ fireEvent(this,trim(t),fn,args) },
-		obj
-	),obj;
-}
-
 function fireEvent(obj,type,fn,args){
 	var hasFn = isFn(fn);
 
@@ -1565,10 +1557,18 @@ function fireEvent(obj,type,fn,args){
 		fn = null;
 	}
 
-	if(obj._events)
+	if(obj._events&&type!=="")
 		ol(obj._events[type],function(f){
 			if(f===fn||!hasFn) f.apply(obj,args||[]);
 		});
+}
+
+function emit(obj,type,fn,args){
+	return al(
+		toString(type).split(","),
+		function(t){ fireEvent(this,trim(t),fn,args) },
+		obj
+	),obj;
 }
 
 // Struct Prop listener
@@ -1578,7 +1578,7 @@ function fireEvent(obj,type,fn,args){
 // @exprot prop
 
 // define deeping getProp method
-function getProp(obj,prop){
+function getProp(obj,prop,dowith){
 	var tmp,keygen = (prop||"").split(".");
 	if(keygen.length === 1){
 		if(obj.hasOwnProperty(prop))
@@ -1592,7 +1592,9 @@ function getProp(obj,prop){
 				break;
 		}
 	}
-	return tmp;
+	return isFn(dowith) ? dowith(tmp) : 
+		((typeof dowith === "string" && dowith) ? 
+			tmp[dowith]() : tmp);
 }
 
 function setProp(obj,prop,value){

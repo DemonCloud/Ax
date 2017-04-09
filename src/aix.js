@@ -91,6 +91,7 @@
 		_find     = struct.find(),
 		_ajax     = struct.ajax(),
 		_size     = struct.size(),
+		_first    = struct.first(),
 		_doom     = struct.doom();
 
 	// aix genertor function
@@ -485,15 +486,46 @@
 		});
 	}
 
-	var diffcount;
+	var diffcount,
+		diffconst = {
+		addAttribute: 0,
+		modifyAttribute: 1,
+		removeAttribute: 2,
+		modifyTextElement: 3,
+		relocateGroup: 4,
+		removeElement: 5,
+		addElement: 6,
+		removeTextElement: 7,
+		addTextElement: 8,
+		replaceElement: 9,
+		modifyValue: 10,
+		modifyChecked: 11,
+		modifySelected: 12,
+		modifyComment: 13,
+		action: 'a',
+		route: 'r',
+		oldValue: 'o',
+		newValue: 'n',
+		element: 'e',
+		'group': 'g',
+		from: 'f',
+		to: 't',
+		name: 'na',
+		value: 'v',
+		'data': 'd',
+		'attributes': 'at',
+		'nodeName': 'nn',
+		'childNodes': 'c',
+		'checked': 'ch',
+		'selected': 's'
+	};
 
 	var Diff = function(options) {
 		var diff = this;
-		if (options) {
+		if(options)
 			_fal(_keys(options),function(option) {
 				diff[option] = options[option];
 			});
-		}
 	};
 
 	Diff.prototype = {
@@ -508,9 +540,8 @@
 
 	SubsetMapping.prototype = {
 		contains: function contains(subset) {
-			if (subset.length < this.length) {
+			if (subset.length < this.length)
 				return subset.newValue >= this.newValue && subset.newValue < this.newValue + this.length;
-			}
 			return false;
 		},
 		toString: function toString() {
@@ -676,18 +707,13 @@
 			c1.some(function(element, i) {
 				var c1Desc = elementDescriptors(element),
 					c2Desc = elementDescriptors(c2[i]);
-				if (c1Desc.length !== c2Desc.length) {
-					subsetsSame = false;
-					return true;
-				}
-				c1Desc.some(function(description, i) {
-					if (description !== c2Desc[i]) {
-						subsetsSame = false;
-						return true;
-					}
+				if (c1Desc.length !== c2Desc.length)
+					return !(subsetsSame = false);
+				c1Desc.some(function(description, i){
+					if (description !== c2Desc[i])
+						return !(subsetsSame = false);
 				});
-				if(!subsetsSame)
-					return true;
+				return !subsetsSame;
 			});
 		}
 
@@ -764,19 +790,6 @@
 		return subsets;
 	};
 
-
-	function swap(obj, p1, p2) {
-		// (function(_) {
-		// 	obj[p1] = obj[p2];
-		// 	obj[p2] = _;
-		// }(obj[p1]));
-		obj[p1]^=obj[p2];
-		obj[p2]^=obj[p1];
-		obj[p1]^=obj[p2];
-		return obj;
-	}
-
-
 	var DiffTracker = function() {
 		this.list = [];
 	};
@@ -784,7 +797,7 @@
 	DiffTracker.prototype = {
 		list: false,
 		add: function(diffs) {
-			_fal(diffs,function(diff) {
+			return _fal(diffs,function(diff) {
 				this.push(diff);
 			},this.list);
 		},
@@ -793,6 +806,7 @@
 		}
 	};
 
+	// dom diff options
 	var diffDOM = function(options) {
 		var defaults = {
 			debug: false,
@@ -811,55 +825,16 @@
 			preDiffApply: function() {},
 			postDiffApply: function() {},
 			filterOuterDiff: null
-		},i;
-
-		if (typeof options === "undefined")
-			options = {};
-
-		for (i in defaults) {
-			if (typeof options[i] === "undefined")
-				this[i] = defaults[i];
-			else
-				this[i] = options[i];
-		}
-
-		this._const = {
-			addAttribute: 0,
-			modifyAttribute: 1,
-			removeAttribute: 2,
-			modifyTextElement: 3,
-			relocateGroup: 4,
-			removeElement: 5,
-			addElement: 6,
-			removeTextElement: 7,
-			addTextElement: 8,
-			replaceElement: 9,
-			modifyValue: 10,
-			modifyChecked: 11,
-			modifySelected: 12,
-			modifyComment: 13,
-			action: 'a',
-			route: 'r',
-			oldValue: 'o',
-			newValue: 'n',
-			element: 'e',
-			'group': 'g',
-			from: 'f',
-			to: 't',
-			name: 'na',
-			value: 'v',
-			'data': 'd',
-			'attributes': 'at',
-			'nodeName': 'nn',
-			'childNodes': 'c',
-			'checked': 'ch',
-			'selected': 's'
 		};
+		_extend(this,_extend(defaults,options||{}));
+
+		this._const = Object.freeze(_clone(diffconst));
 	};
 
 	diffDOM.Diff = Diff;
 
 	diffDOM.prototype = {
+
 		diff: function(t1Node, t2Node) {
 
 			var t1 = this.nodeToObj(t1Node),
@@ -875,6 +850,7 @@
 			this.tracker = new DiffTracker();
 			return this.findDiffs(t1, t2);
 		},
+
 		findDiffs: function(t1, t2) {
 			var diffs;
 			do {
@@ -886,13 +862,12 @@
 					if (!isEqual(t1, t2))
 						diffs = (removeDone(t1),this.findNextDiff(t1, t2, []));
 
-				if (diffs.length > 0) {
-					this.tracker.add(diffs);
-					this.applyVirtual(t1, diffs);
-				}
+				if (diffs.length>0)
+					this.applyVirtual(t1,this.tracker.add(diffs));
 			} while (diffs.length > 0);
 			return this.tracker.list;
 		},
+
 		findNextDiff: function(t1, t2, route) {
 			var diffs, fdiffs;
 
@@ -931,6 +906,7 @@
 			// no differences
 			return [];
 		},
+
 		findOuterDiff: function(t1, t2, route) {
 			var t = this;
 			var diffs = [],
@@ -1004,10 +980,11 @@
 
 			return diffs;
 		},
+
 		nodeToObj: function(aNode) {
-			var objNode = {};
-			objNode.nodeName = aNode.nodeName;
-			if (objNode.nodeName === '#text' || objNode.nodeName === '#comment') {
+			var objNode = {}; objNode.nodeName = aNode.nodeName;
+			if (objNode.nodeName === '#text' || 
+					objNode.nodeName === '#comment') {
 				objNode.data = aNode.data;
 			} else {
 				if (aNode.attributes && aNode.attributes.length > 0) {
@@ -1036,6 +1013,7 @@
 
 			return objNode;
 		},
+
 		objToNode: function(objNode, insideSvg) {
 			var node;
 			if (objNode.nodeName === '#text') {
@@ -1070,6 +1048,7 @@
 			}
 			return node;
 		},
+
 		findInnerDiff: function(t1, t2, route) {
 			var t = this;
 			var subtrees = (t1.childNodes && t2.childNodes) ? markSubTrees(t1, t2) : [],
@@ -1302,13 +1281,13 @@
 		},
 
 		// ===== Apply a virtual diff =====
-
 		applyVirtual: function(tree, diffs) {
 			_fal(diffs,function(diff) {
 				this.applyVirtualDiff(tree, diff);
 			},this);
 			return true;
 		},
+
 		getFromVirtualRoute: function(tree, route) {
 			var node = tree,
 				parentNode, nodeIndex;
@@ -1327,6 +1306,7 @@
 				nodeIndex: nodeIndex
 			};
 		},
+
 		applyVirtualDiff: function(tree, diff) {
 			var routeInfo = this.getFromVirtualRoute(tree, diff[this._const.route]),
 				node = routeInfo.node,
@@ -1471,6 +1451,7 @@
 			},this);
 			return true;
 		},
+
 		getFromRoute: function(tree, route) {
 			route = route.slice();
 			var c, node = tree;
@@ -1482,6 +1463,7 @@
 			}
 			return node;
 		},
+
 		applyDiff: function(tree, diff) {
 			var node = this.getFromRoute(tree, diff[this._const.route]),
 				newNode, reference, route, c;
@@ -1582,72 +1564,6 @@
 			this.postDiffApply(info);
 
 			return true;
-		},
-
-		// ===== Undo a diff =====
-
-		undo: function(tree, diffs) {
-			diffs = diffs.slice();
-			if (!diffs.length)
-				diffs = [diffs];
-			_fal(diffs.reverse(),function(diff) {
-				this.undoDiff(tree, diff);
-			},this);
-		},
-		undoDiff: function(tree, diff) {
-			switch (diff[this._const.action]) {
-				case this._const.addAttribute:
-					diff[this._const.action] = this._const.removeAttribute;
-					this.applyDiff(tree, diff);
-					break;
-				case this._const.modifyAttribute:
-					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
-					break;
-				case this._const.removeAttribute:
-					diff[this._const.action] = this._const.addAttribute;
-					this.applyDiff(tree, diff);
-					break;
-				case this._const.modifyTextElement:
-					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
-					break;
-				case this._const.modifyValue:
-					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
-					break;
-				case this._const.modifyComment:
-					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
-					break;
-				case this._const.modifyChecked:
-					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
-					break;
-				case this._const.modifySelected:
-					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
-					break;
-				case this._const.replaceElement:
-					this.applyDiff(tree, swap(diff, this._const.oldValue, this._const.newValue));
-					break;
-				case this._const.relocateGroup:
-					this.applyDiff(tree, swap(diff, this._const.from, this._const.to));
-					break;
-				case this._const.removeElement:
-					diff[this._const.action] = this._const.addElement;
-					this.applyDiff(tree, diff);
-					break;
-				case this._const.addElement:
-					diff[this._const.action] = this._const.removeElement;
-					this.applyDiff(tree, diff);
-					break;
-				case this._const.removeTextElement:
-					diff[this._const.action] = this._const.addTextElement;
-					this.applyDiff(tree, diff);
-					break;
-				case this._const.addTextElement:
-					diff[this._const.action] = this._const.removeTextElement;
-					this.applyDiff(tree, diff);
-					break;
-				default:
-					console.log('unknown action');
-			}
-
 		}
 	};
 
@@ -1866,23 +1782,38 @@
 	};
 
 	function checkValidate(olddata,newdata,validate){
-		var res = false,key,s=_size(validate);
-		if(!s) return true;
+		var res = [],s=_size(validate);
+		if(!s) return res;
 		if(!_eq(olddata,newdata)){
-			key = _keys(validate); res = true;
-			for(var i=0,isRequired; i<s; i++){
+			var key = _keys(validate);
+			for(var i=0,isRequired,value; i<s; i++){
 				// get validate funtion
 				isRequired = validate[key[i]];
-				if(!isRequired(_prop(newdata,key[i]))){
-					res = false; break;
+				value=_prop(newdata,key[i]);
+				if(!isRequired(value)){
+					res.push(key[i],value);
+					break;
 				}
 			}
 		}
 		return res;
 	}
 
+	function on(type,fn){
+		if(_isFn(fn)) _on(this,type,fn);
+		return this;
+	}
+
 	function uon(fn,type){
 		return this.on(type,fn);
+	}
+
+	function unbind(type,fn){
+		return _unbind(this,type,fn);
+	}
+
+	function emit(type,fn,args){
+		return _emit(this,type,fn,args);
 	}
 
 	// Aix Model
@@ -1907,18 +1838,22 @@
 				return _clone(data);
 			},
 			set : function(newdata){
-				if(_eq(data,newdata))
-					return data;
-				var args = [_clone(newdata)];
+				if(_eq(data,newdata)) return data;
+
+				var args = [_clone(newdata)],error;
 				if((this.emit("validate",args),
 					_isPrim(newdata)?
-					validate(newdata):
-					checkValidate(data,newdata,validate)))
+					(error=validate(newdata)):
+					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
 					this.emit("validate:success,change",args),
 					this.change=true,
 					newdata;
-				return this.emit("validate:fail",args),data;
+
+				this.emit("validate:fail",args.concat(error));
+				if(_isAry(error)&&_size(error)===2)
+					this.emit("validate:fail:"+_first(error),error);
+				return data;
 			},
 			enumerable:true,
 			configurable:false
@@ -1932,9 +1867,9 @@
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
 	aix.model.prototype = {
-		get : function(key){
+		get : function(key,dowith){
 			if(key!=null)
-				return _prop(this.data,key);
+				return _prop(this.data,key,dowith);
 			return this.data;
 		},
 
@@ -1948,20 +1883,11 @@
 		},
 
 		// API event
-		on: function(type,fn){
-			if(_isFn(fn)) _on(this,type,fn);
-			return this;
-		},
+		on: on,
 
-		unbind : function(type,fn){
-			return _unbind(this,type,fn);
-		},
+		unbind : unbind,
 
-		emit : function(type,fn,args){
-			return _fal((type||"").split(","),function(t){
-				_emit(this,t,fn,args);
-			},this),this;
-		},
+		emit : emit,
 
 		// Aix Restful API design for
 		// [Aix Model] data format serialize
@@ -2219,18 +2145,11 @@
 	// Aix-Route for SPA Architecture
 	// auto trigger regex event when route change
 	aix.route.prototype = {
-		on : function(type,fn){
-			if(_isFn(fn)) _on(this,type,fn);
-			return this;
-		},
+		on : on,
 
-		unbind : function(type,fn){
-			return _unbind(this,type,fn);
-		},
+		unbind : unbind,
 
-		emit : function(type,fn,args){
-			return _emit(this,type,fn,args);
-		},
+		emit : emit,
 
 		listen: function(hash){
 			if(!this._listen){
