@@ -36,7 +36,7 @@
 	"use strict";
 
 	// Define DOM frame
-	var z,Z,
+	var z,Z,aM,aV,aR,
 	// Define Setting
 		VIEW_DEFAULT  = { root:"[__aix__]", events:{} },
 		MODEL_DEFAULT = { data:{}, events:{}, validate:{} },
@@ -94,6 +94,10 @@
 		_first    = struct.first(),
 		_doom     = struct.doom();
 
+	function frozen(){
+		_fal(_slice(arguments),Object.freeze);
+	}
+
 	// aix genertor function
 	function genertor_(api){
 		return function(){
@@ -117,13 +121,13 @@
 	}
 
 	function hackaix(origin,extend){
-		var fnstr = _toString(origin); 
+		var fnstr = _toString(origin),
+			oargs = _toString(origin),
+			eargs = _toString(extend),
 
-		var oargs = _toString(origin);
-		var eargs = _toString(extend);
-		var body = fnstr.slice(
-							 fnstr.indexOf("{") + 1, 
-							 fnstr.lastIndexOf("}"));
+		body = fnstr.slice(
+					 fnstr.indexOf("{")+1, 
+					 fnstr.lastIndexOf("}"));
 
 		oargs = oargs.slice(oargs.indexOf('(')+1, oargs.indexOf(')'))
 								 .match(/([^\s,]+)/g)[0];
@@ -136,18 +140,15 @@
 	function createExtend(origin){
 		return function(def){
 			var x = hackaix(aix[origin],aix[origin].extend);
-			var extend = eval(
-				"(function(ops){ " +
-				"var " + x[0] + "=_extend(_extend({},"+x[1]+"),ops||{}); " +
-				x[2] +
-				"})"
-			);
+			var extend = eval("(function(ops){ "+
+				"var "+x[0]+"=_extend(_extend({},"+x[1]+"),ops||{}); "+x[2]+
+				"})");
 
 			_extend(extend.prototype,aix[origin].prototype);
-			extend.prototype.constructor = extend;
 			return extend;
 		};
 	}
+
 	// get childNodes and filter by selector
 	// cant use Global matcher
 	var isId    = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
@@ -165,7 +166,7 @@
 	function dsizzle(elm){
 		elm = _trim(elm);
 
-		var $el=[] ,$1 = !cidSl.test(elm) ,$2 = !pitSl.test(elm);
+		var $el=[], $1=!cidSl.test(elm), $2=!pitSl.test(elm);
 		if($1&&$2){
 			if(elm.search(",")>-1)
 				_fal(elm.split(","),function(sl){
@@ -204,26 +205,7 @@
 		}
 
 		return _clone($el);
-	};
-
-	function pushcache(sl){
-		if(zCache.length >= 4)
-			zCache.shift();
-		zCache.push(sl);
 	}
-
-	function inpage(sl){
-		return _ey(sl.$el,function(e){ 
-			return e === document.body ? false : 
-				(document.body.contains(e) || document.contains(e)); 
-		});
-	}
-
-	var zCache = [];
-
-	var zInit = function(x){
-		return new Z(x);
-	};
 
 	Z = function(str){
 		this.$el = [];
@@ -254,7 +236,7 @@
 	};
 
 	z = function(x){
-		return zInit.call(root,x);
+		return z.init.call(root,x);
 	};
 
 	var _zid = 1,
@@ -419,8 +401,12 @@
 											 _has(this.parentNode.querySelectorAll(selector),this);
 								};
 
+	z.init = function(x){
+		return new Z(x);
+	};
+
 	z.matchz = function(elm,selector){
-		if(elm==null||elm===document||typeof selector !== "string") 
+		if(elm===null||elm===document||typeof selector !== "string") 
 			return false;
 		return matchzx.call(elm, selector);
 	};
@@ -445,12 +431,10 @@
 			return proxyFn;
 	
 		} else if (typeof context === "string") {
-			if (args) {
-				args.unshift(fn[context], fn);
-				return z.proxy.apply(null, args);
-			} else {
+			if (args)
+				return z.proxy.apply(null,(args.unshift(fn[context],fn),args));
+			else
 				return z.proxy(fn[context], fn);
-			}
 		} else {
 			throw new TypeError("expected function");
 		}
@@ -521,11 +505,7 @@
 	};
 
 	var Diff = function(options) {
-		var diff = this;
-		if(options)
-			_fal(_keys(options),function(option) {
-				diff[option] = options[option];
-			});
+		_extend(this,options||{});
 	};
 
 	Diff.prototype = {
@@ -541,11 +521,14 @@
 	SubsetMapping.prototype = {
 		contains: function contains(subset) {
 			if (subset.length < this.length)
-				return subset.newValue >= this.newValue && subset.newValue < this.newValue + this.length;
+				return subset.newValue >= this.newValue && 
+							 subset.newValue < this.newValue + this.length;
 			return false;
 		},
 		toString: function toString() {
-			return this.length + " element subset, first mapping: old " + this.oldValue + " → new " + this.newValue;
+			return this.length + 
+						" element subset, first mapping: old " + 
+						this.oldValue + " → new " + this.newValue;
 		}
 	};
 
@@ -608,8 +591,8 @@
 		}))
 			return false;
 
-		if ((Boolean(e1.attributes) !== Boolean(e2.attributes)) ||
-				 Boolean(e1.childNodes) !== Boolean(e2.childNodes))
+		if (Boolean(e1.attributes) !== Boolean(e2.attributes) ||
+				Boolean(e1.childNodes) !== Boolean(e2.childNodes))
 			return false;
 
 		if (e1.attributes) {
@@ -646,7 +629,6 @@
 			// the mere fact that it's the same tag and "has text" means it's roughly
 			// equal, and then we can find out the true text difference later.
 			return preventRecursion ? true : e1.data === e2.data;
-
 
 		if (e1.nodeName in uniqueDescriptors)
 			return true;
@@ -1151,7 +1133,6 @@
 				group, node, similarNode, testI, diffs = [],
 				index1, index2, j;
 
-
 			for (index2 = 0, index1 = 0; index2 < shortest; index1 += 1, index2 += 1) {
 				if (gaps1[index2] === true) {
 					node = t1.childNodes[index1];
@@ -1269,6 +1250,7 @@
 					.setValue(t._const.route, route)
 				);
 			}
+
 			if (t1.checked !== t2.checked) {
 				diffs.push(new Diff()
 					.setValue(t._const.action, t._const.modifyChecked)
@@ -1277,6 +1259,7 @@
 					.setValue(t._const.route, route)
 				);
 			}
+
 			return diffs;
 		},
 
@@ -1644,17 +1627,16 @@
 		},
 
 		closest : function(selector,element){
-			var el = this.$el ,find ,tmp;
+			var el = this.$el ,find ,tmp=el[0];
 
-			for(var i=0,l=el.length;i<l;i++){
-				tmp = el[i];
-
+			for(var i=0,l=el.length;i<l;i++,tmp=el[i]){
 				while(tmp&&!find&&tmp!==element){
-					tmp = tmp.parentNode;
-					if(z.matchz(tmp,selector)) find=tmp;
+					if(z.matchz(tmp=tmp.parentNode,selector)) 
+						find=tmp;
 				}
 
-				if(find) break;
+				if(find)
+					break;
 			}
 
 			return z(find ? [find] : []);
@@ -1817,7 +1799,7 @@
 	}
 
 	// Aix Model
-	aix.model = function(obj){
+	aix.model = aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
 			data = config.data,
 			events = config.events,
@@ -1866,7 +1848,7 @@
 	// Model Prototype extend
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
-	aix.model.prototype = {
+	aM.prototype = {
 		get : function(key,dowith){
 			if(key!=null)
 				return _prop(this.data,key,dowith);
@@ -1996,7 +1978,7 @@
 	};
 
 	// bind selector
-	aix.view = function(obj){
+	aix.view = aV = function(obj){
 		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
 			events = config.events;
 
@@ -2030,7 +2012,7 @@
 		this.emit("init");
 	};
 
-	aix.view.prototype = {
+	aV.prototype = {
 		on : function(type,fn){
 			return _fal((type||"").split(","),function(mk){
 				var param = mk.split(":");
@@ -2110,7 +2092,7 @@
 	}
 
 	// define route for SPA
-	aix.route = function(obj){
+	aix.route = aR = function(obj){
 		var _this = this,
 			history = { old: "", now: root.location.href },
 			config = _extend(_clone(ROUTE_DEFAULT),obj||{}),
@@ -2144,7 +2126,7 @@
 
 	// Aix-Route for SPA Architecture
 	// auto trigger regex event when route change
-	aix.route.prototype = {
+	aR.prototype = {
 		on : on,
 
 		unbind : unbind,
@@ -2214,7 +2196,7 @@
 		"unique",
 		"concat"
 	],function(api){
-		aix.model.prototype[api]= genertor_(api);
+		aM.prototype[api]= genertor_(api);
 	});
 
 	_fal([
@@ -2232,7 +2214,7 @@
 		"type",
 		"index"
 	],function(api){
-		aix.model.prototype[api]=genertor_$(api);
+		aM.prototype[api]=genertor_$(api);
 	});
 
 	// Extend method
@@ -2240,13 +2222,11 @@
 	// Prepare for component
 	aix.VERSION = struct.VERSION;
 
-	aix.view.extend  = createExtend("view");
-	aix.model.extend = createExtend("model");
-	aix.route.extend = createExtend("route");
+	aV.extend = createExtend("view");
+	aM.extend = createExtend("model");
+	aR.extend = createExtend("route");
 
-	Object.freeze(aix.model);
-	Object.freeze(aix.view);
-	Object.freeze(aix.route);
+	frozen(aM,aV,aR,v8(aix));
 
-	return Object.freeze(v8(aix));
+	return aix;
 });

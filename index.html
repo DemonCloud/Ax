@@ -5,6 +5,7 @@
 	<title></title>
 	<style>
 		a{ display: block }
+		.target{ display:inline-block; color:red; }
 	</style>
 </head>
 <body>
@@ -23,7 +24,7 @@
 	<!-- <script src="./src/aix.js"></script> -->
 	<script src="./dest/aix.c.js"></script>
 
-	<script>
+<script>
 var model = new aix.model({
 	data:{
 		name:"cloud",
@@ -39,23 +40,27 @@ var model = new aix.model({
 	},
 	events:{
 		change:function(){
-			console.log("model change successful!");
+			console.log("model change successful -> "+this.toJSON());
 		},
 		"validate:fail":function(data,key,value){
 			console.log("error -> ["+key+"] value = ("+value+") set!");
 		},
 		"validate:fail:score":function(key,value){
-			console.log(key+" must better than 7, not as "+value);
+			console.warn(key+" must better than 7, not as "+value);
 		}
 	}
 });
 
 var view = new aix.view({
 	root:"#app",
-	template:"<div>name: {{-name}}</div>"+
-					 "<div>score: {{-score}}</div>"
+	template:"<div>name: <div class='target'>{{-name}}</div></div>"+
+					 "<div>score: <div class='target'>{{-score}}</div></div>",
+	events:{
+		"click:div.target":function(event){
+			console.log(this,"click "+this.innerText);
+		}
+	}
 });
-
 
 var route = new aix.route({
 	routes:{
@@ -75,6 +80,6 @@ var route = new aix.route({
 
 model.on("change",view.render);
 route.listen();
-	</script>
+</script>
 </body>
 </html>
