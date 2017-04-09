@@ -80,8 +80,9 @@
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
 		_emit     = struct.event('emit'),
-		_prop     = struct.prop(),
+		_prop     = struct.prop("get"),
 		_setProp  = struct.prop("set"),
+		_rmProp   = struct.prop("not"),
 		_watch    = struct.prop('watch'),
 		_unwatch  = struct.prop('unwatch'),
 		_param    = struct.param(),
@@ -1849,9 +1850,10 @@
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
 	aM.prototype = {
-		get : function(key,dowith){
+		get : function(key){
 			if(key!=null)
-				return _prop(this.data,key,dowith);
+				return _prop.apply(this,
+					[this.data].concat(_slice(arguments)));
 			return this.data;
 		},
 
@@ -1864,8 +1866,13 @@
 			return param ? this.emit("change:"+param,[arguments[1]]) : this;
 		},
 
+		remove : function(prop){
+			this.data = _rmProp(this.data,prop);
+			return this;
+		},
+
 		// API event
-		on: on,
+		on : on,
 
 		unbind : unbind,
 
@@ -2120,8 +2127,7 @@
 		});
 
 		_extend(this,config);
-		this.on("hashchange",hashChange);
-		this.emit("init");
+		this.on("hashchange",hashChange).emit("init");
 	};
 
 	// Aix-Route for SPA Architecture

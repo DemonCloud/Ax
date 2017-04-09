@@ -1579,52 +1579,69 @@ function emit(obj,type,fn,args){
 
 // define deeping getProp method
 function getProp(obj,prop,dowith){
-	var tmp,keygen = (prop||"").split(".");
+	var tmp,i,keygen = (prop||"").split(".");
+
 	if(keygen.length === 1){
 		if(obj.hasOwnProperty(prop))
 			tmp = obj[prop];
 	}else{
 		// [a.b.2]
-		tmp = obj;
-		for(var i=0;i<keygen.length;i++){
-			tmp = tmp[keygen[i]]; 
-			if(isPrimitive(tmp)) 
+		for(i=0,tmp = obj;i<keygen.length;i++)
+			if(isPrimitive(tmp = tmp[keygen[i]])) 
 				break;
-		}
 	}
-	return isFn(dowith) ? dowith(tmp) : 
-		((typeof dowith === "string" && dowith) ? 
-			tmp[dowith]() : tmp);
+
+	if(dowith){
+		var args = slice(arguments,3);
+		if(isFn(dowith))
+			tmp = dowith.apply(tmp,(args.unshift(tmp),args));
+		else if(typeof dowith === "string")
+			tmp = isFn(tmp[dowith]) ? 
+						tmp[dowith].apply(tmp,args) :
+						tmp[dowith];
+	}
+		
+	return tmp;
 }
 
 function setProp(obj,prop,value){
-	var tmp,end,keygen = (prop||"").split(".");
+	var tmp,end,i,keygen = (prop||"").split(".");
 	if(keygen.length === 1){
 		if(obj.hasOwnProperty(prop))
 			obj[prop] = value;
 	}else{
 		// [a.b.2]
-		tmp = obj;
-		end = keygen.pop();
-		for(var i=0;i<keygen.length;i++)
+		for(i=0,tmp=obj,end = keygen.pop();i<keygen.length;i++)
 			tmp = tmp[keygen[i]]; 
 		tmp[end] = value;
 	}
 	return obj;
 }
 
+function rmProp(obj,prop){
+	var tmp,i,end,keygen = (prop||"").split(".");
+	if(keygen.length === 1){
+		if(obj.hasOwnProperty(prop))
+			delete obj[prop];
+	}else{
+		for(i=0,tmp=obj,end = keygen.pop();i<keygen.length;i++)
+			tmp = tmp[keygen[i]]; 
+		delete tmp[end];
+	}
+	return obj;
+}
+
 function watch(obj,prop,handle){
 	var oldval = obj[prop] , newval = oldval;
-	function getter(){ return newval; }
-	function setter(val){ 
-		oldval = newval; 
-		return newval = handle.call(obj,val,oldval,prop); 
-	}
 
 	if(delete obj[prop]){
 		define(obj,prop,{
-			get: getter,
-			set: setter,
+			get: function(){ 
+				return newval; 
+			},
+			set: function(val){ 
+				return (newval = handle.call(obj,val,oldval = newval,prop)); 
+			},
 			enumerable: true,
 			configurable: true
 		});
@@ -2108,6 +2125,9 @@ function $prop(c){
 			return getProp;
 		case "set":
 			return setProp;
+		case "not":
+		case "remove":
+			return rmProp;
 		case "watch":
 		case "listen":
 			return watch;
