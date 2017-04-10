@@ -185,7 +185,7 @@ function isDefine(obj,name){
 
 // ArrayLike [ type ] 
 function isArrayLike(obj){
-	return (typeof obj.length === "number" && isObject(obj)) &&(
+	return obj !==null && (typeof obj.length === "number" && isObject(obj)) &&(
 				 isArray(obj) ||
 				 isDefine(obj,"Arguments") ||
 				 isDefine(obj,"NodeList") ||
@@ -1538,15 +1538,28 @@ function addEvent(obj,type,fn){
 }
 
 function removeEvent(obj,type,fn){
-	if(obj._events[type]){
-		not(obj._events[type],fn);
-		if(!obj._events[type].length || !fn)
-			delete obj._events[type];
-	}else if(!type && !fn){
-		delete obj._events;
-		return obj;
+	if(obj._events){
+		if(obj._events[type]){
+			not(obj._events[type],fn);
+			if(!obj._events[type].length || !fn)
+				delete obj._events[type];
+		}else if(!type && !fn){
+			delete obj._events;
+			return obj;
+		}
 	}
 	return obj;
+}
+
+function hasEvent(obj,type,fn){
+	var res;
+	if(obj._events){
+		if(isFn(fn) && obj._events[type])
+			res = has(obj._events[type],fn);
+		else
+			res = size(obj._events[type]);
+	}
+	return !!res;
 }
 
 function fireEvent(obj,type,fn,args){
@@ -1605,14 +1618,13 @@ function getProp(obj,prop,dowith){
 }
 
 function setProp(obj,prop,value){
-	var tmp,end,i,keygen = (prop||"").split(".");
+	var tmp,end,i,check,keygen = (prop||"").split(".");
 	if(keygen.length === 1){
-		if(obj.hasOwnProperty(prop))
-			obj[prop] = value;
+		obj[prop] = value;
 	}else{
 		// [a.b.2]
-		for(i=0,tmp=obj,end = keygen.pop();i<keygen.length;i++)
-			tmp = tmp[keygen[i]]; 
+		for(i=0,tmp=obj,check,end=keygen.pop();i<keygen.length;i++)
+			tmp = (check = tmp[keygen[i]]) == null ? {} : check ;
 		tmp[end] = value;
 	}
 	return obj;
@@ -2110,6 +2122,9 @@ function $event(c){
 		case "remove":
 		case "unbind":
 			return removeEvent;
+		case "has":
+		case "exist":
+			return hasEvent;
 		case "dispatch":
 		case "trigger":
 		case "emit":

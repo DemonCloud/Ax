@@ -38,8 +38,8 @@
 	// Define DOM frame
 	var z,Z,aM,aV,aR,
 	// Define Setting
-		VIEW_DEFAULT  = { root:"[__aix__]", events:{} },
-		MODEL_DEFAULT = { data:{}, events:{}, validate:{} },
+		VIEW_DEFAULT  = { },
+		MODEL_DEFAULT = { data:{}, validate:{} },
 		ROUTE_DEFAULT = { char:"@", routes:{}, actions:{} },
 
 	// resetful list 
@@ -72,6 +72,7 @@
 		_isFn     = struct.type('function'),
 		_isInt    = struct.type('int'),
 		_isAry    = struct.type('array'),
+		_isAryL   = struct.type('arraylike'),
 		_isPrim   = struct.type('primitive'),
 		_loop     = struct.op(),
 		_fol      = struct.op('object'),
@@ -80,9 +81,9 @@
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
 		_emit     = struct.event('emit'),
-		_prop     = struct.prop("get"),
-		_setProp  = struct.prop("set"),
-		_rmProp   = struct.prop("not"),
+		_prop     = struct.prop('get'),
+		_setProp  = struct.prop('set'),
+		_rmProp   = struct.prop('not'),
 		_watch    = struct.prop('watch'),
 		_unwatch  = struct.prop('unwatch'),
 		_param    = struct.param(),
@@ -211,15 +212,16 @@
 	Z = function(str){
 		this.$el = [];
 		
-		if(str!=null){
+		if(str!==null){
 			if(typeof str === "string"){
 				this.$el = dsizzle(str);
 				this.$indicator = str;
 			}else if( str===document || str===root || str.nodeType ===1){
 				this.$el.push(str);
 				this.$indicator = str;
-			}else if(_isAry(str)){
-				this.$el = _find(str,function(node){ return node.nodeType===1; });
+			}else if(_isAryL(str)){
+				this.$el = _size(str) ? 
+					_find(_slice(str),function(node){ return node.nodeType===1; }) : [];
 				this.$indicator = Math.random();
 			}
 		}
@@ -1826,11 +1828,11 @@
 				var args = [_clone(newdata)],error;
 				if((this.emit("validate",args),
 					_isPrim(newdata)?
-					(error=validate(newdata)):
+					(error=_isFn(validate) ? validate(newdata) : true):
 					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
-					this.emit("validate:success,change",args),
 					this.change=true,
+					this.emit("validate:success,change",args),
 					newdata;
 
 				this.emit("validate:fail",args.concat(error));
@@ -1860,14 +1862,19 @@
 		set : function(){
 			var param;
 			this.data = arguments.length > 1 ?
-				(param = arguments[0],
-				_setProp(this.parse(),arguments[0],arguments[1])) : 
-				arguments[0];
+				(param = arguments[0],_setProp(this.data,param,arguments[1])) : arguments[0];
 			return param ? this.emit("change:"+param,[arguments[1]]) : this;
 		},
 
 		remove : function(prop){
-			this.data = _rmProp(this.data,prop);
+			if(prop){
+				var tmp = this.data;
+				this.data = _isAry(tmp) ? 
+					(tmp.splice(+prop,1),tmp) : 
+					_rmProp(tmp,prop);
+			}else{
+				this.data=null;
+			}
 			return this;
 		},
 
@@ -1987,33 +1994,49 @@
 	// bind selector
 	aix.view = aV = function(obj){
 		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
-			events = config.events;
+			events = config.events,
+			stencil = config.template,
+			vroot = config.root,
+			render = config.render;
 
+		delete config.root;
 		delete config.events;
-		// parse template
-		// building the render function
-		if(!_isFn(config.render)){
-			var template = typeof config.template === "string" ? 
-				_doom(config.template) :
-				(config.template || _noop);
-
-			config.render = function(){ 
-				var rt = z(config.root),args = _slice(arguments);
-				return this.emit("beforeRender",args),
-					(template !== _noop && (
-						(_trim(rt.get(0).innerHTML)==="" ? 
-							rt.html(template.apply(this,args)) : 
-							rt.render(template.apply(this,args))
-						) && this.emit("afterRender",args))),
-					this;
-			};
-
-			delete config.template;
-		}
+		delete config.render;
+		delete config.template;
 
 		_extend(this,config);
+		// parse template
+		// building the render function
+		if(!_isFn(render)){
+			stencil = (typeof stencil === "string") ? 
+				_doom(stencil) : (_isFn(stencil) ? stencil : _noop);
+
+			render = function(){ 
+				var t = z(vroot),args = _slice(arguments);
+				return this.emit("beforeRender",args),
+					(stencil !== _noop && (
+						(_trim(t.get(0).innerHTML)==="" ? 
+							t.html(stencil.apply(this,args)) : 
+							t.render(stencil.apply(this,args))
+						) && this.emit("afterRender",args))),this;
+			};
+		}
+
 		// if userobj has more events
-		_fol(events,uon,this);
+		if(vroot&&(vroot instanceof Element || typeof vroot === "string")){
+			this.root = vroot; this.render = render;
+			_fol(events,uon,this);
+		}else{
+			this.mount = function(el){
+				if(typeof el !== "string")
+					throw new TypeError("mount argument"+el+" must typeof sting.");
+				this.root = vroot = el; this.render = render;
+
+				_fol(events,uon,this);
+				// trigger render and delete mount
+				return this.render.apply(this,_slice(arguments,1)),delete this.mount;
+			}.bind(this);
+		}
 
 		// first trgger "init" event
 		this.emit("init");
@@ -2142,13 +2165,12 @@
 		listen: function(hash){
 			if(!this._listen){
 				_define(this,"_listen",{
-					value:true,
+					value:!root.addEventListener("hashchange",this.event),
 					writable : false,
 					enumerable : false,
 					configurable: true,
 				});
-
-				root.addEventListener("hashchange",this.event);
+				
 				return hash ? 
 					this.go(hash) : 
 					this.emit("hashchange",[root.location.href,this.char]);

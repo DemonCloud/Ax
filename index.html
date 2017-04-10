@@ -52,7 +52,6 @@ var model = new aix.model({
 });
 
 var view = new aix.view({
-	root:"#app",
 	template:"<div>name: <div class='target'>{{-name}}</div></div>"+
 					 "<div>score: <div class='target'>{{-score}}</div></div>",
 	events:{
@@ -73,7 +72,7 @@ var route = new aix.route({
 	},
 	events:{
 		init:function(){
-			return view.render(model.parse());
+			return view.mount("#app",model.parse());
 		}
 	}
 });
