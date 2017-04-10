@@ -12,7 +12,7 @@ It require `Struct` utils lib, for the sake of better organization application s
 - **Model**: Allows you to easily manage the data , model parse is the Immutable data, who can be monitored. So that data would not be modified by accident. Flexible authentication mechanism, to ensure the availability of data.
 
 
-- **View**: The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events mechanism and virtual DOM rendering mechanism by default way.
+- **View**: The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events emitter and virtual DOM rendering mechanism by default way.
 
 
 - **Route**: A routing manager for application, support regular expressions to match the router with multiple actions. Detection of hash change and carry any parameters at the same time.
@@ -49,9 +49,9 @@ model.set("info.score","61");      // fail! score must be pure number
 model.toJSON()                     // "{"name":"Cloud","info":{"id":10024,"score":88}}"
 ```
 
-This example show how to set `validate` for model, easy manger data.
+This example show how to set `validate` for model, easy manager data.
 
-Immutable data is extreme for the protection of itself,  the only way is that use set method to change model's data.
+Immutable data is extreme for the protection of itself,  the only way is that use `set` method to change data.
 
 ### ` - View `
 
@@ -67,18 +67,20 @@ var view = new aix.view({
 	}
 });
 
-// mount element[id=#app]
+// mount only once time on element[id=#app]
 view.mount(
 	document.getElementById("app"),
 	{ id: "target" ,name: "Buke" }
 );
 ```
-This example will render "Hello Buke" into a container on the page.
+This example will render **"Hello Buke"** into a container on the page.
 
-mount application rendering at the element [#app], if set `root` property by default, `render` method can be using directly.
+mount application rendering at the element [#app], if set `root` property by default, `render` method can be using anytime directly (would not create mount method).
 
 # License
 
-Open source don't need any permission, Fuck Any License(FAL) is best license
+Open source don't need any permission, 
+
+Fuck Any License(FAL) is best license!
 
 
