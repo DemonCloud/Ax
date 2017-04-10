@@ -96,29 +96,27 @@
 		_first    = struct.first(),
 		_doom     = struct.doom();
 
+	// frozen api
 	function frozen(){
 		_fal(_slice(arguments),Object.freeze);
 	}
 
 	// aix genertor function
 	function genertor_(api){
-		return function(){
-			var fn = struct[api](),
-					tmp = this.parse(),
+		aM.prototype[api] = function(){
+			var tmp = this.data,
 					args = [tmp].concat(_slice(arguments));
-			if(!_eq(tmp = fn.apply(tmp,args),this.data))
-				this.emit((this.data = tmp,api),null,args);
+			if(!_eq(tmp = struct[api]().apply(tmp,args),this.data))
+				this.emit((this.data = tmp,api),args);
 			return this;
 		};
 	}
 
 	// not change rebase data
 	function genertor_$(api){
-		return function(){
-			var fn = struct[api](),
-					tmp = this.parse(),
-					args = [tmp].concat(_slice(arguments));
-			return fn.apply(tmp,args);
+		aM.prototype[api] = function(){
+			var args = [this.data].concat(_slice(arguments));
+			return struct[api]().apply(this,args);
 		};
 	}
 
@@ -1813,10 +1811,6 @@
 		delete config.events;
 		delete config.validate;
 
-		_extend(this,config);
-		// if userobj has more events
-		_fol(events,uon,this);
-
 		// define data
 		_define(this,"data",{
 			get : function(){
@@ -1844,7 +1838,12 @@
 			configurable:false
 		});
 
-		this.emit("init",[this.parse()]);
+		// if userobj has more events
+		_fol(events,uon,this);
+
+		// init event
+		_extend(this,config)
+			.emit("init",[this.data]);
 	};
 
 	// Extend aix model method 
@@ -2000,11 +1999,11 @@
 			render = config.render;
 
 		delete config.root;
+		delete config.mount;
 		delete config.events;
 		delete config.render;
 		delete config.template;
 
-		_extend(this,config);
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
@@ -2039,7 +2038,8 @@
 		}
 
 		// first trgger "init" event
-		this.emit("init");
+		_extend(this,config)
+			.emit("init");
 	};
 
 	aV.prototype = {
@@ -2128,10 +2128,9 @@
 			config = _extend(_clone(ROUTE_DEFAULT),obj||{}),
 			events = config.events;
 
+		delete config.history;
 		delete config.events;
 		// if userobj has more events
-		_fol(events,uon,this);
-
 		// addEvent for this route object
 		// use dispatch event to trigger
 		// cant change regular hash title
@@ -2149,8 +2148,11 @@
 			configurable: false
 		});
 
-		_extend(this,config);
-		this.on("hashchange",hashChange).emit("init");
+		_fol(events,uon,this);
+
+		_extend(this,config)
+			.on("hashchange",hashChange)
+			.emit("init");
 	};
 
 	// Aix-Route for SPA Architecture
@@ -2223,9 +2225,7 @@
 		"sort",
 		"unique",
 		"concat"
-	],function(api){
-		aM.prototype[api]= genertor_(api);
-	});
+	],genertor_);
 
 	_fal([
 		"keys",
@@ -2241,9 +2241,7 @@
 		"has",
 		"type",
 		"index"
-	],function(api){
-		aM.prototype[api]=genertor_$(api);
-	});
+	],genertor_$);
 
 	// Extend method
 	// Create Aix Pack extends
