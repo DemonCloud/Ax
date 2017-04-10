@@ -49,7 +49,7 @@ model.set("info.score","61");      // fail! score must be pure number
 model.toJSON()                     // "{"name":"Cloud","info":{"id":10024,"score":88}}"
 ```
 
-This example show how to set `validate` for model, easy manager data.
+This example show how to set `validate` for model and an easy way to manager data.
 
 Immutable data is extreme for the protection of itself,  the only way is that use `set` method to change data.
 
@@ -75,12 +75,12 @@ view.mount(
 ```
 This example will render **"Hello Buke"** into a container on the page.
 
-mount application rendering at the element [#app], if set `root` property by default, `render` method can be using anytime directly (would not create mount method).
+mount application rendering at the element[#app], if set `root` property by default, `render` method can be using anytime directly (it means not create `mount` method).
 
 # License
 
 Open source don't need any permission, 
 
-Fuck Any License(FAL) is best license!
+Fuck Any License(FAL) is the best license!
 
 
