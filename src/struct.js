@@ -495,7 +495,7 @@ function reject(list,idf,reskey){
 
 function every(list,idf){
 	var res = true;
-	for(var key = keys(list),i=keys.length;i--;)
+	for(var key = keys(list),i=key.length;i--;)
 		if(!(res=idf(list[key[i]],key[i],list)))
 			break;
 	return res;
@@ -503,7 +503,7 @@ function every(list,idf){
 
 function some(list,idf){
 	var res = false;
-	for(var key = keys(list),i=keys.length;i--;)
+	for(var key = keys(list),i=key.length;i--;)
 		if((res=idf(list[key[i]],key[i],list)))
 			break;
 	return res;
@@ -1540,19 +1540,17 @@ function addEvent(obj,type,fn){
 function removeEvent(obj,type,fn){
 	if(obj._events){
 		if(obj._events[type]){
-			not(obj._events[type],fn);
-			if(!obj._events[type].length || !fn)
+			if(!((not(obj._events[type],fn)).length) || !fn)
 				delete obj._events[type];
 		}else if(!type && !fn){
 			delete obj._events;
-			return obj;
 		}
 	}
 	return obj;
 }
 
 function hasEvent(obj,type,fn){
-	var res;
+	var res = false;
 	if(obj._events){
 		if(isFn(fn) && obj._events[type])
 			res = has(obj._events[type],fn);
@@ -1586,8 +1584,6 @@ function emit(obj,type,fn,args){
 
 // Struct Prop listener
 // @use getProp
-// @use watch [ listen ]
-// @use unwatch [ unlisten ]
 // @exprot prop
 
 // define deeping getProp method
@@ -1638,36 +1634,20 @@ function rmProp(obj,prop){
 	}else{
 		for(i=0,tmp=obj,end = keygen.pop();i<keygen.length;i++)
 			tmp = tmp[keygen[i]]; 
-		delete tmp[end];
+		if(isArray(tmp))
+			tmp.splice(toNumber(end),1);
+		else
+			delete tmp[end];
 	}
 	return obj;
 }
 
-function watch(obj,prop,handle){
-	var oldval = obj[prop] , newval = oldval;
+// #not need api
+// function watch(obj,prop,handle){
+// }
 
-	if(delete obj[prop]){
-		define(obj,prop,{
-			get: function(){ 
-				return newval; 
-			},
-			set: function(val){ 
-				return (newval = handle.call(obj,val,oldval = newval,prop)); 
-			},
-			enumerable: true,
-			configurable: true
-		});
-	}
-
-	return obj;
-}
-
-function unwatch(obj,prop){
-	var val = obj[prop];
-	delete obj[prop]; 
-	obj[prop] = val;
-	return obj;
-}
+// function unwatch(obj,prop){
+// }
 
 // countBy [ method ]
 // countBy(['abc','de','fg'],'length') => {2: 2, 3: 1}
@@ -2143,12 +2123,6 @@ function $prop(c){
 		case "not":
 		case "remove":
 			return rmProp;
-		case "watch":
-		case "listen":
-			return watch;
-		case "unwatch":
-		case "unlisten":
-			return unwatch;
 		default:
 			return getProp;
 	}

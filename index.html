@@ -74,12 +74,14 @@ var route = new aix.route({
 	},
 	events:{
 		init:function(){
-			return view.mount("#app",model.parse());
+			return view.mount(
+				document.getElementById("app"),
+				model.parse()
+			);
 		}
 	}
 });
-
-model.on("change",view.render);
+model.on("change",view.render)
 route.listen();
 </script>
 </body>

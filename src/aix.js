@@ -84,8 +84,6 @@
 		_prop     = struct.prop('get'),
 		_setProp  = struct.prop('set'),
 		_rmProp   = struct.prop('not'),
-		_watch    = struct.prop('watch'),
-		_unwatch  = struct.prop('unwatch'),
 		_param    = struct.param(),
 		_trim     = struct.string('trim'),
 		_one      = struct.index('one'),
@@ -163,66 +161,8 @@
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
-	function dsizzle(elm){
-		elm = _trim(elm);
-
-		var $el=[], $1=!cidSl.test(elm), $2=!pitSl.test(elm);
-		if($1&&$2){
-			if(elm.search(",")>-1)
-				_fal(elm.split(","),function(sl){
-					$el = $el.concat(dsizzle(sl));
-				});
-
-			else if(isId.test(elm))
-				return [document.getElementById(elm.substr(1))];
-
-			else if(isClass.test(elm))
-				$el = document.getElementsByClassName(elm.substr(1));
-
-			else if(isTag.test(elm))
-				$el = document.getElementsByTagName(elm);
-
-			else if(isAttr.test(elm)){
-				var matcher = isAttr.exec(elm);
-				var parent = matcher[1],
-						attr   = matcher[2],
-						value  = matcher[3];
-				if(parent == null){
-					return _clone(document.getElementsByTagName("*")).filter(function(e){
-						return e.getAttribute(attr) === value;
-					});
-				} else {
-					return dsizzle(parent).filter(function(e){
-						return e.getAttribute(attr) === value;
-					});			
-				}
-
-			}else{
-				$el = document.querySelectorAll(elm);
-			}
-		}else{ 
-			$el = document.querySelectorAll(elm);
-		}
-
-		return _clone($el);
-	}
-
-	Z = function(str){
-		this.$el = [];
-		
-		if(str!==null){
-			if(typeof str === "string"){
-				this.$el = dsizzle(str);
-				this.$indicator = str;
-			}else if( str===document || str===root || str.nodeType ===1){
-				this.$el.push(str);
-				this.$indicator = str;
-			}else if(_isAryL(str)){
-				this.$el = _size(str) ? 
-					_find(_slice(str),function(node){ return node.nodeType===1; }) : [];
-				this.$indicator = Math.random();
-			}
-		}
+	Z = function(elm){
+		this.el = _isAryL(elm) ? _slice(elm) : (elm instanceof Element ? [elm] : []);
 	};
 
 	z = function(x){
@@ -1424,12 +1364,11 @@
 
 		getFromRoute: function(tree, route) {
 			route = route.slice();
-			var c, node = tree;
+			var node = tree;
 			while (route.length > 0) {
 				if (!node.childNodes)
 					return false;
-				c = route.splice(0, 1)[0];
-				node = node.childNodes[c];
+				node = node.childNodes[route.splice(0, 1)[0]];
 			}
 			return node;
 		},
@@ -1596,37 +1535,31 @@
 	Z.prototype = {
 		get : function(index){
 			return 0 in arguments ? 
-						 this.$el[( +index + ( index < 0 ? this.length : 0 ) )] : 
-						 _slice(this.$el);
+				this.el[( +index + ( index < 0 ? this.length : 0 ) )] : 
+				this.el;
 		},
 
 		each : function(fn,context){
-			_fal(this.$el,fn,context||this);
-			return this;
+			return _fal(this.el,fn,context||this),this;
 		},
 
 		find : function(sl){
 			var res = []; 
-			_fal(this.$el,function(e){
+			_fal(this.el,function(e){
 				res = _slice(e.querySelectorAll(sl)).concat(res);
 			});
 			return z(res);
 		},
 
 		closest : function(selector,element){
-			var el = this.$el ,find ,tmp=el[0];
+			var el = this.el ,tmp=this.get(0) ,find;
 
-			for(var i=0,l=el.length;i<l;i++,tmp=el[i]){
-				while(tmp&&!find&&tmp!==element){
-					if(z.matchz(tmp=tmp.parentNode,selector)) 
-						find=tmp;
-				}
+			for(var i=0,l=el.length;i<l;i++,tmp=el[i])
+				while(tmp&&!find&&tmp!==element)
+					if(z.matchz(tmp=find=tmp.parentNode,selector)) 
+						if(find) break;
 
-				if(find)
-					break;
-			}
-
-			return z(find ? [find] : []);
+			return z(find||[]);
 		},
 
 		on : function(event, selector, data, callback, one){
@@ -1659,8 +1592,7 @@
 	
 				if (selector) 
 					delegator = function(e){
-						var evt, 
-							match = !z.matchz(e.target,selector) ? 
+						var evt, match = !z.matchz(e.target,selector) ? 
 											z(e.target).closest(selector, element).get(0) :
 											e.target;
 
@@ -1847,7 +1779,9 @@
 		set : function(){
 			var param;
 			this.data = arguments.length > 1 ?
-				(param = arguments[0],_setProp(this.data,param,arguments[1])) : arguments[0];
+				(param = arguments[0],
+				_setProp(this.data,param,arguments[1])) : 
+				arguments[0];
 			return param ? this.emit("change:"+param,[arguments[1]]) : this;
 		},
 
@@ -2013,8 +1947,8 @@
 			_fol(events,uon,this);
 		}else{
 			this.mount = function(el){
-				if(typeof el !== "string")
-					throw new TypeError("mount argument"+el+" must typeof sting.");
+				if(!(el instanceof Element)&&!_isAryL(el))
+					throw new TypeError("el must be typeof DOMElement or NodeList collections -> not "+el);
 				this.root = vroot = el; this.render = render;
 
 				_fol(events,uon,this);
@@ -2092,8 +2026,7 @@
 		var hash = hashGet(url,char), param = hashParam(url,char); 
 		_fol(this.routes,function(fn,key){
 			if((new RegExp(key,"i")).test(hash))
-				hashChangeReg.call(this,fn,
-					[hash,param,event]);
+				hashChangeReg.call(this,fn,[hash,param,event]);
 		},this);
 	}
 

@@ -6,6 +6,7 @@ const optimizejs = require('gulp-optimize-js');
 const path_js = "./src/*.js";
 const path_dis = "./dest/";
 const path_disjs = "./dest/*.js";
+const path_doc = "./docs/app/";
 
 
 gulp.task('concat',function(){
@@ -19,6 +20,7 @@ gulp.task('uglify',function(){
 				 .pipe(uglify())
 				 .pipe(optimizejs())
 				 .pipe(gulp.dest(path_dis))
+				 .pipe(gulp.dest(path_doc));
 });
 
 gulp.task('watch',function(){
