@@ -3,25 +3,26 @@
 
 Aix is a fast MVR JavaScript Framework. 
 
-It is for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace the Backbone or AngularJS, maybe it boring form of entertainment.
+It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` very well.
 
-<br>
+> require [ Struct ] : [ Struct - the C Lang JavaScript Utils Lib ](https://github.com/DemonCloud/struct)
 
-#  Modules
+# Modules
 
 - **Model**: Allows you to easily manage the data , model parse is the Immutable data, who can be monitored. So that data would not be modified by accident. Flexible authentication mechanism, to ensure the availability of data.
+
+
 - **View**: The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events mechanism and virtual DOM rendering mechanism by default way.
+
+
 - **Route**: A routing manager for application, support regular expressions to match the router with multiple actions. Detection of hash change and carry any parameters at the same time.
 
+> Document : [See how to use Aix in your project](https://github.com/DemonCloud/aix) (**comming soon**)
 
-Document : [See how to use Aix in your project](https://github.com/DemonCloud/aix)
-
-Test : [Check Aix test in different browser](https://github.com/DemonCloud/aix)
-
-<br>
+> Test : [Check Aix test in different browser](https://github.com/DemonCloud/aix) (**comming soon**)
 
 # Examples
-### ` - Model `.
+### ` - Model `
 
 ```javascript
 var model = new aix.model({
@@ -59,7 +60,6 @@ var view = new aix.view({
 	template:"<div id='{{-id}}'>" +
 				"Hello {{-name}}"+
 			 "</div>",
-
 	events:{
 		"click:div" : function(){
 			alert(this.innerHTML);
@@ -67,7 +67,7 @@ var view = new aix.view({
 	}
 });
 
-// mount elm at element[id=#app]
+// mount element[id=#app]
 view.mount(
 	document.getElementById("app"),
 	{ id: "target" ,name: "Buke" }
@@ -75,13 +75,10 @@ view.mount(
 ```
 This example will render "Hello Buke" into a container on the page.
 
-mount application rendering at the element [#app], also can set `root` property by default,  directly using `render` method.
-
-<br>
+mount application rendering at the element [#app], if set `root` property by default, `render` method can be using directly.
 
 # License
 
 Open source don't need any permission, Fuck Any License(FAL) is best license
-
 
 
