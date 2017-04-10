@@ -220,14 +220,14 @@ function isElement(e){
 
 // Detect if a Function is Native Code with JavaScript
 function isNative(api){
-  return typeof api == 'function' ?
+  return typeof api === 'function' ?
   // Use `Function#toString` to bypass the value's own `toString` method
   // and avoid being faked out.
      reNative.test(Function.prototype.toString.call(api)) :
   // Fallback to a host object check because some environments will represent
   // things like typed arrays as DOM methods which may not conform to the
   // normal native pattern.
-     (api && typeof api == 'object' && reHostCtor.test(ts.call(api))) || false;
+     (api && typeof api === 'object' && reHostCtor.test(ts.call(api))) || false;
 }
 
 var typeArray = [
@@ -729,7 +729,7 @@ function pullWith(ary,it){
 // @use random
 function shuffle(ary){
 	var ln = ary.length,
-			disorder = Array(ln);
+			disorder = new Array(ln);
 	for( var i=0 , ra; i<ln; i++){
 		ra = randomInt(0,i);
 		if(ra !==i)
@@ -1048,7 +1048,7 @@ function paramStringify(param){
 		);
 
 	return JSON.stringify(Cparam)
-		.replace(/[\"\{\}]/g,"")
+		.replace(/["{}]/g,"")
 		.replace(/:/g,"=")
 		.replace(/,/g,"&")
 		.replace(whiteSpace,"");
@@ -1204,7 +1204,7 @@ function DOOM(txt,name){
 			res = "_p+='",
 			args = slice(arguments,2),
 
-			exp = RegExp((this.escape||no) + 
+			exp = new RegExp((this.escape||no) +
 						"|" + (this.interpolate||no) + 
 						"|" + (this.evaluate||no) +"|$","g");
 
@@ -1260,7 +1260,7 @@ function DOOM(txt,name){
 // @use cookieParse
 // @export cookie
 function cookieParse(ckstr){
-	var tmp, res={}, pars = ckstr ? ckstr.split(";") : [];
+	var res={}, pars = ckstr ? ckstr.split(";") : [];
 
 	al(pars, function(item){
 		var ind = (item||"").search("=");

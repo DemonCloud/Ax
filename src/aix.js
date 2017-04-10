@@ -223,17 +223,6 @@
 				this.$indicator = Math.random();
 			}
 		}
-
-		_define(this,"length",{
-			get:function(){
-				return this.$el.length;
-			},
-			set:function(){
-				return this.$el.length;
-			},
-			configurable : false,
-			enumerable : false
-		});
 	};
 
 	z = function(x){
@@ -338,10 +327,10 @@
 		_loop((events || '').split(/\s/),function(event){
 			_loop(findHandlers(element, event, fn, selector),function(handler){
 				delete handlers[id][handler.i];
-	
+
 				element.removeEventListener(
-					realEvent(handler.e), 
-					handler.proxy, 
+					realEvent(handler.e),
+					handler.proxy,
 					eventCapture(handler, capture)
 				);
 			});
@@ -359,7 +348,7 @@
 	function compatible(event, source) {
 		if (source || !event.isDefaultPrevented) {
 	
-			source || (source = event)
+			source || (source = event);
 	
 			_loop(eventMethods, function(predicate, name) {
 				var sourceMethod = source[name];
@@ -407,9 +396,7 @@
 	};
 
 	z.matchz = function(elm,selector){
-		if(elm===null||elm===document||typeof selector !== "string") 
-			return false;
-		return matchzx.call(elm, selector);
+		return !(elm===null||elm===document||typeof selector !== "string") && matchzx.call(elm, selector);
 	};
 
 	z.event = { 
@@ -451,7 +438,7 @@
 	
 		if (props) 
 			for (var name in props) 
-				(name == 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name]);
+				(name === 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name]);
 	
 		event.initEvent(type, bubbles, true);
 		return compatible(event);
@@ -799,7 +786,6 @@
 			// syntax: textDiff: function (node, currentValue, expectedValue, newValue)
 			textDiff: function() {
 				arguments[0].data = arguments[3];
-				return;
 			},
 			// empty functions were benchmarked as running faster than both
 			// `f && f()` and `if (f) { f(); }`
@@ -1822,7 +1808,7 @@
 				var args = [_clone(newdata)],error;
 				if((this.emit("validate",args),
 					_isPrim(newdata)?
-					(error=_isFn(validate) ? validate(newdata) : true):
+					(_isFn(validate) ? validate(newdata) : true):
 					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
 					this.change=true,
@@ -1943,7 +1929,7 @@
 			return this.emit(type,[get_xhr,st]);
 		},
 
-		aget: function(url,param,fns,fnf,header){
+		send: function(url,param,fns,fnf,header){
 			return this.pipe.apply(this,
 				["get"].concat(_clone(arguments))
 			);
@@ -2037,7 +2023,7 @@
 			}.bind(this);
 		}
 
-		// first trgger "init" event
+		// first trigger "init" event
 		_extend(this,config)
 			.emit("init");
 	};
@@ -2105,7 +2091,7 @@
 	function hashChange(url,char,event){
 		var hash = hashGet(url,char), param = hashParam(url,char); 
 		_fol(this.routes,function(fn,key){
-			if(RegExp(key,"i").test(hash))
+			if((new RegExp(key,"i")).test(hash))
 				hashChangeReg.call(this,fn,
 					[hash,param,event]);
 		},this);
