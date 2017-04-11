@@ -12,8 +12,6 @@ _dom.html
 .idea
 .idea/
 .idea/*
-dest/
-dest
 
 npm-debug.log*
 

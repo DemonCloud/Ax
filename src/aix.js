@@ -1,20 +1,8 @@
 /* 
- * aix.js
+ * Aix
  *
- * pure Javascript MVC framwork
- *
- * Include:
- * [ model ]
- * [ view ]
- * [ route ]
- *
- * *IE 9-Edge support
- *
- * @Author  : YIJUN
+ * @Author  : YiJun
  * @Date    : 2017.4.1 - now
- * @Version : 0.1
- *
- * @License : FAL
  *
  * require Utils Lib [ struct ]
  */
@@ -1661,10 +1649,6 @@
 			return result;
 		},
 	
-		emit : function(){
-			return this.trigger.apply(this,arguments);
-		},
-
 		html : function(html){
 			return this.each(function(elm){
 				elm.innerHTML = html;
@@ -1713,8 +1697,8 @@
 		return _unbind(this,type,fn);
 	}
 
-	function emit(type,fn,args){
-		return _emit(this,type,fn,args);
+	function emit(type,args){
+		return _emit(this,type,args||[]);
 	}
 
 	// Aix Model
@@ -1863,10 +1847,15 @@
 			return this.emit(type,[get_xhr,st]);
 		},
 
-		send: function(url,param,fns,fnf,header){
-			return this.pipe.apply(this,
-				["get"].concat(_clone(arguments))
-			);
+		send: function(url,fns,fnf,header){
+			return this.pipe.apply(this,[
+				"get",
+				url || this.url,
+				this.data,
+				fns,
+				fnf,
+				header
+			]);
 		},
 
 		fetch: function(param,fns,fnf,header){
@@ -1883,22 +1872,11 @@
 			]);
 		},
 
-		post: function(url,param,fns,fnf,header){
-		  return this.pipe.apply(this,[
-		  	"post",
-		  	url,
-		  	param || this.parse(),
-		  	fns,
-		  	fnf,
-		  	header
-			]);
-		},
-
-		save: function(url,param,fns,fnf,header){
+		sync: function(fns,fnf,header){
 		  return this.pipe.apply(this,[
 		  	"save",
-		  	url,
-		  	param || this.parse(),
+		  	this.url,
+		  	this.data,
 		  	fns,
 		  	fnf,
 		  	header
@@ -1951,9 +1929,14 @@
 					throw new TypeError("el must be typeof DOMElement or NodeList collections -> not "+el);
 				this.root = vroot = el; this.render = render;
 
+				// bind events
 				_fol(events,uon,this);
-				// trigger render and delete mount
-				return this.render.apply(this,_slice(arguments,1)),delete this.mount;
+
+				// trigger render 
+				if(_isFn(this.render))
+					this.render.apply(this,_slice(arguments,1))
+				// delete mount
+				return delete this.mount;
 			}.bind(this);
 		}
 
@@ -1985,10 +1968,7 @@
 			},this),this;
 		},
 
-		emit : function(type,fn,args){
-			if(_isAry(fn))
-				args = fn,fn = null;
-
+		emit : function(type,args){
 			var k = (type||"").split(":");
 
 			if(k.length>2){
@@ -2001,7 +1981,7 @@
 			if(k.length>1)
 				return z(this.root).find(k[1]).trigger(k[0],args),this;
 
-			return _emit(this,type,fn,args);
+			return _emit(this,type,args);
 		},
 
 		toString : function(){
@@ -2026,7 +2006,7 @@
 		var hash = hashGet(url,char), param = hashParam(url,char); 
 		_fol(this.routes,function(fn,key){
 			if((new RegExp(key,"i")).test(hash))
-				hashChangeReg.call(this,fn,[hash,param,event]);
+				hashChangeReg.call(this,fn,[param,hash,event]);
 		},this);
 	}
 
@@ -2093,7 +2073,7 @@
 				});
 				
 				return hash ? 
-					this.go(hash) : 
+					this.assign(hash) : 
 					this.emit("hashchange",[root.location.href,this.char]);
 			}
 			return this;
@@ -2105,8 +2085,8 @@
 			return this;
 		},
 
-		go : function(hash){
-			if(this._listen){			
+		assign : function(hash,param){
+			if(this._listen){
 				var url = root.location.href; 
 				var hashindex = url.search("#");
 				if(hashindex > 0)

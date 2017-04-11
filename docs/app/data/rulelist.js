@@ -1,0 +1,33 @@
+define("data/rulelist",
+[],
+function(){
+	return Object.freeze({
+		api:[
+			"model.get",
+			"model.set",
+			"model.remove",
+			"model.toJSON",
+			"model.parse",
+			"model.send",
+			"model.fetch",
+			"model.sync",
+			"model.validate",
+			"model.events",
+			"model.extend",
+			"view.events",
+			"view.mount",
+			"view.render",
+			"view.extend",
+			"route.listen",
+			"route.stop",
+			"route.assign",
+			"route.events",
+			"route.extend"
+		],
+		cap:[
+			"model",
+			"view",
+			"route"
+		]
+	});
+});

@@ -1,11 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
+	<meta charset="utf-8">
 	<title>Aix - fast MVR JavaScript Framework</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="keywords" content="aix,aixjs,web,mvr,mvc,javaScript,javaScript framework,lib,utils,framework,github,jsproject,web development">
+	<meta name="description" content="Aix is a fast MVR JavaScript Framework.
+It require Struct utils lib, for the sake of better organization application structure with modular architecture( AMD or CommonJS specification ). This is not to replace Backbone or Angular etc, maybe it boring form of entertainment. Of course, it can cooperate with React very well.">
+	<meta name="copyright" content="Copyright 2016-2017 Cloud YiJun. All Rights Reserved">
+	<meta name="author" content="YiJun">
+
+	<meta name="format-detection" content="telephone=no">
+	<meta name="App-Config" content="fullscreen=yes,useHistoryState=yes,transition=yes">
+	<meta name="renderer" content="webkit">
+
+	<meta name="format-detection" content="telephone=no,email=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-touch-fullscreen" content="yes">
+	<meta name="page" type="document" target="index">
+	<meta name="type" type="SPA">
+
+	<link rel="home" href="/">
+	<link rel="stylesheet" href="./app/styles/main.css" media="all">
+	<link rel="stylesheet" href="./app/styles/icons.min.css" media="all">
 </head>
 <body>
-	<h1 style="margin:0 auto">Document comming soon...</h1>
-	<script src="./app/aix.c.js"></script>
+<main class="main">
+	<aside class="sidebar">
+		<section class="s-top">
+			<div class="s-logo">
+				<div class="s-logo-cube"></div>
+				<div class="s-logo-incube"></div>
+				<div class="s-logo-inside"></div>
+				<div class="s-logo-bar"></div>
+			</div>
+		</section>
+		<section class="s-middle">
+			<h1 class="s-title">Aix</h1>
+			<h3 class="s-description">
+				<i class="ion-android-apps s-description-icon"></i>
+				Fast constructors
+			</h3>
+		</section>
+		<section id="search" class="s-search">
+			<form action="/search" autocomplete="off" method="GET" target="javascript:;">
+				<span class="ion-ios-search s-search-icon"></span>
+				<input id="search" class="s-search-key" type="search" rel="search" name="key" placeholder="Search on docs" required>
+			</form>
+		</section>
+		<nav id="menu" class="s-menu">
+			<div class="s-menu-section">
+				<h4><i class="ion-android-wifi"></i> Introduce</h4>
+				<a class="s-caption" href="#introduce">Introduce</a>
+			</div>
+			<div class="s-menu-section">
+				<h4><i class="ion-ios-browsers-outline"></i> Model</h4>
+				<a class="s-caption" href="#cap@s=model">aix.model</a>
+				<a class="s-link" href="#api@s=model.get">get</a>
+				<a class="s-link" href="#api@s=model.set">set</a>
+				<a class="s-link" href="#api@s=model.remove">remove</a>
+				<a class="s-link" href="#api@s=model.toJSON">toJSON</a>
+				<a class="s-link" href="#api@s=model.parse">parse</a>
+				<a class="s-link" href="#api@s=model.send">send</a>
+				<a class="s-link" href="#api@s=model.fetch">fetch</a>
+				<a class="s-link" href="#api@s=model.sync">sync</a>
+				<a class="s-link" href="#api@s=model.validate">validate
+					<i class="ion-ios-medical s-link-icon"></i>
+				</a>
+				<a class="s-link" href="#api@s=model.events">events</a>
+				<a class="s-link" href="#api@s=model.extend">extend</a>
+			</div>
+			<div class="s-menu-section">
+				<h4><i class="ion-ios-browsers-outline"></i> View</h4>
+				<a class="s-caption" href="#cap@s=view">aix.view</a>
+				<a class="s-link" href="#api@s=view.events">events</a>
+				<a class="s-link" href="#api@s=view.mount">mount
+					<i class="ion-ios-medical s-link-icon"></i>
+				</a>
+				<a class="s-link" href="#api@s=view.render">render
+					<i class="ion-ios-medical s-link-icon"></i>
+				</a>
+				<a class="s-link" href="#api@s=view.extend">extend</a>
+			</div>
+			<div class="s-menu-section">
+				<h4><i class="ion-ios-browsers-outline"></i> Route</h4>
+				<a class="s-caption" href="#cap@s=route">aix.route</a>
+				<a class="s-link" href="#api@s=route.listen">listen</a>
+				<a class="s-link" href="#api@s=route.stop">stop</a>
+				<a class="s-link" href="#api@s=route.assign">assign</a>
+				<a class="s-link" href="#api@s=route.events">events</a>
+				<a class="s-link" href="#api@s=route.extend">extend</a>
+			</div>
+			<div class="s-menu-section">
+				<h4><i class="ion-social-nodejs"></i> Examples</h4>
+				<a class="s-caption" href="/docs/examples">examples</a>
+			</div>
+		</nav>
+	</aside>
+
+	<section id="app" class="content clear">
+
+	</section>
+</main>
+<script src="./app/scripts/libs/require.min.js"></script>
+<script src="./app/scripts/libs/aix.c.js"></script>
+<script src="./app.js"></script>
+<script>
+	require(["route"]);
+</script>
 </body>
 </html>

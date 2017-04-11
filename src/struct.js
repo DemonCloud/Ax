@@ -1,5 +1,5 @@
 /* 
- * Struct 0.1
+ * Struct
  *
  * The C Lang Javascript construction lib
  *
@@ -19,7 +19,6 @@
  *
  * @Author  : YiJun
  * @Date    : 2017.2.28 - now
- * @License : FAL
  */
 
 (function(root,struct,factory){
@@ -40,7 +39,7 @@
 
 // Strict mode
 // define const
-struct.VERSION = 0.1;
+struct.VERSION = 1.0;
 
 // base method
 var or = {},
@@ -2178,7 +2177,7 @@ var nublist = {
 	values    : values,
 	memoize   : memoize,
 	negate    : negate,
-	wrap      : wrap,
+	link      : wrap,
 	size      : size,
 	now       : now,
 	sort      : sort,
