@@ -325,18 +325,18 @@ body{
 }
 
 .s-logo .s-logo-incube{
-	border: 60px solid;
+	border: 65px solid;
   border-left-width: 40px;
   border-right-width: 40px;
   border-bottom-color: #eee;
-  top: 0;
+  top: -10px;
   z-index: 2;
 }
 
 .s-logo .s-logo-inside{
 	border: 40px solid;
-	border-left-width: 26px;
-	border-right-width: 26px;
+	border-left-width: 25px;
+	border-right-width: 25px;
 	border-bottom-color: #8a3838;
 	top: 40px;
 	z-index: 3;
