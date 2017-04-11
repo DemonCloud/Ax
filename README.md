@@ -58,10 +58,10 @@ Immutable data is extreme for the protection of itself,  the only way is that us
 ```javascript
 var view = new aix.view({
 	template:"<div id='{{-id}}'>" +
-				"Hello {{-name}}"+
+				"Hello {{-name}}" +
 			 "</div>",
 	events:{
-		"click:div" : function(){
+		"click:div":function(){
 			alert(this.innerHTML);
 		}
 	}

@@ -1797,7 +1797,9 @@
 		},
 
 		parse : function(deep){
-			return deep?_dpclone(this.data):this.data;
+			return deep ? 
+				_dpclone(this.data) : 
+				this.data;
 		},
 
 		// Fetch mean Restful "GET"
@@ -1807,10 +1809,7 @@
 			var st = {
 				type  : RESTFUL[_toString(type).toLowerCase()]||"GET",
 				aysnc : true
-			},
-			_fns,
-			_fnf,
-			isFn= _isFn(param);
+			}, _fns, _fnf, isFn= _isFn(param);
 
 			// deel with arguments 
 			if(typeof url === 'string'){
@@ -1832,7 +1831,7 @@
 
 			// set http header param
 			st.header = header;
-			st.success  = function(responseText,xhr,event){
+			st.success = function(responseText,xhr,event){
 				// change the data before dispatch event;
 				_fns.call(this,responseText,xhr,event);
 				this.emit(type+":success",[responseText,xhr,event]);
@@ -1843,8 +1842,7 @@
 			}.bind(this);
 
 			// trigger ajax events
-			var get_xhr = _ajax(st);
-			return this.emit(type,[get_xhr,st]);
+			return this.emit(type,[_ajax(st),st]);
 		},
 
 		send: function(url,fns,fnf,header){

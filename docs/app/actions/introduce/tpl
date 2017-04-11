@@ -1,1 +1,26 @@
-<div class="introduce"></div>
+<article class="introduce">
+	<header>
+		<h3 class="it-title">Aix</h3>
+		<p>Aix is a fast MVR JavaScript Framework.</p>
+
+		<p>It require Struct utils lib, for the sake of better organization application structure with modular architecture( AMD or CommonJS specification ). This is not to replace Backbone or Angular etc, maybe it boring form of entertainment. Of course, it can cooperate with React very well.</p>
+	</header>
+
+	<div class="it-block">
+		<h3>Modules</h3>
+	</div>
+
+	<div class="it-block">
+		<h3>Examples</h3>
+	</div>
+
+	<div class="it-block">
+		<h3>Update</h3>
+	</div>
+
+	<footer>
+	
+	</footer>
+</article>
+
+

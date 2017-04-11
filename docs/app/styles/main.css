@@ -380,7 +380,7 @@ body{
 
 .s-search .s-search-key{
 	display: inline-block;
-	padding: 4px 2px 4px 34px;
+	padding: 4px 4px 4px 34px;
 	color:#444;
 	margin: 0;
 	font-size: 12px;
@@ -486,4 +486,8 @@ body{
 .content{
 	display:block;
 	width:100%;
+	padding:30px;
+}
 
+.introduce{
+}

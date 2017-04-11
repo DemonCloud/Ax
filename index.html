@@ -3,86 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title></title>
-	<style>
-		a{ display: block }
-		.target{ display:inline-block; color:red; }
-	</style>
 </head>
 <body>
-	<a href="#abc@name=sam&score=8">hash #sam</a>
-	<a href="#buke@name=buke&score=99">hash #buke</a>
-	<a href="#moon@name=leon&score=68">hash #leon</a>
-	<a href="#moon@name=moon&score=6">hash #moon</a>
-
-	<br>
-	<br>
 	
-	<div id="app">
-	</div>
-	<div id="text">
-	</div>
-
-	<!-- <script src="./src/struct.js"></script> -->
-	<!-- <script src="./src/aix.js"></script> -->
-	<script src="./dest/aix.c.js"></script>
-
-<script>
-var model = new aix.model({
-	data:{
-		name:"cloud",
-		score:8
-	},
-	validate:{
-		name:function(name){
-			return name.length>3;
-		},
-		score:function(score){
-			return score>7;
-		}
-	},
-	events:{
-		change:function(){
-			console.log("model change successful -> "+this.toJSON());
-		},
-		"validate:fail":function(data,key,value){
-			console.log("error -> ["+key+"] value = ("+value+") set!");
-		},
-		"validate:fail:score":function(key,value){
-			console.warn(key+" must better than 7, not as "+value);
-		}
-	}
-});
-
-var view = new aix.view({
-	template:"<div>name: <div class='target'>{{-name}}</div></div>"+
-					 "<div>score: <div class='target'>{{-score}}</div></div>",
-	events:{
-		"click:div.target":function(event){
-			document.getElementById("text").innerHTML = ("click "+ this.innerText)
-		}
-	}
-});
-
-var route = new aix.route({
-	routes:{
-		".":"ac"
-	},
-	actions:{
-		ac:function(hash,param){ 
-			return model.set(param);
-		}
-	},
-	events:{
-		init:function(){
-			return view.mount(
-				document.getElementById("app"),
-				model.parse()
-			);
-		}
-	}
-});
-model.on("change",view.render)
-route.listen();
-</script>
 </body>
 </html>
