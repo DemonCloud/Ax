@@ -9,13 +9,13 @@ const path_disjs = "./dest/*.js";
 const path_doc = "./docs/app/scripts";
 
 
-gulp.task('concat',function(){
+gulp.task('concat',()=>{
 	return gulp.src(['./src/struct.js','./src/aix.js'])
 				 .pipe(concat('aix.c.js'))
 				 .pipe(gulp.dest(path_dis));
 });
 
-gulp.task('uglify',function(){
+gulp.task('minix',()=>{
 	return gulp.src(path_disjs)
 				 .pipe(uglify())
 				 .pipe(optimizejs())
@@ -23,10 +23,20 @@ gulp.task('uglify',function(){
 				 .pipe(gulp.dest(path_doc));
 });
 
-gulp.task('watch',function(){
-	gulp.watch(path_js,['default']);
+gulp.task('make',()=>{
+	return gulp.src(['./src/aix.js'])
+				 .pipe(concat('aix.min.js'))
+				 .pipe(uglify())
+				 .pipe(optimizejs())
+				 .pipe(gulp.dest("./"));
 });
 
-gulp.task('default',['concat'],function(){ gulp.start('uglify'); });
+gulp.task('watch',()=>{
+	return gulp.watch(path_js,['default']);
+});
+
+gulp.task('default',['concat'],()=>{ 
+	return gulp.start(['minix','make']);
+});
 
 
