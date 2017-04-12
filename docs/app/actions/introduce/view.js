@@ -20,12 +20,7 @@ function(aix,tpl){
 				var view = new aix.view({
 					template:"<div class='name'>"+
 											"Hello {{-name}}"+
-									 "</div>",
-					events:{
-						"click:.name":function(){
-							alert(this.innerHTML);
-						}
-					}
+									 "</div>"
 				});
 
 				view.mount(
@@ -35,19 +30,74 @@ function(aix,tpl){
 
 				//#example2
 				var view2 = new aix.view({
-					template:"<input type='text' id='text'>"+
-									 "<div>{{-text}}</div>",
+					template:"<input id='text' value='{{-text}}'>"+
+									 "<h2>{{-text}}</h2>",
 					events:{
-						"input:#text":function(){
-							model2.set({ text:this.value });
+						"input:#text":function(event){
+							model2.set("text",this.value);
 						}
 					}
 				});
 
 				var model2 = new aix.model({
-					data : { text: "Hello World" }
+					events:{
+						change:function(){
+							view2.render(this.data);
+						}
+					}
 				});
 
+				view2.mount(
+					document.getElementById("mount2"),
+					{ text: "Hello World" }
+				);
+
+				//example3
+				var trim = struct.string("trim");
+
+				var view3 = new aix.view({
+					template:'{{ var each = struct.op() }}'+
+									 '<input id="name" maxlength=10>'+
+									 '<button id="add">add</button>'+
+									 '<ul>'+
+									 '{{ each(list,function(item,index){ }}'+
+									 ' 	 <li>'+
+									 '    {{-item.name}}'+
+									 '    <span class="del" idx={{-index}}>×</span>'+
+									 ' 	 </li>'+
+									 '{{ }) }}'+
+									 '</ul>',
+					events:{
+						"click:#add":function(){
+							var getName = trim(document.getElementById("name").value);
+							if(getName)
+								model3.moc("list",{ name : getName });
+						},
+						"keypress:#name":function(event){
+							if(event.keyCode === 13)
+								event.data.self.emit("click:#add");
+						},
+						"click:.del":function(event){
+							model3.remove("list."+this.getAttribute("idx"));
+						}
+					}
+				});
+
+				var model3 = new aix.model({
+					data:{
+						list:[]
+					},
+					events:{
+						change:function(){
+							view3.render(this.data);
+						}
+					}
+				});
+
+				view3.mount(
+					document.getElementById("mount3"),
+					model3.parse()
+				);
 			}
 		}
 	});

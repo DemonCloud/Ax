@@ -3,22 +3,51 @@
 		<h3 class="target">Aix</h3>
 		<p><b>Aix</b> is a fast MVR JavaScript Framework.</p>
 
-		<p>It require Struct utils lib, for the sake of better organization application structure with modular architecture( AMD or CommonJS specification ). This is not to replace Backbone or Angular etc, maybe it boring form of entertainment. Of course, it can cooperate with React very well.</p>
+		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it can cooperate with <b>React</b> very well.</p>
+
+		<p>The <b>Aix</b> compress file <b>10KB(gzip)</b> , with struct pack only <b>18KB(gzip)</b> </p>
+
+		<br>
+		
+		<h2>[ Latest version - 1.0 ]</h2>
+		<p>
+			<span>Pack with <code>Struct</code> 18KB(gzip) - </span>
+			<a href="app/scripts/libs/aix.c.js" rel="donload" download='aix.s.js'>
+				<i class="ion-ios-list-outline"></i>
+				aix.s.js (53k)
+			</a>
+		</p>
+		<p>
+			<span>Single Aix 10KB(gzip) - </span>
+			<a href="app/scripts/libs/aix.min.js" rel="donload" download='aix.min.js'>
+				<i class="ion-ios-list-outline"></i>
+				aix.min.js (30k)
+			</a>
+		</p>
 	</header>
 
 	<div class="it-block">
 		<h3 class="target">Modules</h3>
-		<ul>
+		<ul class="it-cap">
 			<li>
-				<b>Model</b>
+				<a href="#cap@s=model">
+					<i class="ion-ios-pie"></i>
+					<b> Model</b>
+				</a>
 				<span> - Allows you to easily manage the data , model parse is the Immutable data, who can be monitored. So that data would not be modified by accident. Flexible authentication mechanism, to ensure the availability of data.</span>
 			</li>
 			<li>
-				<b>View</b>
+				<a href="#cap@s=view">
+					<i class="ion-ios-photos"></i>
+					<b> View</b>
+				</a>
 				<span> - The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events emitter and virtual DOM rendering mechanism by default way.</span>
 			</li>
 			<li>
-				<b>Route</b>
+				<a href="#cap@s=route">
+					<i class="ion-social-buffer"></i>
+					<b> Route</b>
+				</a>
 				<span> - A routing manager for application, support regular expressions to match the router with multiple actions. Detection of hash change and carry any parameters at the same time.</span>
 			</li>
 		</ul>
@@ -27,19 +56,14 @@
 	<div class="it-block">
 		<h3 class="target">Examples</h3>
 		<!-- example1 -->
-		<div class="it-example-info">base render</div>
+		<div class="it-example-info">Basic</div>
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
 var view = new aix.view({
 	template:"&lt;div class='name'&gt;"+
 							"Hello &#123;&#123;-name&#125;&#125;"+
-					 "&lt;/div&gt;",
-	events:{
-		"click:.name":function(){
-			alert(this.innerHTML);
-		}
-	}
+					 "&lt;/div&gt;"
 });
 
 view.mount(
@@ -54,11 +78,32 @@ view.mount(
 		</div>
 		<!-- example1 end -->
 		<!-- example2 -->
-		<div class="it-example-info">base render</div>
+		<div class="it-example-info">Two-way Data Binding</div>
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
-var model
+var view = new aix.view({
+	template:"&lt;input id='text' value='&#123;&#123;-text&#125;&#125;'&gt;"+
+					 "&lt;h2&gt;&#123;&#123;-text&#125;&#125;&lt;/h2&gt;",
+	events:{
+		"input:#text":function(){
+			 model.set("text",this.value);
+		}
+	}
+});
+
+var model = new aix.model({
+	events:{
+		change:function(){
+			view.render(this.data);
+		}
+	}
+});
+
+view.mount(
+	document.getElementById("mount2"),
+	{ text: "Hello World" }
+);
 				</pre>
 			</div>
 			<div class="ite-preview">
@@ -66,6 +111,67 @@ var model
 			</div>
 		</div>
 		<!-- example2 end -->
+		<!-- example3 -->
+		<div class="it-example-info">Todo List</div>
+		<div class="it-example">
+			<div class="ite-code">
+				<pre class="sh_javascript">
+var trim = struct.string("trim");
+
+var view = new aix.view({
+	template:'&#123;&#123; var each = struct.op() &#125;&#125;'+
+		'&lt;input id="name" maxlength=10&gt;'+
+		'&lt;button id="add"&gt;add&lt;/button&gt;'+
+		'&lt;ul&gt;'+
+		'&#123;&#123; each(list,function(item,index){ &#125;&#125;'+
+			'&lt;li&gt;'+
+			'&#123;&#123;-item.name&#125;&#125;'+
+			'&lt;span class="del" idx=&#123;&#123;-index&#125;&#125;&gt;×&lt;/span&gt;'+
+			'&lt;/li&gt;'+
+		'&#123;&#123; }) &#125;&#125;'+
+		'&lt;/ul&gt;',
+	events:{
+		"click:#add":function(){
+			var getName = trim(
+				document.getElementById("name").value
+			);
+			if(getName)
+				model.moc("list",{ name : getName });
+		},
+		"keypress:#name":function(event){
+			if(event.keyCode === 13)
+				event.data.self.emit("click:#add");
+		},
+		"click:.del":function(event){
+			model.remove(
+				"list."+this.getAttribute("idx")
+			);
+		}
+	}
+});
+
+var model = new aix.model({
+	data:{
+		list:[]
+	},
+	events:{
+		change:function(){
+			view.render(this.data);
+		}
+	}
+});
+
+view.mount(
+	document.getElementById("mount3"),
+	model.parse()
+);
+				</pre>
+			</div>
+			<div class="ite-preview">
+				<div class="ite-mount" id="mount3"></div>
+			</div>
+		</div>
+		<!-- example3 end -->
 
 	</div>
 

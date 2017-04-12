@@ -1702,6 +1702,16 @@
 		return _emit(this,type,args||[]);
 	}
 
+	function moc(target,val){
+		if(_isAry(target))
+			target = target.concat(val);
+		else if(_isObj(target))
+			target = _extend(_clone(target),_isObj(val) ? val : {});
+		else if(typeof target === "string" || +val === val)
+			target += val;
+		return target;
+	}
+
 	// Aix Model
 	aix.model = aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
@@ -1780,6 +1790,10 @@
 				this.data=null;
 			}
 			return this;
+		},
+
+		moc: function(key,val){
+			return this.set(key,moc(_prop(this.data,key),val));
 		},
 
 		// API event

@@ -28,6 +28,7 @@ gulp.task('make',()=>{
 				 .pipe(uglify())
 				 .pipe(optimizejs())
 				 .pipe(gulp.dest(path_dis))
+				 .pipe(gulp.dest(path_doc))
 				 .pipe(gulp.dest("./"));
 });
 

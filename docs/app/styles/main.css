@@ -240,11 +240,49 @@ body{
 	background-color:#fff;
 	line-height: 1.6024236872;
 
+	font-size-adjust: unset;
+	font-stretch: expanded;
+
   -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
 
   zoom:1;
 }
+
+h1,h2,h3,h4,h5,h6{
+	margin:0;
+	margin-bottom:10px;
+}
+
+code{
+	font-family: inherit;
+	background-color: #efefef;
+
+	color: #6f3434;
+	font-size: 12px;
+	padding: 0 6px;
+	vertical-align: 1px;
+	border-radius: 2px;
+}
+
+a{
+	font-size:15px;
+	color: #8a3838;
+  text-decoration: none;
+}
+
+a:focus,
+a:hover,
+a:active{
+  text-decoration: underline;
+}
+
+a i{
+	font-size: inherit;
+	vertical-align: baseline;
+}
+
 .clear{
 	display:block;
 	*zoom:1;
@@ -407,7 +445,7 @@ body{
 .s-search .s-search-icon {
 	font-size: 20px;
 	position: absolute;
-	top: 24px;
+	top: 21px;
 	left: 30px;
 	color: #4a4a4a;
 
@@ -491,7 +529,7 @@ body{
 }
 
 .introduce{
-	padding-right:400px;
+	padding-right:300px;
 }
 
 .introduce p,
@@ -506,11 +544,17 @@ body{
 }
 
 .introduce ul{
-  list-style-type: square;
-	font-size:18px;
+	list-style-type: square; 
+	padding-left:20px;
 }
 
-.introduce ul li{
+.introduce .it-cap{
+	list-style-type: none;
+	font-size: 18px;
+	padding-left: 10px;
+}
+
+.introduce .it-cap li{
 	line-height:1.62;
 }
 
@@ -524,6 +568,7 @@ body{
 	max-width:100%;
 	min-width:0;
 	padding:20px 0;
+	-moz-tab-size:2;
 	tab-size:2;
 }
 
@@ -539,13 +584,13 @@ body{
 
 .it-example-info{
 	display:block;
-	padding-left:5px;
-	font-size:18px;
+	padding-left:10px;
+	font-size:20px;
 	font-weight:bold;
 	color:#888;
-	border-left:3px solid;
+	border-left:4px solid;
 	line-height:1.1;
-	margin-bottom:20px;
+	margin:20px 0;
 }
 
 .it-example .ite-code,
@@ -565,8 +610,8 @@ body{
 	padding: 1px 7px 3px;
 	font-size: 12px;
 	vertical-align: baseline;
-	background-color: #ccc;
-	color: #757575;
+	background-color: #f1f1f1;
+	color: #6d6d6d;
 }
 
 .it-example .ite-code:before{
@@ -590,4 +635,16 @@ body{
 .it-example .ite-mount{
 	padding:20px 0 0 20px;
 	line-height:1;
+}
+
+.it-example .ite-mount .del{
+  display: inline-block;
+  /* float: right; */
+  margin-left: 20px;
+  padding: 0px 4px 2px;
+  background: #ccc;
+  border-radius: 1px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
 }
