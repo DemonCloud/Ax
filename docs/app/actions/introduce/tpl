@@ -1,21 +1,76 @@
 <article class="introduce">
 	<header>
-		<h3 class="it-title">Aix</h3>
-		<p>Aix is a fast MVR JavaScript Framework.</p>
+		<h3 class="target">Aix</h3>
+		<p><b>Aix</b> is a fast MVR JavaScript Framework.</p>
 
 		<p>It require Struct utils lib, for the sake of better organization application structure with modular architecture( AMD or CommonJS specification ). This is not to replace Backbone or Angular etc, maybe it boring form of entertainment. Of course, it can cooperate with React very well.</p>
 	</header>
 
 	<div class="it-block">
-		<h3>Modules</h3>
+		<h3 class="target">Modules</h3>
+		<ul>
+			<li>
+				<b>Model</b>
+				<span> - Allows you to easily manage the data , model parse is the Immutable data, who can be monitored. So that data would not be modified by accident. Flexible authentication mechanism, to ensure the availability of data.</span>
+			</li>
+			<li>
+				<b>View</b>
+				<span> - The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events emitter and virtual DOM rendering mechanism by default way.</span>
+			</li>
+			<li>
+				<b>Route</b>
+				<span> - A routing manager for application, support regular expressions to match the router with multiple actions. Detection of hash change and carry any parameters at the same time.</span>
+			</li>
+		</ul>
 	</div>
 
 	<div class="it-block">
-		<h3>Examples</h3>
+		<h3 class="target">Examples</h3>
+		<!-- example1 -->
+		<div class="it-example-info">base render</div>
+		<div class="it-example">
+			<div class="ite-code">
+				<pre class="sh_javascript">
+var view = new aix.view({
+	template:"&lt;div class='name'&gt;"+
+							"Hello &#123;&#123;-name&#125;&#125;"+
+					 "&lt;/div&gt;",
+	events:{
+		"click:.name":function(){
+			alert(this.innerHTML);
+		}
+	}
+});
+
+view.mount(
+	document.getElementById("mount1"),
+	{ name : "Buke" }
+);
+				</pre>
+			</div>
+			<div class="ite-preview">
+				<div class="ite-mount" id="mount1"></div>
+			</div>
+		</div>
+		<!-- example1 end -->
+		<!-- example2 -->
+		<div class="it-example-info">base render</div>
+		<div class="it-example">
+			<div class="ite-code">
+				<pre class="sh_javascript">
+var model
+				</pre>
+			</div>
+			<div class="ite-preview">
+				<div class="ite-mount" id="mount2"></div>
+			</div>
+		</div>
+		<!-- example2 end -->
+
 	</div>
 
 	<div class="it-block">
-		<h3>Update</h3>
+		<h3 class="target">Update</h3>
 	</div>
 
 	<footer>

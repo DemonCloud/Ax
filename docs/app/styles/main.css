@@ -238,7 +238,7 @@ body{
 	font-family:"Titillium","Jura","Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size:14px;
 	background-color:#fff;
-	line-height: 1.4124236872;
+	line-height: 1.6024236872;
 
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
@@ -486,8 +486,108 @@ body{
 .content{
 	display:block;
 	width:100%;
-	padding:30px;
+	padding-left:30px;
+	padding-top:30px;
 }
 
 .introduce{
+	padding-right:400px;
+}
+
+.introduce p,
+.introduce h3,
+.introduce ul li{
+	margin:0;
+	margin-bottom:10px;
+}
+
+.introduce h3{
+	font-size:32px;
+}
+
+.introduce ul{
+  list-style-type: square;
+	font-size:18px;
+}
+
+.introduce ul li{
+	line-height:1.62;
+}
+
+.introduce p{
+	font-size:18px;
+}
+
+.introduce pre{
+	margin:0;
+	font-size:12px;
+	max-width:100%;
+	min-width:0;
+	padding:20px 0;
+	tab-size:2;
+}
+
+.it-block{
+	margin-bottom:10px;
+}
+
+.it-example{
+	display:flex;
+	min-width:0;
+	max-width:100%;
+}
+
+.it-example-info{
+	display:block;
+	padding-left:5px;
+	font-size:18px;
+	font-weight:bold;
+	color:#888;
+	border-left:3px solid;
+	line-height:1.1;
+	margin-bottom:20px;
+}
+
+.it-example .ite-code,
+.it-example .ite-preview{
+	position:relative;
+	min-width:0;
+	max-width:100%;
+	flex:5
+}
+
+.it-example .ite-code:before,
+.it-example .ite-preview:before{
+	position: absolute;
+	display: table;
+	line-height: 1;
+	top: 0;
+	padding: 1px 7px 3px;
+	font-size: 12px;
+	vertical-align: baseline;
+	background-color: #ccc;
+	color: #757575;
+}
+
+.it-example .ite-code:before{
+	left: 0;
+	content:"code"
+}
+
+.it-example .ite-preview:before{
+	right: 0;
+	content:"preview"
+}
+
+.it-example .ite-code{
+	border-right: 1px solid #ccc;
+}
+
+.it-example .ite-preview{
+	background-color:#f8f8f8;
+}
+
+.it-example .ite-mount{
+	padding:20px 0 0 20px;
+	line-height:1;
 }

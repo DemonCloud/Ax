@@ -16,7 +16,7 @@ gulp.task('concat',()=>{
 });
 
 gulp.task('minix',()=>{
-	return gulp.src(path_doc)
+	return gulp.src(path_doc+"aix.c.js")
 				 .pipe(uglify())
 				 .pipe(optimizejs())
 				 .pipe(gulp.dest(path_doc));
