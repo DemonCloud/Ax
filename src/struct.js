@@ -1030,7 +1030,7 @@ function paramParse(url){
 	var findQuery = turl.indexOf("?") , match , x = {},
 			param = ~findQuery ? turl.substr(findQuery+1) : turl;
 
-	while(match = qrsReg.exec(param))
+	while((match = qrsReg.exec(param)))
 		x[rSpace(match[1])] = rSpace(match[2]);
 
 	return x;
@@ -1151,14 +1151,6 @@ function rize(s,and,upper){
 	});
 }
 
-// const DOOM4 settings
-// rule for parse Template
-var doomSetting  = {
-	escape      : "{{-([\\s\\S]+?)}}",
-	interpolate : "{{#([\\s\\S]+?)}}",
-	evaluate    : "{{([\\s\\S]+?)}}"
-};
-
 function c_ecode(str){ return ecode[str] || str; }
 function c_dcode(str){ return dcode[str] || str; }
 function c_escape(et){ return '\\' + escapes[et]; }
@@ -1197,6 +1189,64 @@ function zipHTML(str){
 // [ fast, precomplete, zoom ]
 // @use ev
 // @export doom
+
+// const DOOM4 settings
+// rule for parse Template
+var doomSetting  = {
+	escape      : "{{-([\\s\\S]+?)}}",
+	interpolate : "{{#([\\s\\S]+?)}}",
+	command     : "{{\\*([\\s\\S]+?)}}",
+	evaluate    : "{{([\\s\\S]+?)}}",
+};
+
+var cmExec = /^([\S]+)\s?([\s\S]+)?/;
+var agExec = /[\[\]]*/g;
+
+function makeComand(command){
+	var res = "", 
+			cms = cmExec.exec(trim(command)),
+			cmd = cms[1],
+			param = cms[2];
+	if(cmd){
+		switch(cmd.toLowerCase()){
+			case "end":
+				res = "';\n}); _p+='";
+				break;
+			case "for":
+			case "each":
+				// {{* each [item,index] in list }}
+				param = param.split(" in ");
+				res = compiLing("op",param[1],param[0]);
+				break;
+			case "not":
+			case "extend":
+				//{{* not param with list }}
+				param = param.split(" with ");
+				res = compSaze(cmd,param[1],param[0]);
+				break;
+			default:
+				//{{* map list use params }}
+				param = param.split(" use ");
+				res = compSaze(cmd,param[0],param[1]||"",true);
+				break;
+		}
+	}
+
+	return res;
+}
+
+function compiLing(usestruct,who,useargs){
+	return "';\n struct."+usestruct+'()('+who+","+ 
+				 "function("+useargs.replace(agExec,'')+"){\n _p+='";
+}
+
+function compSaze(usestruct,who,useargs,assign){
+	var api = usestruct.split(":");
+	return (assign ? (who+"=") : "") + 
+				 "';\n struct."+api[0]+'("'+(api[1]||"")+'")('+who+","+
+				 useargs.replace(agExec,'')+"); _p+='";
+}
+
 function DOOM(txt,name){
 	var position = 0,
 			render,
@@ -1205,10 +1255,19 @@ function DOOM(txt,name){
 
 			exp = new RegExp((this.escape||no) +
 						"|" + (this.interpolate||no) + 
-						"|" + (this.evaluate||no) +"|$","g");
+						"|" + (this.command||no) + 
+						"|" + (this.evaluate||no) + 
+						"|$","g");
 
 	// start replace
-	txt.replace(exp, function(match,escape,interpolate,evaluate,offset){
+	txt.replace(exp, function(
+		match,
+		escape,
+		interpolate,
+		command,
+		evaluate,
+		offset
+	){
 		res += txt.slice(position,offset).replace(escaper,c_escape);
 		// refresh index where to find text string
 		position = offset + match.length;
@@ -1218,6 +1277,8 @@ function DOOM(txt,name){
 			res += "'+((_t=(" + escape + "))==null?'':_(_t))+'";
 		else if(interpolate)
 			res += "'+((_t=(" + interpolate + "))==null?'':_t)+'";
+		else if(command)
+			res += makeComand(command);
 		else if(evaluate)
 			res += "';\n" + evaluate + "\n_p+='";
 
@@ -1241,6 +1302,7 @@ function DOOM(txt,name){
 		);
 	}catch(e){
 		e.res = res;
+		console.log(res);
 		throw e;
 	}
 

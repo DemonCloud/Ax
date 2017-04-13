@@ -536,7 +536,7 @@ a i{
 .introduce h3,
 .introduce ul li{
 	margin:0;
-	margin-bottom:10px;
+	margin-bottom:12px;
 }
 
 .introduce h3{
@@ -550,7 +550,7 @@ a i{
 
 .introduce .it-cap{
 	list-style-type: none;
-	font-size: 18px;
+	font-size: 16px;
 	padding-left: 10px;
 }
 
@@ -559,7 +559,7 @@ a i{
 }
 
 .introduce p{
-	font-size:18px;
+	font-size:16px;
 }
 
 .introduce pre{
@@ -570,6 +570,12 @@ a i{
 	padding:20px 0;
 	-moz-tab-size:2;
 	tab-size:2;
+}
+
+.introduce footer{
+	padding: 20px 0;
+	color: #888;
+	font-size: 13px;
 }
 
 .it-block{
@@ -639,12 +645,16 @@ a i{
 
 .it-example .ite-mount .del{
   display: inline-block;
-  /* float: right; */
-  margin-left: 20px;
+  float: right;
   padding: 0px 4px 2px;
   background: #ccc;
   border-radius: 1px;
   color: #fff;
   font-weight: bold;
   cursor: pointer;
+
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  user-select:none;
 }
+

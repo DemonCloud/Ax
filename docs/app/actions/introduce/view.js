@@ -56,20 +56,21 @@ function(aix,tpl){
 				var trim = struct.string("trim");
 
 				var view3 = new aix.view({
-					template:'{{ var each = struct.op() }}'+
-									 '<input id="name" maxlength=10>'+
+					template:'<input id="name" maxlength=10>'+
 									 '<button id="add">add</button>'+
 									 '<ul>'+
-									 '{{ each(list,function(item,index){ }}'+
-									 ' 	 <li>'+
+									 '{{* each [item,index] in list }}'+
+									 ' 	 <li style="max-width:168px">'+
 									 '    {{-item.name}}'+
-									 '    <span class="del" idx={{-index}}>×</span>'+
+									 '    <b class="del" idx={{-index}}>×</b>'+
 									 ' 	 </li>'+
-									 '{{ }) }}'+
+									 '{{* end }}'+
 									 '</ul>',
 					events:{
-						"click:#add":function(){
-							var getName = trim(document.getElementById("name").value);
+						"click:#add":function(event){
+							var getName = trim(
+								document.getElementById("name").value
+							);
 							if(getName)
 								model3.moc("list",{ name : getName });
 						},
@@ -88,8 +89,8 @@ function(aix,tpl){
 						list:[]
 					},
 					events:{
-						change:function(){
-							view3.render(this.data);
+						"change:list":function(){
+							view3.render(this.parse());
 						}
 					}
 				});

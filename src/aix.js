@@ -1779,19 +1779,28 @@
 				(param = arguments[0],
 				_setProp(this.data,param,arguments[1])) : 
 				arguments[0];
-			return param ? this.emit("change:"+param,[arguments[1]]) : this;
+			return param ? this.emit(
+				"change:"+param.split(".").shift() + "," +
+				"change:"+param,
+				[arguments[1]]
+			) : this;
 		},
 
 		remove : function(prop){
+			var tmp = null;
 			if(prop){
-				var tmp = this.data;
+				tmp = this.data;
 				this.data = _isAry(tmp) ? 
 					(tmp.splice(+prop,1),tmp) : 
 					_rmProp(tmp,prop);
 			}else{
-				this.data=null;
+				this.data = tmp;
 			}
-			return this;
+
+			return prop ? this.emit(
+				"change:"+prop.split(".").shift() + "," +
+				"change:"+prop
+			) : this;
 		},
 
 		moc: function(key,val){
