@@ -45,6 +45,7 @@
 
 	// *use struct utils list
 		root      = struct.root,
+		asy       = struct.asy,
 		v8        = struct.v8(),
 		_keys     = struct.keys(),
 		_noop     = struct.noop(),
@@ -162,7 +163,8 @@
 		handlers = {},
 		focusinSupported = 'onfocusin' in window,
 		focus = { focus: 'focusin', blur: 'focusout' },
-		hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' };
+		hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' },
+		change = { change: 'input', input: 'input' };
 	
 	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
 		eventMethods = {
@@ -205,17 +207,47 @@
 			!!captureSetting;
 	}
 
+	function capCursor(elm){
+	  var pos = 0;
+  	// IE Support
+  	if (document.selection) {
+    	elm.focus();
+
+    	var sel = document.selection.createRange();
+    	sel.moveStart('character', -elm.value.length);
+    	// The caret position is selection length
+    	pos = sel.text.length;
+  	}
+  	else if (elm.selectionStart != null)
+    	pos = elm.selectionStart;
+  	return pos;
+	}
+
+	function setCursor(elm,pos){
+    if(elm.createTextRange) {
+      var range = elm.createTextRange();
+      range.move('character', pos);
+      range.select();
+    } else {
+      if(elm.selectionStart)
+        elm.setSelectionRange(pos, pos, elm.focus());
+      else
+        elm.focus();
+    }
+	}
+
 	function realEvent(type) {
-		return hover[type] || (focusinSupported && focus[type]) || type;
+		return hover[type] || 
+					 change[type] || 
+					 (focusinSupported && focus[type]) || 
+					 type;
 	}
 
 	function zaddEvent(element, events, fn, data, selector, delegator, capture){
-		var id = zid(element), set = (handlers[id] || (handlers[id] = []));
+		var id = zid(element), 
+			set = (handlers[id] || (handlers[id] = []));
 	
 		_loop(events.split(/\s/),function(event){
-			if (event == 'ready') 
-				return z(fn);
-	
 			var handler   = parse(event);
 			handler.fn    = fn;
 			handler.sel   = selector;
@@ -226,28 +258,41 @@
 					if (!related || (related !== this && ! this.contains(related)))
 						return handler.fn.apply(this, arguments);
 				};
-	
+
 			handler.del   = delegator;
 			var callback  = delegator || fn;
 			handler.proxy = function(e){
+				var pos,
+					type = e.type,
+					tname = e.target.nodeName, 
+					editable = e.target.contentEditable === "true";
 				e = compatible(e);
 	
 				if (e.isImmediatePropagationStopped()) 
 					return false;
 	
 				e.data = data;
-				var result = callback.apply(element, e._args == undefined ? [e] : [e].concat(e._args));
-	
-				if (result === false) 
+				if((type==="input" || type==="keypress" || type==="keyup")&&
+					 (tname === "INPUT" || tname === "TEXTAREA" || editable ))
+					pos = capCursor(e.target);
+				var result = callback.apply(element, 
+					e._args === undefined ? [e] : [e].concat(e._args));
+
+				if(result === false)
 					e.preventDefault(), e.stopPropagation();
-	
+				if(pos)
+					setCursor(e.target,pos);
 				return result;
 			};
 	
 			handler.i = set.length;
 			set.push(handler);
 	
-			element.addEventListener(realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+			element.addEventListener(
+				realEvent(handler.e), 
+				handler.proxy, 
+				eventCapture(handler, capture)
+			);
 		});
 	}
 
@@ -1660,6 +1705,13 @@
 		// virtual render
 		render : function(newhtml){
 			return this.each(function(elm){
+				// setTimeout(function(){
+				// 	this.apply(elm,this.diff(elm,
+				// 		createDOM(elm,newhtml.nodeType === 1 ? 
+				// 			newhtml.outerHTML : _toString(newhtml))
+				// 		)
+				// 	);
+				// }.bind(this),0);
 				this.apply(elm,this.diff(elm,
 					createDOM(elm,newhtml.nodeType === 1 ? 
 						newhtml.outerHTML : _toString(newhtml))
@@ -1786,7 +1838,7 @@
 			) : this;
 		},
 
-		remove : function(prop){
+		rm : function(prop){
 			var tmp = null;
 			if(prop){
 				tmp = this.data;
@@ -1951,10 +2003,12 @@
 			vroot = config.root,
 			render = config.render,
 			events = config.events,
-			stencil = config.template;
+			stencil = config.template,
+			compile = config.compile;
 
 		delete config.root;
 		delete config.mount;
+		delete config.compile;
 		delete config.events;
 		delete config.render;
 		delete config.template;
@@ -1963,12 +2017,13 @@
 		// building the render function
 		if(!_isFn(render)){
 			stencil = (typeof stencil === "string") ? 
-				_doom(stencil) : (_isFn(stencil) ? stencil : _noop);
+				_doom(stencil,_isObj(compile) ? compile : {}) : 
+				(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){ 
-				var t = z(vroot),args = _slice(arguments);
+				var t = z(vroot), args = _slice(arguments);
 				return (stencil !== _noop && (
-						(_trim(t.get(0).innerHTML)==="" ? 
+						(_trim(t.get(0).innerHTML) === "" ? 
 							t.html(stencil.apply(this,args)) : 
 							t.render(stencil.apply(this,args))
 						))

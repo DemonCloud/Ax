@@ -33,7 +33,7 @@ function(aix,tpl){
 					template:"<input id='text' value='{{-text}}'>"+
 									 "<h2>{{-text}}</h2>",
 					events:{
-						"input:#text":function(event){
+						"change:#text":function(event){
 							model2.set("text",this.value);
 						}
 					}
@@ -59,13 +59,16 @@ function(aix,tpl){
 					template:'<input id="name" maxlength=10>'+
 									 '<button id="add">add</button>'+
 									 '<ul>'+
-									 '{{* each [item,index] in list }}'+
+									 '{{* each [item,i] in list }}'+
 									 ' 	 <li style="max-width:168px">'+
-									 '    {{-item.name}}'+
-									 '    <b class="del" idx={{-index}}>×</b>'+
+									 '    {{-cap(item.name)}}'+
+									 '    <b class="del" key={{-i}}>×</b>'+
 									 ' 	 </li>'+
 									 '{{* end }}'+
 									 '</ul>',
+					compile:{
+						cap: struct.string("capit")
+					},
 					events:{
 						"click:#add":function(event){
 							var getName = trim(
@@ -79,7 +82,7 @@ function(aix,tpl){
 								event.data.self.emit("click:#add");
 						},
 						"click:.del":function(event){
-							model3.remove("list."+this.getAttribute("idx"));
+							model3.rm("list."+this.getAttribute("key"));
 						}
 					}
 				});

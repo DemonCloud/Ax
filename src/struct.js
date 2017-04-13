@@ -991,11 +991,6 @@ function eq(x,y){
 	return false;
 }
 
-// use setTimeout
-function asy(fn,time){
-	return setTimeout(fn,time||0);
-}
-
 // URL [param] parse and stringify
 // Browser useful
 // @use paramParse
@@ -1083,8 +1078,8 @@ var escapes = {
 
 var encodeReg    = /[&<">'](?:(amp|lt|quot|gt|#39);)?/g,
 		decodeReg    = /&((g|l|quo)t|amp|#39);/g,
-		stripReg     = /<script\b[^>]*>(.*?)<\/script>/gim,
-		commentReg   = /<!--[\s\S]*?-->/gim,
+		stripReg     = /<script\b[^>]*>(.*?)<\/script>/gi,
+		commentReg   = /<!--[\s\S]*?-->/gi,
 		zipReg       = /[\t\r\n\f]/gim,
 		upperReg     = /[A-Z]/g,
 		sReg         = '[\\s\\x20\\xA0\\uFEFF]+',
@@ -1247,12 +1242,15 @@ function compSaze(usestruct,who,useargs,assign){
 				 useargs.replace(agExec,'')+"); _p+='";
 }
 
-function DOOM(txt,name){
+function DOOM(txt,bounds,name){
 	var position = 0,
 			render,
 			res = "_p+='",
+			rname = isObject(bounds) ? 
+							name : (typeof bounds === "string" ? bounds : ""),
+			methods = isObject(bounds) ?
+								bounds : {},
 			args = slice(arguments,2),
-
 			exp = new RegExp((this.escape||no) +
 						"|" + (this.interpolate||no) + 
 						"|" + (this.command||no) + 
@@ -1260,7 +1258,7 @@ function DOOM(txt,name){
 						"|$","g");
 
 	// start replace
-	txt.replace(exp, function(
+	(txt||"").replace(exp,function(
 		match,
 		escape,
 		interpolate,
@@ -1284,25 +1282,21 @@ function DOOM(txt,name){
 
 		return match;
 	});
-
 	// End wrap res@ String
-	res += "';";
-	if(!name) res = "with(_x||{}){\n" + res + "\n}";
-	res = "var _t,_= struct.html('encode'),_p='';\n" + res + "\nreturn _p;";
+	// use default paramKey to compline
+	res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){\n" + res + "';\n}";
+	res = "var _t,_d,_=struct.html('encode'),__=struct.extend(),_p='';\n" + res + "\nreturn _p;";
 
 	// Complete building Function string
 	// try to build anmousyous function
 	try{
-		render = ev(
-			"(function("+(name||"_x")+
-			",struct"+
-			(args.length ? ","+args.toString() : "")+"){"+ 
-			res + 
+		render = ev("(function("+(rname||"_x_")+
+			",_bounds,struct"+(args.length?","+args.toString():"")+"){"+ 
+				res + 
 			"})"
 		);
 	}catch(e){
-		e.res = res;
-		console.log(res);
+		console.error(e.res = res);
 		throw e;
 	}
 
@@ -1312,7 +1306,7 @@ function DOOM(txt,name){
 	return function(data){
 		return eq(arguments,render.pre) ? (render.complete) : 
 			(render.pre=arguments, render.complete = render.apply(this,
-				[data,struct].concat(slice(arguments,1))
+				[data,methods,struct].concat(slice(arguments,1))
 			));
 	};
 }
@@ -1536,7 +1530,7 @@ function JSONP(option){
 
 	// if timeout will trigger failcall
 	if(toNumber(config.timeout)){
-		config.timesetup = asy(function(){
+		config.timesetup = setTimeout(function(){
 			document.body.removeChild(tag);
 			root[config.callback] = null;
 
@@ -2234,7 +2228,6 @@ var nublist = {
 	part      : part,
 	once      : once,
 	eq        : eq,
-	asy       : asy,
 	cookie    : cookie,
 	values    : values,
 	memoize   : memoize,
