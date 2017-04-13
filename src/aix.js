@@ -1543,10 +1543,12 @@
 		closest : function(selector,element){
 			var el = this.el ,tmp=this.get(0) ,find;
 
-			for(var i=0,l=el.length;i<l;i++,tmp=el[i])
+			for(var i=0,l=el.length;i<l;i++,tmp=el[i]){
 				while(tmp&&!find&&tmp!==element)
-					if(z.matchz(tmp=find=tmp.parentNode,selector)) 
-						if(find) break;
+					if(z.matchz((tmp=tmp.parentNode),selector)) 
+						find = tmp;
+				if(find) break;
+			}
 
 			return z(find||[]);
 		},
