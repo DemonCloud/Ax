@@ -2218,7 +2218,7 @@ var nublist = {
 	groupBy   : groupBy,
 	countBy   : countBy,
 	concat    : concat,
-	castArray : castArray,
+	cast      : castArray,
 	shuffle   : shuffle,
 	first     : first,
 	last      : last,

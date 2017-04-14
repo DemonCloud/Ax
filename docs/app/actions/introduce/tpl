@@ -1,71 +1,74 @@
 <article class="introduce">
 	<header>
-		<h3 class="target">Aix</h3>
+		<h3 t=1>Aix</h3>
 		<p><b>Aix</b> is a fast MVR JavaScript Framework.</p>
 
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
 
-		<p><b>Struct</b> pass over <b>300 test unit</b>.
+		<p><b>Struct</b> pass over <b>300 test case by Qunit</b>.
 		</p>
 
 		<br>
 
 		<p>The <b>Aix</b> compress file <b>10KB(gzip)</b> , with struct pack only <b>18KB(gzip)</b> </p>
 		
-		<h2>[ Latest version - 1.0 ]</h2>
+		<mark>Latest version - 1.0</mark>
 		<p>
 			<span>Pack with <code>struct</code> 18KB(gzip) - </span>
 			<a href="app/scripts/libs/aix.c.js" rel="donload" download='aix.s.js'>
-				<i class="ion-ios-list-outline"></i>
+				<i class="ion-android-checkmark-circle"></i>
 				aix.s.js (53k)
 			</a>
 		</p>
 		<p>
 			<span>Single <code>aix</code> 10KB(gzip) - </span>
 			<a href="app/scripts/libs/aix.min.js" rel="donload" download='aix.min.js'>
-				<i class="ion-ios-list-outline"></i>
+				<i class="ion-android-checkmark-circle"></i>
 				aix.min.js (30k)
 			</a>
 		</p>
 		<br>
 		
 		<p>
-			<span style="margin-right:5px">
+			<span class="it-outlink">
 				<a href="https://github.com/DemonCloud/aix" target="_blank"><i class="ion-social-github"></i> Encourage a Star</a> 
 			</span> 
-			<span>
-				<a href="/" target="_blank"><i class="ion-ios-analytics"></i> See test here</a> 
+			<span class="it-outlink">
+				<a href="tests" target="_blank"><i class="ion-ios-analytics"></i> See Unit test</a> 
+			</span>
+			<span class="it-outlink">
+				<a href="examples" target="_blank"><i class="ion-social-nodejs"></i> More Examples</a> 
 			</span>
 		</p>
 
 	</header>
 
 	<div class="it-block">
-		<h3 class="target">Modules</h3>
+		<h3 class="target" t=2>Modules</h3>
 		<ul class="it-cap">
 			<li>
-				<a href="#cap@s=route">
+				<a href="#cap@s=single" tc=2>
 					<i class="ion-gear-a"></i> 
 					<b> Struct</b>
 				</a>
 				<span> - Struct is basic utils in aix, Salute to K&amp;R <b>&lt;The C Programming Language&gt;</b>. It contains more than 100 practical function, also it can be used as a single tool. focus on functional programming, the limits of performance, and the function of packaging more easily</span>
 			</li>
 			<li>
-				<a href="#cap@s=model">
+				<a href="#cap@s=model" tc=2>
 					<i class="ion-ios-pie"></i> 
 					<b> Model</b>
 				</a>
 				<span> - Allows you to easily manage the data , model parse is the Immutable data, who can be monitored. So that data would not be modified by accident. Flexible authentication mechanism, to ensure the availability of data.</span>
 			</li>
 			<li>
-				<a href="#cap@s=view">
+				<a href="#cap@s=view" tc=2>
 					<i class="ion-ios-photos"></i> 
 					<b> View</b>
 				</a>
 				<span> - The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events emitter and virtual DOM rendering mechanism by default way.</span>
 			</li>
 			<li>
-				<a href="#cap@s=route">
+				<a href="#cap@s=route" tc=2>
 					<i class="ion-social-buffer"></i> 
 					<b> Route</b>
 				</a>
@@ -75,9 +78,11 @@
 	</div>
 
 	<div class="it-block">
-		<h3 class="target">Examples</h3>
+		<h3 t=3>Examples</h3>
 		<!-- example1 -->
-		<div class="it-example-info">Basic</div>
+		<div class="it-example-info" tc=3>
+			Basic
+		</div>
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
@@ -99,15 +104,17 @@ view.mount(
 		</div>
 		<!-- example1 end -->
 		<!-- example2 -->
-		<div class="it-example-info">Two-way Data Binding</div>
+		<div class="it-example-info" tc=3>
+			Two-way Data Binding
+		</div>
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
 var view = new aix.view({
-	template:"&lt;input id='text' value='&#123;&#123;-text&#125;&#125;'&gt;"+
+	template:"&lt;input value='&#123;&#123;-text&#125;&#125;'&gt;"+
 					 "&lt;h2&gt;&#123;&#123;-text&#125;&#125;&lt;/h2&gt;",
 	events:{
-		"change:#text":function(){
+		"change:input":function(){
 			 model.set("text",this.value);
 		}
 	}
@@ -133,7 +140,9 @@ view.mount(
 		</div>
 		<!-- example2 end -->
 		<!-- example3 -->
-		<div class="it-example-info">Todo List</div>
+		<div class="it-example-info" tc=3>
+			Todo List
+		</div>
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
@@ -194,6 +203,11 @@ view.mount(
 			</div>
 		</div>
 		<!-- example3 end -->
+	</div>
+
+	<div class="it-block">
+		<h3 t=4>Info</h3>
+		<p>These examples were simple described the behavior of <b>Aix</b> and way of writing. u can get more example in here <a target="_blank" href="examples">More Examples</a>. Flexible and simple way of assembly is main design objective for Aix .</p>
 	</div>
 
 	<footer>

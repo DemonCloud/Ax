@@ -1928,6 +1928,12 @@
 		},
 
 		fetch: function(param,byfilter,header){
+			if(_isFn(param)){
+				header = byfilter;
+				byfilter = param;
+				param = {};
+			}
+
 			return this.pipe.apply(this,[
 				"fetch",
 				this.url,
@@ -1940,12 +1946,12 @@
 			]);
 		},
 
-		sync: function(fns,header){
+		sync: function(header){
 		  return this.pipe.apply(this,[
 		  	"sync",
 		  	this.url,
 		  	this.data,
-		  	fns,
+		  	_noop,
 		  	_noop,
 		  	header
 			]);
@@ -2042,7 +2048,7 @@
 				if(1 in arguments)
 					this.render.apply(this,_slice(arguments,1));
 				// delete mount
-				return delete this.mount;
+				return delete this.mount, this;
 			};
 		}
 

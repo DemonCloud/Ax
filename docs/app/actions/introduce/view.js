@@ -1,10 +1,11 @@
 define("actions/introduce/view",
 [
 	"aix",
+	"modules/tags",
 	// template 
 	"text!actions/introduce/tpl"
 ],
-function(aix,tpl){
+function(aix,tags,tpl){
 	// mount at elment[#app]
 	return new aix.view({
 		root:document.getElementById("app"),
@@ -14,7 +15,7 @@ function(aix,tpl){
 				console.log("#introduce randering");
 			},
 			complete:function(data){
-				sh_highlightDocument();
+				sh_highlightDocument(tags.make());
 
 				//#example1
 				var view = new aix.view({
@@ -30,10 +31,10 @@ function(aix,tpl){
 
 				//#example2
 				var view2 = new aix.view({
-					template:"<input id='text' value='{{-text}}'>"+
+					template:"<input value='{{-text}}' style='margin-bottom:5px'>"+
 									 "<h2>{{-text}}</h2>",
 					events:{
-						"change:#text":function(event){
+						"change:input":function(event){
 							model2.set("text",this.value);
 						}
 					}
