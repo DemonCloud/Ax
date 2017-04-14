@@ -6,6 +6,6 @@ define("actions/introduce/export",
 function(model,view){
 	return function(key){
 		if(key) 
-			view.render(model.parse());
+			view.render(model.get());
 	};
 });

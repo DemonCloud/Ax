@@ -5,8 +5,7 @@
 
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
 
-		<p>require <b>Struct</b> utils lib pass over <b>300 test unit</b> : 
-		<a href="/" target="_blank"><i class="ion-ios-analytics"></i> see test here</a>
+		<p><b>Struct</b> pass over <b>300 test unit</b>.
 		</p>
 
 		<br>
@@ -31,7 +30,12 @@
 		<br>
 		
 		<p>
-			<span><a href="https://github.com/DemonCloud/aix" target="_blank"><i class="ion-social-github"></i> Encourage a Star</a></span>
+			<span style="margin-right:5px">
+				<a href="https://github.com/DemonCloud/aix" target="_blank"><i class="ion-social-github"></i> Encourage a Star</a> 
+			</span> 
+			<span>
+				<a href="/" target="_blank"><i class="ion-ios-analytics"></i> See test here</a> 
+			</span>
 		</p>
 
 	</header>
@@ -112,7 +116,7 @@ var view = new aix.view({
 var model = new aix.model({
 	events:{
 		change:function(){
-			view.render(this.data);
+			view.render(this.get());
 		}
 	}
 });
@@ -181,7 +185,7 @@ var model = new aix.model({
 
 view.mount(
 	document.getElementById("mount3"),
-	model.parse()
+	model.get()
 );
 				</pre>
 			</div>
@@ -193,7 +197,7 @@ view.mount(
 	</div>
 
 	<footer>
-		Copyright © 2017-2017 Cloud YiJun
+		Copyright © 2016-2017 Cloud YiJun
 	</footer>
 </article>
 

@@ -42,7 +42,7 @@ function(aix,tpl){
 				var model2 = new aix.model({
 					events:{
 						change:function(){
-							view2.render(this.data);
+							view2.render(this.get());
 						}
 					}
 				});
@@ -93,14 +93,14 @@ function(aix,tpl){
 					},
 					events:{
 						"change:list":function(){
-							view3.render(this.parse());
+							view3.render(this.get());
 						}
 					}
 				});
 
 				view3.mount(
 					document.getElementById("mount3"),
-					model3.parse()
+					model3.get()
 				);
 			}
 		}

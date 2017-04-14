@@ -1258,7 +1258,7 @@ function DOOM(txt,bounds,name){
 						"|$","g");
 
 	// start replace
-	(txt||"").replace(exp,function(
+	trim(txt||"").replace(exp,function(
 		match,
 		escape,
 		interpolate,

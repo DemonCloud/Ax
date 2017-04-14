@@ -35,12 +35,11 @@
 	RESTFUL = {
 		get    : "GET",
 		put    : "POST",
-		save   : "POST",
+		send   : "GET",
+		sync   : "POST",
 		post   : "POST",
-		pull   : "POST",
 		fetch  : "GET",
-		update : "POST",
-		delete : "POST"
+		update : "POST"
 	},
 
 	// *use struct utils list
@@ -209,8 +208,10 @@
 
 	function capCursor(elm){
 	  var pos = 0;
+  	if (elm.selectionStart != null)
+    	pos = elm.selectionStart;
   	// IE Support
-  	if (document.selection) {
+  	else if (document.selection) {
     	elm.focus();
 
     	var sel = document.selection.createRange();
@@ -218,8 +219,6 @@
     	// The caret position is selection length
     	pos = sel.text.length;
   	}
-  	else if (elm.selectionStart != null)
-    	pos = elm.selectionStart;
   	return pos;
 	}
 
@@ -321,7 +320,6 @@
 
 	function compatible(event, source) {
 		if (source || !event.isDefaultPrevented) {
-	
 			source || (source = event);
 	
 			_loop(eventMethods, function(predicate, name) {
@@ -1819,10 +1817,10 @@
 	// because it much as MVC-M logs 
 	aM.prototype = {
 		get : function(key){
-			if(key!=null)
+			if(key != null && key !== "")
 				return _prop.apply(this,
 					[this.data].concat(_slice(arguments)));
-			return this.data;
+			return key === true ? _dpclone(this.data) : this.data;
 		},
 
 		set : function(){
@@ -1833,8 +1831,7 @@
 				arguments[0];
 			return param ? this.emit(
 				"change:"+param.split(".").shift() + "," +
-				"change:"+param,
-				[arguments[1]]
+				"change:"+param,[arguments[1]]
 			) : this;
 		},
 
@@ -1856,7 +1853,9 @@
 		},
 
 		moc: function(key,val){
-			return this.set(key,moc(_prop(this.data,key),val));
+			return this.set(key,
+				moc(_prop(this.data,key),val)
+			);
 		},
 
 		// API event
@@ -1872,12 +1871,6 @@
 			return _isPrim(this.data) ? 
 				this.data : 
 				JSON.stringify(this.data);
-		},
-
-		parse : function(deep){
-			return deep ? 
-				_dpclone(this.data) : 
-				this.data;
 		},
 
 		// Fetch mean Restful "GET"
@@ -1923,38 +1916,37 @@
 			return this.emit(type,[_ajax(st),st]);
 		},
 
-		send: function(url,fns,fnf,header){
+		send: function(url,fns,header){
 			return this.pipe.apply(this,[
-				"get",
+				"send",
 				url || this.url,
 				this.data,
 				fns,
-				fnf,
+				_noop,
 				header
 			]);
 		},
 
-		fetch: function(param,fns,fnf,header){
+		fetch: function(param,byfilter,header){
 			return this.pipe.apply(this,[
 				"fetch",
 				this.url,
 				param,
-				function(responseText,xhr,event){
-					this.data = JSON.parse(responseText);
-					(fns||_noop).call(this,responseText,xhr,event);
-				},
-				fnf,
+				_link(
+					(_isFn(byfilter) ? byfilter : JSON.parse),
+					this.set.bind(this)),
+				_noop,
 				header
 			]);
 		},
 
-		sync: function(fns,fnf,header){
+		sync: function(fns,header){
 		  return this.pipe.apply(this,[
-		  	"save",
+		  	"sync",
 		  	this.url,
 		  	this.data,
 		  	fns,
-		  	fnf,
+		  	_noop,
 		  	header
 			]);
 		},
