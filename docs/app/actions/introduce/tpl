@@ -1,6 +1,6 @@
 <article class="introduce">
 	<header>
-		<h3 t=1>Aix</h3>
+		<h3 t=1>{{#main}}</h3>
 		<p><b>Aix</b> is a fast MVR JavaScript Framework.</p>
 
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
@@ -44,7 +44,7 @@
 	</header>
 
 	<div class="it-block">
-		<h3 class="target" t=2>Modules</h3>
+		<h3 class="target" t=2>{{#cap1}}</h3>
 		<ul class="it-cap">
 			<li>
 				<a href="#cap@s=single" tc=2>
@@ -78,10 +78,10 @@
 	</div>
 
 	<div class="it-block">
-		<h3 t=3>Examples</h3>
+		<h3 t=3>{{#cap2}}</h3>
 		<!-- example1 -->
 		<div class="it-example-info" tc=3>
-			Basic
+			Base
 		</div>
 		<div class="it-example">
 			<div class="ite-code">
@@ -206,12 +206,12 @@ view.mount(
 	</div>
 
 	<div class="it-block">
-		<h3 t=4>Info</h3>
+		<h3 t=4>{{#cap3}}</h3>
 		<p>These examples were simple described the behavior of <b>Aix</b> and way of writing. u can get more example in here <a target="_blank" href="examples">More Examples</a>. Flexible and simple way of assembly is main design objective for Aix .</p>
 	</div>
 
 	<footer>
-		Copyright © 2016-2017 Cloud YiJun
+		{{#copy}}
 	</footer>
 </article>
 
