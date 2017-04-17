@@ -12,7 +12,9 @@ function(model,view){
 	});
 
 	return function(key){
-		if((prevKey = key)) 
+		if((prevKey = key)){
+			window.scrollTo(0,0);
 			view.render(model.get(key));
+		}
 	};
 });

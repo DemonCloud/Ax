@@ -23,6 +23,8 @@ cap
 ){
 	'use strict';
 
+	struct.root.aix = aix;
+
 	var has = struct.has(),
 			_ = struct.link();
 

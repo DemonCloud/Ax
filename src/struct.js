@@ -104,6 +104,8 @@ function cit(fn){
 	};
 }
 
+// check -> function
+// a
 function citd(fn,check){
 	return function(){
 		return (check.apply(null,arguments) ? fn : cool).apply(null,arguments);
@@ -1207,6 +1209,12 @@ function makeComand(command){
 			case "end":
 				res = "';\n}); _p+='";
 				break;
+			case "if":
+			case "exist":
+				param = param.split(" then ");
+				res = "'; var " + param[0] + " = " + param[0] + " || false; "+
+							"_ext("+param[0]+","+(param[1] ? param[1].toString()+"," : "")+"function(){ _p+='";
+				break;
 			case "for":
 			case "each":
 				// {{* each [item,index] in list }}
@@ -1276,7 +1284,7 @@ function DOOM(txt,bounds,name){
 		else if(interpolate)
 			res += "'+((_t=(" + interpolate + "))==null?'':_t)+'";
 		else if(command)
-			res += makeComand(command);
+			res += makeComand(command,res);
 		else if(evaluate)
 			res += "';\n" + evaluate + "\n_p+='";
 
@@ -1285,7 +1293,7 @@ function DOOM(txt,bounds,name){
 	// End wrap res@ String
 	// use default paramKey to compline
 	res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){\n" + res + "';\n}";
-	res = "var _t,_d,_=struct.html('encode'),__=struct.extend(),_p='';\n" + res + "\nreturn _p;";
+	res = "var _t,_d,_ext=struct.exist(),_=struct.html('encode'),__=struct.extend(),_p='';\n" + res + "\nreturn _p;";
 
 	// Complete building Function string
 	// try to build anmousyous function
@@ -2191,6 +2199,12 @@ function $doom(config){
 	);
 }
 
+function exist(check){
+	var args = slice(arguments,1);
+	if(check)
+		last(args).apply(null,args);
+}
+
 // signet API
 var nublist = {
 	chain     : _,
@@ -2236,6 +2250,7 @@ var nublist = {
 	size      : size,
 	now       : now,
 	sort      : sort,
+	exist     : exist,
 	v8        : v8
 };
 

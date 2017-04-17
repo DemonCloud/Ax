@@ -5,7 +5,9 @@ define("actions/introduce/export",
 ],
 function(model,view){
 	return function(key){
-		if(key) 
+		if(key){
+			window.scrollTo(0,0);
 			view.render(model.get());
+		}
 	};
 });

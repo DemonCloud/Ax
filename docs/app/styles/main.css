@@ -253,6 +253,13 @@ body{
   zoom:1;
 }
 
+hr{
+	height: 1px;
+	background-color: #eee;
+	width: 100%;
+	border: 0;
+}
+
 h1,h2,h3,h4,h5,h6{
 	margin:0;
 	margin-bottom:10px;
@@ -300,6 +307,63 @@ a i{
 
 .clear:after{
 	clear:both;
+}
+
+.btn{
+	position: relative;
+	overflow: visible;
+	display: inline-block;
+	padding: 0.3em 0.6em 0.375em;
+	border: 1px solid;
+	margin: 0;
+	text-decoration: none;
+	text-align: center;
+	font: bold 11px/normal 'lucida grande', tahoma, verdana, arial, sans-serif;
+	white-space: nowrap;
+	cursor: pointer;
+
+	-webkit-outline: none;
+	outline: none;
+
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	user-select:none;
+
+	z-index: 1;
+	zoom: 1;
+}
+
+.btn.btn-fb-default{
+	color: #333;
+	border-color:#999;
+	border-bottom-color: #888;
+	background-color: #eee;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f5f6f6), to(#e4e4e3));
+	background-image: -moz-linear-gradient(#f5f6f6, #e4e4e3);
+	background-image: -o-linear-gradient(#f5f6f6, #e4e4e3);
+	background-image: linear-gradient(#f5f6f6, #e4e4e3);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#f5f6f6', EndColorStr='#e4e4e3');
+	-webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 1px 0 #fff;
+	-moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 1px 0 #fff;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 1px 0 #fff;
+
+}
+
+.btn.btn-fb-default:focus,
+.btn.btn-fb-default:hover,
+.btn.btn-fb-default.focus,
+.btn.btn-fb-default.hover{
+  border-color: #777 #777 #666;
+}
+
+.btn.btn-fb-default:active,
+.btn.btn-fb-default.active{
+	border-color: #aaa;
+	background: #ddd;
+	filter: none;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
 }
 
 .main{
@@ -574,18 +638,44 @@ a i{
 	padding-top:30px;
 }
 
-.introduce{
+#tags{
+	padding: 0 4px;
+}
+
+.t-out,
+.t-child{
+	display:table;
+	cursor:pointer;
+}
+
+.t-child{
+	font-size: 13px;
+	padding-left: 15px;
+	color: #924545;
+}
+
+.t-out{
+	font-size:16px;
+  font-weight: bold;
+  line-height: 1.7;
+}
+
+.introduce,
+.api{
 	padding-right:33%;
 }
 
 .introduce p,
 .introduce h3,
-.introduce ul li{
+.introduce ul li,
+.api p,
+.api h3{
 	margin:0;
 	margin-bottom:12px;
 }
 
-.introduce h3{
+.introduce h3,
+.api h3{
 	font-size:32px;
 }
 
@@ -676,7 +766,9 @@ a i{
 }
 
 .it-example .ite-code:before,
-.it-example .ite-preview:before{
+.it-example .ite-preview:before,
+.api-examples .example-code:before,
+.api-examples .example-preview:before{
 	position: absolute;
 	display: table;
 	line-height: 1;
@@ -726,24 +818,98 @@ a i{
   user-select:none;
 }
 
-#tags{
-	padding: 0 4px;
+.api p{
+	font-size:15px;
 }
 
-.t-out,
-.t-child{
-	display:table;
-	cursor:pointer;
+.api .api-introduce,
+.api .api-params,
+.api .api-usage,
+.api .api-info,
+.api .api-related,
+.api .api-examples{
+	padding-bottom:1px;
+	margin-bottom:30px;
 }
 
-.t-child{
+.api-usage .usage-example{
+	display: table;
+	font-size: 14px;
+	padding: 2px 11px;
+	color: #fff;
+	background-color: #8a3838;
+	margin-bottom: 12px;
+	border-radius: 2px;
+}
+
+.api-params .param{
+  font-size: 16px;
+  /* text-transform: capitalize; */
+  margin-bottom: 6px;
+}
+
+.api-params .param b {
+	display: inline-block;
+	padding: 0 8px 2px;
+	color: #fff;
 	font-size: 13px;
-	padding-left: 15px;
-	color: #924545;
+	font-weight: normal;
+	margin: 0;
+	line-height: 1.4;
+	vertical-align: middle;
+	background-color: #dadada;
+	border: 1px solid #dadada;
+	/* border-radius: 3px; */
 }
 
-.t-out{
-	font-size:16px;
-  font-weight: bold;
-  line-height: 1.7;
+.api-examples{
+	display:block;
+	max-width:100%;
+	overflow:hidden;
+}
+
+.api-examples .example{
+	display:block;
+	max-width:100%;
+	margin-bottom:15px;
+	z-index:1;
+	zoom:1;
+}
+
+.api-examples .example .code{
+	tab-size:2;
+ 	padding: 20px;
+ 	margin: 0;
+}
+
+.api-examples .example h5{
+	font-size:26px;
+	font-weight:normal;
+	color:#666;
+}
+
+.api-examples .example-code{
+	position: relative;
+	flex:5;
+}
+
+.api-examples .example-code:before{
+	left: 0;
+	content:"code"
+}
+
+.api-examples .example-preview{
+	flex:5;
+}
+
+.api-examples .example-code .btn{
+	position:absolute;
+	font-size:11px;
+	right:10px;
+	top:10px;
+}
+
+.api-examples .example-code .btn i{
+	font-size:12px;
+	vertical-align:-1px;
 }
