@@ -1371,19 +1371,21 @@ function cookie(param){
 // @use JSONP
 // @export ajax
 var MIME = {
+	"application/x-www-form-urlencoded": 0,
 	"application/json" : 1
 };
 
 // deal with Data type
 function dataMIME(enable,header,param){
 	if(enable)
-		if(isObject(header))
-			switch(MIME[header["Content-Type"]]){
-				case 1:
-					return JSON.stringify(param||{});
-				default : 
-					return paramStringify(param||{});
-			}
+		switch(header){
+			case 0:
+				return paramStringify(param||{});
+			case 1:
+				return JSON.stringify(param||{});
+			default : 
+				return paramStringify(param||{});
+		}
 	return param;
 }
 
@@ -1413,17 +1415,17 @@ function aix(option){
 
 	if(config.cache){
 		// *Init set localStorage
-		if(!ls.getItem("_struct"))
-			ls.setItem("_struct","{}");
+		if(!ls.getItem("_"))
+			ls.setItem("_","{}");
 
-		var cache = JSON.parse(ls.getItem("_struct"));
+		var cache = JSON.parse(ls.getItem("_"));
 		var data = cache[config.url || root.location.href.split("#").shift()];
 
 		if(data!==void 0) 
 			return config.sucess.call(root,data);
 	}
 	
-	var xhr = new XMLHttpRequest();
+	var xhr = new XMLHttpRequest(), cType;
 	// with GET method
 	if(config.type.toUpperCase() === "GET" && config.param){
 		config.url += (~config.url.search(/\?/g) ?
@@ -1445,23 +1447,17 @@ function aix(option){
 	);
 
 	// with POST method
-	if(config.type.toUpperCase() === "POST" &&
-		 config.param &&
-		 !config.header["Content-Type"] &&
-		 config.contentType)
-		xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded;chartset="+config.charset);
+	cType = isObject(config.header) ? 
+			config.header["Content-Type"] : 
+			"application/x-www-form-urlencoded";
 
-	if(isObject(config.header) && config.header !== broken){
-		var contentType = config.header["Content-Type"];
+	if(config.header !== broken && isObject(config.header))
+		ol(config.header,function(val,key){ xhr.setRequestHeader(key,val); });
 
-		if(contentType)
-			if(!~contentType.search('charset') && !~contentType.search('json'))
-				config.header["Content-Type"] += ";charset=" + config.charset;
-
-		ol(config.header,function(val,key){
-			xhr.setRequestHeader(key,val);
-		});
-	}
+	if(config.type.toUpperCase() === "POST" && 
+		 config.contentType === true && 
+		 (cType||"").search("json")===-1)
+		xhr.setRequestHeader("Content-Type",cType+";chartset="+config.charset);
 
 	xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
 	xhr.setRequestHeader("Struct-Requested","StructHttpRequest");
@@ -1476,9 +1472,9 @@ function aix(option){
 				config.success.call(root,xhr.responseText,xhr,event);
 				// if cache been set writeJSON in chache
 				if(config.cache){
-					var cache = JSON.parse(ls.getItem("_struct"));
+					var cache = JSON.parse(ls.getItem("_"));
 					cache[config.url||root.location.href.split("#")[0]] = xhr.responseText;
-					ls.setItem("_struct",JSON.stringify(cache));
+					ls.setItem("_",JSON.stringify(cache));
 				}
 			} else {
 				config.error.call(root,xhr,event);
@@ -1496,12 +1492,10 @@ function aix(option){
 	}
 
 	// send request
-	xhr.send(config.param ? 
-			(isObject(config.param) ? 
-			dataMIME(config.contentType,config.header,config.param) :
-			config.param ) : null);
-
-	return xhr;
+	return xhr.send(config.param ? 
+		(isObject(config.param) ? 
+		dataMIME(config.contentType,cType,config.param) :
+		config.param ) : null),xhr;
 }
 
 function JSONP(option){

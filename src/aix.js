@@ -1917,6 +1917,12 @@
 		},
 
 		send: function(url,fns,header){
+			if(_isFn(url)){
+				header = fns;
+				fns = url;
+				url = null;
+			}
+
 			return this.pipe.apply(this,[
 				"send",
 				url || this.url,

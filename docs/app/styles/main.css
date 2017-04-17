@@ -913,3 +913,7 @@ a i{
 	font-size:12px;
 	vertical-align:-1px;
 }
+
+.api-related .relate-link{
+	display:table;
+}

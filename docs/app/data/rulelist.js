@@ -5,7 +5,8 @@ function(){
 		api:[
 			"model:get",
 			"model:set",
-			"model:remove",
+			"model:rm",
+			"model:moc",
 			"model:toJSON",
 			"model:parse",
 			"model:send",
