@@ -13,7 +13,7 @@ function(struct){
 			var runbtn = document.createElement("button");
 			
 			runbtn.setAttribute("class","btn btn-fb-default run-code");
-			runbtn.innerHTML = "run code <i class='ion-compose'></i>";
+			runbtn.innerHTML = "run <i class='ion-compose'></i>";
 			runbtn.onclick = function(event){
 				event.preventDefault();
 				event.stopPropagation();

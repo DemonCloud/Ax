@@ -23,10 +23,12 @@
 	</div>
 	{{* end }}
 
+	{{* exist info }}
 	<div class="api-info">
 		<h3 t=4>Info</h3>
 		<div>{{#info}}</div>
 	</div>
+	{{* end }}
 
 	{{* exist related }}
 	<div class="api-related">

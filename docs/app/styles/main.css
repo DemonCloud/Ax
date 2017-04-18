@@ -851,15 +851,18 @@ a i{
 .api-params .param b {
 	display: inline-block;
 	padding: 0 8px 2px;
-	color: #fff;
+	color: #868686;
 	font-size: 13px;
 	font-weight: normal;
 	margin: 0;
-	line-height: 1.4;
-	vertical-align: middle;
+	line-height: 1.2;
+	vertical-align: 1px;
 	background-color: #dadada;
 	border: 1px solid #dadada;
-	/* border-radius: 3px; */
+
+	-webkit-border-radius:1px;
+	-moz-border-radius:1px;
+	border-radius:1px;
 }
 
 .api-examples{
@@ -917,4 +920,38 @@ a i{
 
 .api-related .relate-link{
 	display:table;
+
+}
+
+.api-info table{
+	max-width:100%;
+	table-layout: fixed;
+  border-collapse: collapse;
+	margin: 0;
+	padding:1px 0;
+	margin-bottom: 15px;
+	overflow:hidden;
+}
+
+.api-info table th,
+.api-info table td{
+	padding: 15px 10px;
+	border-bottom:1px solid #f1f1f1;
+}
+
+.api-info table td{
+	color: #888;
+}
+
+.api-info table tr td:first-child{
+	color: #5a7759;
+	font-size:15px;
+	font-weight: bold;
+}
+
+.api-info table th{
+	color:#8a3838;
+	font-size:15px;
+	font-weight:bold;
+	text-align:left;
 }

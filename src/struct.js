@@ -1615,6 +1615,21 @@ function hasEvent(obj,type,fn){
 	return !!res;
 }
 
+function copyEvent(toobj,related){
+	var rid = (isObject(related) ? related._eid : 0) || 0;
+	if(rid){
+		define(toobj,"_eid",{ 
+			value : ++_eid, 
+			writable : false, 
+			enumerable: false, 
+			configurable: true 
+		});
+
+		_events[toobj._eid] = depclone(_events[rid]);
+	}
+	return toobj;
+}
+
 function fireEvent(obj,type,args){
 	var id = obj._eid || 0, args = args||[];
 	if(id && _events[id] && type!=="")
@@ -2154,6 +2169,9 @@ function $event(c){
 		case "has":
 		case "exist":
 			return hasEvent;
+		case "copy":
+		case "extend":
+			return copyEvent;
 		case "dispatch":
 		case "trigger":
 		case "emit":

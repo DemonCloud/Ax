@@ -1787,8 +1787,8 @@
 
 				var args = [_clone(newdata)], error;
 				if((this.emit("validate",args),
-					_isPrim(newdata)?
-					(_isFn(validate) ? validate(newdata) : true):
+					_isPrim(newdata) ?
+					(_isFn(validate) ? validate(newdata) : true) :
 					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
 					this.change=true,
@@ -1809,7 +1809,8 @@
 
 		// init event
 		_extend(this,config)
-			.emit("init",[this.data]);
+			.emit("init",[this.data])
+			.unbind("init");
 	};
 
 	// Extend aix model method 
@@ -2061,7 +2062,8 @@
 
 		// first trigger "init" event
 		_extend(this,config)
-			.emit("init");
+			.emit("init")
+			.unbind("init");
 	};
 
 	aV.prototype = {
@@ -2170,7 +2172,8 @@
 
 		_extend(this,config)
 			.on("hashchange",hashChange)
-			.emit("init");
+			.emit("init")
+			.unbind("init");
 	};
 
 	// Aix-Route for SPA Architecture

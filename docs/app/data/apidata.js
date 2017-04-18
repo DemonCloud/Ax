@@ -522,5 +522,213 @@ console.log(\"see the model's data -> \",m.get());"
 				}
 			]
 		},
+
+		//#model.events
+		"model:events" : {
+			title:"Model [ Events ]",
+			introduce:"<code>model.events</code> extend to <code>struct</code> event-dispatching thread, give the events to Object, the events can be easy to extend, there is no performance loss",
+			usages:[
+				"model.on(type,fn)",
+				"model.emit(type,args)",
+				"model.unbind(type,fn)",
+			],
+			params:[
+				{ name:"type", type:"String" },
+				{ name:"fn", type:"Function" },
+				{ name:"args", type:"Array" }
+			],
+			info:"<p>if not enter <code>fn</code> args, the <code>model.unbind</code>, would remove events of <code>type</code>,</p><p>if not <code>type</code> param, it will remove all the events for this model.</p> <p>model has some basic events , see this table: </p> <h2 tc=4>built-in events</h2>\n\
+<table>\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Event Name</th>\n\
+			<th>Event Info</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>init</td>\n\
+			<td>when model create, it will trigger <b>once time</b></td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>change</td>\n\
+			<td>when model.data has been changed</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>validate</td>\n\
+			<td>begin to validate the set-data ( model not change )</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>validate:success</td>\n\
+			<td>set-data pass validate ( same as \"change\" )</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>validate:fail</td>\n\
+			<td>set-data fail to pass validate</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>send</td>\n\
+			<td>begin to send model.data to server</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>send:success</td>\n\
+			<td>get 200 success or 304 HTTP code</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>send:fail</td>\n\
+			<td>send fail to server</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>fetch</td>\n\
+			<td>begin to fetch the data form server</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>fetch:success</td>\n\
+			<td>get 200 success or 304 HTTP code ( data should pass validate )</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>fetch:fail</td>\n\
+			<td>fetch fail to server</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>sync</td>\n\
+			<td>sync the data to server</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>sync:success</td>\n\
+			<td>get 200 success or 304 HTTP code ( save the data in server )</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>sync:fail</td>\n\
+			<td>sync data fail to server</td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var m = new aix.model();\n\
+// bind change event\n\
+m.on(\"change\",function(){\n\
+	console.log(\"data has been changed!\",this);\n\
+});\n\
+m.set(\"a\",1);"
+				},
+				{ 
+					title: "Multiple events",
+					code:"var m = new aix.model({\n\
+	events:{\n\
+		// define at model initialize\n\
+		change:function(){\n\
+			console.log(\"My Events 0\");\n\
+		}\n\
+	}\n\
+});\n\
+// bind change event\n\
+m.on(\"change\",function(){\n\
+	console.log(\"My Events 1\");\n\
+});\n\
+m.on(\"change\",function(){\n\
+	console.log(\"My Events 2\");\n\
+});\n\
+m.on(\"change\",function(){\n\
+	console.log(\"My Events 3\",this);\n\
+});\n\
+// trigger change\n\
+m.set({ a:1 });"
+				},
+				{ 
+					title: "Proactive trigger",
+					code:"var m = new aix.model({\n\
+	events:{\n\
+		custom:function(a,b){\n\
+			console.log(\"see the total \"+(a+b));\n\
+		}\n\
+	}\n\
+});\n\
+// Proactive emit with params\n\
+m.emit(\"custom\",[2,3]);"
+				},
+				{ 
+					title: "Remove event",
+					code:"var m = new aix.model({\n\
+	events:{\n\
+		change:function(){\n\
+			console.log(\"change event 1\");\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+m.on(\"change\",function(){\n\
+	console.log(\"change event 2\");\n\
+})\n\
+// remove events\n\
+m.unbind(\"change\");\n\
+\n\
+// see emit\n\
+console.log(m.set({ a:1,b:2 }));"
+				}
+			]
+		},
+
+		//#model.extend
+		"model:extend" : {
+			title:"Model [ Extend ]",
+			introduce:"<code>model.extend</code>,it provides a way of object-oriented programming",
+			usages:[
+				"new aix.model.extend(defaultOption)",
+			],
+			params:[
+				{ name:"defaultOption", type:"Object" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var m = new aix.model.extend({\n\
+	data:{\n\
+		a : 2\n\
+	},\n\
+	events:{\n\
+		change: function(){\n\
+			console.log(\"data changed!\",this.get());\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+// new m constructor\n\
+var n = new m();\n\
+n.set({ a:1, b:2 });"
+				},
+				{ 
+					title: "Override default option",
+					code:"var m = new aix.model.extend({\n\
+	data:{\n\
+		a : \"abc\"\n\
+	}\n\
+});\n\
+\n\
+// new m constructor\n\
+var n = new m({\n\
+	data:{\n\
+		a : \"213\"\n\
+	},\n\
+	validate:{\n\
+		a : function(val){\n\
+			return typeof val === \"string\";\n\
+		}\n\
+	},\n\
+	events:{\n\
+		\"validate:fail\":function(data,key,val){\n\
+			console.log(\"can't set [\"+key+\"] as (\"+ val +\")\");\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+n.set({ a:1, b:2 });\n\
+console.log(n.get());"
+				}
+			]
+		}
 	});
 });
