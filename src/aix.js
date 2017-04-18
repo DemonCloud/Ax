@@ -80,6 +80,7 @@
 		_ajax     = struct.ajax(),
 		_size     = struct.size(),
 		_first    = struct.first(),
+		_last     = struct.last(),
 		_link     = struct.link(),
 		_doom     = struct.doom();
 
@@ -1784,7 +1785,7 @@
 			set : function(newdata){
 				if(_eq(data,newdata)) return data;
 
-				var args = [_clone(newdata)],error;
+				var args = [_clone(newdata)], error;
 				if((this.emit("validate",args),
 					_isPrim(newdata)?
 					(_isFn(validate) ? validate(newdata) : true):
@@ -1796,7 +1797,7 @@
 
 				this.emit("validate:fail",args.concat(error));
 				if(_isAry(error)&&_size(error)===2)
-					this.emit("validate:fail:"+_first(error),error);
+					this.emit("validate:fail:"+_first(error),[_last(error)]);
 				return data;
 			},
 			enumerable:true,

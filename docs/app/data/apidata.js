@@ -468,8 +468,58 @@ m.sync({\n\
 	}\n\
 });\n\
 // try to change the data\n\
-m.set(\"a\",\"1\");"
+m.set(\"a\",\"1\");\n\
+m.set(\"a\",6);"
 				},
+				{ 
+					title: "Deeping checking",
+					code:"var m = new aix.model({\n\
+	validate:{\n\
+		\"a.b\" : function(value){\n\
+			return typeof value === \"string\";\n\
+		}\n\
+	},\n\
+	events:{\n\
+		\"validate:success\":function(){\n\
+			console.log(\"validate success!\",this.get());\n\
+		},\n\
+		\"validate:fail\":function(){\n\
+			console.log(\"validate fail!\",this.get());\n\
+		}\n\
+	}\n\
+});\n\
+// try to change the data\n\
+m.set(\"a\",[\"b\",\"c\"]);\n\
+m.set(\"a\",{});\n\
+m.set(\"a\",{ b : 6 });\n\
+m.set(\"a\",{ b : \"7\" });"
+				},
+				{ 
+					title: "Error handling",
+					code:"var m = new aix.model({\n\
+	validate:{\n\
+		\"a.b\" : function(value){\n\
+			return typeof value === \"string\";\n\
+		},\n\
+		\"a.c\" : function(value){\n\
+			return +value === value;\n\
+		}\n\
+	},\n\
+	events:{\n\
+		\"validate:fail\":function(set,key,value){\n\
+			console.log(\n\
+				\"set Property [\"+key+\"] with \" + \n\
+				\"(\"+value+\") not pass validate\"\n\
+			);\n\
+		}\n\
+	}\n\
+});\n\
+// try to change the data\n\
+m.set(\"a\",[\"b\",\"c\"]);\n\
+m.set(\"a\",{ b:6, c:2 });\n\
+m.set(\"a\",{ b:\"7\", c:\"2\" })\n\
+console.log(\"see the model's data -> \",m.get());"
+				}
 			]
 		},
 	});

@@ -1579,62 +1579,54 @@ function ajaxPOST(url,param,sucess,error){
 // @use removeEvent
 // @use *emit
 // @export Event
+var _events = {} , _eid=0;
+
 function addEvent(obj,type,fn){
-	if(!obj._events)
-		define(obj,"_events",{
-			value : {},
-			writable : false,
-			enumerable: false,
-			configurable: true
-		});
-	if(!obj._events[type])
-		obj._events[type] = [];
-	if(!has(obj._events[type],fn))
-		obj._events[type].push(fn);
+	var id = obj._eid || 0;
+	if(id === 0) define(obj,"_eid",{ value : (id = (++_eid)), writable : false, enumerable: false, configurable: true });
+	if(!_events[id]) _events[id] = {};
+	if(!_events[id][type]) _events[id][type] = [];
+	if(!has(_events[id][type],fn)) _events[id][type].push(fn);
 	return obj;
 }
 
 function removeEvent(obj,type,fn){
-	if(obj._events){
-		if(obj._events[type]){
-			if(!((not(obj._events[type],fn)).length) || !fn)
-				delete obj._events[type];
+	var id = obj._eid || 0;
+	if(id&&_events[id]){
+		if(_events[id][type]){
+			if(!((not(_events[id][type],fn)).length) || !fn)
+				delete _events[id][type];
 		}else if(!type && !fn){
-			delete obj._events;
+			delete obj._eid;
+			delete _events[id];
 		}
 	}
 	return obj;
 }
 
 function hasEvent(obj,type,fn){
-	var res = false;
-	if(obj._events){
-		if(isFn(fn) && obj._events[type])
-			res = has(obj._events[type],fn);
+	var res = false, id= obj._eid || 0;
+	if(id&&_events[id]){
+		if(isFn(fn) && _events[id][type])
+			res = has(_events[id][type],fn);
 		else
-			res = size(obj._events[type]);
+			res = size(_events[id][type]);
 	}
 	return !!res;
 }
 
-function fireEvent(obj,type,fn,args){
-	var hasFn = isFn(fn);
-
-	if(isArray(fn) && !args){
-		args = fn;
-		fn = null;
-	}
-
-	if(obj._events&&type!=="")
-		ol(obj._events[type],function(f){
-			if(f===fn||!hasFn) f.apply(obj,args||[]);
-		});
+function fireEvent(obj,type,args){
+	var id = obj._eid || 0, args = args||[];
+	if(id && _events[id] && type!=="")
+		ol(_events[id][type],function(f){
+			f.apply(this,args);
+		},obj);
 }
 
-function emit(obj,type,fn,args){
+function emit(obj,type,args){
 	return al(
 		toString(type).split(","),
-		function(t){ fireEvent(this,trim(t),fn,args) },
+		function(t){ fireEvent(this,trim(t),args); },
 		obj
 	),obj;
 }

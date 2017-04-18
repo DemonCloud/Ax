@@ -877,9 +877,10 @@ a i{
 }
 
 .api-examples .example .code{
-	tab-size:2;
  	padding: 20px;
  	margin: 0;
+	-moz-tab-size:2;
+	tab-size:2;
 }
 
 .api-examples .example h5{
