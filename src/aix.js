@@ -44,7 +44,6 @@
 
 	// *use struct utils list
 		root      = struct.root,
-		asy       = struct.asy,
 		v8        = struct.v8(),
 		_keys     = struct.keys(),
 		_noop     = struct.noop(),
@@ -53,6 +52,7 @@
 		_clone    = struct.clone(),
 		_dpclone  = struct.depclone(),
 		_extend   = struct.extend(),
+		_dpextend = struct.depextend(),
 		_eq       = struct.eq(),
 		_toString = struct.convert('string'),
 		_type     = struct.type(),
@@ -108,7 +108,7 @@
 		};
 	}
 
-	function hackaix(origin,extend){
+	function hackAix(origin,extend){
 		var fnstr = _toString(origin),
 			oargs = _toString(origin),
 			eargs = _toString(extend),
@@ -127,10 +127,10 @@
 
 	function createExtend(origin){
 		return function(def){
-			var x = hackaix(aix[origin],aix[origin].extend);
+			var x = hackAix(aix[origin],aix[origin].extend);
 			var extend = eval("(function(ops){ "+
-				"var "+x[0]+"=_extend(_extend({},"+x[1]+"),ops||{}); "+x[2]+
-				"})");
+				"var "+x[0]+"=_dpextend("+x[1]+",ops||{}); "+x[2]+
+			"})");
 
 			_extend(extend.prototype,aix[origin].prototype);
 			return extend;
@@ -152,7 +152,9 @@
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
 	Z = function(elm){
-		this.el = _isAryL(elm) ? _slice(elm) : (elm instanceof Element ? [elm] : []);
+		this.el = _isAryL(elm) ? 
+							_slice(elm) : 
+							(elm instanceof Element ? [elm] : []);
 	};
 
 	z = function(x){
@@ -1704,13 +1706,6 @@
 		// virtual render
 		render : function(newhtml){
 			return this.each(function(elm){
-				// setTimeout(function(){
-				// 	this.apply(elm,this.diff(elm,
-				// 		createDOM(elm,newhtml.nodeType === 1 ? 
-				// 			newhtml.outerHTML : _toString(newhtml))
-				// 		)
-				// 	);
-				// }.bind(this),0);
 				this.apply(elm,this.diff(elm,
 					createDOM(elm,newhtml.nodeType === 1 ? 
 						newhtml.outerHTML : _toString(newhtml))
