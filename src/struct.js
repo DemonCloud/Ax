@@ -1448,7 +1448,7 @@ function aix(option){
 
 	// with POST method
 	cType = isObject(config.header) ? 
-			config.header["Content-Type"] : 
+			(config.header["Content-Type"] || "application/x-www-form-urlencoded" ) : 
 			"application/x-www-form-urlencoded";
 
 	if(config.header !== broken && isObject(config.header))

@@ -391,15 +391,15 @@ m.fetch(function(res){\n\
 		//#model.sync
 		"model:sync" : {
 			title:"Model.sync",
-			introduce:"<code>model.sync</code>",
+			introduce:"<code>model.sync</code> use \"POST\" method to sync the data to Server",
 			usages:[
 				"model.sync()",
-				"model.fetch(header)"
+				"model.sync(header)"
 			],
 			params:[
 				{ name:"header", type:"Object" }
 			],
-			info:"<p>sync</p>",
+			info:"<p>sync with only single param <code>header</code>, use to set [ HTTP Header ]</p>",
 			related:[
 				{ name:"model.send", target:"model:send" },
 				{ name:"model.fetch", target:"model:fetch" }
@@ -416,7 +416,60 @@ m.fetch(function(res){\n\
 });\n\
 // sync data to server\n\
 m.sync();"
+				},
+				{ 
+					title: "Sync with HTTP Header",
+					code:"var m = new aix.model({\n\
+	url:\"ajax/data3\",\n\
+	data:{\n\
+		a:1\n\
+	}\n\
+});\n\
+// sync data to server\n\
+m.sync({\n\
+	SeeConsole : \"Here\"\n\
+});"
 				}
+			]
+		},
+
+		//#model.validate
+		"model:validate" : {
+			title:"Model [ Validate ]",
+			introduce:"<code>model</code> provides a mechanism checker for setting up the data, (this checker will not apply to initialize) before <code>model.change</code>.",
+			usages:[
+				"validate:",
+			],
+			params:[
+				{ name:"validate", type:"Object" }
+			],
+			info:"<p><code>validate</code> should be defined at <code>model</code> initialize, if u set <code>model.validate</code>, it would not be any sense.</p><p><code>validate</code> function should return boolean type for checker</p>",
+			related:[
+				{ name:"model.set", target:"model:set" },
+				{ name:"model.moc", target:"model:moc" },
+				{ name:"model.fetch", target:"model:fetch" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var m = new aix.model({\n\
+	validate:{\n\
+		a : function(value){\n\
+			return typeof value === \"number\";\n\
+		}\n\
+	},\n\
+	events:{\n\
+		\"validate:success\":function(){\n\
+			console.log(\"validate success!\",this.get());\n\
+		},\n\
+		\"validate:fail\":function(){\n\
+			console.log(\"validate fail!\",this.get());\n\
+		}\n\
+	}\n\
+});\n\
+// try to change the data\n\
+m.set(\"a\",\"1\");"
+				},
 			]
 		},
 	});
