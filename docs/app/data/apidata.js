@@ -815,14 +815,14 @@ v.render({ text: rs(5) });"
 			]
 		},
 
-		//#view.compile
-		"view:compile" : {
-			title:"View [ compile ]",
-			introduce:"<code>view.compile</code> is methods collection ember in template, it must define at initialize",
+		//#view.props
+		"view:props" : {
+			title:"View [ props ]",
+			introduce:"<code>view.props</code> is methods collection ember in template, it must define at initialize",
 			usages:[
-				"compile:",
+				"props:",
 			],
-			info:"care about <code>compile</code> object methods name, dont make same name to <code>render-data</code>",
+			info:"care about <code>props</code> object methods name, dont make same name to <code>render-data</code>",
 			related:[
 				{ name:"view.mount", target:"view:mount" },
 				{ name:"view.render", target:"view:render" }
@@ -833,7 +833,7 @@ v.render({ text: rs(5) });"
 					preview:"base",
 					code:"var v = new aix.view({\n\
 	template:\"Hi! {{#capit(random(length))}}\",\n\
-	compile:{\n\
+	props:{\n\
 		// dont make method name as 'length'\n\
 		capit : struct.string(\"capitalize\"),\n\
 		random : struct.random(\"string\")\n\

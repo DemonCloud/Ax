@@ -17,7 +17,7 @@ function(){
 			"model:extend",
 			"view:events",
 			"view:mount",
-			"view:compile",
+			"view:props",
 			"view:render",
 			"view:extend",
 			"route:listen",

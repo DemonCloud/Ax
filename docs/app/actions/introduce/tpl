@@ -157,7 +157,7 @@ var view = new aix.view({
 			'&lt;b class="del" key=&#123;&#123;-i&#125;&#125;&gt;×&lt;/b&gt;&lt;/li&gt;'+
 		'&#123;&#123;* end &#125;&#125;'+
 		'&lt;/ul&gt;',
-	compile:{
+	props:{
 		cap: struct.string("capit")
 	},
 	events:{

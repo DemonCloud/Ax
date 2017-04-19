@@ -2020,11 +2020,11 @@
 			render = config.render,
 			events = config.events,
 			stencil = config.template,
-			compile = config.compile;
+			props = config.props;
 
 		delete config.root;
 		delete config.mount;
-		delete config.compile;
+		delete config.props;
 		delete config.events;
 		delete config.render;
 		delete config.template;
@@ -2033,7 +2033,7 @@
 		// building the render function
 		if(!_isFn(render)){
 			stencil = (typeof stencil === "string") ? 
-				_doom(stencil,_isObj(compile) ? compile : {}) : 
+				_doom(stencil, _isObj(props) ? props : {}) : 
 				(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){ 

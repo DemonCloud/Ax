@@ -67,7 +67,7 @@ function(aix,tags,tpl){
 									 ' 	 </li>'+
 									 '{{* end }}'+
 									 '</ul>',
-					compile:{
+					props:{
 						cap: struct.string("capit")
 					},
 					events:{
