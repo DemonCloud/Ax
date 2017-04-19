@@ -778,7 +778,7 @@ v.mount(\n\
 			params:[
 				{ name:"...args", type:"AnyType" }
 			],
-			info:"<p>create render function must define <code>root</code> property at initialize.</p><p></p>",
+			info:"<p>create render function must define <code>root</code> property at initialize.</p><p></p><p>u should be care about rewrite render function with <code>(view.render = somefunction )</code>, because rewrite render function make view repackage render events</p>",
 			related:[
 				{ name:"view.mount", target:"view:mount" }
 			],
@@ -799,7 +799,9 @@ v.mount(\n\
 				{ 
 					title: "Custom render",
 					preview:"base3",
-					code:"var v = new aix.view({\n\
+					code:"var rs = struct.random(\"string\");\n\
+\n\
+var v = new aix.view({\n\
 	root:document.getElementById(\"base3\"),\n\
 	render: function(data){\n\
 		var div = document.createElement(\"div\");\n\
@@ -808,8 +810,179 @@ v.mount(\n\
 	}\n\
 });\n\
 \n\
-v.render({ text: \"Samke\" });"
+v.render({ text: rs(5) });"
 				},
+			]
+		},
+
+		//#view.compile
+		"view:compile" : {
+			title:"View [ compile ]",
+			introduce:"<code>view.compile</code> is methods collection ember in template, it must define at initialize",
+			usages:[
+				"compile:",
+			],
+			info:"care about <code>compile</code> object methods name, dont make same name to <code>render-data</code>",
+			related:[
+				{ name:"view.mount", target:"view:mount" },
+				{ name:"view.render", target:"view:render" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					preview:"base",
+					code:"var v = new aix.view({\n\
+	template:\"Hi! {{#capit(random(length))}}\",\n\
+	compile:{\n\
+		// dont make method name as 'length'\n\
+		capit : struct.string(\"capitalize\"),\n\
+		random : struct.random(\"string\")\n\
+	}\n\
+});\n\
+\n\
+v.mount(\n\
+	document.getElementById(\"base\"),\n\
+	{ length: 6 }\n\
+)"
+				}
+			]
+		},
+
+		//#view.events
+		"view:events" : {
+			title:"View [ events ]",
+			introduce:"<code>view.events</code> provide a complete mechanism within the view on delegate DOM elements and their own custom events for binding. The event is different form <code>model</code>, <code>route</code>",
+			usages:[
+				"view.on(type,fn)",
+				"view.emit(type,args)",
+				"view.unbind(type,fn)",
+			],
+			params:[
+				{ name:"type", type:"String" },
+				{ name:"fn", type:"Function" },
+				{ name:"args", type:"Array" }
+			],
+			info:"<p><code>view.emit</code> trigger event with mutilp assembly like <code>view.emit(\"event1,event2,event3,...\", [args])</code></p><h2 tc=4>Build-in events</h2>\n\
+<table>\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Event Name</th>\n\
+			<th>Event Info</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>init</td>\n\
+			<td>when view create, it will trigger <b>once time</b> ( even if it not mount or not trigger render )</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>beforeRender</td>\n\
+			<td>before calling the <b>render</b> function</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>completed</td>\n\
+			<td>when <b>render</b> completed</td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+",
+			examples:[
+				{ 
+					title: "Basic usage",
+					preview:"v1",
+					code:"var v = new aix.view({\n\
+	root:document.getElementById(\"v1\"),\n\
+	template:\"{{-number}}\",\n\
+	events:{\n\
+		init: function(){\n\
+			this.render({ number: 2 });\n\
+		}\n\
+	}\n\
+});"
+				},
+				{ 
+					title: "Detect beforeRender",
+					preview:"v2",
+					code:"var v = new aix.view({\n\
+	root:document.getElementById(\"base\"),\n\
+	template:\"{{-number}}\"\n\
+});\n\
+\n\
+v.on(\"beforeRender\",function(data){\n\
+	data.number += 2;\n\
+});\n\
+\n\
+v.mount(\n\
+	document.getElementById(\"v2\"),\n\
+	{ number : 8 }\n\
+)"
+				},
+				{ 
+					title: "Custom event",
+					preview:"v3",
+					code:"var v = new aix.view({\n\
+	template:\"&lt;input id='t' &gt;\" +\n\
+					 \"&lt;button&gt;send&lt;/button&gt;\",\n\
+	events:{\n\
+		\"click:button\":function(event){\n\
+			event.preventDefault();\n\
+			var input = document.getElementById(\"t\");\n\
+\n\
+			// event.data.self -> view *this\n\
+			event.data.self.emit(\n\
+				\"send\",\n\
+				[input.value,input.value = \"\"]\n\
+			);\n\
+		},\n\
+\n\
+		send:function(msg){\n\
+			alert(\"your msg [ \" +\n\
+						msg +\n\
+						\" ]\ has been send!\"\n\
+			);\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+v.mount(\n\
+	document.getElementById(\"v3\"),\n\
+	void 0\n\
+)"
+				}
+			]
+		},
+
+		//#view.extend
+		"view:extend" : {
+			title:"View [ Extend ]",
+			introduce:"<code>view.extend</code>,it provides a way of object-oriented programming",
+			usages:[
+				"new aix.view.extend(defaultOption)",
+			],
+			params:[
+				{ name:"defaultOption", type:"Object" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					preview:"v",
+					code:"var v = new aix.view.extend({\n\
+	root: document.getElementById(\"v\"),\n\
+	template: \"&lt;span&gt;{{-code}}&lt;/span&gt;\",\n\
+	events: {\n\
+		init : function(){\n\
+			this.render(this.state);\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+// extend v\n\
+var view = new v({\n\
+	state : {\n\
+		code : \"JavaScript\"\n\
+	}\n\
+});"
+				}
 			]
 		},
 	});

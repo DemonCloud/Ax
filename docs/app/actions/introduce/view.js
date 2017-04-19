@@ -14,7 +14,7 @@ function(aix,tags,tpl){
 			beforeRender:function(data){
 				console.log("#introduce randering");
 			},
-			complete:function(data){
+			completed:function(data){
 				sh_highlightDocument(tags.make());
 
 				//#example1

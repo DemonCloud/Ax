@@ -258,6 +258,10 @@ hr{
 	background-color: #eee;
 	width: 100%;
 	border: 0;
+	margin: 20px 0;
+  background: rgba(0,0,0,0.20);
+  background: -moz-linear-gradient(left center, rgba(138, 56, 56, 0.0) rgba(138, 56, 56, 0.33) 50%, rgba(138, 56, 56, 0.0));
+  background: -webkit-gradient(linear,left top,right top,from(rgba(138, 56, 56, 0.0)), color-stop(0.5, rgba(138, 56, 56, 0.33)), to(rgba(138, 56, 56, 0.0)));
 }
 
 h1,h2,h3,h4,h5,h6{
@@ -377,6 +381,8 @@ a i{
   min-width: 0;
   max-width:210px;
   background-color:#eee;
+	border-right: 1px solid #8a3838;
+  box-shadow: inset -6px 0 18px rgba(0, 0, 0, 0.1);
 }
 
 .main .content{
@@ -462,7 +468,7 @@ a i{
 
 .s-title{
 	margin:0;
-	font-size: 40px;
+	font-size: 26px;
 	text-transform: uppercase;
 }
 
@@ -589,6 +595,10 @@ a i{
 	-webkit-user-select:none;
 	-moz-user-select:none;
 	user-select:none;
+}
+
+.s-menu-section .s-caption i{
+	vertical-align: middle;
 }
 
 .s-menu-section .s-caption:hover{
@@ -880,7 +890,8 @@ a i{
 }
 
 .api-examples .example .code{
- 	padding: 20px;
+	font-size:12px;
+ 	padding: 40px 20px 20px;
  	margin: 0;
  	height: 100%;
  	max-height: 100%;
@@ -928,7 +939,7 @@ a i{
 .api-examples .example-preview .example-mount{
 	position: relative;
 	display:block;
-	padding:10px 20px;
+	padding:30px 20px 20px;
 }
 
 .api-related .relate-link{

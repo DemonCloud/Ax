@@ -16,7 +16,7 @@ function(aix,tags,code,tpl){
 			beforeRender:function(data){
 				console.log("#api randering");
 			},
-			complete:function(data){
+			completed:function(data){
 				sh_highlightDocument(tags.make(code.make()));
 			}
 		}

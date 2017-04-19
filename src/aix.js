@@ -1968,7 +1968,7 @@
 			packComplete(view)
 		);
 		return function(){
-			return pack(_slice(arguments));
+			return pack(arguments);
 		};
 	}
 
@@ -1986,12 +1986,31 @@
 
 	function packComplete(view){
 		return function(args){
-			return view.emit("complete",args),view;
+			return view.emit("completed",args),view;
 		};
 	}
 
+	function setRender(view,render){
+		var that = packRender(view,render);
+		_define(view,"render",{
+			get : function(){
+				return that;
+			},
+			set : function(fn){
+				if(_isFn(fn))
+					that = packRender(view,fn);
+				return that;
+			},
+			enumerable:true,
+			configurable:false
+		});
+		return view;
+	}
+
 	function checkElm(el){
-		return el instanceof Element || _isAryL(el);
+		if(!(el instanceof Element || _isAryL(el)))
+				throw new TypeError("el must be typeof DOMElement or NodeList collections -> not " + el);
+		return true;
 	}
 
 	// bind selector
@@ -2028,26 +2047,24 @@
 			};
 		}
 
-		// package
-		render = packRender(this,render);
-
 		// if userobj has more events
 		if(vroot&&checkElm(vroot)){
-			this.root = vroot; this.render = render;
-			_fol(events,uon,this);
+			// bind events
+			this.root = vroot;
+			_fol(events,uon,setRender(this,render));
 		}else{
 			this.mount = function(el){
-				if(!checkElm(el))
-					throw new TypeError("el must be typeof DOMElement or NodeList collections -> not " + el);
-				this.root = vroot = el; this.render = render;
-				// bind events
-				_fol(events,uon,this);
+				if(checkElm(el)){
+					// bind events
+					this.root = vroot = el; 
+					_fol(events,uon,setRender(this,render));
 
-				// trigger render 
-				if(1 in arguments)
-					this.render.apply(this,_slice(arguments,1));
-				// delete mount
-				return delete this.mount, this;
+					// trigger render 
+					if(1 in arguments)
+						this.render.apply(this,_slice(arguments,1));
+					// delete mount
+					return delete this.mount, this;
+				}
 			};
 		}
 

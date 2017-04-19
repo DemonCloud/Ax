@@ -49,7 +49,7 @@
 			<h5 tc=6>{{#e.title}}</h5>
 			<section style="display:flex">
 				<div class="example-code">
-					<pre class="code sh_javascript" style="background-color: #f7f7f7; padding: 20px; font-size: 12px; margin:0">{{#e.code}}</pre>
+					<pre class="code sh_javascript" style="background-color: #f7f7f7;">{{#e.code}}</pre>
 				</div>
 
 				<div class="example-preview">
