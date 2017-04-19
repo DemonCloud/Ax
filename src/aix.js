@@ -45,6 +45,7 @@
 	// *use struct utils list
 		root      = struct.root,
 		v8        = struct.v8(),
+		_lock     = struct.lock(),
 		_keys     = struct.keys(),
 		_noop     = struct.noop(),
 		_define   = struct.define(),
@@ -83,11 +84,6 @@
 		_last     = struct.last(),
 		_link     = struct.link(),
 		_doom     = struct.doom();
-
-	// frozen api
-	function frozen(){
-		_fal(_slice(arguments),Object.freeze);
-	}
 
 	// aix genertor function
 	function genertor_(api){
@@ -2268,7 +2264,7 @@
 	aM.extend = createExtend("model");
 	aR.extend = createExtend("route");
 
-	frozen(aM,aV,aR,v8(aix));
+	_lock(aM,aV,aR,v8(aix));
 
 	return aix;
 });

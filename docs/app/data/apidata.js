@@ -729,6 +729,88 @@ n.set({ a:1, b:2 });\n\
 console.log(n.get());"
 				}
 			]
-		}
+		},
+
+		//#view.mount
+		"view:mount" : {
+			title:"View [ mount ]",
+			introduce:"<code>mount</code> is once-time function to initialize view ( if not set <code>root</code> property )",
+			usages:[
+				"view.mount(elm)",
+				"view.mount(elm,initdata)"
+			],
+			params:[
+				{ name:"elm", type:"DOMElement,DOMHTMLCollection" },
+				{ name:"initdata", type:"Object" }
+			],
+			info:"<p>if <code>view</code> not define <code>root</code> property, the view will not create <code>render</code> function</p> <p>just create <code>mount</code> once-time function, call <code>mount</code> then create <code>render</code> method</p>",
+			related:[
+				{ name:"view.render", target:"view:render" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					preview:"base",
+					code:"var v = new aix.view({\n\
+	template:\"&lt;span&gt;Hello {{-text}}&lt;/span&gt;\",\n\
+	events:{\n\
+		\"click:span\":function(){\n\
+			alert(this.innerHTML);\n\
+		}\n\
+	}\n\
+});\n\
+// mount to elm\n\
+v.mount(\n\
+	document.getElementById(\"base\"),\n\
+	{ text : \"Mary\" }\n\
+)"
+				}
+			]
+		},
+
+		//#view.render
+		"view:render" : {
+			title:"View [ render ]",
+			introduce:"<code>render</code> function create at view initialize ( if set <code>root</code> property )",
+			usages:[
+				"view.render(...args)",
+			],
+			params:[
+				{ name:"...args", type:"AnyType" }
+			],
+			info:"<p>create render function must define <code>root</code> property at initialize.</p><p></p>",
+			related:[
+				{ name:"view.mount", target:"view:mount" }
+			],
+			examples:[
+				{ 
+					title: "Basic init",
+					preview:"base2",
+					code:"var v = new aix.view({\n\
+	root:document.getElementById(\"base2\"),\n\
+	template:\"Hi! {{-text}}\",\n\
+	events:{\n\
+		init: function(){\n\
+			this.render({ text: \"Cloud\" });\n\
+		}\n\
+	}\n\
+});"
+				},
+				{ 
+					title: "Custom render",
+					preview:"base3",
+					code:"var v = new aix.view({\n\
+	root:document.getElementById(\"base3\"),\n\
+	render: function(data){\n\
+		var div = document.createElement(\"div\");\n\
+		div.innerHTML = data.text;\n\
+		return this.root.appendChild(div);\n\
+	}\n\
+});\n\
+\n\
+v.render({ text: \"Samke\" });"
+				},
+			]
+		},
 	});
 });

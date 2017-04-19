@@ -768,7 +768,7 @@ a i{
 .it-example .ite-code:before,
 .it-example .ite-preview:before,
 .api-examples .example-code:before,
-.api-examples .example-preview:before{
+.api-examples .example-preview .example-mount:before{
 	position: absolute;
 	display: table;
 	line-height: 1;
@@ -882,6 +882,8 @@ a i{
 .api-examples .example .code{
  	padding: 20px;
  	margin: 0;
+ 	height: 100%;
+ 	max-height: 100%;
 	-moz-tab-size:2;
 	tab-size:2;
 }
@@ -902,6 +904,11 @@ a i{
 	content:"code"
 }
 
+.api-examples .example-preview .example-mount:before{
+	right:0;
+	content:"preview - [ "attr(id)" ]"
+}
+
 .api-examples .example-preview{
 	flex:5;
 }
@@ -916,6 +923,12 @@ a i{
 .api-examples .example-code .btn i{
 	font-size:12px;
 	vertical-align:-1px;
+}
+
+.api-examples .example-preview .example-mount{
+	position: relative;
+	display:block;
+	padding:10px 20px;
 }
 
 .api-related .relate-link{

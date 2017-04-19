@@ -1822,6 +1822,16 @@ function sort(ary,key){
 	return ary;
 }
 
+function exist(check){
+	var args = slice(arguments,1);
+	if(check)
+		last(args).apply(null,args);
+}
+
+function frozen(){
+	al(castArray.apply(null,arguments),Object.freeze);
+}
+
 // _ chain stack [ method ]
 // @use wrap
 // @use chain
@@ -2203,12 +2213,6 @@ function $doom(config){
 	);
 }
 
-function exist(check){
-	var args = slice(arguments,1);
-	if(check)
-		last(args).apply(null,args);
-}
-
 // signet API
 var nublist = {
 	chain     : _,
@@ -2255,6 +2259,7 @@ var nublist = {
 	now       : now,
 	sort      : sort,
 	exist     : exist,
+	lock      : frozen,
 	v8        : v8
 };
 
