@@ -64,7 +64,8 @@ var m = new aix.model({\n\
 	}\n\
 });\n\
 // get data \n\
-console.log(m.get(\"a.d\",size));"
+console.log(m.get(\"a.d\",size));\n\
+console.log(m.get(\"a.d\",JSON.stringify));"
 				}
 			]
 		},
@@ -1227,7 +1228,7 @@ console.log(arr);"
 			]
 		},
 
-		//#struct.extend
+		//#struct.depextend
 		"struct:depextend" : {
 			title:"depextend",
 			introduce:"<code>struct.depextend</code> use to extend property for origin object, will <b>change</b> origin and return itself",
@@ -1287,5 +1288,88 @@ console.log(keys(arr));"
 				}
 			]
 		},
+
+		//#struct.noop
+		"struct:noop" : {
+			title:"noop",
+			introduce:"<code>struct.noop</code> point at useless function", 
+			usages:[
+				"noop -> struct.noop()",
+			],
+			info:"<p>Generally make useless function point to it</p>"
+		},
+
+		//#struct.clone
+		"struct:clone" : {
+			title:"clone",
+			introduce:"<code>struct.clone</code> base , fast copy Object and Array",
+			usages:[
+				"clone -> struct.clone()",
+				"clone(obj)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+			],
+			related:[
+				{ name:"struct.depclone", target:"struct:depclone" }
+			],
+			info:"<p>For arrays, the clone method just shallow copy, for object, clone copies only pure data objects</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var clone = struct.clone();\n\
+var obj = { a:1, b:2 };\n\
+var obj2 = clone(obj);\n\
+\n\
+console.log(obj,obj2,obj===obj2);"
+				},
+				{ 
+					title: "Clone array",
+					code:"var clone = struct.clone();\n\
+var arr = [{a:1},{b:2}];\n\
+var arr2 = clone(arr);\n\
+\n\
+// care about array\n\
+console.log(arr2,arr===arr2,arr[0]===arr2[0]);"
+				}
+			]
+		},
+
+		//#struct.depclone
+		"struct:depclone" : {
+			title:"depclone",
+			introduce:"deeping clone the Object, Array with there prototypes",
+			usages:[
+				"depclone -> struct.depclone()",
+				"depclone(obj)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+			],
+			related:[
+				{ name:"struct.clone", target:"struct:clone" }
+			],
+			info:"<p>deeping clone copy the Object, Array completed with there data and prototype</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var clone = struct.depclone();\n\
+var obj = { a:1, b:2 };\n\
+var obj2 = clone(obj);\n\
+\n\
+console.log(obj,obj2,obj===obj2);"
+				},
+				{ 
+					title: "Clone array",
+					code:"var clone = struct.depclone();\n\
+var arr = [{a:1},{b:2}];\n\
+var arr2 = clone(arr);\n\
+\n\
+// care about array\n\
+console.log(arr2,arr===arr2,arr[0]===arr2[0]);"
+				}
+			]
+		},
+
 	});
 });
