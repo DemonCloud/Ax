@@ -74,6 +74,7 @@
 		_setProp  = struct.prop('set'),
 		_rmProp   = struct.prop('not'),
 		_param    = struct.param(),
+		_paramStr = struct.param("string"),
 		_trim     = struct.string('trim'),
 		_one      = struct.index('one'),
 		_has      = struct.has(),
@@ -1853,10 +1854,8 @@
 
 		// API event
 		on : on,
-
-		unbind : unbind,
-
 		emit : emit,
+		unbind : unbind,
 
 		// Aix Restful API design for
 		// [Aix Model] data format serialize
@@ -2188,12 +2187,10 @@
 	// auto trigger regex event when route change
 	aR.prototype = {
 		on : on,
-
+		emit : emit,
 		unbind : unbind,
 
-		emit : emit,
-
-		listen: function(hash){
+		listen: function(hash,param){
 			if(!this._listen){
 				_define(this,"_listen",{
 					value:!root.addEventListener("hashchange",this.event),
@@ -2203,7 +2200,7 @@
 				});
 				
 				return hash ? 
-					this.assign(hash) : 
+					this.assign(hash,param) : 
 					this.emit("hashchange",[root.location.href,this.char]);
 			}
 			return this;
@@ -2222,7 +2219,9 @@
 				if(hashindex > 0)
 					url = url.slice(0,hashindex);
 
-				root.location.href = url + (hash.toString().slice(0,1)==="#"?"":"#") + hash;
+				root.location.href = url + 
+					(hash.toString().slice(0,1)==="#"?"":"#") + hash + 
+					(_isObj(param) ? ((this.char||"@")+_paramStr(param)) : "");
 			}
 			return this;
 		},

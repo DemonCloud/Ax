@@ -62,7 +62,7 @@
 			</li>
 			<li>
 				<a href="#cap@s=view" tc=2>
-					<i class="ion-ios-photos"></i> 
+					<i class="ion-ionic"></i> 
 					<b> View</b>
 				</a>
 				<span> - The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events emitter and virtual DOM rendering mechanism by default way.</span>

@@ -537,7 +537,7 @@ console.log(\"see the model's data -> \",m.get());"
 				{ name:"fn", type:"Function" },
 				{ name:"args", type:"Array" }
 			],
-			info:"<p>if not enter <code>fn</code> args, the <code>model.unbind</code>, would remove events of <code>type</code>,</p><p>if not <code>type</code> param, it will remove all the events for this model.</p> <p>model has some basic events , see this table: </p> <h2 tc=4>built-in events</h2>\n\
+			info:"<p>if not enter <code>fn</code> args, the <code>model.unbind</code>, would remove events of <code>type</code>,</p><p>if not <code>type</code> param, it will remove all the events for this model.</p> <p>model has some basic events , see this table: </p> <h2 tc=4>Built-in events</h2>\n\
 <table>\n\
 	<thead>\n\
 		<tr>\n\
@@ -862,7 +862,7 @@ v.mount(\n\
 				{ name:"fn", type:"Function" },
 				{ name:"args", type:"Array" }
 			],
-			info:"<p><code>view.emit</code> trigger event with mutilp assembly like <code>view.emit(\"event1,event2,event3,...\", [args])</code></p><h2 tc=4>Build-in events</h2>\n\
+			info:"<p><code>view.emit</code> trigger event with mutilp assembly like <code>view.emit(\"event1,event2,event3,...\", [args])</code></p><h2 tc=4>Built-in events</h2>\n\
 <table>\n\
 	<thead>\n\
 		<tr>\n\
@@ -982,6 +982,308 @@ var view = new v({\n\
 		code : \"JavaScript\"\n\
 	}\n\
 });"
+				}
+			]
+		},
+
+		//#route.listen
+		"route:listen" : {
+			title:"Route.listen",
+			introduce:"<code>route.listen</code> let route start listening the change",
+			usages:[
+				"route.listen()",
+				"route.listen(default)",
+				"route.listen(default,params)"
+			],
+			related:[
+				{ name:"route.assign", target:"route:assign" }
+			],
+			params:[
+				{ name:"default", type:"String" },
+				{ name:"params",  type:"Object" }
+			],
+			info:"<p>use it to start <code>routes</code> actions</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var route = new aix.route({\n\
+	routes:{\n\
+		\"^post\":\"renderPost\"\n\
+	},\n\
+	actions:{\n\
+		renderPost:function(param){\n\
+			alert(\n\
+				\"goto hash post! \" + \n\
+				JSON.stringify(param)\n\
+			);\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+route.listen(\"post\",{a:1,b:2});"
+				},
+				{ 
+					title: "Init",
+					not: true,
+					code:"var route = new aix.route({\n\
+	routes:{\n\
+		\"^index\":\"index\"\n\
+	},\n\
+	actions:{\n\
+		index:function(param){\n\
+			// ...\n\
+		}\n\
+	},\n\
+	events:{\n\
+		init:function(){\n\
+			// auto start listen at create\n\
+			this.listen();\n\
+		}\n\
+	}\n\
+});\n\
+"
+				}
+			]
+		},
+
+		//#route.stop
+		"route:stop" : {
+			title:"Route.stop",
+			introduce:"<code>route.stop</code> let route stop listening the change.",
+			usages:[
+				"route.stop()"
+			],
+			info:"<p>use it to stop <code>routes</code> actions</p>"
+		},
+
+		//#route.assign
+		"route:assign" : {
+			title:"Route.assign",
+			introduce:"<code>route.assign</code> trigger hashchange",
+			usages:[
+				"route.assign(hash)",
+				"route.assign(hash,params)"
+			],
+			related:[
+				{ name:"route.listen", target:"route:listen" }
+			],
+			params:[
+				{ name:"hash", type:"String" },
+				{ name:"params", type:"Object" }
+			],
+			info:"do not add param char in hash string",
+			examples:[
+				{ 
+					title: "Basic usage",
+					not : true,
+					code:"// assign to route \"post\" with param \n\
+var route = new aix.route( /*...*/ )\n\
+route.assign(\"post\",{ id : 10243 });"
+				},
+			]
+		},
+
+		//#route.events
+		"route:events" : {
+			title:"Route [ events ]",
+			introduce:"<code>route.events</code> base events method with route",
+			usages:[
+				"route.on(type,fn)",
+				"route.emit(type,args)",
+				"route.unbind(type,fn)",
+			],
+			params:[
+				{ name:"type", type:"String" },
+				{ name:"fn", type:"Function" },
+				{ name:"args", type:"Array" }
+			],
+			info:"<p><code>view.emit</code> </p><h2 tc=4>Built-in events</h2>\n\
+<table>\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Event Name</th>\n\
+			<th>Event Info</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>init</td>\n\
+			<td>when route create, it will trigger <b>once time</b></td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+",
+			examples:[
+				{ 
+					title: "Basic usage",
+					not : true,
+					code:"var v = new aix.route({\n\
+	events:{\n\
+		init: function(){\n\
+			this.listen(\"index\");\n\
+		}\n\
+	}\n\
+});"
+				}
+			]
+		},
+
+		//#route.extend
+		"route:extend" : {
+			title:"Route [ Extend ]",
+			introduce:"<code>route.extend</code>,it provides a way of object-oriented programming",
+			usages:[
+				"new aix.route.extend(defaultOption)",
+			],
+			params:[
+				{ name:"defaultOption", type:"Object" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					not: true,
+					code:"var route = new aix.route.extend({\n\
+		routes : { /* ... */ },\n\
+		actions : { /* ... */ },\n\
+		init : function(){\n\
+			this.listen(\"index\");\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+// extend route\n\
+var r = new route();"
+				}
+			]
+		},
+
+		//#struct.define
+		"struct:define" : {
+			title:"define",
+			introduce:"<code>struct.define</code> use to define property for object",
+			usages:[
+				"define -> struct.define()",
+				"define(obj,name,props)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array,Function" },
+				{ name:"name", type:"String,Object(properties)" },
+				{ name:"props", type:"Object" },
+			],
+			info:"<p>this use method contain <b>Object.defineProperty</b> and <b>Object.defineProperties</b></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var define = struct.define();\n\
+var obj = {};\n\
+\n\
+define(obj,\"a\",{\n\
+	value: 1,\n\
+	configurable:false,\n\
+	enumerable:true,\n\
+	writable:false\n\
+});\n\
+\n\
+console.log(obj);\n\
+obj.a = 2;\n\
+console.log(obj);"
+				},
+			]
+		},
+
+		//#struct.extend
+		"struct:extend" : {
+			title:"extend",
+			introduce:"<code>struct.extend</code> use to extend property for origin object, will change <b>not</b> origin and return itself",
+			usages:[
+				"extend -> struct.extend()",
+				"extend(org,obj)"
+			],
+			params:[
+				{ name:"org", type:"Object,Array" },
+				{ name:"obj", type:"Object,Array" },
+			],
+			related:[
+				{ name:"struct.depextend", target:"struct:depextend" }
+			],
+			info:"<p>extend method can also use for Array</p><p>method compress to <code>aix.model</code>, use it as <code>model.extend(target)</code> (compress model data)</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var extend = struct.extend();\n\
+var obj = {};\n\
+\n\
+extend(obj,{ a:1,b:2 });\n\
+console.log(obj);"
+				},
+				{ 
+					title: "Use for Array",
+					code:"var extend = struct.extend();\n\
+var arr = [1,2,3,4];\n\
+\n\
+extend(arr,[5,6,7]);\n\
+console.log(arr);"
+				}
+			]
+		},
+
+		//#struct.extend
+		"struct:depextend" : {
+			title:"depextend",
+			introduce:"<code>struct.depextend</code> use to extend property for origin object, will <b>change</b> origin and return itself",
+			usages:[
+				"depextend -> struct.depextend()",
+				"depextend(org,obj)"
+			],
+			params:[
+				{ name:"org", type:"Object,Array" },
+				{ name:"obj", type:"Object,Array" },
+			],
+			related:[
+				{ name:"struct.extend", target:"struct:extend" }
+			],
+			info:"<p>depextend method can also use for Array</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var extend = struct.depextend();\n\
+var obj = {};\n\
+\n\
+var b = extend(obj,{ a:1,b:2 });\n\
+console.log(obj,b);"
+				},
+				{ 
+					title: "Use for Array",
+					code:"var extend = struct.depextend();\n\
+var arr = [1,2,3,4];\n\
+\n\
+var b = extend(arr,[5,6,7]);\n\
+console.log(arr,b);"
+				}
+			]
+		},
+
+		//#struct.keys
+		"struct:keys" : {
+			title:"keys",
+			introduce:"<code>struct.keys</code> use to extend property for origin object, will <b>change</b> origin and return itself",
+			usages:[
+				"keys -> struct.keys()",
+				"keys(obj)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+			],
+			info:"<p>Progressive enhancement with this keys method</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var keys = struct.keys();\n\
+var obj = {a:1,b:2};\n\
+var arr = [1,2,3];\n\
+\n\
+console.log(keys(obj));\n\
+console.log(keys(arr));"
 				}
 			]
 		},

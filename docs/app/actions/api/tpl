@@ -41,6 +41,7 @@
 	</div>
 	{{* end }}
 
+	{{* exist examples }}
 	<div class="api-examples">
 		<h3 t=6>Examples</h3>
 
@@ -49,7 +50,8 @@
 			<h5 tc=6>{{#e.title}}</h5>
 			<section style="display:flex">
 				<div class="example-code">
-					<pre class="code sh_javascript" style="background-color: #f7f7f7;">{{#e.code}}</pre>
+					<pre class="{{#e.not ? "not-code" : "code"}} sh_javascript" 
+						style="background-color: #f7f7f7;">{{#e.code}}</pre>
 				</div>
 
 				<div class="example-preview">
@@ -61,6 +63,6 @@
 		</div>
 		{{* end }}
 	</div>
-
+	{{* end }}
 	<hr>
 </article>

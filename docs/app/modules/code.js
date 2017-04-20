@@ -18,7 +18,7 @@ function(struct){
 				event.preventDefault();
 				event.stopPropagation();
 
-				eval("(function(){\n"+runcode+"\n}())");
+				return eval("(function(){ \"use strict\";\n"+runcode+"\n}())");
 			};
 
 			elm.parentNode.appendChild(runbtn);

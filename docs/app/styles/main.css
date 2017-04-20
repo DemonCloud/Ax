@@ -845,7 +845,7 @@ a i{
 .api-usage .usage-example{
 	display: table;
 	font-size: 14px;
-	padding: 2px 11px;
+	padding: 0px 11px 2px;
 	color: #fff;
 	background-color: #8a3838;
 	margin-bottom: 12px;
@@ -862,7 +862,7 @@ a i{
 	display: inline-block;
 	padding: 0 8px 2px;
 	color: #868686;
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: normal;
 	margin: 0;
 	line-height: 1.2;
@@ -889,7 +889,8 @@ a i{
 	zoom:1;
 }
 
-.api-examples .example .code{
+.api-examples .example .code,
+.api-examples .example .not-code{
 	font-size:12px;
  	padding: 40px 20px 20px;
  	margin: 0;
