@@ -611,15 +611,19 @@ a i{
 	display: table;
 	width: auto;
 	font-size:14px;
-	color:#8a3838;
+	color: #9c6d6d;
+	/* color:#8a3838; */
 	text-decoration: none;
 	text-transform: none;
 	padding: 2px 5px;
 	padding-left:10px;
 	margin-bottom: 2px;
+
+	transition: color .1s cubic-bezier(0.3, 0.81, 1, 1) , font-weight .1s cubic-bezier(0.3, 0.81, 1, 1);
 }
 
 .s-menu-section .s-link:hover{
+	color:#8a3838;
 	font-weight:bold;
 	text-decoration:underline;
 }
@@ -847,7 +851,7 @@ a i{
 	font-size: 14px;
 	padding: 0px 11px 2px;
 	color: #fff;
-	background-color: #8a3838;
+	background-color: #9c6d6d;
 	margin-bottom: 12px;
 	border-radius: 2px;
 }
