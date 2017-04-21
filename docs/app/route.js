@@ -35,26 +35,17 @@ cap
 			else
 				alert("do not get fuck off hash change?");
 			throw new TypeError("fuck you with make bich off hash url?");
-		},
-		cap:function(param){
-			if(has(ruleList.cap,param.s))
-				return param.s;
-			else
-				alert("do not get fuck off hash change?");
-			throw new TypeError("fuck you with make bich off hash url?");
 		}
 	};
 
 	var app = new aix.route({
 		routes:{
 			"^introduce$" : "index",
-			"^api$"       : "api",
-			"^cap$"       : "cap"
+			"^api$"       : "api"
 		},
 		actions:{
 			index : introduce,
-			api   : _(check.api,api),
-			cap   : _(check.cap,cap)
+			api   : _(check.api,api)
 		}
 	});
 

@@ -1311,6 +1311,7 @@ console.log(keys(arr));"
 				{ name:"obj", type:"Object,Array" },
 			],
 			related:[
+				{ name:"struct.slice", target:"struct:slice" },
 				{ name:"struct.depclone", target:"struct:depclone" }
 			],
 			info:"<p>For arrays, the clone method just shallow copy, for object, clone copies only pure data objects</p>",
@@ -1371,5 +1372,180 @@ console.log(arr2,arr===arr2,arr[0]===arr2[0]);"
 			]
 		},
 
+		//#struct.not
+		"struct:not" : {
+			title:"not",
+			introduce:"<code>struct.not</code> use to remove target value in Object, Array",
+			usages:[
+				"not -> struct.not()",
+				"not(obj,find)",
+				"not(obj,find,useEqual)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+				{ name:"find", type:"AnyType (exist RegExp)" },
+				{ name:"useEqual", type:"Boolean" },
+			],
+			related:[
+				{ name:"struct.cat", target:"struct:cat" },
+				{ name:"struct.find(filter)", target:"struct:find" }
+			],
+			info:"support <b>RegExp</b> to match the value what u wanto remove",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var not = struct.not();\n\
+var obj = [1,2,3,4,5,6];\n\
+var obj2 = [1,2,3,4,5,6,7];\n\
+\n\
+not(obj,2);\n\
+not(obj2,4);\n\
+\n\
+console.log(obj,obj2);"
+				},
+				{ 
+					title: "Use equal",
+					code:"var not = struct.not();\n\
+var obj = [{a:1},{b:2},{c:3},{d:4}];\n\
+\n\
+// use equal compare\n\
+not(obj,{a:1},true);\n\
+\n\
+console.log(obj);"
+				},
+				{ 
+					title: "Use RegExp",
+					code:"var not = struct.not();\n\
+var obj = [\"abc\",\"sbc\",\"eds\",\"bce\",\"acb\"];\n\
+\n\
+// use RegExp to compare\n\
+not(obj,/bc/,true);\n\
+\n\
+console.log(obj);"
+				},
+				{ 
+					title: "For Object",
+					code:"var not = struct.not();\n\
+var obj = { a:1,b:2,c:3,d:1,e:1 };\n\
+\n\
+not(obj,1);\n\
+\n\
+console.log(obj);"
+				}
+			]
+		},
+
+		//#struct.cat
+		"struct:cat" : {
+			title:"cat",
+			introduce:"<code>struct.cat</code> use to remove target and cat remove value for return",
+			usages:[
+				"cat -> struct.cat()",
+				"cat(obj,idf)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+				{ name:"idf", type:"AnyType (exist RegExp)" },
+			],
+			related:[
+				{ name:"struct.not", target:"struct:not" }
+			],
+			info:"support <b>RegExp</b> to match the value what u wanto remove and cat",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var cat = struct.cat();\n\
+var obj = [1,2,3,4,5,6];\n\
+var cobj = cat(obj,function(n){ return n>3 });\n\
+// part2\n\
+var obj2 = [1,1,3,4,5];\n\
+var cobj2 = cat(obj2,1);\n\
+\n\
+console.log(obj,cobj);\n\
+console.log(obj2,cobj2);"
+				},
+				{ 
+					title: "Use Regexp",
+					code:"var cat = struct.cat();\n\
+var obj = [\"abc\",\"asd\",\"vjs\",\"bsd\",\"zos\"];\n\
+var cobj = cat(obj,/a/);\n\
+\n\
+console.log(obj,cobj);"
+				},
+				{ 
+					title: "For Object",
+					code:"var cat = struct.cat();\n\
+var obj = {a:1,b:2,c:3,d:4,f:5};\n\
+var cobj = cat(obj,function(v){ return v>3 });\n\
+\n\
+console.log(obj,cobj);"
+				}
+			]
+		},
+
+		//#struct.slice
+		"struct:slice" : {
+			title:"slice",
+			introduce:"<code>struct.slice</code> fast copy Array(shawllow) and convert ArrayLike to array",
+			usages:[
+				"slice -> struct.slice()",
+				"slice(obj)"
+			],
+			params:[
+				{ name:"obj", type:"Array" }
+			],
+			related:[
+				{ name:"struct.clone", target:"struct:clone" }
+			],
+			info:"<p>use it to copy Array or convert ArrayLike( arguments )</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var slice = struct.slice();\n\
+var obj = [1,2,3,4];\n\
+console.log(slice(obj));"
+				},
+				{
+					title: "Slice arguments",
+					code:"var slice = struct.slice();\n\
+var fn = function(){\n\
+	return slice(arguments);\n\
+};\n\
+console.log(fn(1,2,3,\"4\"));"
+				}
+			]
+		},
+
+		//#struct.find
+		"struct:find" : {
+			title:"find",
+			introduce:"<code>struct.find</code> fast filter value for Object and Array", 
+			usages:[
+				"alias: (filter)",
+				"find -> struct.find()",
+				"filter -> struct.filter()",
+				"find(obj,idf)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+				{ name:"idf", type:"AnyType"  }
+			],
+			related:[
+				{ name:"struct.not", target:"struct:not" },
+				{ name:"struct.cat", target:"struct:cat" }
+			],
+			info:"<p>use to filter Object</p><p>it return new <code>copy</code></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var find = struct.find();\n\
+var obj = [1,2,3,4];\n\
+var fobj = find(obj,function(n){\n\
+	return n>2;\n\
+});\n\
+console.log(obj,fobj);"
+				}
+			]
+		},
 	});
 });

@@ -84,13 +84,6 @@ function(){
 			"struct:random",
 			"struct:string",
 			"struct:doom"
-		],
-		cap:[
-			"model",
-			"view",
-			"route",
-			"single",
-			"mixed"
 		]
 	});
 });
