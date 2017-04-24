@@ -1528,9 +1528,10 @@ console.log(fn(1,2,3,\"4\"));"
 			],
 			params:[
 				{ name:"obj", type:"Object,Array" },
-				{ name:"idf", type:"AnyType"  }
+				{ name:"idf", type:"Function,RegExp"  }
 			],
 			related:[
+				{ name:"struct.reject", target:"struct:reject" },
 				{ name:"struct.not", target:"struct:not" },
 				{ name:"struct.cat", target:"struct:cat" }
 			],
@@ -1544,8 +1545,200 @@ var fobj = find(obj,function(n){\n\
 	return n>2;\n\
 });\n\
 console.log(obj,fobj);"
+				},
+				{ 
+					title: "Use RegExp",
+					code:"var find = struct.find();\n\
+var obj = [\"abc\",\"cad\",\"sad\",\"csv\",\"dfa\",\"bfw\"];\n\
+var fobj = find(obj,/d/)\n\
+console.log(obj,fobj);"
+				},
+				{ 
+					title: "For Object",
+					code:"var find = struct.find();\n\
+var obj = { a:\"as\", b:\"sd\", c:\"saw\", d:\"vc\" }\n\
+var fobj = find(obj,/a/)\n\
+console.log(obj,fobj);"
 				}
 			]
 		},
+
+		//#struct.reject
+		"struct:reject" : {
+			title:"reject",
+			introduce:"<code>struct.reject</code> fast filter value for Object and Array, reverse to filter", 
+			usages:[
+				"reject -> struct.reject()",
+				"reject(obj,idf)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+				{ name:"idf", type:"Function,RegExp"  }
+			],
+			related:[
+				{ name:"struct.find(filter)", target:"struct:find" },
+				{ name:"struct.not", target:"struct:not" },
+				{ name:"struct.cat", target:"struct:cat" }
+			],
+			info:"<p>use to filter Object</p><p>it return new <code>copy</code></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var reject = struct.reject();\n\
+var obj = [1,2,3,4];\n\
+var fobj = reject(obj,function(n){\n\
+	return n>2;\n\
+});\n\
+console.log(obj,fobj);"
+				},
+				{ 
+					title: "Use RegExp",
+					code:"var reject = struct.reject();\n\
+var obj = [\"abc\",\"cad\",\"sad\",\"csv\",\"dfa\",\"bfw\"];\n\
+var fobj = reject(obj,/d/)\n\
+console.log(obj,fobj);"
+				},
+				{ 
+					title: "For Object",
+					code:"var reject = struct.reject();\n\
+var obj = { a:\"as\", b:\"sd\", c:\"saw\", d:\"vc\" }\n\
+var fobj = reject(obj,/a/)\n\
+console.log(obj,fobj);"
+				}
+			]
+		},
+
+		//#struct.every
+		"struct:every" : {
+			title:"every",
+			introduce:"<code>struct.every</code> check if all the value pass identify", 
+			usages:[
+				"every -> struct.every()",
+				"every(obj,idf)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+				{ name:"idf", type:"Function,RegExp"  }
+			],
+			related:[
+				{ name:"struct.some", target:"struct:some" },
+			],
+			info:"<p>Also can use for RegExp</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var every = struct.every();\n\
+var obj = [1,2,3,4];\n\
+var fobj = every(obj,function(n){\n\
+	return n>0;\n\
+});\n\
+console.log(fobj);"
+				}
+			]
+		},
+
+		//#struct.some
+		"struct:some" : {
+			title:"some",
+			introduce:"<code>struct.some</code> check if there is at least one pass identify", 
+			usages:[
+				"some -> struct.some()",
+				"some(obj,idf)"
+			],
+			params:[
+				{ name:"obj", type:"Object,Array" },
+				{ name:"idf", type:"Function,RegExp"  }
+			],
+			related:[
+				{ name:"struct.every", target:"struct:every" },
+			],
+			info:"<p>Also can use for RegExp</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var some = struct.some();\n\
+var obj = [1,2,3,4];\n\
+var fobj = some(obj,function(n){\n\
+	return n>3;\n\
+});\n\
+console.log(fobj);"
+				}
+			]
+		},
+
+		//#struct.diff
+		"struct:diff" : {
+			title:"diff",
+			introduce:"<code>struct.diff</code> diff the Array", 
+			usages:[
+				"diff -> struct.diff()",
+				"diff(...args)"
+			],
+			params:[
+				{ name:"args", type:"Array" },
+			],
+			related:[
+				{ name:"struct.intsec", target:"struct:intsec" },
+			],
+			info:"diff any length Array arguments",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var diff = struct.diff();\n\
+var df = diff([1,2,3,4],[0,3,4]);\n\
+console.log(df);"
+				},
+				{ 
+					title: "Mutilp usage",
+					code:"var diff = struct.diff();\n\
+var df = diff([0,3,4],[2,0,1,4],[\"3\",3]);\n\
+console.log(df);"
+				},
+				{ 
+					title: "With single value",
+					code:"var diff = struct.diff();\n\
+var df = diff([0,4],3,4,[\"3\",3]);\n\
+console.log(df);"
+				}
+			]
+		},
+
+		//#struct.diff
+		"struct:intsec" : {
+			title:"intsec",
+			introduce:"<code>struct.intsec</code> intsec same values the Array", 
+			usages:[
+				"intsec -> struct.intsec()",
+				"intsec(...args)"
+			],
+			params:[
+				{ name:"args", type:"Array" },
+			],
+			related:[
+				{ name:"struct.diff", target:"struct:diff" },
+			],
+			info:"intsec same any length Array arguments",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var intsec = struct.intsec();\n\
+var df = intsec([1,2,4],[2,4],[4,2]);\n\
+console.log(df);"
+				},
+				{ 
+					title: "Mutilp usage",
+					code:"var intsec = struct.intsec();\n\
+var df = intsec([0,3],[2,0,3],[\"3\",0]);\n\
+console.log(df);"
+				},
+				{ 
+					title: "For same object",
+					code:"var intsec = struct.intsec();\n\
+var df = intsec([{a:1}],[{a:1},{b:1}],[{a:1},{c:2}]);\n\
+console.log(df);"
+				}
+			]
+		}
+
 	});
 });

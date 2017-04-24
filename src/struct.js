@@ -768,42 +768,26 @@ function concat(){
 // @export *intsec
 // diff([1,2],[2,3],[1,3,4],[5]) => [4,5]
 function diff(){
-	var res =[], 
-			pact = concat.apply([],arguments), 
-			ite = isFn(last(pact)) ? pact.pop() : false;
-
-	for(var i=0,l=pact.sort().length;i<l;){
-		var p = pact[i] ,list = index(pact, ite ? cit(ite,p) : p),
-				n = isArray(list) ? list.length : 1;
-		if(n===1)
-			res.push(pact[i]) && i++;
-		else
-			i+=n;
-	}
-	
+	var res = [];
+	for(var tmp = concat.apply([],arguments),
+			s = tmp.shift(tmp.push(tmp.length-1)); 
+			tmp.length !== 0; s = tmp.shift())
+			has(tmp,s,true) ? not(tmp,s,true) : res.push(s);
 	return res;
 }
 
 // intersection([1,2],[2,3],[2,3,4]) => [2]
 function intersection(){
-	var args = slice(arguments),
-			ite = isFn(last(args)) ? args.pop() : false,
-			pact = slimUnique(concat.apply([],args),true),
-			res = [];
+	var res = [], pact = slice(arguments);
+	pact.reduce(function(cot,arr){
+		var r = [];
+		if(size(cot) && size(arr))
+			al(cot,function(value){
+				if(has(this,value,true)) 
+					r.push(value); },arr);
+		return (res = r);
+	},pact.shift()||[]);
 
-	al(pact,function(key){
-		var all = true;
-		for(var i=args.length; i--;){
-			if(index(
-				isArray(args[i])?args[i]:[args[i]],
-				ite ? cit(ite,key) : key)===null
-			){
-				all = false; break;
-			}
-		}
-		if(all) res.push(key);
-	});
-	
 	return res;
 }
 
@@ -812,9 +796,7 @@ function intersection(){
 // @export merge
 // merge([1,2,3],[2,1,3],[3,4],[1,5]) => [1,2,3,4,5]
 function merge(){
-	var args = slice(arguments),
-			useq = isDefine(last(args),"Boolean") ? args.pop():false;
-	return slimUnique(concat.apply([],args),useq);
+	return slimUnique(concat.apply([],arguments),true);
 }
 
 // Drop array [ method ]
