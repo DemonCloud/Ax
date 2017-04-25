@@ -754,7 +754,7 @@ function chunk(ary,size){
 // save pure number filter the false value
 // compact([1,'',false,2,undefined,null,[],3]) => [1,2,[],3]
 function compact(ary){
-	return ary.filter(cool);
+	return filter(ary,cool);
 }
 
 function concat(){
@@ -2003,7 +2003,14 @@ function $index(c){
 }
 
 function $map(c){
-	return c === "key" ? mapKey : mapValue;
+	switch ((c||"").toLowerCase()) {
+		case 'key':
+			return mapKey;
+		case 'hook':
+			return hook;
+		default:
+			return mapValue;
+	}
 }
 
 function $unique(c){
@@ -2215,7 +2222,6 @@ var nublist = {
 	some      : some,
 	diff      : diff,
 	intsec    : intersection,
-	hook      : hook,
 	chunk     : chunk,
 	compact   : compact,
 	pluck     : pluck,

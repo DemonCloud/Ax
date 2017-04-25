@@ -1703,7 +1703,7 @@ console.log(df);"
 			]
 		},
 
-		//#struct.diff
+		//#struct.intsec
 		"struct:intsec" : {
 			title:"intsec",
 			introduce:"<code>struct.intsec</code> intsec same values the Array", 
@@ -1738,7 +1738,56 @@ var df = intsec([{a:1}],[{a:1},{b:1}],[{a:1},{c:2}]);\n\
 console.log(df);"
 				}
 			]
-		}
+		},
 
+		//#struct.chunk
+		"struct:chunk" : {
+			title:"chunk",
+			introduce:"<code>struct.chunk</code> make part for array", 
+			usages:[
+				"chunk -> struct.chunk()",
+				"chunk(arr,size)"
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+				{ name:"size", type:"Number" },
+			],
+			info:"default size part of 2",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var chunk = struct.chunk();\n\
+console.log(chunk([1,2,3,4,5,6],3));"
+				},
+				{ 
+					title: "Default part",
+					code:"var chunk = struct.chunk();\n\
+console.log(chunk([1,2,3,4,5,6]));"
+				}
+			]
+		},
+
+		//#struct.compact
+		"struct:compact" : {
+			title:"compact",
+			introduce:"<code>struct.compact</code> filter true value for Array", 
+			usages:[
+				"compact -> struct.compact()",
+				"compact(arr)"
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+			],
+			related:[
+				{ name:"struct.find(filter)", target:"struct:find" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var compact = struct.compact();\n\
+console.log(compact([null,1,undefined,2,\"0\",0,\"a\",true,false]));"
+				},
+			]
+		}
 	});
 });
