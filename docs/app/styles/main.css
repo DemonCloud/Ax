@@ -91,11 +91,13 @@ dfn {
   font-style: italic;
 }
 mark {
-	background-color: #eee;
-	color: #a0a0a0;
-	padding: 1px 7px;
-	margin-bottom: 10px;
-	display: inline-block;
+  background-color: #9e6868;
+  color: #ead9d9;
+  padding: 0 8px 1px;
+  border-radius: 1px;
+  font-size: 12px;
+  margin-bottom: 10px;
+  display: inline-block;
 }
 small {
   font-size: 80%;
@@ -240,6 +242,7 @@ template {
 body{
 	font-family:"Titillium","Jura","Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size:14px;
+	color:#282828;
 	background-color:#fff;
 	line-height: 1.6024236872;
 
@@ -496,7 +499,7 @@ a i{
 	max-width:240px;
 	border: 1px solid #ccc;
 	border-radius: 3px;
-	box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 6px 18px -1px rgba(0, 0, 0, 0.1);
 }
 
 .s-search .s-search-key{
@@ -751,7 +754,8 @@ a i{
 }
 
 .it-block{
-	margin-bottom:10px;
+	display:block;
+	padding:20px 0;
 }
 
 .it-example{
@@ -762,13 +766,11 @@ a i{
 
 .it-example-info{
 	display:block;
-	padding-left:10px;
-	font-size:20px;
+	font-size:22px;
 	font-weight:bold;
 	color:#888;
-	border-left:4px solid;
 	line-height:1.1;
-	margin:20px 0;
+	padding:30px 0;
 }
 
 .it-example .ite-code,
@@ -848,8 +850,8 @@ a i{
 
 .api-usage .usage-example{
 	display: table;
-	font-size: 14px;
-	padding: 0px 11px 2px;
+	font-size: 13px;
+	padding: 0px 10px 2px;
 	color: #fff;
 	background-color: #9c6d6d;
 	margin-bottom: 12px;
@@ -857,18 +859,18 @@ a i{
 }
 
 .api-params .param{
-  font-size: 16px;
   /* text-transform: capitalize; */
   margin-bottom: 6px;
 }
 
 .api-params .param b {
 	display: inline-block;
-	padding: 0 8px 2px;
+	padding: 0 4px 1px;
 	color: #868686;
 	font-size: 12px;
 	font-weight: normal;
 	margin: 0;
+	margin-right: 2px;
 	line-height: 1.2;
 	vertical-align: 1px;
 	background-color: #dadada;
@@ -965,7 +967,7 @@ a i{
 .api-info table th,
 .api-info table td{
 	padding: 15px 10px;
-	border-bottom:1px solid #f1f1f1;
+	border-bottom:1px solid #f6f6f6;
 }
 
 .api-info table td{

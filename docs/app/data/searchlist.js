@@ -1,11 +1,6 @@
 define("data/searchlist",
 [],function(){
 	return Object.freeze([
-		{ n:"cap:model" ,         k: ["model","data","aix.model"] },
-		{ n:"cap:view"  ,         k: ["view","ui","interface","aix.view"] },
-		{ n:"cap:route" ,         k: ["route","hash","aix.route"] },
-		{ n:"cap:single",         k: ["single","struct","api"] },
-		{ n:"cap:mixed" ,         k: ["mixed","struct","api"] },
 		{ n:"api:model.get",      k: ["get","data"] },
 		{ n:"api:model.set",      k: ["set","data"] },
 		{ n:"api:model.send",     k: ["send","data"] },

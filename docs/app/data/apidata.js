@@ -1788,6 +1788,440 @@ console.log(chunk([1,2,3,4,5,6]));"
 console.log(compact([null,1,undefined,2,\"0\",0,\"a\",true,false]));"
 				},
 			]
-		}
+		},
+
+		//#struct.pluck
+		"struct:pluck" : {
+			title:"pluck",
+			introduce:"<code>struct.pluck</code> collect target values list", 
+			usages:[
+				"pluck -> struct.pluck()",
+				"pluck(list,mapkey)",
+				"pluck(list,mapkey,dowith)"
+			],
+			params:[
+				{ name:"list", type:"Array,Object" },
+				{ name:"mapkey", type:"String" },
+				{ name:"dowith", type:"String,Function" },
+			],
+			related:[
+				{ name:"struct.groupBy", target:"struct:groupBy" },
+				{ name:"struct.countBy", target:"struct:countBy" }
+			],
+			info:"<p>use the dowith to fack the value</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var pluck = struct.pluck();\n\
+var data = { \n\
+	a : { a : 1, b : 6 }, \n\
+	b : { a : 2, b : 5 }, \n\
+	c : { a : 3, b : 4 }, \n\
+	d : { a : 4, b : 3 }, \n\
+	e : { a : 5, b : 2 }, \n\
+	f : { a : 6, b : 1 } \n\
+};\n\
+console.log(pluck(data,\"a\"));\n\
+console.log(pluck(data,\"b\",\"toString\"));"
+				},
+				{ 
+					title: "Deeping key",
+					code:"var pluck = struct.pluck();\n\
+var data = { \n\
+	a : [ { a:[1,2] }, { b:[6,7] } ], \n\
+	b : [ { a:[2,3] }, { b:[5,6] } ], \n\
+	c : [ { a:[3,4] }, { b:[4,5] } ], \n\
+	d : [ { a:[4,5] }, { b:[3,4] } ], \n\
+	e : [ { a:[5,6] }, { b:[2,3] } ], \n\
+	f : [ { a:[6,7] }, { b:[1,2] } ] \n\
+};\n\
+console.log(pluck(data,\"0.a.1\"));\n\
+console.log(pluck(data,\"1.b.0\",\"toString\"));"
+				}
+			]
+		},
+
+		//#struct.groupBy
+		"struct:groupBy" : {
+			title:"groupBy",
+			introduce:"<code>struct.groupBy</code> group part of data", 
+			usages:[
+				"groupBy -> struct.groupBy()",
+				"groupBy(list,by)",
+			],
+			params:[
+				{ name:"list", type:"Array" },
+				{ name:"by", type:"String,Function" },
+			],
+			related:[
+				{ name:"struct.pluck", target:"struct:pluck" },
+				{ name:"struct.countBy", target:"struct:countBy" }
+			],
+			info:"<p>use the dowith to fack the value</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var groupBy = struct.groupBy();\n\
+var data = [ \n\
+	{ name : \"Nike\"   , score : 68 }, \n\
+	{ name : \"Joye\"   , score : 30 }, \n\
+	{ name : \"Sam\"    , score : 81 }, \n\
+	{ name : \"Cloudy\" , score : 22 }, \n\
+	{ name : \"Marry\"  , score : 98 }, \n\
+	{ name : \"Leon\"   , score : 94 } \n\
+];\n\
+var check = groupBy(data,function(item){\n\
+	return item.score>60 ? \"pass\" : \"notpass\";\n\
+});\n\
+console.log(check);"
+				},
+				{ 
+					title: "By porperty",
+					code:"var groupBy = struct.groupBy();\n\
+var data = [ \n\
+	{ name : \"Nike\"   , course : [1,3] }, \n\
+	{ name : \"Nike\"   , course : [6,9] }, \n\
+	{ name : \"Sam\"    , course : [1] }, \n\
+	{ name : \"Cloudy\" , course : [4,6] }, \n\
+	{ name : \"Sam\"    , course : [2,4] }, \n\
+	{ name : \"Leon\"   , course : [9] } \n\
+];\n\
+var check = groupBy(data,\"name\")\n\
+console.log(check);"
+				}
+			]
+		},
+
+		//#struct.countBy
+		"struct:countBy" : {
+			title:"countBy",
+			introduce:"<code>struct.countBy</code> group part of data", 
+			usages:[
+				"countBy -> struct.countBy()",
+				"countBy(list,by)",
+			],
+			params:[
+				{ name:"list", type:"Array" },
+				{ name:"by", type:"String,Function" },
+			],
+			related:[
+				{ name:"struct.pluck", target:"struct:pluck" },
+				{ name:"struct.groupBy", target:"struct:groupBy" }
+			],
+			info:"<p>use the dowith to fack the value</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var countBy = struct.countBy();\n\
+var data = [ \n\
+	{ name : \"Nike\"   , score : 68 }, \n\
+	{ name : \"Joye\"   , score : 30 }, \n\
+	{ name : \"Sam\"    , score : 81 }, \n\
+	{ name : \"Cloudy\" , score : 22 }, \n\
+	{ name : \"Marry\"  , score : 98 }, \n\
+	{ name : \"Leon\"   , score : 94 } \n\
+];\n\
+var check = countBy(data,function(item){\n\
+	return item.score>60 ? \"pass\" : \"notpass\";\n\
+});\n\
+console.log(check);"
+				},
+				{ 
+					title: "By porperty",
+					code:"var countBy = struct.countBy();\n\
+var data = [ \n\
+	{ name : \"Nike\"   , course : [1,3] }, \n\
+	{ name : \"Nike\"   , course : [6,9] }, \n\
+	{ name : \"Sam\"    , course : [1] }, \n\
+	{ name : \"Cloudy\" , course : [4,6] }, \n\
+	{ name : \"Sam\"    , course : [2,4] }, \n\
+	{ name : \"Leon\"   , course : [9] } \n\
+];\n\
+var check = countBy(data,\"name\")\n\
+console.log(check);"
+				}
+			]
+		},
+
+		//#struct.concat
+		"struct:concat" : {
+			title:"concat",
+			introduce:"<code>struct.concat</code> concat mutilp array", 
+			usages:[
+				"concat -> struct.concat()",
+				"concat(..args)"
+			],
+			params:[
+				{ name:"..args", type:"Array,SingleValue" },
+			],
+			related:[
+				{ name:"struct.merge", target:"struct:merge" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var concat = struct.concat();\n\
+console.log(concat([1,2],[3,4,5],6,[7],8))"
+				},
+			]
+		},
+
+		//#struct.cast
+		"struct:cast" : {
+			title:"cast",
+			introduce:"<code>struct.cast</code> fast cast arguments", 
+			usages:[
+				"cast -> struct.cast()",
+				"cast(..args)"
+			],
+			params:[
+				{ name:"..args", type:"AnyType" },
+			],
+			related:[
+				{ name:"struct.concat", target:"struct:concat" },
+				{ name:"struct.merge", target:"struct:merge" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var cast = struct.cast();\n\
+console.log(cast([1,2],[3,4,5],6,[7],8));"
+				},
+			]
+		},
+
+		//#struct.shuffle
+		"struct:shuffle" : {
+			title:"shuffle",
+			introduce:"<code>struct.shuffle</code> array of random sequence", 
+			usages:[
+				"shuffle -> struct.shuffle()",
+				"shuffle()"
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var shuffle = struct.shuffle();\n\
+console.log(shuffle([1,2,3,4,5,6]));\n\
+console.log(shuffle([1,2,3,4,5,6]));"
+				},
+			]
+		},
+
+		//#struct.first
+		"struct:first" : {
+			title:"first",
+			introduce:"<code>struct.first</code> first value in array", 
+			usages:[
+				"first -> struct.first()",
+				"first(ary)"
+			],
+			params:[
+				{ name:"ary", type:"Array" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var first = struct.first();\n\
+console.log(first([1,2,3]));"
+				},
+			]
+		},
+
+		//#struct.last
+		"struct:last" : {
+			title:"last",
+			introduce:"<code>struct.last</code> last value in array", 
+			usages:[
+				"last -> struct.last()",
+				"last(ary)"
+			],
+			params:[
+				{ name:"ary", type:"Array" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var last = struct.last();\n\
+console.log(last([1,2,3]));"
+				},
+			]
+		},
+
+		//#struct.flat
+		"struct:flat" : {
+			title:"flat",
+			introduce:"<code>struct.flat</code> deconstruction array", 
+			usages:[
+				"flat -> struct.flat()",
+				"flat(arr,deep)",
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+				{ name:"deep", type:"Boolean" },
+			],
+			related:[
+				{ name:"struct.merge", target:"struct:merge" },
+				{ name:"struct.pluck", target:"struct:pluck" }
+			],
+			info:"<p>default use a layer of flat</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var flat = struct.flat();\n\
+console.log(flat([1,2,[3,4,[5,6,[7,8]]]]));"
+				},
+				{ 
+					title: "Deeping flat",
+					code:"var flat = struct.flat();\n\
+console.log(flat([1,2,[3,4,[5,6,[7,8]]]],true));"
+				},
+			]
+		},
+
+		//#struct.merge
+		"struct:merge" : {
+			title:"merge",
+			introduce:"<code>struct.merge</code> merge the same data on mutilp array", 
+			usages:[
+				"merge -> struct.merge()",
+				"merge(...args)",
+			],
+			params:[
+				{ name:"args", type:"Array" },
+			],
+			related:[
+				{ name:"struct.concat", target:"struct:concat" },
+				{ name:"struct.unique", target:"struct:unique" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var merge = struct.merge();\n\
+console.log(merge([1,2,3],[2,4,3],[2,1],[5,1]));"
+				}
+			]
+		},
+
+		//#struct.auto
+		"struct:auto" : {
+			title:"auto",
+			introduce:"<code>struct.auto</code> random slice part in Array  or String", 
+			usages:[
+				"auto -> struct.auto()",
+				"auto(arr)",
+				"auto(arr,num)",
+			],
+			params:[
+				{ name:"arr", type:"Array,String" },
+				{ name:"num", type:"Number" },
+			],
+			related:[
+				{ name:"struct.shuffle", target:"struct:shuffle" },
+				{ name:"struct.random", target:"struct:random" }
+			],
+			info:"<p>default part size 1</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var auto = struct.auto();\n\
+console.log(auto([1,2,3,4,5]));\n\
+console.log(auto([1,2,3,4,5],3));"
+				},
+				{ 
+					title: "For String",
+					code:"var auto = struct.auto();\n\
+console.log(auto(\"Hello\"));\n\
+console.log(auto(\"SKULLCANDY\",3));"
+				}
+			]
+		},
+
+		//#struct.part
+		"struct:part" : {
+			title:"part",
+			introduce:"<code>struct.part</code> generate part times function", 
+			usages:[
+				"part -> struct.part()",
+				"part(fn)",
+				"part(fn,times)",
+			],
+			params:[
+				{ name:"fn", type:"Function" },
+				{ name:"times", type:"Number" },
+			],
+			related:[
+				{ name:"struct.once", target:"struct:once" },
+			],
+			info:"<p>default part size 1, if not has <code>times</code> param, the <code>part(fn)</code> equal to use <code>once(fn)</code></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var part = struct.part();\n\
+var a = 0;\n\
+var fn = part(function(){ a++; },2);\n\
+// run it 4 times\n\
+fn();fn();fn();fn();\n\
+console.log(a);"
+				},
+			]
+		},
+
+		//#struct.once
+		"struct:once" : {
+			title:"once",
+			introduce:"<code>struct.once</code> generate once times function", 
+			usages:[
+				"once -> struct.once()",
+				"once(fn)",
+			],
+			params:[
+				{ name:"fn", type:"Function" },
+			],
+			related:[
+				{ name:"struct.part", target:"struct:part" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var once = struct.once();\n\
+var a = 0;\n\
+var fn = once(function(){ a++; });\n\
+// run it 4 times\n\
+fn();fn();fn();fn();\n\
+console.log(a);"
+				},
+			]
+		},
+
+		//#struct.eq
+		"struct:eq" : {
+			title:"eq",
+			introduce:"<code>struct.eq</code> advanced method to compare isEqual", 
+			usages:[
+				"eq -> struct.eq()",
+				"eq(a,b)",
+			],
+			params:[
+				{ name:"a,b", type:"AnyType" },
+			],
+			info:"<p>By default, we use <code>==</code> and <code>===</code> to compare two variable in JavaScript. Think that : <code>{a:1}==={a:1}</code>, In theory，we believe that as long as the key and value are the same object should be equal</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var eq = struct.eq();\n\
+console.log({a:1}==={a:1});\n\
+console.log(eq({a:1},{a:1}));"
+				},
+				{ 
+					title: "Complex data",
+					code:"var eq = struct.eq();\n\
+console.log(eq(\n\
+	[{a:[{b:1,c:[2,{d:3,e:[4,5]}]}]}],\n\
+	[{a:[{b:1,c:[2,{d:3,e:[4,5]}]}]}]\n\
+));"
+				},
+			]
+		},
 	});
 });

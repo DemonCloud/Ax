@@ -8,8 +8,7 @@ define("route",
 
 // actions
 "actions/introduce/export",
-"actions/api/export",
-"actions/cap/export"
+"actions/api/export"
 ],
 function(
 aix,
@@ -18,15 +17,15 @@ struct,
 ruleList,
 
 introduce,
-api,
-cap
+api
 ){
 	'use strict';
 
+	// make aix as GLOBAL
 	struct.root.aix = aix;
 
 	var has = struct.has(),
-			_ = struct.link();
+			_   = struct.link();
 
 	var check = {
 		api:function(param){
@@ -50,7 +49,7 @@ cap
 	});
 
 	// route start
-	app.listen(
+	return app.listen(
 		window.location.hash ? 
 		void 0 : 
 		"introduce"

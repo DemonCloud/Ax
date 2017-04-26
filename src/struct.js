@@ -39,7 +39,7 @@
 
 // Strict mode
 // define const
-struct.VERSION = 1.0;
+struct.VERSION = "1.0";
 
 // base method
 var or = {},
@@ -649,33 +649,48 @@ function hook(list,hookname){
 }
 
 // pluck contain [ method ]
-function pluck(list,mapkey){
-	var res = [];
+function pluck(list,mapkey,dowith){
+	var res = [], keyname = toString(mapkey);
 	fov(list,function(item){
-		var key = keys(item);
-		for( var i=key.length; i--; )
-			if(key[i]===toString(mapkey))
-				this.push(item[key[i]]);
+		var v = getProp(item,mapkey,dowith);
+		return v !== void 0 && this.push(v);
 	},res);
 	return res;
 }
 
 // groupBy [ method ]
 function groupBy(list,by){
-	if(isArray(list)){
-		var group = {},
-				func  = isFn(by);
-		fov(list,function(val){
-			var key = func ? by(val) : val[by];
+	var group = {},
+		func  = isFn(by);
+	fov(list,function(val){
+		var key = func ? by(val) : getProp(val,by);
+		if(key){
 			if(!this[key])
 				// first time should init group check
 				this[key] = [val];
 			else
 				this[key].push(val);
-		},group);
-		return group;
-	}
-	return list;
+		}
+	},group);
+	return group;
+}
+
+// countBy [ method ]
+// countBy(['abc','de','fg'],'length') => {2: 2, 3: 1}
+// countBy([3.1, 1.4, 1.2, 2.2],Math.floor) => {1: 2, 2: 1, 3: 1}
+function countBy(list,by){
+	var res = {},
+		fn = isFn(by);
+	fov(list,function(val){
+		var key = fn ? by(val) : getProp(val,by);
+		if(key){
+			if(!res[key])
+				this[key] = 1;
+			else
+				this[key] += 1;
+		}
+	},res);
+	return res;
 }
 
 // Pairs Object to array 
@@ -1634,7 +1649,7 @@ function emit(obj,type,args){
 
 // define deeping getProp method
 function getProp(obj,prop,dowith){
-	var tmp,i,keygen = (prop||"").split(".");
+	var tmp,i,keygen = toString(prop||"").split(".");
 
 	if(keygen.length === 1){
 		if(obj.hasOwnProperty(prop))
@@ -1694,22 +1709,6 @@ function rmProp(obj,prop){
 
 // function unwatch(obj,prop){
 // }
-
-// countBy [ method ]
-// countBy(['abc','de','fg'],'length') => {2: 2, 3: 1}
-// countBy([3.1, 1.4, 1.2, 2.2],Math.floor) => {1: 2, 2: 1, 3: 1}
-function countBy(ary,by){
-	var res = {};
-	var fn = isFn(by);
-	fov(ary,function(val,key){
-		var getkey = (fn ? by(val) : val[by]);
-		if(!res[getkey])
-			res[getkey] = 1;
-		else
-			res[getkey] += 1;
-	});
-	return res;
-}
 
 // return random element [ method ]
 // auto([1,2,3,4,5]) => random(in ary);

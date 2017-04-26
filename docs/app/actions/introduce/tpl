@@ -11,19 +11,19 @@
 		<br>
 
 		<p>The <b>Aix</b> compress file <b>10KB(gzip)</b> , with struct pack only <b>18KB(gzip)</b> </p>
-		
-		<mark>Latest version - 1.0</mark>
+		<br>
+		<mark>Latest version - {{#struct.VERSION}}</mark>
 		<p>
-			<span>Pack with <code>struct</code> 18KB(gzip) - </span>
+			<span>Pack with <code>struct</code> - </span>
 			<a href="app/scripts/libs/aix.c.js" rel="donload" download='aix.s.js'>
-				<i class="ion-android-checkmark-circle"></i>
+				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
 				aix.s.js (53k)
 			</a>
 		</p>
 		<p>
-			<span>Single <code>aix</code> 10KB(gzip) - </span>
+			<span>Single <code>aix</code> - </span>
 			<a href="app/scripts/libs/aix.min.js" rel="donload" download='aix.min.js'>
-				<i class="ion-android-checkmark-circle"></i>
+				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
 				aix.min.js (30k)
 			</a>
 		</p>
@@ -47,28 +47,28 @@
 		<h3 class="target" t=2>{{#cap1}}</h3>
 		<ul class="it-cap">
 			<li>
-				<a href="#cap@s=single" tc=2>
+				<a href="javascript:;" tc=2>
 					<i class="ion-gear-a"></i> 
 					<b> Struct</b>
 				</a>
 				<span> - Struct is basic utils in aix, Salute to K&amp;R <b>&lt;The C Programming Language&gt;</b>. It contains more than 100 practical function, also it can be used as a single tool. focus on functional programming, the limits of performance, and the function of packaging more easily</span>
 			</li>
 			<li>
-				<a href="#cap@s=model" tc=2>
+				<a href="javascript:;" tc=2>
 					<i class="ion-ios-pie"></i> 
 					<b> Model</b>
 				</a>
 				<span> - Allows you to easily manage the data , model parse is the Immutable data, who can be monitored. So that data would not be modified by accident. Flexible authentication mechanism, to ensure the availability of data.</span>
 			</li>
 			<li>
-				<a href="#cap@s=view" tc=2>
+				<a href="javascript:;" tc=2>
 					<i class="ion-ionic"></i> 
 					<b> View</b>
 				</a>
 				<span> - The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events emitter and virtual DOM rendering mechanism by default way.</span>
 			</li>
 			<li>
-				<a href="#cap@s=route" tc=2>
+				<a href="javascript:;" tc=2>
 					<i class="ion-social-buffer"></i> 
 					<b> Route</b>
 				</a>

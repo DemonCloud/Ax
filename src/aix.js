@@ -2239,7 +2239,6 @@
 		"find",
 		"filter",
 		"reject",
-		"hook",
 		"chunk",
 		"compact",
 		"pluck",

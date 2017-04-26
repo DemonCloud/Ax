@@ -1,6 +1,8 @@
 define("modules/tags",
 ["struct"],
 function(struct){
+	'use strict';
+
 	var _slice = struct.slice(),
 			_each = struct.op("array");
 

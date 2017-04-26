@@ -16,7 +16,7 @@
 		<h3 t=3>Params</h3>
 		{{* each [param] in params }}
 		<div class="param">
-			<b>{{#param.name}}</b> - 
+			<b><i class="ion-ios-cog" style="vertical-align: -1px;"></i> {{#param.name}}</b>
 			<span>[ {{#param.type}} ]</span>
 		</div>
 		{{* end }}

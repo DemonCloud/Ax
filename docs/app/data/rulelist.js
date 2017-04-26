@@ -42,7 +42,6 @@ function(){
 			"struct:some",
 			"struct:diff",
 			"struct:intsec",
-			"struct:hook",
 			"struct:chunk",
 			"struct:compact",
 			"struct:pluck",
