@@ -1751,15 +1751,11 @@ function values(obj){
 function memoize(fn,context){
 	var memo = [];
 	return function(){
-		var args = slice(arguments), df;
-		for(var i=memo.length; i--; ){
-			if(eq(memo[i][0],args)){
-				df = memo[i][1]; break;
-			}
-		}
-		if(df===void 0)
-			memo.push([args,df=fn.apply(context,args)]);
-		return df;
+		var args = slice(arguments),df;
+		for(var i=memo.length; i--;)
+			if(eq(memo[i][0],args))
+				return (df=memo[i][1]);
+		return memo.push([args,df=fn.apply(context,args)]),df;
 	};
 }
 
@@ -1767,13 +1763,9 @@ function memoize(fn,context){
 function negate(fn,context){
 	var mapper = isDefine(fn,"RegExp") ? cit(regCheck,fn) : fn;
 	
-	if(isFn(mapper)){
-		return function(){
-			return !mapper.apply(context,arguments);
-		};
-	}
-
-	return cit(nseq,mapper).bind(context);
+	return isFn(mapper) ? function(){
+		return !mapper.apply(context,arguments);
+	} : cit(nseq,mapper).bind(context);
 }
 
 // create wrapper functions stack [ method ]

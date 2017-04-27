@@ -253,6 +253,10 @@ body{
   -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
 
+  -webkit-osx-font-smoothing : grayscale;
+  -moz-osx-font-smoothing : grayscale;
+  osx-font-smoothing : grayscale;
+
   zoom:1;
 }
 
@@ -277,7 +281,7 @@ code{
 	background-color: #efefef;
 
 	color: #6f3434;
-	font-size: 12px;
+	font-size: 11px;
 	padding: 0 6px 1px;
 	vertical-align: 1px;
 	border-radius: 2px;
@@ -341,7 +345,7 @@ a i{
 }
 
 .btn.btn-fb-default{
-	color: #333;
+	color: #686868;
 	border-color:#999;
 	border-bottom-color: #888;
 	background-color: #eee;
@@ -360,7 +364,9 @@ a i{
 .btn.btn-fb-default:hover,
 .btn.btn-fb-default.focus,
 .btn.btn-fb-default.hover{
+	color:#333;
   border-color: #777 #777 #666;
+  text-decoration:none;
 }
 
 .btn.btn-fb-default:active,
@@ -385,6 +391,8 @@ a i{
   max-width:210px;
   background-color:#eee;
 	border-right: 1px solid #8a3838;
+  overflow:hidden;
+
   box-shadow: inset -6px 0 18px rgba(0, 0, 0, 0.1);
 }
 
@@ -476,8 +484,10 @@ a i{
 }
 
 .s-description{
+	display:block;
+	color:#8a3838;
 	margin: 0;
-	font-size: 14px;
+	font-size: 16px;
 	text-transform: uppercase;
 	margin-bottom:20px;
 }
@@ -531,7 +541,10 @@ a i{
 }
 
 .s-search .s-search-key:focus{
-	border-color:#8a3838
+	border-color:#8a3838;
+	-webkit-box-shadow: 0 0 0 2px rgba(138, 56, 56, 0.3);
+	-moz-box-shadow: 0 0 0 2px rgba(138, 56, 56, 0.3);
+	box-shadow: 0 0 0 2px rgba(138, 56, 56, 0.3);
 }
 
 .s-search .s-search-icon {
@@ -552,6 +565,7 @@ a i{
   zoom:1;
   z-index:0;
 }
+
 .s-menu{
 	padding: 0 20px;
 	text-transform: uppercase;
@@ -582,7 +596,7 @@ a i{
 .s-menu-section .s-caption{
 	display: inline-block;
   color: #fff;
-  border: 1px solid #b77474;
+  border: 1px solid #b36161;
   background-color:#b77474;
   padding: 0 8px 1px;
   font-weight:bold;
@@ -622,7 +636,69 @@ a i{
 	padding-left:10px;
 	margin-bottom: 2px;
 
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  user-select:none;
+
+  -webkit-outline:none;
+  outline:none;
+
 	transition: color .1s cubic-bezier(0.3, 0.81, 1, 1) , font-weight .1s cubic-bezier(0.3, 0.81, 1, 1);
+}
+
+.s-menu-toggle{
+	display:block;
+	text-align:center;
+	margin-bottom:20px;
+}
+
+.s-menu-toggle .toggle-button{
+	color:#8a3838;
+	margin:0;
+	margin-left:-1px;
+	text-decoration: none;
+	text-shadow:1px 1px 0px #e8e8e8;
+	text-transform:none;
+	z-index:2;
+	zoom:1;
+}
+
+.s-menu-toggle .toggle-button:hover{
+	color:#8a3838;
+	border-color:#8a3838;
+}
+
+.s-menu-toggle .toggle-button.active:hover{
+	color:#a1a1a1;
+  border-color: #bfbfbf;
+  background: #ddd;
+}
+
+.s-menu-toggle .toggle-button i{
+	display:inline-block;
+	font-size:13px;
+	vertical-align:-1px;
+}
+
+.s-menu-toggle .toggle-button:first-child{
+	border-bottom-left-radius:1px;
+	border-top-left-radius:1px;
+}
+.s-menu-toggle .toggle-button:last-child{
+	border-bottom-right-radius:1px;
+	border-top-right-radius:1px;
+}
+
+.s-menu-toggle .toggle-button:active,
+.s-menu-toggle .toggle-button.active{
+	color: #a1a1a1;
+	border-color: #bfbfbf;
+	box-shadow: inset 0 1px 1px #c6c6c6, 0 1px 0 rgba(0, 0, 0, 0.01);
+	text-shadow: -1px -1px 0px #d6d6d6, 1px 1px 0px #e8e8e8;
+	-webkit-background-clip: border-box;
+	-moz-background-clip: border-box;
+	background-clip: border-box;
+	z-index: 0;
 }
 
 .s-menu-section .s-link:hover{
@@ -646,6 +722,39 @@ a i{
 	margin-left: 2px;
 	font-size:11px;
 	vertical-align: middle;
+}
+
+.s-tabs{
+	position:relative;
+	display:block;
+	width:100%;
+	max-width:100%;
+	min-height:1px;
+
+	zoom:1;
+}
+
+.s-tabs .s-menu-tab{
+	position:absolute;
+	display:block;
+	width:100%;
+	max-width:100%;
+	visibility:hidden;
+	float:left;
+	opacity:0;
+
+	transform:translateX(-8px);
+	-webkit-transition:all .2s cubic-bezier(0.31, 0.85, 1, 1) 0s;
+	-moz-transition:all .2s cubic-bezier(0.31, 0.85, 1, 1) 0s;
+	transition:all .2s cubic-bezier(0.31, 0.85, 1, 1) 0s;
+	z-index:-1px;
+}
+
+.s-tabs .s-menu-tab.active{
+	position:static;
+	transform:translateX(0);
+	opacity:1;
+	visibility:visible;
 }
 
 .content{
@@ -850,12 +959,14 @@ a i{
 
 .api-usage .usage-example{
 	display: table;
-	font-size: 13px;
-	padding: 0px 10px 2px;
+	font-size: 12px;
+	font-family: Arial sans-serif;
+
 	color: #fff;
+	padding: 0px 6px 2px;
 	background-color: #9c6d6d;
 	margin-bottom: 12px;
-	border-radius: 2px;
+	border-radius: 1px;
 }
 
 .api-params .param{

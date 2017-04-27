@@ -1,6 +1,6 @@
 <article class="introduce">
 	<header>
-		<h3 t=1>{{#main}}</h3>
+		<h3 t=1 style="color:#8a3838">{{#main}}</h3>
 		<p><b>Aix</b> is a fast MVR JavaScript Framework.</p>
 
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>

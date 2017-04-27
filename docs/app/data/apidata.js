@@ -2088,7 +2088,7 @@ console.log(flat([1,2,[3,4,[5,6,[7,8]]]],true));"
 				"merge(...args)",
 			],
 			params:[
-				{ name:"args", type:"Array" },
+				{ name:"...args", type:"Array" },
 			],
 			related:[
 				{ name:"struct.concat", target:"struct:concat" },
@@ -2223,5 +2223,88 @@ console.log(eq(\n\
 				},
 			]
 		},
+
+		//#struct.values
+		"struct:values" : {
+			title:"values",
+			introduce:"<code>struct.values</code> directly get values collection form Object", 
+			usages:[
+				"values -> struct.values()",
+				"values(obj)",
+			],
+			params:[
+				{ name:"obj", type:"Object" },
+			],
+			info:"<p>also use it for String, but not make sense</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var values = struct.values();\n\
+console.log(values({ a:1, b:2, d:\"3\"}));"
+				},
+				{ 
+					title: "Complex data",
+					code:"var values = struct.values();\n\
+console.log((values(\"MyName\")));"
+				},
+			]
+		},
+
+		//#struct.memoize
+		"struct:memoize" : {
+			title:"memoize",
+			introduce:"<code>struct.memoize</code> create memoize function ,store result in memory", 
+			usages:[
+				"memoize -> struct.memoize()",
+				"memoize(fn)",
+				"memoize(fn,context)",
+			],
+			params:[
+				{ name:"fn", type:"Function" },
+				{ name:"context", type:"AnyType" },
+			],
+			info:"<p><code>context</code> allow u bind this for <code>fn</code>.</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var memoize = struct.memoize();\n\
+var b = 1;\n\
+var fn = function(a){\n\
+	// variable [b] natural growth\n\
+	return a+(b++);\n\
+};\n\
+var fnmemo = memoize(fn);\n\
+\n\
+console.log(fnmemo(1));\n\
+console.log(fnmemo(1));\n\
+console.log(fnmemo(1));"
+				}
+			]
+		},
+
+		//#struct.memoize
+		"struct:negate" : {
+			title:"negate",
+			introduce:"<code>struct.negate</code> create reverse result function", 
+			usages:[
+				"negate -> struct.negate()",
+				"negate(fn)",
+				"negate(fn,context)",
+			],
+			params:[
+				{ name:"fn", type:"Function" },
+				{ name:"context", type:"AnyType" },
+			],
+			info:"<p><code>context</code> allow u bind this for <code>fn</code>.</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var negate = struct.negate();\n\
+var fn = negate(function(){ return true; });\n\
+console.log(fn());"
+				}
+			]
+		},
+
 	});
 });

@@ -8,7 +8,11 @@ define("route",
 
 // actions
 "actions/introduce/export",
-"actions/api/export"
+"actions/api/export",
+
+// module
+"modules/common",
+
 ],
 function(
 aix,
