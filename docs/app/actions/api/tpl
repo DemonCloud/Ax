@@ -7,7 +7,11 @@
 	<div class="api-usage">
 		<h3 t=2>Usage</h3>
 		{{* each [us] in usages }}
-		<div class="usage-example">{{#us}}</div>
+			{{ if(us!==""){ }}
+			<div class="usage-example">{{#us}}</div>
+			{{ } else { }}
+			<br>
+			{{ } }}
 		{{* end }}
 	</div>
 

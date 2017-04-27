@@ -547,12 +547,16 @@ a i{
 	box-shadow: 0 0 0 2px rgba(138, 56, 56, 0.3);
 }
 
+.s-search .s-search-key:focus + span{
+	color:#8a3838;
+}
+
 .s-search .s-search-icon {
 	font-size: 20px;
 	position: absolute;
 	top: 21px;
 	left: 30px;
-	color: #4a4a4a;
+	color: #888;
 
   -webkit-user-select:none;
   -moz-user-select:none;

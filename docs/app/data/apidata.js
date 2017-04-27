@@ -2282,7 +2282,7 @@ console.log(fnmemo(1));"
 			]
 		},
 
-		//#struct.memoize
+		//#struct.negate
 		"struct:negate" : {
 			title:"negate",
 			introduce:"<code>struct.negate</code> create reverse result function", 
@@ -2306,5 +2306,255 @@ console.log(fn());"
 			]
 		},
 
+		//#struct.link
+		"struct:link" : {
+			title:"link",
+			introduce:"<code>struct.link</code> create a continuous execution stack", 
+			usages:[
+				"link -> struct.link()",
+				"link(...args)",
+			],
+			params:[
+				{ name:"...args", type:"Function" },
+			],
+			info:"<p>Function of execution order is determined based on the order through time, that you can only use <code>single param</code></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var _ = struct.link();\n\
+var fn = function(a){ return a+a; };\n\
+var fn1 = function(c){ return c*c };\n\
+var fn2 = function(d){ return d/2; };\n\
+\n\
+// create stack chain\n\
+var link = _(fn,fn1,fn2);\n\
+\n\
+// 2+2  = 4\n\
+// 4*4  = 16\n\
+// 16/2 = 8\n\
+console.log(link(2));"
+				}
+			]
+		},
+
+		//#struct.size
+		"struct:size" : {
+			title:"size",
+			introduce:"<code>struct.size</code> check variable length(size)", 
+			usages:[
+				"size -> struct.size()",
+				"size(obj)",
+			],
+			params:[
+				{ name:"obj", type:"AnyType" },
+			],
+				info:"<p>if primitive not has <code>length</code> property. as it become <code>null</code><code>undefined</code> size to be 0</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var size = struct.size();\n\
+console.log(size([1,2,3]))\n\
+console.log(size('abcd'))\n\
+console.log(size({a:1,b:3,c:2}))\n\
+console.log(size(null))\n\
+console.log(size(NaN))"
+				}
+			]
+		},
+
+		//#struct.now
+		"struct:now" : {
+			title:"now",
+			introduce:"<code>struct.now</code> now Date Unix timestamp", 
+			usages:[
+				"now -> struct.now()",
+				"now()",
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var now = struct.now();\n\
+console.log(now())"
+				}
+			]
+		},
+
+		//#struct.now
+		"struct:sort" : {
+			title:"sort",
+			introduce:"<code>struct.sort</code> array sort method( will rewirte at <code>VERSION 1.1</code>)", 
+			usages:[
+				"sort -> struct.sort()",
+				"sort(arr)",
+				"sort(arr,compare)",
+			],
+			info:"<p>it use default <code>Array.sort</code></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var sort = struct.sort();\n\
+var a = [10,9,8,2,1];\n\
+console.log(sort(a))"
+				},
+				{ 
+					title: "Use compare",
+					code:"var sort = struct.sort();\n\
+var a = [1,9,4,8,3,2,6];\n\
+console.log(sort(a,function(a,b){ return b-a; }))"
+				}
+			]
+		},
+
+		// Mixed Chaos API
+		//#struct.each
+		"struct:each" : {
+			title:"each [ array,object ]",
+			introduce:"<code>struct.each</code>, simple loop function",
+			usages:[
+				"Each -> struct.each()",
+				"ArrayEach -> struct.each(\"array\")",
+				"ObjectEach -> struct.each(\"object\")",
+				"",
+				"Each( list,fn(val,key|index,list),context )",
+				"ArrayEach( arr,fn(val,index,arr),context )",
+				"ObjectEach( obj,fn(val,key,obj),context )",
+			],
+
+			params:[
+				{ name:"list", type:"Array,Object" },
+				{ name:"arr", type:"Array" },
+				{ name:"obj", type:"Object" },
+				{ name:"fn", type:"Function" },
+				{ name:"context", type:"AnyType" },
+			],
+			info:"<p> if u already now typeof <code>list</code>, that u should use <code>each(array|object)</code> current target,</p><p><code>each</code> api is best than <code>Array.forEach</code> or <code>for in</code> loop</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var each = struct.each();\n\
+var arr = [1,2,3,4];\n\
+var obj = { Nike:1, Cloud:2, Sam:3, Buke:4 };\n\
+var a=0,b=\"Pack\";\n\
+\n\
+// each action\n\
+each(arr,function(num){ a+=num; });\n\
+each(obj,function(val,name){ b+=\",\"+name; });\n\
+console.log(a);\n\
+console.log(b)"
+				},
+				{ 
+					title: "For Array",
+					code:"var each = struct.each(\"array\");\n\
+var arr = [1,2,3,4],a=1;\n\
+\n\
+// each action\n\
+each(arr,function(num){ a=a*num; });\n\
+console.log(a)"
+				},
+				{ 
+					title: "Bind Context",
+					code:"var each = struct.each(\"object\");\n\
+var obj = { Nike:98, Cloud:18, Sam:21 },\n\
+		a=[];\n\
+\n\
+// each action bind context(a)\n\
+each(obj, function(score){\n\
+	this.push(score);\n\
+}, a);\n\
+console.log(a)"
+				},
+			]
+		},
+
+		//#struct.map
+		"struct:map" : {
+			title:"map [ key,hook ]",
+			introduce:"<code>struct.map</code>, mapping method for Array and isObject",
+			usages:[
+				"Map -> struct.map()",
+				"Hook -> struct.map(\"hook\")",
+				"MapKey -> struct.map(\"key\")",
+				"",
+				"Map( list,fn(val,index,list) )",
+				"Hook( list,fn(val,index,arr) )",
+				"MapKey( obj,fn(val,key,obj) )",
+			],
+
+			params:[
+				{ name:"list", type:"Array,Object" },
+				{ name:"obj", type:"Object" },
+				{ name:"fn", type:"Function" },
+			],
+			info:"<p>instanceof <code>Array.map</code></p><p><code>hook</code> is compress advance mapping method</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var map = struct.map();\n\
+var a = [0,1,2,3,4];\n\
+var b = map(a,function(n){ return n+1; });\n\
+console.log(a,b)"
+				},
+				{ 
+					title: "Hook",
+					code:"var hook = struct.map(\"hook\");\n\
+var a = [0,1,2,3,4];\n\
+var b = hook(a,\"valueOf\");\n\
+var c = hook(a,function(n){ return n*n; });\n\
+console.log(a);\n\
+console.log(b,c);"
+				},
+				{ 
+					title: "Mapping Key",
+					code:"var mapkey = struct.map(\"key\");\n\
+var a = { a:1, b:2, c:3 };\n\
+var b = mapkey(a,function(val,key){\n\
+	return key+val;\n\
+});\n\
+console.log(b);"
+				}
+			]
+		},
+
+		//#struct.has
+		"struct:has" : {
+			title:"has [ key,hook ]",
+			introduce:"<code>struct.has</code> check param in Array or Object",
+			usages:[
+				"Has -> struct.has()",
+				"HasKey -> struct.has(\"key\")",
+				"",
+				"Has( list,value,useEqual )",
+				"HasKey( list,value,useEqual )",
+			],
+
+			params:[
+				{ name:"list", type:"Array,Object" },
+				{ name:"value", type:"AnyType" },
+				{ name:"useEqual", type:"Boolean" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var has = struct.has();\n\
+var a = [0,1,2,3,4];\n\
+console.log(has(a,2))\n\
+console.log(has(a,5))"
+				},
+				{ 
+					title: "Use eq",
+					code:"var has = struct.has();\n\
+var a = [{a:1},{b:2},{c:{a:{b:1}}}];\n\
+console.log(has(a,{c:{a:{b:1}}},true))\n\
+console.log(has(a,{a:1},true))\n\
+console.log(has(a,{a:1}))"
+				},
+				{ 
+					title: "Has Key",
+					code:"var has = struct.has(\"key\");\n\
+var a = {a:1,b:2,c:3};\n\
+console.log(has(a,\"a\"))"
+				},
+			]
+		},
 	});
 });

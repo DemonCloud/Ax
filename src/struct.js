@@ -371,22 +371,21 @@ function keys(e){
 // @alias each
 function al(ary,fn,ts){
 	for(var i=0, l=ary.length; i<l; i++)
-		fn.call(ts===void 0 ? ary : ts ,ary[i],i,ary);
+		fn.call(2 in arguments ? ts : ary, ary[i], i, ary);
 	return ary;
 }
 
 function ol(obj,fn,ts){
-	al(keys(obj),function(v){ 
-		fn.call(this,obj[v],v,obj);
-	},ts===void 0 ? obj : ts);
+	var _ = function(key){ fn.call(this,obj[key],key,obj); };
+	al(keys(obj), _, 2 in arguments ? ts : obj);
 	return obj;
 }
 
-function fov(list,fn,ts){
+function fov(list){
 	if(isArray(list))
-		return al.call(null,list,fn,ts);
+		return al.apply(list,arguments);
 	else if(isObject(list) && !isFn(list) && list !== null)
-		return ol.call(null,list,fn,ts);
+		return ol.apply(list,arguments);
 	return list;
 }
 
