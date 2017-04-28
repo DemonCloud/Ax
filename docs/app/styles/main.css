@@ -542,9 +542,9 @@ a i{
 
 .s-search .s-search-key:focus{
 	border-color:#8a3838;
-	-webkit-box-shadow: 0 0 0 2px rgba(138, 56, 56, 0.3);
-	-moz-box-shadow: 0 0 0 2px rgba(138, 56, 56, 0.3);
-	box-shadow: 0 0 0 2px rgba(138, 56, 56, 0.3);
+	-webkit-box-shadow: 0 0 0 2px rgba(138, 56, 56, .2);
+	-moz-box-shadow: 0 0 0 2px rgba(138, 56, 56, .2);
+	box-shadow: 0 0 0 2px rgba(138, 56, 56, .2);
 }
 
 .s-search .s-search-key:focus + span{

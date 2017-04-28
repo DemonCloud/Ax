@@ -2517,7 +2517,7 @@ console.log(b);"
 
 		//#struct.has
 		"struct:has" : {
-			title:"has [ key,hook ]",
+			title:"has [ key ]",
 			introduce:"<code>struct.has</code> check param in Array or Object",
 			usages:[
 				"Has -> struct.has()",
@@ -2554,6 +2554,43 @@ console.log(has(a,{a:1}))"
 var a = {a:1,b:2,c:3};\n\
 console.log(has(a,\"a\"))"
 				},
+			]
+		},
+
+		//#struct.type
+		"struct:type" : {
+			title:"type [ ... ]",
+			introduce:"<code>struct.type</code> ",
+			usages:[
+				"type -> struct.type()",
+				"",
+				"isObject -> struct.type(\"object\")",
+				"isArray -> struct.type(\"array\")",
+				"isArrayLike -> struct.type(\"arraylike\")",
+				"isFunction -> struct.type(\"function\")",
+				"isNaN -> struct.type(\"nan\")",
+				"isPrimitive -> struct.type(\"prim\")",
+				"isIdentifier -> struct.type(\"idt\")",
+				"isDefine -> struct.type(\"define\")",
+				"isInt -> struct.type(\"int\")",
+				"isFloat -> struct.type(\"float\")",
+				"isDate -> struct.type(\"date\")",
+				"isEmpty -> struct.type(\"empty\")",
+				"isElement -> struct.type(\"elm\")",
+				"isNative -> struct.type(\"native\")",
+			],
+			params:[
+				{ name:"val", type:"AnyType" }
+			],
+			examples:[
+				{ 
+					title: "Use eq",
+					code:"var has = struct.has();\n\
+var a = [{a:1},{b:2},{c:{a:{b:1}}}];\n\
+console.log(has(a,{c:{a:{b:1}}},true))\n\
+console.log(has(a,{a:1},true))\n\
+console.log(has(a,{a:1}))"
+				}
 			]
 		},
 	});

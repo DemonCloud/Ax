@@ -20,11 +20,12 @@ function(struct,aix){
 				event.preventDefault();
 				event.stopPropagation();
 
-				each(logs,rmclass);
-				
-				this.setAttribute("class",this.getAttribute("class")+" active");
-				document.getElementById("tab-"+this.getAttribute("id"))
-								.setAttribute("class","s-menu-tab active");
+				if(!/active/.test(this.getAttribute("class"))){
+					this.setAttribute((each(logs,rmclass),"class"),
+						this.getAttribute("class")+" active");
+					document.getElementById("tab-"+this.getAttribute("id"))
+						.setAttribute("class","s-menu-tab active");
+				}
 			}
 		}
 	
