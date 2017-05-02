@@ -963,11 +963,11 @@ a i{
 
 .api-usage .usage-example{
 	display: table;
-	font-size: 12px;
+	font-size: 11px;
 	font-family: Arial sans-serif;
 
 	color: #fff;
-	padding: 0px 6px 2px;
+	padding: 2px 6px;
 	background-color: #9c6d6d;
 	margin-bottom: 12px;
 	border-radius: 1px;

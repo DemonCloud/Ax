@@ -2578,20 +2578,175 @@ console.log(has(a,\"a\"))"
 				"isEmpty -> struct.type(\"empty\")",
 				"isElement -> struct.type(\"elm\")",
 				"isNative -> struct.type(\"native\")",
+				"",
+				"isDefine(val,defineName)"
 			],
 			params:[
-				{ name:"val", type:"AnyType" }
+				{ name:"val", type:"AnyType" },
+				{ name:"defineName", type:"String" }
 			],
 			examples:[
 				{ 
-					title: "Use eq",
-					code:"var has = struct.has();\n\
-var a = [{a:1},{b:2},{c:{a:{b:1}}}];\n\
-console.log(has(a,{c:{a:{b:1}}},true))\n\
-console.log(has(a,{a:1},true))\n\
-console.log(has(a,{a:1}))"
+					title: "Basic usage",
+					code:"var type = struct.type();\n\
+console.log(type({a:1}))\n\
+console.log(type([1,2,3]))\n\
+console.log(type(1))\n\
+console.log(type(\"a\"))\n\
+console.log(type(null))\n\
+console.log(type(NaN))\n\
+console.log(type(void 0))\n\
+console.log(type(struct.noop()))\n\
+console.log(type(Date))"
+				},
+				{ 
+					title: "Check Native",
+					code:"var type = struct.type(\"native\");\n\
+console.log(type(alert))\n\
+console.log(type(console))\n\
+console.log(type(struct.noop()))"
+				},
+				{ 
+					title: "Detect arguments",
+					code:"var isAryL = struct.type(\"arraylike\");\n\
+var isAry = struct.type(\"array\");\n\
+var fn = function(){ \n\
+	console.log(\n\
+		isAry(arguments),\n\
+		isAryL(arguments)\n\
+	); \n\
+};\n\
+fn(1,2,3,4);"
 				}
 			]
 		},
+
+		//#struct.html
+		"struct:html" : {
+			title:"html [ encode,decode,strip ]",
+			introduce:"<code>struct.html</code> encode decode pack with html string",
+			usages:[
+				"encode -> struct.html(\"encode\")",
+				"decode -> struct.html(\"decode\")",
+				"strip -> struct.html(\"strip\")",
+				"",
+				"html(htmlStr)"
+			],
+
+			params:[
+				{ name:"htmlStr", type:"String" },
+			],
+
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var encode = struct.html(\"encode\");\n\
+console.log(encode(\"&lt;div&gt;&lt;/div&gt;\"))"
+				}
+			]
+		},
+
+		//#struct.unique
+		"struct:unique" : {
+			title:"unique [ fast ]",
+			introduce:"<code>struct.unique</code> fast unique in Array",
+			usages:[
+				"slimUnique -> struct.unique()",
+				"fastUnique -> struct.unique(\"fast\")",
+				"",
+				"slimUnique(arr)",
+				"fastUnique(arr)"
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+			],
+			info:"<p>care about <code>(fast)unqiue</code>, it also use for pure same typeof <code>string,number</code> array, if the array exist <code>function,array,object</code>, it will get error</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var unique = struct.unique();\n\
+console.log(unique([1,3,2,1,4,5,6,2,3,5,4,1,1,4,2,5,6,8,7,3,1,2,8]))"
+				}
+			]
+		},
+
+		//#struct.convert
+		"struct:convert" : {
+			title:"convert [  ]",
+			introduce:"<code>struct.convert</code> safe type convert",
+			usages:[
+				"toString -> struct.convert()",
+				"toString -> struct.convert(\"str\")",
+				"toNumber -> struct.convert(\"num\")",
+				"toArray  -> struct.convert(\"arr\")",
+				"toHEX    -> struct.convert(\"hex\")",
+				"toRGB    -> struct.convert(\"rgb\")",
+				"toMinus  -> struct.convert(\"minus\")",
+			],
+			info:"<p>the method to safe convert. see more info form tables:</p>\n\
+<table>\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Convert method</th>\n\
+			<th>Usage info</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>toString</td>\n\
+			<td>Safe to String, use if it exist first, or return empty string</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>toNumber</td>\n\
+			<td>Safe to Number, if it can convert to number, or return 0</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>toArray</td>\n\
+			<td>Safe to Array, return a array eternal</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>toHEX</td>\n\
+			<td>Convert RGB object <code>{r:255,g:255,b:255}</code> to HEX string #<code>ffffff</code></td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>toRGB</td>\n\
+			<td>Convert HEX string <code>#ffffff</code> to RGB object <code>{r:255,g:255,b:255}</code></td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>toMinus</td>\n\
+			<td>Convert number minus <code>1</code> to <code>-1</code></td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var toString = struct.convert();\n\
+console.log(toString([1,3,2]))\n\
+console.log(toString({ a:1, b:2 }))\n\
+console.log(toString(struct.noop()))\n\
+console.log(toString(null))\n\
+console.log(toString(void 0))\n\
+console.log(toString(213))"
+				},
+				{ 
+					title: "toNumber",
+					code:"var toNumber = struct.convert(\"number\");\n\
+console.log(toNumber(null));\n\
+console.log(toNumber(\"abc\"));\n\
+console.log(toNumber(\"213\"));"
+				},
+				{ 
+					title: "toArray",
+					code:"var toArray = struct.convert(\"array\");\n\
+console.log(toArray({a:1,b:2,c:3}));\n\
+console.log(toArray(\"1234\"));\n\
+console.log(toArray(1));\n\
+console.log(toArray(null));"
+				}
+			]
+		},
+
 	});
 });
