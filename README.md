@@ -34,9 +34,6 @@ var model = new aix.model({
 		}
 	},
 	validate:{
-		"name":function(name){
-			return name.length>4;
-		},
 		"info.score":function(score){
 			return score === +score;
 		}
@@ -45,6 +42,7 @@ var model = new aix.model({
 
 model.data.name = "Trump"          // fail! it's immutable data
 model.get("name");                 // "Cloud"
+
 model.set("info.score","61");      // fail! score must be pure number
 model.toJSON()                     // "{"name":"Cloud","info":{"id":10024,"score":88}}"
 ```
@@ -57,20 +55,13 @@ Immutable data is extreme for the protection of itself,  the only way is that us
 
 ```javascript
 var view = new aix.view({
-	template:"<div id='{{-id}}'>" +
-				"Hello {{-name}}" +
-			 "</div>",
-	events:{
-		"click:div":function(){
-			alert(this.innerHTML);
-		}
-	}
+	template:"Hello {{-name}}",
 });
 
 // mount only once time on element[id=#app]
 view.mount(
 	document.getElementById("app"),
-	{ id: "target" ,name: "Buke" }
+	{ name: "Buke" }
 );
 ```
 This example will render **"Hello Buke"** into a container on the page.
@@ -79,8 +70,6 @@ mount application rendering at the element[#app], if set `root` property by defa
 
 # License
 
-Open source don't need any permission, 
-
-Fuck Any License(FAL) is the best license!
+License (FAL)
 
 

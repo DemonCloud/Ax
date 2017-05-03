@@ -12,6 +12,7 @@ function(){
 			"model:send",
 			"model:fetch",
 			"model:sync",
+			"model:store",
 			"model:validate",
 			"model:events",
 			"model:extend",
@@ -58,7 +59,6 @@ function(){
 			"struct:part",
 			"struct:once",
 			"struct:eq",
-			"struct:cookie",
 			"struct:values",
 			"struct:memoize",
 			"struct:negate",
@@ -74,6 +74,7 @@ function(){
 			"struct:unique",
 			"struct:convert",
 			"struct:pull",
+			"struct:drop",
 			"struct:param",
 			"struct:ajax",
 			"struct:event",
@@ -82,6 +83,7 @@ function(){
 			"struct:index",
 			"struct:random",
 			"struct:string",
+			"struct:assembly",
 			"struct:doom"
 		]
 	});

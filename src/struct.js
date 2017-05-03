@@ -724,19 +724,17 @@ function unpairs(ary){
 // pullAll([1,2,3,4,1,2,4],1,4) => [2,3,2];
 function pullAll(ary){
 	var ft = flatten(slice(arguments,1),true);
-	return ary.filter(negate(cit(has,ft)));
+	return (ary = filter(ary,negate(cit(has,ft))));
 }
 
 function pullAt(ary){
 	var ft = flatten(slice(arguments,1),true);
-	return ary.filter(function(val,index){
+	return (ary = filter(ary,function(val,index){
 		return !has(ft,index);
-	});
+	}));
 }
 
-function pullWith(ary,it){
-	return not(ary,it);
-}
+var pullWith = not;
 
 // Array Disorder
 // Shuffle a collection , using the modern version of the
@@ -1480,7 +1478,7 @@ function aix(option){
 
 	// setTimeout data of ajax
 	if(toNumber(config.timeout)){
-		xhr.timeout = toNumber(config.timeout);
+		xhr.timeout = toNumber(config.timeout)*1000;
 		xhr.ontimeout = function(event){
 			if(xhr.readyState !== 4 || !xhr.responseText)
 				config.error.call(root,xhr);xhr.abort();
@@ -1898,6 +1896,71 @@ XHookRequest.prototype = {
 
 var xhr = new XHookRequest();
 
+// atob && btoa
+// base IE9 not support this method;
+// ASCII to Base64 encoding and decoding
+// UTF8 to Base64 encoding and decoding
+// @ use atob(a2b)
+// @ use btoa(b2a)
+// @ use utob(u2b)
+// @ use btou(b2u)
+// @ export assembly
+var crs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+var btoa = root.btoa || function(input){
+	var str = toString(input) , output = "";
+
+	for(
+		var block,charCode,idx=0, map = crs;
+		// if the next str index does not exist:
+		// change the mapping table to "="
+		// check if d has no fractional digits
+		str.charAt(idx|0) || (map = '=', idx%1);
+		// "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+		output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+	){
+		charCode = str.charCodeAt(idx += 3/4);
+		if (charCode > 0xFF)
+			throw new Error(
+				"'btoa' failed: The string to be encoded contains characters outside of the Latin1 range."
+			);
+		block = block << 8 | charCode;
+	}
+
+	return output;
+};
+
+var atob = root.atob || function(input){
+	var str = toString(input).replace(/[=]+$/,'') , output = "";
+
+	if (str.length % 4 === 1)
+		throw new Error(
+			"'atob' failed: The string to be decoded is not correctly encoded."
+		);
+
+	for (
+		var bc = 0, bs, buffer, idx = 0, map = crs;
+		(buffer = str.charAt(idx++));
+		// character found in table? initialize bit storage and add its ascii value;
+		~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+			// and if not first of each 4 characters,
+			// convert the first 8 bits to one ascii character
+			bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+	) {
+		// try to find character in table (0-63, not found => -1)
+		buffer = map.indexOf(buffer);
+	}
+	return output;
+};
+
+function utob(input){
+	return btoa(unescape(encodeURIComponent(toString(input))));
+}
+
+function btou(input){
+	return decodeURIComponent(escape(atob(toString(input).replace(/\s/g,''))));
+}
+
 // Type export
 function $type(c){
 	switch((c||"").toLowerCase()){
@@ -2184,6 +2247,25 @@ function $prop(c){
 	}
 }
 
+function $assembly(c){
+	switch((c||"").toLowerCase()){
+		case "atob":
+		case "a2b":
+			return atob;
+		case "btoa":
+		case "b2a":
+			return btoa;
+		case "utob":
+		case "u2b":
+			return utob;
+		case "btou":
+		case "b2u":
+			return btou;
+		default:
+			return atob;
+	}
+}
+
 // bound DOOM settings
 function $doom(config){
 	return DOOM.bind((isDefine(config,"Object"))?
@@ -2243,26 +2325,27 @@ var nublist = {
 
 // generator API
 var zublist = {
-	op      : $op,
-	each    : $op,
-	map     : $map,
-	has     : $has,
-	type    : $type,
-	html    : $html,
-	unique  : $unique,
-	convert : $convert,
-	pull    : $pull,
-	param   : $param,
-	ajax    : $ajax,
-	event   : $event,
-	prop    : $prop,
-	drop    : $drop,
-	pairs   : $pair,
-	index   : $index,
-	random  : $random,
-	string  : $string,
-	error   : $error,
-	doom    : $doom
+	op       : $op,
+	each     : $op,
+	map      : $map,
+	has      : $has,
+	type     : $type,
+	html     : $html,
+	unique   : $unique,
+	convert  : $convert,
+	pull     : $pull,
+	param    : $param,
+	ajax     : $ajax,
+	event    : $event,
+	prop     : $prop,
+	drop     : $drop,
+	pairs    : $pair,
+	index    : $index,
+	random   : $random,
+	string   : $string,
+	error    : $error,
+	assembly : $assembly,
+	doom     : $doom
 };
 
 // Generators

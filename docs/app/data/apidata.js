@@ -1,6 +1,8 @@
 define("data/apidata",
 [],
 function(){
+	// api data
+	// binding the template
 	return Object.freeze({
 		//#model.get
 		"model:get" : {
@@ -434,12 +436,47 @@ m.sync({\n\
 			]
 		},
 
+		//#model.store
+		"model:store" : {
+			title:"Model [ Store ]",
+			introduce:"<code>model</code> provides a mechanism for data persistence can be stored locally",
+			usages:[
+				"store:(Boolean)",
+			],
+			params:[
+				{ name:"store", type:"Boolean" }
+			],
+			info:"<p><code>store</code> property should define with <code>url</code> at the same time, otherwise the storage will not take effect!</p><p>Persistent storage data can be shared by multiple models at the same time, as long as they define the <b>same</b> <code>url</code>.</p><p>store data will be synced when the model <b>changed</b></p>",
+			related:[
+				{ name:"model.set", target:"model:set" },
+				{ name:"model.moc", target:"model:moc" },
+				{ name:"model.fetch", target:"model:fetch" }
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var size = struct.size();\n\
+var m = new aix.model({\n\
+	url:\"myCustom\",\n\
+	store:true,\n\
+});\n\
+// store data at locally\n\
+if(size(m.data)){\n\
+	console.log(\"store data: \" + m.toJSON());\n\
+}else{\n\
+	m.set({ a:1, b:2, c:3, d:4 });\n\
+	console.log(\"refresh this page and rerun the code example\");\n\
+}"
+				},
+			]
+		},
+
 		//#model.validate
 		"model:validate" : {
 			title:"Model [ Validate ]",
 			introduce:"<code>model</code> provides a mechanism checker for setting up the data, (this checker will not apply to initialize) before <code>model.change</code>.",
 			usages:[
-				"validate:",
+				"validate:(Object)",
 			],
 			params:[
 				{ name:"validate", type:"Object" }
@@ -2664,7 +2701,7 @@ console.log(encode(\"&lt;div&gt;&lt;/div&gt;\"))"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var unique = struct.unique();\n\
+					code:"var unique = struct.unique(\"fast\");\n\
 console.log(unique([1,3,2,1,4,5,6,2,3,5,4,1,1,4,2,5,6,8,7,3,1,2,8]))"
 				}
 			]
@@ -2672,7 +2709,7 @@ console.log(unique([1,3,2,1,4,5,6,2,3,5,4,1,1,4,2,5,6,8,7,3,1,2,8]))"
 
 		//#struct.convert
 		"struct:convert" : {
-			title:"convert [  ]",
+			title:"convert [ ... ]",
 			introduce:"<code>struct.convert</code> safe type convert",
 			usages:[
 				"toString -> struct.convert()",
@@ -2748,5 +2785,400 @@ console.log(toArray(null));"
 			]
 		},
 
+		//#struct.pull
+		"struct:pull" : {
+			title:"pull [ at,with,all ]",
+			introduce:"<code>struct.pull</code> fast pull elm in Array",
+			usages:[
+				"pullAll -> struct.pull()",
+				"pullAt -> struct.pull(\"at\")",
+				"pullWith -> struct.pull(\"with\")",
+				"",
+				"pullAll(arr,...args)",
+				"pullAt(arr,...indexs)",
+				"pullWith(arr,val)"
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+				{ name:"val", type:"AnyType" },
+				{ name:"...args", type:"AnyType" },
+				{ name:"...indexs", type:"Number" },
+			],
+			info:"<p>pull position or value form Array, change origin ary</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var pullAll = struct.pull(\"all\");\n\
+console.log(pullAll([1,2,3,4],1,2))"
+				},
+				{ 
+					title: "At index",
+					code:"var pullAt = struct.pull(\"at\");\n\
+console.log(pullAt([1,2,3,4],1,2))"
+				},
+				{ 
+					title: "With single",
+					code:"var pull = struct.pull();\n\
+console.log(pull([1,2,3,4],4))"
+				}
+			]
+		},
+
+		//#struct.drop
+		"struct:drop" : {
+			title:"drop [ ... ]",
+			introduce:"<code>struct.drop</code> fast drop part size in Array",
+			usages:[
+				"dropLeft -> struct.drop(\"left\")",
+				"dropRight -> struct.drop(\"right\")",
+				"dropLeftTo -> struct.drop(\"leftto\")",
+				"dropRightTo -> struct.drop(\"rightto\")",
+				"",
+				"dropLeft(arr,pos)",
+				"dropLeftTo(arr,until)",
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+				{ name:"pos", type:"Number" },
+				{ name:"until", type:"AnyType" },
+			],
+			info:"<p><code>dropTo</code> means drop until assert defined value</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var dropLeft = struct.drop(\"left\");\n\
+console.log(dropLeft([1,2,3,4],2))"
+				},
+				{ 
+					title: "Drop form Right",
+					code:"var dropRight = struct.drop(\"right\");\n\
+console.log(dropRight([1,2,3,4],2))"
+				},
+				{ 
+					title: "Drop until catch",
+					code:"var drop = struct.drop(\"leftto\");\n\
+console.log(drop([1,2,\"2\",3,4,5],\"2\"))"
+				},
+			]
+		},
+
+		//#struct.param
+		"struct:param" : {
+			title:"param [ ... ]",
+			introduce:"<code>struct.param</code> given binding method for params queryString",
+			usages:[
+				"pmParse -> struct.param()",
+				"pmParse -> struct.param(\"parse\")",
+				"pmRequery -> struct.param(\"query\")",
+				"pmStringify -> struct.param(\"serialize\")",
+				"",
+				"pmParse(paramString)",
+				"pmStringify(paramObject)",
+				"pmRequery([jQuery|Zepto]serializeArray)"
+			],
+			params:[
+				{ name:"paramString", type:"String" },
+				{ name:"paramObject", type:"Object" },
+				{ name:"serializeArray", type:"Array" },
+			],
+			info:"<p><code>param(query)</code> to parse <code>jQuery|Zepto</code> serializeArray API export</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var parse = struct.param();\n\
+var url = \"https://chrome.google.com/search/LocalStorage?hl=en-US&_category=extensions\";\n\
+var param = \"sl=strick&wonder=true&catch=1&id=2001\";\n\
+console.log(parse(url));\n\
+console.log(parse(param));"
+				},
+				{ 
+					title: "Param serialize",
+					code:"var serialize = struct.param(\"serialize\");\n\
+var param = {\n\
+	id : 2014,\n\
+	search : \"hl-cake\",\n\
+	trick: false\n\
+};\n\
+console.log(serialize(param));"
+				},
+				{ 
+					title: "Use Requery",
+					code:"var query = struct.param(\"query\");\n\
+// jQuery form.serializeArray cap formData\n\
+var serializeArray = [\n\
+	{ name:\"sj\"     , value:\"something\" }     ,\n\
+	{ name:\"search\" , value:\"goods\" }         ,\n\
+	{ name:\"score\"  , value:1088 }            ,\n\
+	{ name:\"p\"      , value:\"dekAx_SADodPS\" } ,\n\
+];\n\
+console.log(query(serializeArray));"
+				},
+			]
+		},
+
+		//#struct.ajax
+		"struct:ajax" : {
+			title:"ajax [ ... ]",
+			introduce:"<code>struct.ajax</code> basic ajax method with appliction",
+			usages:[
+				"ajax -> struct.ajax()",
+				"aget -> struct.ajax(\"get\")",
+				"apost -> struct.ajax(\"post\")",
+				"jsonp -> struct.ajax(\"jsonp\")",
+				"",
+				"ajax(option)",
+				"jsonp(option)",
+				"aget (url,[param].success,error)",
+				"apost(url,[param].success,error)",
+			],
+			params:[
+				{ name:"option", type:"Object" },
+				{ name:"url", type:"String" },
+				{ name:"param", type:"String,Object,NOT" },
+				{ name:"success", type:"Function" },
+				{ name:"error", type:"Function" },
+			],
+				info:"<p><code>param</code> is not necessary argument</p><p>ajax ,ethod support <code>JSONP</code></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					not:true,
+					code:"var ajax = struct.ajax();\n\
+ajax({\n\
+	url         : /* string */,\n\
+	type        : /* string */,\n\
+	param       : /* string | object */,\n\
+	success     : /* function */,\n\
+	error       : /* function */,\n\
+	timeout     : /* number */,\n\
+	cache       : /* boolean */,\n\
+	valid       : /* boolean */,\n\
+	header      : /* object */,\n\
+	charset     : /* string */,\n\
+	contentType : /* boolean */\n\
+});"
+				},
+				{ 
+					title: "Use get",
+					not:true,
+					code:"var get = struct.ajax(\"get\");\n\
+get(\"/ajax/data1\",function(res){\n\
+	//success for response data\n\
+	console.log(res);\n\
+});"
+				},
+			]
+		},
+
+		//#struct.event
+		"struct:event" : {
+			title:"event [ on,unbind,emit ]",
+			introduce:"<code>struct.event</code> given pure object event capable",
+			usages:[
+				"addEvent -> struct.event(\"on\")",
+				"hasEvent -> struct.event(\"has\")",
+				"copyEvent -> struct.event(\"copy\")",
+				"emitEvent -> struct.event(\"emit\")",
+				"unbindEvent -> struct.event(\"unbind\")",
+				"",
+				"addEvent(obj,type,fn)",
+				"hasEvent(obj,type,fn)",
+				"unbindEvent(obj,type,fn)",
+				"emitEvent(obj,type,args)",
+				"copyEvent(obj,related)",
+			],
+			params:[
+				{ name:"obj", type:"Object,Array,Function" },
+				{ name:"type", type:"String" },
+				{ name:"fn", type:"Function" },
+				{ name:"args", type:"Array,NOT" },
+				{ name:"related", type:"Object,Array,Function" },
+			],
+			info:"<p></p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var on = struct.event(\"on\");\n\
+var emit = struct.event(\"emit\");\n\
+\n\
+var o = {};\n\
+on(o,\"myevent\",function(a,b){\n\
+	console.log(a+b);\n\
+});\n\
+\n\
+emit(o,\"myevent\",[1,2]);"
+				},
+				{ 
+					title: "Has event",
+					code:"var on = struct.event(\"on\");\n\
+var has = struct.event(\"has\");\n\
+\n\
+var o = {};\n\
+on(o,\"myevent\",struct.noop());\n\
+on(o,\"mysun\",struct.noop());\n\
+\n\
+console.log(has(o,\"mysun\"));\n\
+console.log(has(o,\"myevent\",struct.noop()));\n\
+console.log(has(o,\"myevent\",function(){}));"
+				},
+			]
+		},
+
+		//#struct.prop
+		"struct:prop" : {
+			title:"prop [ get,set,not ]",
+			introduce:"<code>struct.prop</code> given pure object prop capable",
+			usages:[
+				"getProp -> struct.prop(\"get\")",
+				"setProp -> struct.prop(\"set\")",
+				"removeProp -> struct.prop(\"not\")",
+				"",
+				"getProp(obj,name,dowith,...args)",
+				"setProp(obj,name,value)",
+				"removeProp(obj,name)",
+			],
+			params:[
+				{ name:"obj", type:"Object,Array,Function" },
+				{ name:"name", type:"String,Number" },
+				{ name:"value", type:"AnyType" },
+				{ name:"dowith", type:"String,Function" },
+			],
+			info:"<p>advance method ADRC property</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var get = struct.prop(\"get\");\n\
+\n\
+var o = { a:{ b:{ c:2 } } };\n\
+console.log(get(o,\"a.b.c\"));"
+				},
+				{ 
+					title: "Set property",
+					code:"var set = struct.prop(\"set\");\n\
+\n\
+var o = {};\n\
+console.log(set(o,\"a\",213));"
+				},
+			]
+		},
+
+		//#struct.pairs
+		"struct:pairs" : {
+			title:"pairs [ un ]",
+			introduce:"<code>struct.pairs</code> pairs unpairs data",
+			usages:[
+				"pairs -> struct.pairs()",
+				"unpairs -> struct.pairs(\"un\")",
+				"",
+				"pairs(obj)",
+				"unpairs(arr)",
+			],
+			params:[
+				{ name:"obj", type:"Object" },
+				{ name:"ary", type:"Array" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var pairs = struct.pairs();\n\
+\n\
+console.log(pairs({a:1,b:2}));"
+				},
+				{ 
+					title: "Unpairs",
+					code:"var unpairs = struct.pairs(\"un\");\n\
+\n\
+console.log(unpairs([['a',1],['b',2]]));"
+				},
+			]
+		},
+
+		//#struct.index
+		"struct:index" : {
+			title:"index [ ... ]",
+			introduce:"<code>struct.index</code> fast find value index in Array | Object",
+			usages:[
+				"firstIndex -> struct.index(\"first\")",
+				"lastIndex -> struct.index(\"last\")",
+				"single -> struct.index(\"one\")",
+				"index -> struct.index()",
+				"",
+				"index(arr,idf)"
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+				{ name:"idf", type:"AnyType" },
+			],
+			info:"<p><code>idf</code> support regexp</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var index = struct.index();\n\
+\n\
+// find number 1 indexs collection\n\
+console.log(index([2,3,4,1,2,4,2,1,1],1));"
+				},
+				{ 
+					title: "First Index",
+					code:"var findex = struct.index(\"first\");\n\
+\n\
+console.log(findex([2,3,4,1,2,4,2,1,1],1));"
+				},
+				{ 
+					title: "Last Index",
+					code:"var lindex = struct.index(\"last\");\n\
+\n\
+console.log(lindex([2,3,4,1,2,4,2,1,1],1));"
+				},
+				{ 
+					title: "Get first SingleValue",
+					code:"var one = struct.index(\"one\");\n\
+\n\
+console.log(one([2,4,2,1,1],function(res){\n\
+	return res>3;\n\
+}));"
+				},
+			]
+		},
+
+		//#struct.random
+		"struct:random" : {
+			title:"random [ ... ]",
+			introduce:"<code>struct.random</code> random someting custom",
+			usages:[
+				"rInt -> struct.random(\"int\")",
+				"rFloat -> struct.random(\"float\")",
+				"rString -> struct.random(\"string\")",
+				"rBool -> struct.random(\"boolean\")",
+				"rChar -> struct.random(\"char\")",
+				"rDate -> struct.random(\"date\")",
+				"rHex -> struct.random(\"hex\")",
+				"rDice -> struct.random(\"dice\")",
+				"rDefault -> struct.random() -> Math.random",
+				"",
+				"rInt(min,max)",
+				"rFloat(min,max,fix)",
+				"rBool(range)",
+				"rChar(all,upper)",
+				"rString(leng,all,upper)",
+				"rHex(format)",
+				"rDate()",
+				"rDice(max)"
+			],
+			params:[
+				{ name:"arr", type:"Array" },
+				{ name:"idf", type:"AnyType" },
+			],
+			info:"<p><code>idf</code> support regexp</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var random = struct.index();\n\
+\n\
+// find number 1 indexs collection\n\
+console.log(index([2,3,4,1,2,4,2,1,1],1));"
+				},
+			]
+		},
 	});
 });

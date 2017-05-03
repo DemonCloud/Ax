@@ -84,6 +84,8 @@
 		_first    = struct.first(),
 		_last     = struct.last(),
 		_link     = struct.link(),
+		_utob     = struct.assembly("u2b"),
+		_btou     = struct.assembly("b2u"),
 		_doom     = struct.doom();
 
 	// aix genertor function
@@ -1757,14 +1759,30 @@
 		return target;
 	}
 
+	function setStore(url,data){
+		localStorage.setItem(
+			"Ax@"+_utob(url),
+			_utob(JSON.stringify(data)+"\r")
+		);
+	}
+
+	function getStore(url){
+		if(toString(url)){
+			var str = _btou(localStorage.getItem("Ax@"+_utob(url)));
+			return _size(str) > 1 ? JSON.parse(str) : "";
+		}
+	}
+
 	// Aix Model
 	aix.model = aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
-			data = config.data,
 			events = config.events,
-			validate = config.validate;
+			validate = config.validate,
+			store = (config.store === true && toString(config.url)),
+			data = store ? (getStore(config.url)||config.data) : config.data; 
 
 		delete config.data;
+		delete config.store;
 		delete config.change;
 		delete config.events;
 		delete config.validate;
@@ -1783,9 +1801,10 @@
 					(_isFn(validate) ? validate(newdata) : true) :
 					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
-					this.change=true,
-					this.emit("validate:success,change",args),
-					newdata;
+						this.change=true,
+						(store && setStore(this.url,newdata)),
+						this.emit("validate:success,change",args),
+						newdata;
 
 				this.emit("validate:fail",args.concat(error));
 				if(_isAry(error)&&_size(error)===2)
