@@ -8,29 +8,32 @@
 
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
 
-		<p><b>Struct</b> pass over <b>300 test case by Qunit</b>.
-		</p>
+		<p><b>Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Aix</b> call build with <b>Saucelabs</b>:</p>
+		<br>
+		<p style="min-height:125px"><img style="display:block; width:100%; max-with:100%; overflow:hidden; zoom:1" src="app/styles/imgs/testing.png" alt="Aix Test by Saucelabs"></p>
+		<br>
 
 		<br>
 
-		<p>The <b>Aix</b> compress file with struct pack only <b>19KB(gzip)</b> </p>
-		<br>
+		<div class="it-download">
 		<mark style="margin-bottom:20px"><i class="ion-gear-b"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
 		<p>
-			<span>Pack with <code>struct</code> - </span>
-			<a href="app/scripts/libs/aix.c.js" rel="donload" download='aix.s.js'>
+			<span>Pack with <code>struct</code></span>
+			<a href="app/scripts/libs/aix.c.js" title="download it" alt="download it" rel="download" download='aix.s.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
 				aix.s.js (57k)
 			</a>
 		</p>
-		<br>
+		<p style="margin-bottom:0">The compress file with <b>GZIP</b> only <b>19KB</b> </p>
+		</div>
 		
+		<br>
 		<p>
 			<span class="it-outlink">
 				<a href="https://github.com/DemonCloud/aix" target="_blank"><i class="ion-social-github"></i> Encourage a Star</a> 
 			</span> 
 			<span class="it-outlink">
-				<a href="tests" target="_blank"><i class="ion-ios-analytics"></i> See Unit test</a> 
+				<a href="test" target="_blank"><i class="ion-ios-analytics"></i> See Unit test</a> 
 			</span>
 			<span class="it-outlink">
 				<a href="examples" target="_blank"><i class="ion-social-nodejs"></i> More Examples</a> 
