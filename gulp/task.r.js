@@ -22,7 +22,8 @@ function taskReuqireJS(){
 	])
 	.pipe(filter(["**"], { restore:true }))
 	.pipe(concat("aixs.min.js"))
-	.pipe(gulp.dest(cfg.path.pub));
+	.pipe(gulp.dest(cfg.path.pub))
+	.pipe(gulp.dest(cfg.path.dest));
 
 	return rjs.optimize(cfg.rjs,function(){ 
 		return gulp.src([

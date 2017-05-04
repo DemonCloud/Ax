@@ -20,9 +20,9 @@
 		<mark style="margin-bottom:20px"><i class="ion-erlenmeyer-flask"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
 		<p>
 			<span>Pack with <code>struct</code></span>
-			<a href="app/scripts/libs/aix.c.js" title="download it" alt="download it" rel="download" download='aix.s.js'>
+			<a href="./aixs.min.js" title="download it" alt="download it" rel="download" download='aixs.min.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				aix.s.js (57k)
+				aixs.min.js (1.0) (57k)
 			</a>
 		</p>
 		<p style="margin-bottom:0">The compress file with <b>GZIP</b> only <b>19KB</b> </p>
