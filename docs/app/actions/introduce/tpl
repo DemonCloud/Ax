@@ -7,8 +7,9 @@
 		<p><b><i class="ion-ios-navigate"></i> Aix</b> is a fast MVR JavaScript Framework.</p>
 
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
-
-		<p><b>Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Aix</b> call build with <b>Saucelabs</b>:</p>
+		<br>
+		
+		<p><b><i class="ion-android-apps"></i> Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Aix</b> call build with <b>Saucelabs</b>:</p>
 		<br>
 		<p style="min-height:125px"><img style="display:block; width:100%; max-with:100%; overflow:hidden; zoom:1" src="app/styles/imgs/testing.png" alt="Aix Test by Saucelabs"></p>
 		<br>
@@ -16,7 +17,7 @@
 		<br>
 
 		<div class="it-download">
-		<mark style="margin-bottom:20px"><i class="ion-gear-b"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
+		<mark style="margin-bottom:20px"><i class="ion-erlenmeyer-flask"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
 		<p>
 			<span>Pack with <code>struct</code></span>
 			<a href="app/scripts/libs/aix.c.js" title="download it" alt="download it" rel="download" download='aix.s.js'>

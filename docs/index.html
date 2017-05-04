@@ -22,9 +22,7 @@ It require Struct utils lib, for the sake of better organization application str
 	<meta name="type" type="SPA">
 
 	<link rel="home" href="/">
-	<link rel="stylesheet" href="./app/styles/main.css" media="all">
-	<link rel="stylesheet" href="./app/styles/icons.min.css" media="all">
-	<link rel="stylesheet" href="./app/styles/sh.min.css" media="all">
+	<link rel="stylesheet" href="./pub.min.css" media="all">
 </head>
 <body>
 <main class="main">
@@ -197,7 +195,35 @@ It require Struct utils lib, for the sake of better organization application str
 	</aside>
 
 	<section id="app" class="content clear">
-
+		<div class="loader">
+	  	<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	     																																																										 width="24px" height="30px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+	    	<rect x="0" y="13" width="4" height="5" fill="#8a3838">
+	      <animate attributeName="height" attributeType="XML"
+	        															values="5;21;5" 
+	        							 begin="0s" dur="0.6s" repeatCount="indefinite" />
+	      <animate attributeName="y" attributeType="XML"
+	        												 values="13; 5; 13"
+	        						 begin="0s" dur="0.6s" repeatCount="indefinite" />
+	    	</rect>
+	    	<rect x="10" y="13" width="4" height="5" fill="#8a3838">
+	      <animate attributeName="height" attributeType="XML"
+	        															values="5;21;5" 
+	        							 begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+	      <animate attributeName="y" attributeType="XML"
+	        												 values="13; 5; 13"
+	        						 begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+	    	</rect>
+	    	<rect x="20" y="13" width="4" height="5" fill="#8a3838">
+	      <animate attributeName="height" attributeType="XML"
+	        															values="5;21;5" 
+	        							 begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+	      <animate attributeName="y" attributeType="XML"
+	        												 values="13; 5; 13"
+	        						 begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+	    	</rect>
+	  	</svg>
+		</div>
 	</section>
 
 	<section class="s-search searchbox">
@@ -216,13 +242,7 @@ It require Struct utils lib, for the sake of better organization application str
 	</section>
 
 </main>
-<script src="./app/scripts/libs/sh_main.min.js"></script>
-<script src="./app/scripts/libs/sh_javascript.min.js"></script>
 <script src="./app/scripts/libs/require.min.js"></script>
-<!-- <script src="./../src/struct.js"></script> -->
-<!-- <script src="./../src/aix.js"></script> -->
-<script src="./app/scripts/libs/aix.c.js"></script>
-<script src="./app.js"></script>
-<script> require(["route"]) </script>
+<script src="./pub.min.js"></script>
 </body>
 </html>

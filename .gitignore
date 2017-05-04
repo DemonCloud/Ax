@@ -12,6 +12,8 @@ _dom.html
 .idea
 .idea/
 .idea/*
+tmp/
+tmp/*
 
 npm-debug.log*
 

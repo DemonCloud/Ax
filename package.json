@@ -28,9 +28,24 @@
   "homepage": "https://github.com/DemonCloud/aix#readme",
   "dependencies": {
     "browser-sync": "latest",
-    "gulp": "latest",
-    "gulp-concat": "latest",
-    "gulp-optimize-js": "latest",
-    "gulp-uglify": "latest"
+		"colors":"latest",
+		"gulp": "latest",
+		"gulp-autoprefixer": "latest",
+		"gulp-clean": "latest",
+		"gulp-clean-css": "latest",
+		"gulp-concat": "latest",
+		"gulp-concat-css":"latest",
+		"gulp-css-url-rebase": "latest",
+		"gulp-filter": "latest",
+		"gulp-optimize-js": "latest",
+		"gulp-px2rem": "latest",
+		"gulp-replace": "latest",
+		"gulp-requirejs-optimize": "latest",
+		"gulp-sequence": "latest",
+		"gulp-uglify": "latest",
+		"gulp-eslint":"latest",
+		"gulp-htmlmin":"latest",
+		"gulp-rename":"latest",
+		"requirejs": "latest"
   }
 }
