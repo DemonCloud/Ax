@@ -1773,6 +1773,47 @@
 		}
 	}
 
+	function pipe(type,url,param,fns,fnf,header){
+		//param must be object typeof
+		var st = {
+			type  : RESTFUL[_toString(type).toLowerCase()]||"GET",
+			aysnc : true
+		}, _fns, _fnf, isFn= _isFn(param);
+
+		// deel with arguments 
+		if(typeof url === 'string'){
+			st.url = url;
+			st.param = isFn ? {} : (param || {});
+			_fns = isFn ?  param : (fns || _noop);
+			_fnf = isFn ? (fns || _noop) : (fnf || _noop);
+		}else if(_isObj(url)){
+			st.url = this.url || "/";
+			st.param = isFn ? url : (param || {});
+			_fns = isFn ?  param : (fns || _noop);
+			_fnf = isFn ? (fns || _noop) : (fnf || _noop);
+		}else{
+			// no param
+			st.url = this.url || "/";
+			_fns = _noop;
+			_fnf = _noop;
+		}
+
+		// set http header param
+		st.header = header;
+		st.success = function(responseText,xhr,event){
+			// change the data before dispatch event;
+			_fns.call(this,responseText,xhr,event);
+			this.emit(type+":success",[responseText,xhr,event]);
+		}.bind(this);
+		st.fail = function(xhr,event){
+			_fnf.call(this,xhr,event);
+			this.emit(type+":fail",[xhr,event]);
+		}.bind(this);
+
+		// trigger ajax events
+		return this.emit(type,[_ajax(st),st]);
+	}
+
 	// Aix Model
 	aix.model = aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
@@ -1886,59 +1927,17 @@
 
 		// Fetch mean Restful "GET"
 		// fetch data form url with param
-		pipe : function(type,url,param,fns,fnf,header){
-			//param must be object typeof
-			var st = {
-				type  : RESTFUL[_toString(type).toLowerCase()]||"GET",
-				aysnc : true
-			}, _fns, _fnf, isFn= _isFn(param);
-
-			// deel with arguments 
-			if(typeof url === 'string'){
-				st.url = url;
-				st.param = isFn ? {} : (param || {});
-				_fns = isFn ?  param : (fns || _noop);
-				_fnf = isFn ? (fns || _noop) : (fnf || _noop);
-			}else if(_isObj(url)){
-				st.url = this.url || "/";
-				st.param = isFn ? url : (param || {});
-				_fns = isFn ?  param : (fns || _noop);
-				_fnf = isFn ? (fns || _noop) : (fnf || _noop);
-			}else{
-				// no param
-				st.url = this.url || "/";
-				_fns = _noop;
-				_fnf = _noop;
-			}
-
-			// set http header param
-			st.header = header;
-			st.success = function(responseText,xhr,event){
-				// change the data before dispatch event;
-				_fns.call(this,responseText,xhr,event);
-				this.emit(type+":success",[responseText,xhr,event]);
-			}.bind(this);
-			st.fail = function(xhr,event){
-				_fnf.call(this,xhr,event);
-				this.emit(type+":fail",[xhr,event]);
-			}.bind(this);
-
-			// trigger ajax events
-			return this.emit(type,[_ajax(st),st]);
-		},
-
-		send: function(url,fns,header){
-			if(_isFn(url)){
-				header = fns;
-				fns = url;
+		send: function(url,header){
+			if(_isObj(url)){
+				header = url;
 				url = null;
 			}
 
-			return this.pipe.apply(this,[
+			return pipe.apply(this,[
 				"send",
 				url || this.url,
 				this.data,
-				fns,
+				_noop,
 				_noop,
 				header
 			]);
@@ -1951,7 +1950,7 @@
 				param = {};
 			}
 
-			return this.pipe.apply(this,[
+			return pipe.apply(this,[
 				"fetch",
 				this.url,
 				param,
@@ -1963,10 +1962,15 @@
 			]);
 		},
 
-		sync: function(header){
-		  return this.pipe.apply(this,[
+		sync: function(url,header){
+			if(_isObj(url)){
+				header = url;
+				url = null;
+			}
+
+		  return pipe.apply(this,[
 		  	"sync",
-		  	this.url,
+		  	url || this.url,
 		  	this.data,
 		  	_noop,
 		  	_noop,

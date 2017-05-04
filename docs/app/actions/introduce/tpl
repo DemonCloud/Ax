@@ -13,21 +13,14 @@
 
 		<br>
 
-		<p>The <b>Aix</b> compress file <b>10KB(gzip)</b> , with struct pack only <b>18KB(gzip)</b> </p>
+		<p>The <b>Aix</b> compress file with struct pack only <b>19KB(gzip)</b> </p>
 		<br>
 		<mark style="margin-bottom:20px"><i class="ion-gear-b"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
 		<p>
 			<span>Pack with <code>struct</code> - </span>
 			<a href="app/scripts/libs/aix.c.js" rel="donload" download='aix.s.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				aix.s.js (53k)
-			</a>
-		</p>
-		<p>
-			<span>Single <code>aix</code> - </span>
-			<a href="app/scripts/libs/aix.min.js" rel="donload" download='aix.min.js'>
-				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				aix.min.js (30k)
+				aix.s.js (57k)
 			</a>
 		</p>
 		<br>

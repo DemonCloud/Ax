@@ -248,7 +248,7 @@ console.log(m.get());"
 			usages:[
 				"model.toJSON()"
 			],
-			info:"<p>sure you model is JSON format, <a href='https://zh.wikipedia.org/zh-hans/JSON' target='blank'>see more about JSON</a></p>",
+			info:"<p>sure you model is JSON format, <a href='https://en.wikipedia.org/wiki/JSON' target='_blank'>see more about JSON</a></p>",
 			examples:[
 				{ 
 					title: "Basic usage",
@@ -276,13 +276,12 @@ console.log(m.toJSON());"
 			introduce:"<code>model.send</code> send model data to server with \"GET\" method, auto convert data to querystring, this action be sure the data is typeof <code>Object</code> ",
 			usages:[
 				"model.send()",
-				"model.send(fn,header)",
-				"model.send(url,fn,header)"
+				"model.send(header)",
+				"model.send(url,header)"
 			],
 
 			params:[
 				{ name:"url", type:"String" },
-				{ name:"fn", type:"Function" },
 				{ name:"header", type:"Object" }
 			],
 			info:"<p>it will trigger the <code>send</code> events</p>\n\
@@ -308,19 +307,6 @@ console.log(m.send());\n\
 console.log(m.send(\"ajax/other\"));"
 				},
 				{ 
-					title: "With callback",
-					code:"var m = new aix.model({\n\
-	url:\"ajax/data1\",\n\
-	data:{\n\
-		id : 213\n\
-	}\n\
-});\n\
-// send data with callback \n\
-m.send(function(res){\n\
-	console.log(res);\n\
-});"
-				},
-				{ 
 					title: "With custom HTTP header",
 					code:"var m = new aix.model({\n\
 	url:\"ajax/data1\",\n\
@@ -329,7 +315,7 @@ m.send(function(res){\n\
 	}\n\
 });\n\
 // send data with custom HTTP header \n\
-m.send(struct.noop(),{\n\
+m.send({\n\
 	MyCustom : \"Buke\"\n\
 });"
 				}
@@ -397,9 +383,11 @@ m.fetch(function(res){\n\
 			introduce:"<code>model.sync</code> use \"POST\" method to sync the data to Server",
 			usages:[
 				"model.sync()",
-				"model.sync(header)"
+				"model.sync(header)",
+				"model.sync(url,header)"
 			],
 			params:[
+				{ name:"url", type:"String" },
 				{ name:"header", type:"Object" }
 			],
 			info:"<p>sync with only single param <code>header</code>, use to set [ HTTP Header ]</p>",
@@ -758,7 +746,9 @@ var n = new m({\n\
 	},\n\
 	events:{\n\
 		\"validate:fail\":function(data,key,val){\n\
-			console.log(\"can't set [\"+key+\"] as (\"+ val +\")\");\n\
+			console.log(\n\
+				\"can't set [\"+key+\"] as (\"+ val +\")\"\n\
+			);\n\
 		}\n\
 	}\n\
 });\n\
@@ -790,7 +780,7 @@ console.log(n.get());"
 					title: "Basic usage",
 					preview:"base",
 					code:"var v = new aix.view({\n\
-	template:\"&lt;span&gt;Hello {{-text}}&lt;/span&gt;\",\n\
+	template:\"&lt;span&gt;Hello &#123;&#123;-text&#125;&#125;&lt;/span&gt;\",\n\
 	events:{\n\
 		\"click:span\":function(){\n\
 			alert(this.innerHTML);\n\
@@ -818,7 +808,8 @@ v.mount(\n\
 			],
 			info:"<p>create render function must define <code>root</code> property at initialize.</p><p></p><p>u should be care about rewrite render function with <code>(view.render = somefunction )</code>, because rewrite render function make view repackage render events</p>",
 			related:[
-				{ name:"view.mount", target:"view:mount" }
+				{ name:"view.mount", target:"view:mount" },
+				{ name:"struct.doom", target:"struct:doom" }
 			],
 			examples:[
 				{ 
@@ -826,7 +817,7 @@ v.mount(\n\
 					preview:"base2",
 					code:"var v = new aix.view({\n\
 	root:document.getElementById(\"base2\"),\n\
-	template:\"Hi! {{-text}}\",\n\
+	template:\"Hi! &#123;&#123;-text&#125;&#125;\",\n\
 	events:{\n\
 		init: function(){\n\
 			this.render({ text: \"Cloud\" });\n\
@@ -870,7 +861,7 @@ v.render({ text: rs(5) });"
 					title: "Basic usage",
 					preview:"base",
 					code:"var v = new aix.view({\n\
-	template:\"Hi! {{#capit(random(length))}}\",\n\
+	template:\"Hi! &#123;&#123;#capit(random(length))&#125;&#125;\",\n\
 	props:{\n\
 		// dont make method name as 'length'\n\
 		capit : struct.string(\"capitalize\"),\n\
@@ -930,7 +921,7 @@ v.mount(\n\
 					preview:"v1",
 					code:"var v = new aix.view({\n\
 	root:document.getElementById(\"v1\"),\n\
-	template:\"{{-number}}\",\n\
+	template:\"&#123;&#123;-number&#125;&#125;\",\n\
 	events:{\n\
 		init: function(){\n\
 			this.render({ number: 2 });\n\
@@ -943,7 +934,7 @@ v.mount(\n\
 					preview:"v2",
 					code:"var v = new aix.view({\n\
 	root:document.getElementById(\"base\"),\n\
-	template:\"{{-number}}\"\n\
+	template:\"&#123;&#123;-number&#125;&#125;\"\n\
 });\n\
 \n\
 v.on(\"beforeRender\",function(data){\n\
@@ -1006,7 +997,7 @@ v.mount(\n\
 					preview:"v",
 					code:"var v = new aix.view.extend({\n\
 	root: document.getElementById(\"v\"),\n\
-	template: \"&lt;span&gt;{{-code}}&lt;/span&gt;\",\n\
+	template: \"&lt;span&gt;&#123;&#123;-code&#125;&#125;&lt;/span&gt;\",\n\
 	events: {\n\
 		init : function(){\n\
 			this.render(this.state);\n\
@@ -3166,18 +3157,319 @@ console.log(one([2,4,2,1,1],function(res){\n\
 				"rDice(max)"
 			],
 			params:[
-				{ name:"arr", type:"Array" },
-				{ name:"idf", type:"AnyType" },
+				{ name:"min", type:"Number" },
+				{ name:"max", type:"Number" },
+				{ name:"fix", type:"Number" },
+				{ name:"range", type:"Number" },
+				{ name:"all", type:"Boolean" },
+				{ name:"upper", type:"Boolean" },
+				{ name:"leng", type:"Number" },
+				{ name:"format", type:"Boolean" },
 			],
-			info:"<p><code>idf</code> support regexp</p>",
+			info:" <p> <code>upper</code> setting the uppercase character</p><p>the range is gona be int <code>1-100</code> number like persistent</p>",
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var random = struct.index();\n\
-\n\
-// find number 1 indexs collection\n\
-console.log(index([2,3,4,1,2,4,2,1,1],1));"
+					code:"var random = struct.random(\"int\");\n\
+console.log(random(1,8));"
 				},
+				{ 
+					title: "Float",
+					code:"var random = struct.random(\"float\");\n\
+console.log(random(1,3.2,6/*fixed*/));"
+				},
+				{ 
+					title: "Range boolean",
+					code:"var random = struct.random(\"bool\");\n\
+console.log(random(40));"
+				},
+				{ 
+					title: "String",
+					code:"var random = struct.random(\"string\");\n\
+console.log(random(8,false,true));"
+				},
+			]
+		},
+
+		//#struct.string
+		"struct:string" : {
+			title:"string [ ... ]",
+			introduce:"<code>struct.string</code> method to deal with format",
+			usages:[
+				" toString -> struct.string()",
+				" trim -> struct.string(\"trim\")",
+				" trimLeft -> struct.string(\"trimLeft\")",
+				" trimRight -> struct.string(\"trimRight\")",
+				" camelize -> struct.string(\"came\")",
+				" capitalize -> struct.string(\"capit\")",
+				" rize -> struct.string(\"rize\")",
+				"",
+				"trim(str)",
+			],
+			params:[
+				{ name:"str", type:"String" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var trim = struct.string(\"trim\");\n\
+console.log(trim(\"  Buke Gun \"));"
+				},
+				{
+					title: "Camelize",
+					code:"var came = struct.string(\"came\");\n\
+console.log(came(\"background-color\"));\n\
+console.log(came(\"name_gen\"));\n\
+console.log(came(\"font-size\"));"
+				},
+				{
+					title: "Rize",
+					code:"var rize = struct.string(\"rize\");\n\
+console.log(rize(\"fontSize\"));\n\
+console.log(rize(\"borderTop\"));"
+				}
+			]
+		},
+
+		//#struct.assembly
+		"struct:assembly" : {
+			title:"assembly [ ... ]",
+			introduce:"<code>struct.assembly</code> provide some computer at the bottom of the method",
+			usages:[
+				" atob -> struct.assembly(\"atob\")",
+				" btoa -> struct.assembly(\"btoa\")",
+				" utob -> struct.assembly(\"utob\")",
+				" btou -> struct.assembly(\"btou\")",
+				"",
+				"atob(str)",
+			],
+			info:"\n\
+<table>\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Assembly</th>\n\
+			<th>Info</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>btoa</td>\n\
+			<td>convert str to Base64 encoding</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>atob</td>\n\
+			<td>decode convert Base64 to str</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>utob</td>\n\
+			<td>convert utf8(all lang) Base64 to str</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>btou</td>\n\
+			<td>decode convert Base64 to utf8-str</td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+",
+			params:[
+				{ name:"str", type:"String" },
+			],
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var atob = struct.assembly(\"atob\");\n\
+console.log(atob(\"Buke\"));"
+				},
+			]
+		},
+
+		//#struct.doom
+		"struct:doom" : {
+			title:"doom [ template ]",
+			introduce:"<code>DOOM</code> slim fast JavaScript template, with <b>precomplete, chache, performance</b>",
+			usages:[
+				" doom -> struct.doom(setting)",
+				" doom(str)",
+			],
+			params:[
+				{ name:"str", type:"String" },
+				{ name:"setting", type:"Object" },
+				{ name:"setting:interpolate", type:"String" },
+				{ name:"setting:escape", type:"String" },
+				{ name:"setting:command", type:"String" },
+				{ name:"setting:evaluate", type:"String" },
+			],
+			related:[
+				{ name:"view.mount", target:"view:mount" },
+				{ name:"view.render", target:"view:render" }
+			],
+			info:"<p>DOOM is <b>[ fast, precomplete, cache, dynamic parameter ]</b> template engine </p>\n\
+<p>DOOM can be regarded as a compiler, build string template like <code>mustache</code>, there use some grammar as :</p>\n\
+<table>\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Grammar</th>\n\
+			<th>Format</th>\n\
+			<th>RegExp</th>\n\
+			<th>Info</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>interpolate</td>\n\
+			<td>&#123;&#123;# &#125;&#125;</td>\n\
+			<td>&#123;&#123;#([\\s\\S]+?)&#125;&#125;</td>\n\
+			<td>directly output variable</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>escape</td>\n\
+			<td>&#123;&#123;- &#125;&#125;</td>\n\
+			<td>&#123;&#123;-([\\s\\S]+?)&#125;&#125;</td>\n\
+			<td>output variable with <b>escape</b> (prevent being  XSS attacked)</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>command</td>\n\
+			<td>&#123;&#123;* &#125;&#125;</td>\n\
+			<td>&#123;&#123;*([\\s\\S]+?)&#125;&#125;</td>\n\
+			<td>extra command parse with doom grammar</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>evaluate</td>\n\
+			<td>&#123;&#123;&nbsp; &#125;&#125;</td>\n\
+			<td>&#123;&#123;([\\s\\S]+?)&#125;&#125;</td>\n\
+			<td>parse normal JavaScript code</td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+<br>\n\
+<br>\n\
+<p>DOOM bind some command grammar, Usually they are used to reduce the code size</p>\n\
+<table style=\"table-layout:auto\">\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Command</th>\n\
+			<th>Usage</th>\n\
+			<th>Info</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>exist(if)</td>\n\
+			<td style=\"white-space:nowrap; color:#778e9c\">&#123;&#123;*exist [var]&#125;&#125; ,<br>\n\
+			&#123;&#123;*exist [var] then [arguments]&#125;&#125;\n\
+			</td>\n\
+			<td>check the variable if exist, <code>then</code> means use some variable. not as function, should use with <code>&#123;&#123;*end&#125;&#125;</code> together</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>each(for)</td>\n\
+			<td style=\"white-space:nowrap; color:#778e9c\">&#123;&#123;*each [..args] in [list]&#125;&#125;</td>\n\
+			<td>each method given a simple way to loop the (Array|Object), should use with <code>&#123;&#123;*end&#125;&#125;</code> together</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>not</td>\n\
+			<td style=\"white-space:nowrap; color:#778e9c\">&#123;&#123;*not [value] with [list]&#125;&#125;</td>\n\
+			<td>simple way to fast pull(not) value in [list], it would change list</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>extend</td>\n\
+			<td style=\"white-space:nowrap; color:#778e9c\">&#123;&#123;*extend [target] with [list]&#125;&#125;</td>\n\
+			<td>simple way extend target into [list]</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>map</td>\n\
+			<td style=\"white-space:nowrap; color:#778e9c\">&#123;&#123;*map [list] use [param]&#125;&#125;</td>\n\
+			<td>directly map list use (param) - struct.map</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>find</td>\n\
+			<td style=\"white-space:nowrap; color:#778e9c\">&#123;&#123;*find [list] use [param]&#125;&#125;</td>\n\
+			<td>directly filter list use (param) - struct.find</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>unique</td>\n\
+			<td style=\"white-space:nowrap; color:#778e9c\">&#123;&#123;*unique [list]&#125;&#125;<br>\n\
+			&#123;&#123;*unique:fast [list]&#125;&#125;</td>\n\
+			<td>unique array - struct.unique</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>...</td>\n\
+			<td></td>\n\
+			<td></td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"var doom = struct.doom();\n\
+//Compiling templates\n\
+var bt = doom(\"&lt;b&gt;Hello &#123;&#123;#name&#125;&#125;&lt;/b&gt;\");\n\
+console.log(bt({ name: \"&lt;Buke&gt;\" }));"
+				},
+				{ 
+					title: "Escape",
+					code:"var doom = struct.doom();\n\
+//Compiling templates\n\
+var bt = doom(\"HTML-> &#123;&#123;-tag&#125;&#125;\");\n\
+console.log(bt({\n\
+	tag: \"&lt;script&gt;alert()&lt;/script&gt;\"\n\
+}));"
+				},
+				{
+					title: "Parse Javascript",
+					code:"var doom = struct.doom();\n\
+//Compiling templates\n\
+var bt = doom(\n\
+	\"&#123;&#123; if(score>60){ &#125;&#125;\"+\n\
+	\"Awesame! you have pass this test.\"+\n\
+	\"&#123;&#123; }else{ &#125;&#125;\"+\n\
+	\"Fail! you may retry this test.\"+\n\
+	\"&#123;&#123; } &#125;&#125;\"\n\
+);\n\
+console.log(bt({ score:42 }));\n\
+console.log(bt({ score:98 }));"
+				},
+				{
+					title: "Use build-in Command",
+					preview: "tpl",
+					code:"var doom = struct.doom();\n\
+var data = { \n\
+	members:[\n\
+		{ name:\"Cloud\" , score:62 },\n\
+		{ name:\"Buke\"  , score:98 },\n\
+		{ name:\"Uncle\" , score:12 },\n\
+		{ name:\"Shougo\", score:85 }\n\
+	]\n\
+};\n\
+\n\
+var bt = doom(\n\
+	\"&lt;ul&gt;\"+\n\
+	\"&#123;&#123;* each [people] in members &#125;&#125;\"+\n\
+	\"	&lt;li&gt;\"+\n\
+	\"		 &#123;&#123;-people.name&#125;&#125; - \"+\n\
+	\"		 &#123;&#123;-people.score&#125;&#125; \"+\n\
+	\"	&lt;/li&gt;\"+\n\
+	\"&#123;&#123;* end &#125;&#125;\"+\n\
+	\"&lt;/ul&gt;\"\n\
+);\n\
+// mount in dom\n\
+document.getElementById(\"tpl\")\n\
+				.innerHTML = bt(data);"
+				},
+				{
+					title: "Use command [unique]",
+					code:"var doom = struct.doom();\n\
+var data = {\n\
+	arr: [2,3,1,4,2,1,4,5,6,3,4,1,8,6,7]\n\
+};\n\
+\n\
+var bt = doom(\n\
+	\"{{*unique:fast arr}}\"+\n\
+	\"{{console.log(arr)}}\"\n\
+);\n\
+bt(data);"
+				}
 			]
 		},
 	});

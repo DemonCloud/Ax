@@ -1216,6 +1216,7 @@ function makeComand(command){
 				res = compiLing("op",param[1],param[0]);
 				break;
 			case "not":
+			case "cat":
 			case "extend":
 				//{{* not param with list }}
 				param = param.split(" with ");
@@ -1239,8 +1240,8 @@ function compiLing(usestruct,who,useargs){
 
 function compSaze(usestruct,who,useargs,assign){
 	var api = usestruct.split(":");
-	return (assign ? (who+"=") : "") + 
-				 "';\n struct."+api[0]+'("'+(api[1]||"")+'")('+who+","+
+	return "'; "+ (assign ? (who+"=") : "") + 
+				 "struct."+api[0]+'("'+(api[1]||"")+'")('+who+","+
 				 useargs.replace(agExec,'')+"); _p+='";
 }
 
@@ -1278,527 +1279,527 @@ function DOOM(txt,bounds,name){
 		else if(interpolate)
 			res += "'+((_t=(" + interpolate + "))==null?'':_t)+'";
 		else if(command)
-			res += makeComand(command,res);
-		else if(evaluate)
-			res += "';\n" + evaluate + "\n_p+='";
+				res += makeComand(command,res);
+			else if(evaluate)
+				res += "';\n" + evaluate + "\n_p+='";
 
-		return match;
-	});
-	// End wrap res@ String
-	// use default paramKey to compline
-	res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){\n" + res + "';\n}";
-	res = "var _t,_d,_ext=struct.exist(),_=struct.html('encode'),__=struct.extend(),_p='';\n" + res + "\nreturn _p;";
+			return match;
+	}).replace(/_p\+=\'\'/gim,'');
+		// End wrap res@ String
+		// use default paramKey to compline
+		res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){\n" + res + "';\n}";
+		res = "var _t,_d,_ext=struct.exist(),_=struct.html('encode'),__=struct.extend(),_p='';\n" + res + "\nreturn _p;";
 
-	// Complete building Function string
-	// try to build anmousyous function
-	try{
-		render = ev("(function("+(rname||"_x_")+
-			",_bounds,struct"+(args.length?","+args.toString():"")+"){"+ 
-				res + 
-			"})"
-		);
-	}catch(e){
-		console.error(e.res = res);
-		throw e;
-	}
-
-  // @ Precomplete JavaScript Template Function
-  // @ the you build once template that use diff Data, not use diff to build function again
-	// @ protect your template code other can observe it?
-	return function(data){
-		return eq(arguments,render.pre) ? (render.complete) : 
-			(render.pre=arguments, render.complete = render.apply(this,
-				[data,methods,struct].concat(slice(arguments,1))
-			));
-	};
-}
-
-// Browser cookie
-// @use cookieParse
-// @export cookie
-function cookieParse(ckstr){
-	var res={}, pars = ckstr ? ckstr.split(";") : [];
-
-	al(pars, function(item){
-		var ind = (item||"").search("=");
-
-		if(!~ind) return;
-		var rkey = trim(item.substr(0,ind));
-		if(rkey.length)
-			res[rkey] = trim(item.substr(ind+1));
-	});
-
-	return res;
-}
-
-function cookie(param){
-	// args :( name , value, expires, path, domain, secure)
-	var args = slice(arguments),
-			len = args.length,
-			parsec = cookieParse(document.cookie);
-
-	if(len){
-		// get cookie
-		if(len === 1)
-			return parsec[param];
-		else{
-			var time = new Date();
-			time.setDate(time.getDate()+365);
-
-			return document.cookie = trim(
-				args[0]+"="+(args[1]||"") + ';' +
-				"expires="+(args[2]||time.toUTCString()) + ';' +
-				"path="   +(args[3]||"/") + ';' +
-				"domain=" +(args[4]||"") + ';' +
-				( args[5] ? "secure":"" )
-			),true;
+		// Complete building Function string
+		// try to build anmousyous function
+		try{
+			render = ev("(function("+(rname||"_x_")+
+				",_bounds,struct"+(args.length?","+args.toString():"")+"){"+ 
+					res + 
+				"})"
+			);
+		}catch(e){
+			console.error(e.res = res);
+			throw e;
 		}
-	}
 
-	return parsec;
-}
-
-// slim ajax method
-// @use *aix
-// @use ajaxGET
-// @use ajaxPOST
-// @use JSONP
-// @export ajax
-var MIME = {
-	"application/x-www-form-urlencoded": 0,
-	"application/json" : 1
-};
-
-// deal with Data type
-function dataMIME(enable,header,param){
-	if(enable)
-		switch(header){
-			case 0:
-				return paramStringify(param||{});
-			case 1:
-				return JSON.stringify(param||{});
-			default : 
-				return paramStringify(param||{});
-		}
-	return param;
-}
-
-// base ajax aix [ method ]
-function aix(option){
-	var config = extend({
-		// default param
-		url       : "",
-		type      : "GET",
-		param     : broken,
-		charset   : "utf-8",
-		vaild     : true,
-		cache     : false,
-		success   : noop,
-		error     : noop,
-		loading   : noop,
-		loadend   : noop,
-		header    : broken,
-		username  : null,
-		password  : null,
-		timeout   : 0,
-		aysnc     : true,
-		contentType : true
-	} , option || {} );
-
-	var ls = root.localStorage;
-
-	if(config.cache){
-		// *Init set localStorage
-		if(!ls.getItem("_"))
-			ls.setItem("_","{}");
-
-		var cache = JSON.parse(ls.getItem("_"));
-		var data = cache[config.url || root.location.href.split("#").shift()];
-
-		if(data!==void 0) 
-			return config.sucess.call(root,data);
-	}
-	
-	var xhr = new XMLHttpRequest(), cType;
-	// with GET method
-	if(config.type.toUpperCase() === "GET" && config.param){
-		config.url += (~config.url.search(/\?/g) ?
-									"&" : (keys(config.param).length ? "?" : ""))+
-									paramStringify(config.param);
-		config.param = null;
-	}
-
-	//set Loading
-	xhr.addEventListener("loadstart",config.loading);
-	xhr.addEventListener("loadend",config.loadend);
-
-	xhr.open(
-		config.type,
-		config.url,
-		config.aysnc,
-		config.username,
-		config.password
-	);
-
-	// with POST method
-	cType = isObject(config.header) ? 
-			(config.header["Content-Type"] || "application/x-www-form-urlencoded" ) : 
-			"application/x-www-form-urlencoded";
-
-	if(config.header !== broken && isObject(config.header))
-		ol(config.header,function(val,key){ xhr.setRequestHeader(key,val); });
-
-	if(config.type.toUpperCase() === "POST" && 
-		 config.contentType === true && 
-		 (cType||"").search("json")===-1)
-		xhr.setRequestHeader("Content-Type",cType+";chartset="+config.charset);
-
-	xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
-	xhr.setRequestHeader("Struct-Requested","StructHttpRequest");
-
-	xhr.onreadystatechange = function(event){
-		// response HTTP response header 200 or lower 300
-		// 304 not modifined
-		if(xhr.readyState === 4 && xhr.responseText){
-			var status = xhr.status;
-
-			if(( status >= 200 && status < 300) || status === 304){
-				config.success.call(root,xhr.responseText,xhr,event);
-				// if cache been set writeJSON in chache
-				if(config.cache){
-					var cache = JSON.parse(ls.getItem("_"));
-					cache[config.url||root.location.href.split("#")[0]] = xhr.responseText;
-					ls.setItem("_",JSON.stringify(cache));
-				}
-			} else {
-				config.error.call(root,xhr,event);
-			}
-		}
-	};
-
-	// setTimeout data of ajax
-	if(toNumber(config.timeout)){
-		xhr.timeout = toNumber(config.timeout)*1000;
-		xhr.ontimeout = function(event){
-			if(xhr.readyState !== 4 || !xhr.responseText)
-				config.error.call(root,xhr);xhr.abort();
+  	// @ Precomplete JavaScript Template Function
+  	// @ the you build once template that use diff Data, not use diff to build function again
+		// @ protect your template code other can observe it?
+		return function(data){
+			return eq(arguments,render.pre) ? (render.complete) : 
+				(render.pre=arguments, render.complete = render.apply(this,
+					[data,methods,struct].concat(slice(arguments,1))
+				));
 		};
 	}
 
-	// send request
-	return xhr.send(config.param ? 
-		(isObject(config.param) ? 
-		dataMIME(config.contentType,cType,config.param) :
-		config.param ) : null),xhr;
-}
+	// Browser cookie
+	// @use cookieParse
+	// @export cookie
+	function cookieParse(ckstr){
+		var res={}, pars = ckstr ? ckstr.split(";") : [];
 
-function JSONP(option){
-	var config = extend({
-		url : "",
-		param : broken,
-		key : "callback",
-		callback : ("jsonp"+Math.random()).replace(".",""),
-		timeout: 5,
-		success : noop,
-		error : noop
-	}, option || {} );
+		al(pars, function(item){
+			var ind = (item||"").search("=");
 
-	var url = config.url+"?" +
-			paramStringify(config.param) +
-			(keys(config.param).length ? "&" : "") +
-			config.key + "=" + config.callback;
-
-	var tag = document.createElement("script");
-			tag.src = url;
-
-	// define callback
-	root[config.callback] = function(res){
-		clearTimeout(config.timesetup);
-
-		document.body.removeChild(tag);
-		root[config.callback] = null;
-		config.success(res);
-	};
-
-	// append elm
-	// send request
-	document.body.append(tag);
-
-	// if timeout will trigger failcall
-	if(toNumber(config.timeout)){
-		config.timesetup = setTimeout(function(){
-			document.body.removeChild(tag);
-			root[config.callback] = null;
-
-			config.error();
-		},config.timeout * 1000);
-	}
-}
-
-// get slim method with signet param [ method ]
-function ajaxGET(url,param,sucess,error){
-	if(isFn(param)){
-		error = sucess;
-		sucess = param;
-		param = {};
-	}
-
-	return aix({
-		url : url,
-		param : param,
-		success : sucess,
-		error : error
-	});
-}
-
-function ajaxPOST(url,param,sucess,error){
-	if(isFn(param)){
-		error = sucess;
-		sucess = param;
-		param = {};
-	}
-
-	return aix({
-		url : url,
-		type : "POST",
-		param : param,
-		success : sucess,
-		error : error
-	});
-}
-
-// Struct Events 
-// object add custom event, use [ emit ] to trigger
-// @use addEvent
-// @use removeEvent
-// @use *emit
-// @export Event
-var _events = {} , _eid=0;
-
-function addEvent(obj,type,fn){
-	var id = obj._eid || 0;
-	if(id === 0) define(obj,"_eid",{ value : (id = (++_eid)), writable : false, enumerable: false, configurable: true });
-	if(!_events[id]) _events[id] = {};
-	if(!_events[id][type]) _events[id][type] = [];
-	if(!has(_events[id][type],fn)) _events[id][type].push(fn);
-	return obj;
-}
-
-function removeEvent(obj,type,fn){
-	var id = obj._eid || 0;
-	if(id&&_events[id]){
-		if(_events[id][type]){
-			if(!((not(_events[id][type],fn)).length) || !fn)
-				delete _events[id][type];
-		}else if(!type && !fn){
-			delete obj._eid;
-			delete _events[id];
-		}
-	}
-	return obj;
-}
-
-function hasEvent(obj,type,fn){
-	var res = false, id= obj._eid || 0;
-	if(id&&_events[id]){
-		if(isFn(fn) && _events[id][type])
-			res = has(_events[id][type],fn);
-		else
-			res = size(_events[id][type]);
-	}
-	return !!res;
-}
-
-function copyEvent(toobj,related){
-	var rid = (isObject(related) ? related._eid : 0) || 0;
-	if(rid){
-		define(toobj,"_eid",{ 
-			value : ++_eid, 
-			writable : false, 
-			enumerable: false, 
-			configurable: true 
+			if(!~ind) return;
+			var rkey = trim(item.substr(0,ind));
+			if(rkey.length)
+				res[rkey] = trim(item.substr(ind+1));
 		});
 
-		_events[toobj._eid] = depclone(_events[rid]);
-	}
-	return toobj;
-}
-
-function fireEvent(obj,type,args){
-	var id = obj._eid || 0, args = args||[];
-	if(id && _events[id] && type!=="")
-		ol(_events[id][type],function(f){
-			f.apply(this,args);
-		},obj);
-}
-
-function emit(obj,type,args){
-	return al(
-		toString(type).split(","),
-		function(t){ fireEvent(this,trim(t),args); },
-		obj
-	),obj;
-}
-
-// Struct Prop listener
-// @use getProp
-// @exprot prop
-
-// define deeping getProp method
-function getProp(obj,prop,dowith){
-	var tmp,i,keygen = toString(prop||"").split(".");
-
-	if(keygen.length === 1){
-		if(obj.hasOwnProperty(prop))
-			tmp = obj[prop];
-	}else{
-		// [a.b.2]
-		for(i=0,tmp = obj;i<keygen.length;i++)
-			if(isPrimitive(tmp = tmp[keygen[i]])) 
-				break;
+		return res;
 	}
 
-	if(dowith){
-		var args = slice(arguments,3);
-		if(isFn(dowith))
-			tmp = dowith.apply(tmp,(args.unshift(tmp),args));
-		else if(typeof dowith === "string")
-			tmp = isFn(tmp[dowith]) ? 
-						tmp[dowith].apply(tmp,args) :
-						tmp[dowith];
+	function cookie(param){
+		// args :( name , value, expires, path, domain, secure)
+		var args = slice(arguments),
+				len = args.length,
+				parsec = cookieParse(document.cookie);
+
+		if(len){
+			// get cookie
+			if(len === 1)
+				return parsec[param];
+			else{
+				var time = new Date();
+				time.setDate(time.getDate()+365);
+
+				return document.cookie = trim(
+					args[0]+"="+(args[1]||"") + ';' +
+					"expires="+(args[2]||time.toUTCString()) + ';' +
+					"path="   +(args[3]||"/") + ';' +
+					"domain=" +(args[4]||"") + ';' +
+					( args[5] ? "secure":"" )
+				),true;
+			}
+		}
+
+		return parsec;
 	}
-		
-	return tmp;
-}
 
-function setProp(obj,prop,value){
-	var tmp,end,i,check,keygen = (prop||"").split(".");
-	if(keygen.length === 1){
-		obj[prop] = value;
-	}else{
-		// [a.b.2]
-		for(i=0,tmp=obj,check,end=keygen.pop();i<keygen.length;i++)
-			tmp = (check = tmp[keygen[i]]) == null ? {} : check ;
-		tmp[end] = value;
-	}
-	return obj;
-}
-
-function rmProp(obj,prop){
-	var tmp,i,end,keygen = (prop||"").split(".");
-	if(keygen.length === 1){
-		if(obj.hasOwnProperty(prop))
-			delete obj[prop];
-	}else{
-		for(i=0,tmp=obj,end = keygen.pop();i<keygen.length;i++)
-			tmp = tmp[keygen[i]]; 
-		if(isArray(tmp))
-			tmp.splice(toNumber(end),1);
-		else
-			delete tmp[end];
-	}
-	return obj;
-}
-
-// #not need api
-// function watch(obj,prop,handle){
-// }
-
-// function unwatch(obj,prop){
-// }
-
-// return random element [ method ]
-// auto([1,2,3,4,5]) => random(in ary);
-function auto(ary,num){
-	return toNumber(num) > 1 ? 
-				 slice(shuffle(ary),0,toNumber(num)) : 
-				 ary[randomInt(size(ary)-1)];
-}
-
-// detect Variable size [ method ]
-// size([1,2,3]) => 3
-// size('abcd') => 4
-// size({a:1}) => 1
-// size(null) => 0
-// size(NaN) => 0
-function size(n){
-	if(!isFn(n) && n!= null && !isNaN(n))
-		return typeof n.length === 'number' ?
-					 n.length : (isObject(n) ? keys(n).length : 0);
-	return 0;
-}
-
-// return now TimeStamp [ method ]
-function now(){
-	return (new Date()).getTime();
-}
-
-// object values [ method ]
-// @export values
-function values(obj){
-	var res=[];
-	if(isDefine(obj,"String"))
-		return obj.split('');
-	else
-		fov(obj,function(val){ res.push(val); });
-	return res;
-}
-
-// create Memoize function [ method ]
-function memoize(fn,context){
-	var memo = [];
-	return function(){
-		var args = slice(arguments),df;
-		for(var i=memo.length; i--;)
-			if(eq(memo[i][0],args))
-				return (df=memo[i][1]);
-		return memo.push([args,df=fn.apply(context,args)]),df;
+	// slim ajax method
+	// @use *aix
+	// @use ajaxGET
+	// @use ajaxPOST
+	// @use JSONP
+	// @export ajax
+	var MIME = {
+		"application/x-www-form-urlencoded": 0,
+		"application/json" : 1
 	};
-}
 
-// create Negate function [ method ]
-function negate(fn,context){
-	var mapper = isDefine(fn,"RegExp") ? cit(regCheck,fn) : fn;
-	
-	return isFn(mapper) ? function(){
-		return !mapper.apply(context,arguments);
-	} : cit(nseq,mapper).bind(context);
-}
-
-// create wrapper functions stack [ method ]
-// args [ ...function ];
-// var a = function(t){ return "<a>"+t+"<a>"}
-// var b = function(t){ return "<b>"+t+"<b>"}
-// var c = function(t){ return "<c>"+t+"<c>"}
-// var w = wrap(a,b,c);
-// w("tag") => "<c><b><a>tag<a><b><c>"
-function wrap(){ 
-	var arg = slice(arguments); 
-	return function(x){ 
-		return arg.reduce(function(val,fn){ 
-			return fn(val);
-		},x);
-	}; 
-}
-
-function sort(ary,key){
-	if(isObject(ary)&&!isArray(ary)&&typeof key === "string"){
-		var target = getProp(ary,key);
-		return target.sort.apply(target,slice(arguments,2)),ary;
+	// deal with Data type
+	function dataMIME(enable,header,param){
+		if(enable)
+			switch(header){
+				case 0:
+					return paramStringify(param||{});
+				case 1:
+					return JSON.stringify(param||{});
+				default : 
+					return paramStringify(param||{});
+			}
+		return param;
 	}
 
-	if(isArray(ary))
-		return ary.sort.apply(ary,slice(arguments,1));
-	return ary;
-}
+	// base ajax aix [ method ]
+	function aix(option){
+		var config = extend({
+			// default param
+			url       : "",
+			type      : "GET",
+			param     : broken,
+			charset   : "utf-8",
+			vaild     : true,
+			cache     : false,
+			success   : noop,
+			error     : noop,
+			loading   : noop,
+			loadend   : noop,
+			header    : broken,
+			username  : null,
+			password  : null,
+			timeout   : 0,
+			aysnc     : true,
+			contentType : true
+		} , option || {} );
 
-function exist(check){
-	var args = slice(arguments,1);
-	if(check)
-		last(args).apply(null,args);
-}
+		var ls = root.localStorage;
 
-function frozen(){
+		if(config.cache){
+			// *Init set localStorage
+			if(!ls.getItem("_"))
+				ls.setItem("_","{}");
+
+			var cache = JSON.parse(ls.getItem("_"));
+			var data = cache[config.url || root.location.href.split("#").shift()];
+
+			if(data!==void 0) 
+				return config.sucess.call(root,data);
+		}
+		
+		var xhr = new XMLHttpRequest(), cType;
+		// with GET method
+		if(config.type.toUpperCase() === "GET" && config.param){
+			config.url += (~config.url.search(/\?/g) ?
+										"&" : (keys(config.param).length ? "?" : ""))+
+										paramStringify(config.param);
+			config.param = null;
+		}
+
+		//set Loading
+		xhr.addEventListener("loadstart",config.loading);
+		xhr.addEventListener("loadend",config.loadend);
+
+		xhr.open(
+			config.type,
+			config.url,
+			config.aysnc,
+			config.username,
+			config.password
+		);
+
+		// with POST method
+		cType = isObject(config.header) ? 
+				(config.header["Content-Type"] || "application/x-www-form-urlencoded" ) : 
+				"application/x-www-form-urlencoded";
+
+		if(config.header !== broken && isObject(config.header))
+			ol(config.header,function(val,key){ xhr.setRequestHeader(key,val); });
+
+		if(config.type.toUpperCase() === "POST" && 
+		 	config.contentType === true && 
+		 	(cType||"").search("json")===-1)
+			xhr.setRequestHeader("Content-Type",cType+";chartset="+config.charset);
+
+		xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
+		xhr.setRequestHeader("Struct-Requested","StructHttpRequest");
+
+		xhr.onreadystatechange = function(event){
+			// response HTTP response header 200 or lower 300
+			// 304 not modifined
+			if(xhr.readyState === 4 && xhr.responseText){
+				var status = xhr.status;
+
+				if(( status >= 200 && status < 300) || status === 304){
+					config.success.call(root,xhr.responseText,xhr,event);
+					// if cache been set writeJSON in chache
+					if(config.cache){
+						var cache = JSON.parse(ls.getItem("_"));
+						cache[config.url||root.location.href.split("#")[0]] = xhr.responseText;
+						ls.setItem("_",JSON.stringify(cache));
+					}
+				} else {
+					config.error.call(root,xhr,event);
+				}
+			}
+		};
+
+		// setTimeout data of ajax
+		if(toNumber(config.timeout)){
+			xhr.timeout = toNumber(config.timeout)*1000;
+			xhr.ontimeout = function(event){
+				if(xhr.readyState !== 4 || !xhr.responseText)
+					config.error.call(root,xhr);xhr.abort();
+			};
+		}
+
+		// send request
+		return xhr.send(config.param ? 
+			(isObject(config.param) ? 
+			dataMIME(config.contentType,cType,config.param) :
+			config.param ) : null),xhr;
+	}
+
+	function JSONP(option){
+		var config = extend({
+			url : "",
+			param : broken,
+			key : "callback",
+			callback : ("jsonp"+Math.random()).replace(".",""),
+			timeout: 5,
+			success : noop,
+			error : noop
+		}, option || {} );
+
+		var url = config.url+"?" +
+				paramStringify(config.param) +
+				(keys(config.param).length ? "&" : "") +
+				config.key + "=" + config.callback;
+
+		var tag = document.createElement("script");
+				tag.src = url;
+
+		// define callback
+		root[config.callback] = function(res){
+			clearTimeout(config.timesetup);
+
+			document.body.removeChild(tag);
+			root[config.callback] = null;
+			config.success(res);
+		};
+
+		// append elm
+		// send request
+		document.body.append(tag);
+
+		// if timeout will trigger failcall
+		if(toNumber(config.timeout)){
+			config.timesetup = setTimeout(function(){
+				document.body.removeChild(tag);
+				root[config.callback] = null;
+
+				config.error();
+			},config.timeout * 1000);
+		}
+	}
+
+	// get slim method with signet param [ method ]
+	function ajaxGET(url,param,sucess,error){
+		if(isFn(param)){
+			error = sucess;
+			sucess = param;
+			param = {};
+		}
+
+		return aix({
+			url : url,
+			param : param,
+			success : sucess,
+			error : error
+		});
+	}
+
+	function ajaxPOST(url,param,sucess,error){
+		if(isFn(param)){
+			error = sucess;
+			sucess = param;
+			param = {};
+		}
+
+		return aix({
+			url : url,
+			type : "POST",
+			param : param,
+			success : sucess,
+			error : error
+		});
+	}
+
+	// Struct Events 
+	// object add custom event, use [ emit ] to trigger
+	// @use addEvent
+	// @use removeEvent
+	// @use *emit
+	// @export Event
+	var _events = {} , _eid=0;
+
+	function addEvent(obj,type,fn){
+		var id = obj._eid || 0;
+		if(id === 0) define(obj,"_eid",{ value : (id = (++_eid)), writable : false, enumerable: false, configurable: true });
+		if(!_events[id]) _events[id] = {};
+		if(!_events[id][type]) _events[id][type] = [];
+		if(!has(_events[id][type],fn)) _events[id][type].push(fn);
+		return obj;
+	}
+
+	function removeEvent(obj,type,fn){
+		var id = obj._eid || 0;
+		if(id&&_events[id]){
+			if(_events[id][type]){
+				if(!((not(_events[id][type],fn)).length) || !fn)
+					delete _events[id][type];
+			}else if(!type && !fn){
+				delete obj._eid;
+				delete _events[id];
+			}
+		}
+		return obj;
+	}
+
+	function hasEvent(obj,type,fn){
+		var res = false, id= obj._eid || 0;
+		if(id&&_events[id]){
+			if(isFn(fn) && _events[id][type])
+				res = has(_events[id][type],fn);
+			else
+				res = size(_events[id][type]);
+		}
+		return !!res;
+	}
+
+	function copyEvent(toobj,related){
+		var rid = (isObject(related) ? related._eid : 0) || 0;
+		if(rid){
+			define(toobj,"_eid",{ 
+				value : ++_eid, 
+				writable : false, 
+				enumerable: false, 
+				configurable: true 
+			});
+
+			_events[toobj._eid] = depclone(_events[rid]);
+		}
+		return toobj;
+	}
+
+	function fireEvent(obj,type,args){
+		var id = obj._eid || 0, args = args||[];
+		if(id && _events[id] && type!=="")
+			ol(_events[id][type],function(f){
+				f.apply(this,args);
+			},obj);
+	}
+
+	function emit(obj,type,args){
+		return al(
+			toString(type).split(","),
+			function(t){ fireEvent(this,trim(t),args); },
+			obj
+		),obj;
+	}
+
+	// Struct Prop listener
+	// @use getProp
+	// @exprot prop
+
+	// define deeping getProp method
+	function getProp(obj,prop,dowith){
+		var tmp,i,keygen = toString(prop||"").split(".");
+
+		if(keygen.length === 1){
+			if(obj.hasOwnProperty(prop))
+				tmp = obj[prop];
+		}else{
+			// [a.b.2]
+			for(i=0,tmp = obj;i<keygen.length;i++)
+				if(isPrimitive(tmp = tmp[keygen[i]])) 
+					break;
+		}
+
+		if(dowith){
+			var args = slice(arguments,3);
+			if(isFn(dowith))
+				tmp = dowith.apply(tmp,(args.unshift(tmp),args));
+			else if(typeof dowith === "string")
+				tmp = isFn(tmp[dowith]) ? 
+							tmp[dowith].apply(tmp,args) :
+							tmp[dowith];
+		}
+			
+		return tmp;
+	}
+
+	function setProp(obj,prop,value){
+		var tmp,end,i,check,keygen = (prop||"").split(".");
+		if(keygen.length === 1){
+			obj[prop] = value;
+		}else{
+			// [a.b.2]
+			for(i=0,tmp=obj,check,end=keygen.pop();i<keygen.length;i++)
+				tmp = (check = tmp[keygen[i]]) == null ? {} : check ;
+			tmp[end] = value;
+		}
+		return obj;
+	}
+
+	function rmProp(obj,prop){
+		var tmp,i,end,keygen = (prop||"").split(".");
+		if(keygen.length === 1){
+			if(obj.hasOwnProperty(prop))
+				delete obj[prop];
+		}else{
+			for(i=0,tmp=obj,end = keygen.pop();i<keygen.length;i++)
+				tmp = tmp[keygen[i]]; 
+			if(isArray(tmp))
+				tmp.splice(toNumber(end),1);
+			else
+				delete tmp[end];
+		}
+		return obj;
+	}
+
+	// #not need api
+	// function watch(obj,prop,handle){
+	// }
+
+	// function unwatch(obj,prop){
+	// }
+
+	// return random element [ method ]
+	// auto([1,2,3,4,5]) => random(in ary);
+	function auto(ary,num){
+		return toNumber(num) > 1 ? 
+				 	slice(shuffle(ary),0,toNumber(num)) : 
+				 	ary[randomInt(size(ary)-1)];
+	}
+
+	// detect Variable size [ method ]
+	// size([1,2,3]) => 3
+	// size('abcd') => 4
+	// size({a:1}) => 1
+	// size(null) => 0
+	// size(NaN) => 0
+	function size(n){
+		if(!isFn(n) && n!= null && !isNaN(n))
+			return typeof n.length === 'number' ?
+					 	n.length : (isObject(n) ? keys(n).length : 0);
+		return 0;
+	}
+
+	// return now TimeStamp [ method ]
+	function now(){
+		return (new Date()).getTime();
+	}
+
+	// object values [ method ]
+	// @export values
+	function values(obj){
+		var res=[];
+		if(isDefine(obj,"String"))
+			return obj.split('');
+		else
+			fov(obj,function(val){ res.push(val); });
+		return res;
+	}
+
+	// create Memoize function [ method ]
+	function memoize(fn,context){
+		var memo = [];
+		return function(){
+			var args = slice(arguments),df;
+			for(var i=memo.length; i--;)
+				if(eq(memo[i][0],args))
+					return (df=memo[i][1]);
+			return memo.push([args,df=fn.apply(context,args)]),df;
+		};
+	}
+
+	// create Negate function [ method ]
+	function negate(fn,context){
+		var mapper = isDefine(fn,"RegExp") ? cit(regCheck,fn) : fn;
+		
+		return isFn(mapper) ? function(){
+			return !mapper.apply(context,arguments);
+		} : cit(nseq,mapper).bind(context);
+	}
+
+	// create wrapper functions stack [ method ]
+	// args [ ...function ];
+	// var a = function(t){ return "<a>"+t+"<a>"}
+	// var b = function(t){ return "<b>"+t+"<b>"}
+	// var c = function(t){ return "<c>"+t+"<c>"}
+	// var w = wrap(a,b,c);
+	// w("tag") => "<c><b><a>tag<a><b><c>"
+	function wrap(){ 
+		var arg = slice(arguments); 
+		return function(x){ 
+			return arg.reduce(function(val,fn){ 
+				return fn(val);
+			},x);
+		}; 
+	}
+
+	function sort(ary,key){
+		if(isObject(ary)&&!isArray(ary)&&typeof key === "string"){
+			var target = getProp(ary,key);
+			return target.sort.apply(target,slice(arguments,2)),ary;
+		}
+
+		if(isArray(ary))
+			return ary.sort.apply(ary,slice(arguments,1));
+		return ary;
+	}
+
+	function exist(check){
+		var args = slice(arguments,1);
+		if(check)
+			last(args).apply(null,args);
+	}
+
+	function frozen(){
 	al(castArray.apply(null,arguments),Object.freeze);
 }
 
