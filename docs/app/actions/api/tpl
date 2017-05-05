@@ -1,6 +1,6 @@
 <article class="api">
 	<header class="api-introduce">
-		<h3 t=1><i class="ion-aperture" style="color:#8a3838"></i> {{#title}}</h3>
+		<h3 t=1 style="color:#8a3838"><i class="ion-aperture" style="color:#8a3838"></i> {{#title}}</h3>
 		<p>{{#introduce}}</p>
 	</header>
 
