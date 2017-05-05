@@ -7,5 +7,5 @@ It require `Struct` utils lib, for the sake of better organization application s
 
 > require [ Struct ] : [ Struct - the C Lang JavaScript Utils Lib ](https://github.com/DemonCloud/struct)
 
-> Document : [ Use Ax in your Project ](https://demoncloud.github.io/ax)
+> Document : [ Use Ax in your Project ](https://demoncloud.github.io/Ax)
 
