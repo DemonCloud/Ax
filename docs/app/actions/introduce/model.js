@@ -9,7 +9,7 @@ function(ax,introduceinfo){
 			cap1:"Modules",
 			cap2:"Examples",
 			cap3:"Info",
-			copy:"Copyright © 2016-2017 Cloud YiJun"
+			copy:"Copyright © 2016-2017 Ax Cloud YiJun"
 		}
 	});
 });

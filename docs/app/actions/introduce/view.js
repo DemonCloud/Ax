@@ -2,17 +2,18 @@ define("actions/introduce/view",
 [
 	"ax",
 	"modules/tags",
+	"modules/title",
 	// template 
 	"text!actions/introduce/tpl"
 ],
-function(ax,tags,tpl){
+function(ax,tags,title,tpl){
 	// mount at elment[#app]
 	return new ax.view({
 		root:document.getElementById("app"),
 		template:tpl,
 		events:{
 			beforeRender:function(data){
-				console.log("#introduce randering");
+				title("Ax - fast MVR JavaScript Framework");
 			},
 			completed:function(data){
 				sh_highlightDocument(tags.make());
