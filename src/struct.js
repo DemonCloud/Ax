@@ -1308,9 +1308,9 @@ function DOOM(txt,bounds,name){
 		// @ protect your template code other can observe it?
 		return function(data){
 			return eq(arguments,render.pre) ? (render.complete) : 
-				(render.pre=arguments, render.complete = render.apply(this,
+				(render.pre=arguments, render.complete = trim(render.apply(this,
 					[data,methods,struct].concat(slice(arguments,1))
-				));
+				)));
 		};
 	}
 

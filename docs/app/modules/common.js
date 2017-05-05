@@ -1,5 +1,5 @@
 define("modules/common",
-["struct","aix"],
+["struct","aix","modules/search"],
 function(struct,aix){
 	'use strict';
 
