@@ -16,7 +16,7 @@ function(struct,slist){
 	// build search template
 	var bt = DOOM(
 		"{{*each [item] in list}}"+
-		"	 <a href='#api@s={{#item.n}}' p=\"{{#(item.t===1 ? 'aix' : 'struct')}}\">"+
+		"	 <a href='#api@s={{#item.n}}' p=\"{{#(item.t===1 ? 'A' : 'S')}}\">"+
 		"	 <i class='{{#(item.t===1 ? 'red ion-ios-navigate'  :'black ion-ios-circle-filled')}}'></i> "+
 		"	 {{#item.n}}</a>"+
 		"{{*end}}"

@@ -9,9 +9,10 @@
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
 		<br>
 		
-		<p><b><i class="ion-android-apps"></i> Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Aix</b> call build with <b>Saucelabs</b>:</p>
+		<p><b><i class="ion-ios-circle-filled"></i> Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Aix</b> call build with <b>Saucelabs</b>, support all the <b style="color:#000">ECMAScript5</b> compatible Browser.</p>
+		<p><b style="color:#e25106">Browserstack</b> pass: <code>IE9+</code> <code>Chrome 30+</code> <code>Firefox 3+(>30)</code> <code>Opera 20+</code> <code>Yandex</code> <code><i class="ion-social-apple"></i> Safari 6+(Lion)</code> <code><i class="ion-social-android"></i> Android 4+</code></p>
 		<br>
-		<p style="min-height:125px"><img style="display:block; width:100%; max-width:700px; overflow:hidden; zoom:1" src="app/styles/imgs/testing.png" alt="Aix Test by Saucelabs"></p>
+		<p style="min-height:125px"><img style="display:block; width:100%; max-width:700px; overflow:hidden; pointer-events: none; zoom:1;" src="app/styles/imgs/testing.png" alt="Aix Test by Saucelabs"></p>
 		<br>
 
 		<br>
@@ -19,15 +20,13 @@
 		<div class="it-download">
 		<mark style="margin-bottom:20px"><i class="ion-erlenmeyer-flask"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
 		<p>
-			<span>Pack with <code>struct</code></span>
+			<span><b>Download pack</b> with <code>struct</code>&nbsp;&nbsp;</span>
 			<a href="./aixs.min.js" title="download it" alt="download it" rel="download" download='aixs.min.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
 				aixs.min.js (1.0) (57k)
 			</a>
 		</p>
 		<p style="margin-bottom:0">The compress file with <b>GZIP</b> only <b>19KB</b> </p>
-		</div>
-		
 		<br>
 		<p>
 			<span class="it-outlink">
@@ -41,6 +40,9 @@
 			</span>
 		</p>
 
+		</div>
+		
+		<br>
 	</header>
 
 	<div class="it-block">

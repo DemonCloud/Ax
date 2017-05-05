@@ -12,7 +12,7 @@
  *  FireFox 4+
  *  IE 9+
  *  Android 4+
- *  Safari 7+
+ *  Safari 6+
  *
  * Server Version With
  *  Node 6.0+ (Full support with ES6)
