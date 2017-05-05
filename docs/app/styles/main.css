@@ -392,6 +392,16 @@ a i{
 
 .main{
 	display:flex;
+	min-width: 100%;
+	max-width: 100%;
+  padding: 0;
+  border-top: 1px solid #8a3838;
+  border-bottom: 5px solid #8a3838;
+  border-left: 0;
+  border-right: 0;
+  overflow: hidden;
+
+  zoom:1;
 }
 
 .main .sidebar{
@@ -538,6 +548,8 @@ a i{
 	background-color:#fff;
 	border: 1px solid #ccc;
 
+ 	box-shadow: 0 1px 0 #efefef;
+
 	overflow:hidden;
 	-webkit-border-radius:2px;
 	border-radius:2px;
@@ -616,6 +628,11 @@ a i{
 .s-search-result a:hover i,
 .s-search-result a:hover:after{
 	color:#8a3838 !important;
+	text-decoration: none;
+}
+
+.s-search-result a:hover:after{
+	color:#c7adad !important;
 }
 
 .s-search-result a i{
@@ -653,9 +670,9 @@ a i{
 	width: 50px;
 	font-weight: bold;
 	font-size: 15px;
-	line-height:1;
+	line-height: .1;
 	text-transform: uppercase;
-	top: -12px;
+	top: -11px;
 	color: #9e6e6e;
 
 	z-index:1;

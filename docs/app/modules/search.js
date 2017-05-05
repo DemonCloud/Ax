@@ -22,7 +22,7 @@ function(struct,slist){
 		"{{*end}}"
 	);
 	
-	return sinput.addEventListener("input",function(event){
+	sinput.addEventListener("input",function(event){
 		event.stopPropagation();
 		
 		var val = trim(this.value);
@@ -36,5 +36,11 @@ function(struct,slist){
 		}else{
 			sresult.innerHTML = "";
 		}
+	});
+
+	// optimize selection
+	return sinput.addEventListener("focus",function(event){
+		event.stopPropagation();
+		return this.select();
 	});
 });

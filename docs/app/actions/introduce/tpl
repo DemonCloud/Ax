@@ -11,7 +11,7 @@
 		
 		<p><b><i class="ion-android-apps"></i> Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Aix</b> call build with <b>Saucelabs</b>:</p>
 		<br>
-		<p style="min-height:125px"><img style="display:block; width:100%; max-with:100%; overflow:hidden; zoom:1" src="app/styles/imgs/testing.png" alt="Aix Test by Saucelabs"></p>
+		<p style="min-height:125px"><img style="display:block; width:100%; max-width:700px; overflow:hidden; zoom:1" src="app/styles/imgs/testing.png" alt="Aix Test by Saucelabs"></p>
 		<br>
 
 		<br>
