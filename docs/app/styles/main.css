@@ -421,6 +421,7 @@ a i{
 	-ms-flex:10;
   -webkit-flex:10;
   flex:10;
+  max-width: 820px;
   min-width: 0;
   background-color:#fff;
 }
@@ -525,7 +526,7 @@ a i{
 	padding: 20px;
 
 	top: 30px;
-	right: 30px;
+	left: 1050px;
 	width:240px;
 	max-width:240px;
 	border: 1px solid #ccc;
@@ -897,11 +898,6 @@ a i{
 	font-size:16px;
   font-weight: bold;
   line-height: 1.7;
-}
-
-.introduce,
-.api{
-	padding-right:33%;
 }
 
 .introduce p,
