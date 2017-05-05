@@ -1,11 +1,11 @@
 define("actions/introduce/model",
 [
-"aix"
+"ax"
 ],
-function(aix,introduceinfo){
-	return new aix.model({
+function(ax,introduceinfo){
+	return new ax.model({
 		data:{
-			main:"Aix",
+			main:"Ax",
 			cap1:"Modules",
 			cap2:"Examples",
 			cap3:"Info",

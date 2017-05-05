@@ -1,10 +1,10 @@
 define("actions/api/model",
 [
-	"aix",
+	"ax",
 	"data/apidata"
 ],
-function(aix,apidata){
-	return new aix.model({
+function(ax,apidata){
+	return new ax.model({
 		data:apidata
 	});
 });

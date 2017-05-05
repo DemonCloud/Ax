@@ -18,10 +18,10 @@ const colors = require('colors');
 function taskReuqireJS(){
 	gulp.src([
 		cfg.path.jsl+"struct.min.js",
-		cfg.path.jsl+"aix.min.js"
+		cfg.path.jsl+"ax.min.js"
 	])
 	.pipe(filter(["**"], { restore:true }))
-	.pipe(concat("aixs.min.js"))
+	.pipe(concat("axs.min.js"))
 	.pipe(gulp.dest(cfg.path.pub))
 	.pipe(gulp.dest(cfg.path.dest));
 

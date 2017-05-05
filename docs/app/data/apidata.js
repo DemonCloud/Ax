@@ -26,7 +26,7 @@ function(){
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		b : 1\n\
 	}\n\
@@ -36,7 +36,7 @@ console.log(m.get());"
 				},
 				{
 					title: "Get with key",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		a : 1,\n\
 		b : { c : 2 }\n\
@@ -47,7 +47,7 @@ console.log(m.get(\"b.c\"));"
 				},
 				{
 					title: "Dowith property method",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		b : \"abcd\",\n\
 		a : [2,3,4]\n\
@@ -60,7 +60,7 @@ console.log(m.get(\"a\",\"toString\"));"
 				{
 					title: "Dowith function",
 					code:"var size = struct.size();\n\
-var m = new aix.model({\n\
+var m = new ax.model({\n\
 	data:{\n\
 		a : { b:1, c:2, d:{ e:3, f:4 } }\n\
 	}\n\
@@ -75,7 +75,7 @@ console.log(m.get(\"a.d\",JSON.stringify));"
 		//#model.set
 		"model:set" : {
 			title:"Model.set",
-			introduce:"<code>model.set</code> it is mainly used to update the data of the model, <code>aix.model</code> data is <b>immutable</b>, it provides a more secure and reliable mechanism. so change the model.data.* direactly may not work.",
+			introduce:"<code>model.set</code> it is mainly used to update the data of the model, <code>ax.model</code> data is <b>immutable</b>, it provides a more secure and reliable mechanism. so change the model.data.* direactly may not work.",
 			usages:[
 				"model.set(data)",
 				"model.set(key,data)"
@@ -93,21 +93,21 @@ console.log(m.get(\"a.d\",JSON.stringify));"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model(); \n\
+					code:"var m = new ax.model(); \n\
 // set the data \n\
 m.set({ a:1 }); \n\
 console.log(m.data);"
 				},
 				{
 					title: "Use key",
-					code:"var m = new aix.model();\n\
+					code:"var m = new ax.model();\n\
 // set the data\n\
 m.set(\"a\",1);\n\
 console.log(m.data);"
 				},
 				{
 					title: "Change deeping target",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data : {\n\
 		a : {\n\
 			b : 1,\n\
@@ -125,7 +125,7 @@ console.log(m.toJSON());"
 				},
 				{
 					title: "Set with Validate",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	// validate the property \"a\" isString\n\
 	validate:{\n\
 		a : function(a){\n\
@@ -174,7 +174,7 @@ console.log(m.data);"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		a : 1,\n\
 		b : 2\n\
@@ -186,7 +186,7 @@ console.log(m.get());"
 				},
 				{ 
 					title: "Remove directly",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		a : 1\n\
 	}\n\
@@ -218,7 +218,7 @@ console.log(m.get());"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		a : []\n\
 	}\n\
@@ -229,7 +229,7 @@ console.log(m.get());"
 				},
 				{ 
 					title: "Update Object",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		a : { b:1 }\n\
 	}\n\
@@ -252,7 +252,7 @@ console.log(m.get());"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	data:{\n\
 		a : 1,\n\
 		b : {\n\
@@ -293,7 +293,7 @@ console.log(m.toJSON());"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	url:\"ajax/action\",\n\
 	data:{\n\
 		id : 1002,\n\
@@ -308,7 +308,7 @@ console.log(m.send(\"ajax/other\"));"
 				},
 				{ 
 					title: "With custom HTTP header",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	url:\"ajax/data1\",\n\
 	data:{\n\
 		id : 213\n\
@@ -348,7 +348,7 @@ m.send({\n\
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	url:\"ajax/data2\",\n\
 	events:{\n\
 		\"fetch:success\":function(){\n\
@@ -361,7 +361,7 @@ m.fetch();"
 				},
 				{ 
 					title: "Fetch byFilter",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	url:\"ajax/data2\",\n\
 	events:{\n\
 		\"fetch:success\":function(){\n\
@@ -398,7 +398,7 @@ m.fetch(function(res){\n\
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	url:\"ajax/data3\",\n\
 	data:{\n\
 		a:1,\n\
@@ -410,7 +410,7 @@ m.sync();"
 				},
 				{ 
 					title: "Sync with HTTP Header",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	url:\"ajax/data3\",\n\
 	data:{\n\
 		a:1\n\
@@ -444,7 +444,7 @@ m.sync({\n\
 				{ 
 					title: "Basic usage",
 					code:"var size = struct.size();\n\
-var m = new aix.model({\n\
+var m = new ax.model({\n\
 	url:\"myCustom\",\n\
 	store:true,\n\
 });\n\
@@ -478,7 +478,7 @@ if(size(m.data)){\n\
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	validate:{\n\
 		a : function(value){\n\
 			return typeof value === \"number\";\n\
@@ -499,7 +499,7 @@ m.set(\"a\",6);"
 				},
 				{ 
 					title: "Deeping checking",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	validate:{\n\
 		\"a.b\" : function(value){\n\
 			return typeof value === \"string\";\n\
@@ -522,7 +522,7 @@ m.set(\"a\",{ b : \"7\" });"
 				},
 				{ 
 					title: "Error handling",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	validate:{\n\
 		\"a.b\" : function(value){\n\
 			return typeof value === \"string\";\n\
@@ -634,7 +634,7 @@ console.log(\"see the model's data -> \",m.get());"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model();\n\
+					code:"var m = new ax.model();\n\
 // bind change event\n\
 m.on(\"change\",function(){\n\
 	console.log(\"data has been changed!\",this);\n\
@@ -643,7 +643,7 @@ m.set(\"a\",1);"
 				},
 				{ 
 					title: "Multiple events",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	events:{\n\
 		// define at model initialize\n\
 		change:function(){\n\
@@ -666,7 +666,7 @@ m.set({ a:1 });"
 				},
 				{ 
 					title: "Proactive trigger",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	events:{\n\
 		custom:function(a,b){\n\
 			console.log(\"see the total \"+(a+b));\n\
@@ -678,7 +678,7 @@ m.emit(\"custom\",[2,3]);"
 				},
 				{ 
 					title: "Remove event",
-					code:"var m = new aix.model({\n\
+					code:"var m = new ax.model({\n\
 	events:{\n\
 		change:function(){\n\
 			console.log(\"change event 1\");\n\
@@ -703,7 +703,7 @@ console.log(m.set({ a:1,b:2 }));"
 			title:"Model [ Extend ]",
 			introduce:"<code>model.extend</code>,it provides a way of object-oriented programming",
 			usages:[
-				"new aix.model.extend(defaultOption)",
+				"new ax.model.extend(defaultOption)",
 			],
 			params:[
 				{ name:"defaultOption", type:"Object" }
@@ -711,7 +711,7 @@ console.log(m.set({ a:1,b:2 }));"
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var m = new aix.model.extend({\n\
+					code:"var m = new ax.model.extend({\n\
 	data:{\n\
 		a : 2\n\
 	},\n\
@@ -728,7 +728,7 @@ n.set({ a:1, b:2 });"
 				},
 				{ 
 					title: "Override default option",
-					code:"var m = new aix.model.extend({\n\
+					code:"var m = new ax.model.extend({\n\
 	data:{\n\
 		a : \"abc\"\n\
 	}\n\
@@ -779,7 +779,7 @@ console.log(n.get());"
 				{ 
 					title: "Basic usage",
 					preview:"base",
-					code:"var v = new aix.view({\n\
+					code:"var v = new ax.view({\n\
 	template:\"&lt;span&gt;Hello &#123;&#123;-text&#125;&#125;&lt;/span&gt;\",\n\
 	events:{\n\
 		\"click:span\":function(){\n\
@@ -815,7 +815,7 @@ v.mount(\n\
 				{ 
 					title: "Basic init",
 					preview:"base2",
-					code:"var v = new aix.view({\n\
+					code:"var v = new ax.view({\n\
 	root:document.getElementById(\"base2\"),\n\
 	template:\"Hi! &#123;&#123;-text&#125;&#125;\",\n\
 	events:{\n\
@@ -830,7 +830,7 @@ v.mount(\n\
 					preview:"base3",
 					code:"var rs = struct.random(\"string\");\n\
 \n\
-var v = new aix.view({\n\
+var v = new ax.view({\n\
 	root:document.getElementById(\"base3\"),\n\
 	render: function(data){\n\
 		var div = document.createElement(\"div\");\n\
@@ -860,7 +860,7 @@ v.render({ text: rs(5) });"
 				{ 
 					title: "Basic usage",
 					preview:"base",
-					code:"var v = new aix.view({\n\
+					code:"var v = new ax.view({\n\
 	template:\"Hi! &#123;&#123;#capit(random(length))&#125;&#125;\",\n\
 	props:{\n\
 		// dont make method name as 'length'\n\
@@ -919,7 +919,7 @@ v.mount(\n\
 				{ 
 					title: "Basic usage",
 					preview:"v1",
-					code:"var v = new aix.view({\n\
+					code:"var v = new ax.view({\n\
 	root:document.getElementById(\"v1\"),\n\
 	template:\"&#123;&#123;-number&#125;&#125;\",\n\
 	events:{\n\
@@ -932,7 +932,7 @@ v.mount(\n\
 				{ 
 					title: "Detect beforeRender",
 					preview:"v2",
-					code:"var v = new aix.view({\n\
+					code:"var v = new ax.view({\n\
 	root:document.getElementById(\"base\"),\n\
 	template:\"&#123;&#123;-number&#125;&#125;\"\n\
 });\n\
@@ -949,7 +949,7 @@ v.mount(\n\
 				{ 
 					title: "Custom event",
 					preview:"v3",
-					code:"var v = new aix.view({\n\
+					code:"var v = new ax.view({\n\
 	template:\"&lt;input id='t' &gt;\" +\n\
 					 \"&lt;button&gt;send&lt;/button&gt;\",\n\
 	events:{\n\
@@ -986,7 +986,7 @@ v.mount(\n\
 			title:"View [ Extend ]",
 			introduce:"<code>view.extend</code>,it provides a way of object-oriented programming",
 			usages:[
-				"new aix.view.extend(defaultOption)",
+				"new ax.view.extend(defaultOption)",
 			],
 			params:[
 				{ name:"defaultOption", type:"Object" }
@@ -995,7 +995,7 @@ v.mount(\n\
 				{ 
 					title: "Basic usage",
 					preview:"v",
-					code:"var v = new aix.view.extend({\n\
+					code:"var v = new ax.view.extend({\n\
 	root: document.getElementById(\"v\"),\n\
 	template: \"&lt;span&gt;&#123;&#123;-code&#125;&#125;&lt;/span&gt;\",\n\
 	events: {\n\
@@ -1035,7 +1035,7 @@ var view = new v({\n\
 			examples:[
 				{ 
 					title: "Basic usage",
-					code:"var route = new aix.route({\n\
+					code:"var route = new ax.route({\n\
 	routes:{\n\
 		\"^post\":\"renderPost\"\n\
 	},\n\
@@ -1054,7 +1054,7 @@ route.listen(\"post\",{a:1,b:2});"
 				{ 
 					title: "Init",
 					not: true,
-					code:"var route = new aix.route({\n\
+					code:"var route = new ax.route({\n\
 	routes:{\n\
 		\"^index\":\"index\"\n\
 	},\n\
@@ -1106,7 +1106,7 @@ route.listen(\"post\",{a:1,b:2});"
 					title: "Basic usage",
 					not : true,
 					code:"// assign to route \"post\" with param \n\
-var route = new aix.route( /*...*/ )\n\
+var route = new ax.route( /*...*/ )\n\
 route.assign(\"post\",{ id : 10243 });"
 				},
 			]
@@ -1146,7 +1146,7 @@ route.assign(\"post\",{ id : 10243 });"
 				{ 
 					title: "Basic usage",
 					not : true,
-					code:"var v = new aix.route({\n\
+					code:"var v = new ax.route({\n\
 	events:{\n\
 		init: function(){\n\
 			this.listen(\"index\");\n\
@@ -1162,7 +1162,7 @@ route.assign(\"post\",{ id : 10243 });"
 			title:"Route [ Extend ]",
 			introduce:"<code>route.extend</code>,it provides a way of object-oriented programming",
 			usages:[
-				"new aix.route.extend(defaultOption)",
+				"new ax.route.extend(defaultOption)",
 			],
 			params:[
 				{ name:"defaultOption", type:"Object" }
@@ -1171,7 +1171,7 @@ route.assign(\"post\",{ id : 10243 });"
 				{ 
 					title: "Basic usage",
 					not: true,
-					code:"var route = new aix.route.extend({\n\
+					code:"var route = new ax.route.extend({\n\
 		routes : { /* ... */ },\n\
 		actions : { /* ... */ },\n\
 		init : function(){\n\
@@ -1235,7 +1235,7 @@ console.log(obj);"
 			related:[
 				{ name:"struct.depextend", target:"struct:depextend" }
 			],
-			info:"<p>extend method can also use for Array</p><p>method compress to <code>aix.model</code>, use it as <code>model.extend(target)</code> (compress model data)</p>",
+			info:"<p>extend method can also use for Array</p><p>method compress to <code>ax.model</code>, use it as <code>model.extend(target)</code> (compress model data)</p>",
 			examples:[
 				{ 
 					title: "Basic usage",

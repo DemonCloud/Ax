@@ -1,6 +1,6 @@
 define("modules/common",
-["struct","aix","modules/search"],
-function(struct,aix){
+["struct","ax","modules/search"],
+function(struct,ax){
 	'use strict';
 
 	var slice = struct.slice();
@@ -12,7 +12,7 @@ function(struct,aix){
 		elm.setAttribute("class",elm.getAttribute("class").replace(/\s+active/,''));
 	};
 
-	return new aix.view({
+	return new ax.view({
 		root: document.getElementById("menu"),
 
 		events:{

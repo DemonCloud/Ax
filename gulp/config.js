@@ -34,16 +34,16 @@ config.rjs = {
 
 		"route" : "route",
 		"struct":"scripts/libs/struct.min",
-		"aix":"scripts/libs/aix.min",
+		"ax":"scripts/libs/ax.min",
 
 		"sh_main":"scripts/libs/sh_main.min",
 		"sh_js":"scripts/libs/sh_javascript.min"
 	},
 
 	shim : {
-		aix : {
+		ax : {
 			deps : ["struct"],
-			exports : "aix"
+			exports : "ax"
 		},
 		sh_js : {
 			deps : ["sh_main"]
@@ -54,7 +54,7 @@ config.rjs = {
 	  {
       name: "route",
       include : [
-				'aix',
+				'ax',
 				'struct',
 				'text',
 				'sh_main',

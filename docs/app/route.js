@@ -1,6 +1,6 @@
 define("route",
 [
-"aix",
+"ax",
 "struct",
 
 // data
@@ -15,7 +15,7 @@ define("route",
 
 ],
 function(
-aix,
+ax,
 struct,
 
 ruleList,
@@ -25,8 +25,8 @@ api
 ){
 	'use strict';
 
-	// make aix as GLOBAL
-	struct.root.aix = aix;
+	// make ax as GLOBAL
+	struct.root.ax = ax;
 
 	var has = struct.has(),
 			_   = struct.link();
@@ -41,7 +41,7 @@ api
 		}
 	};
 
-	var app = new aix.route({
+	var app = new ax.route({
 		routes:{
 			"^introduce$" : "index",
 			"^api$"       : "api"

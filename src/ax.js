@@ -1,5 +1,5 @@
 /* 
- * Aix
+ * Ax
  *
  * @Author  : YiJun
  * @Date    : 2017.4.1 - now
@@ -7,20 +7,20 @@
  * require Utils Lib [ struct ]
  */
 
-(function(root,aix,factory){
+(function(root,ax,factory){
 
 	if(typeof define === 'function' && define.amd)
 		// support AMD require.js
 		// ruler by UMD Javascript
-		define('aix',['struct'],function(struct){ return factory(aix,struct); });
+		define('ax',['struct'],function(struct){ return factory(ax,struct); });
 	else if(typeof exports === "object" && typeof module !== "undefined")
 		// support CommonJS exports
-		module.exports = factory(aix,struct);
+		module.exports = factory(ax,struct);
 	else
 		// build on browser global object
-		root.aix = factory(aix,struct);
+		root.ax = factory(ax,struct);
 
-})(this, {}, function(aix,struct){
+})(this, {}, function(ax,struct){
 	"use strict";
 
 	// Define DOM frame
@@ -31,7 +31,7 @@
 		ROUTE_DEFAULT = { char:"@", routes:{}, actions:{} },
 
 	// resetful list 
-	// use for aix ajax-api
+	// use for ax ajax-api
 	RESTFUL = {
 		get    : "GET",
 		put    : "POST",
@@ -88,7 +88,7 @@
 		_btou     = struct.assembly("b2u"),
 		_doom     = struct.doom();
 
-	// aix genertor function
+	// ax genertor function
 	function genertor_(api){
 		aM.prototype[api] = function(){
 			var tmp = this.data,
@@ -107,7 +107,7 @@
 		};
 	}
 
-	function hackAix(origin,extend){
+	function hackAx(origin,extend){
 		var fnstr = _toString(origin),
 			oargs = _toString(origin),
 			eargs = _toString(extend),
@@ -126,12 +126,12 @@
 
 	function createExtend(origin){
 		return function(def){
-			var x = hackAix(aix[origin],aix[origin].extend);
+			var x = hackAx(ax[origin],ax[origin].extend);
 			var extend = eval("(function(ops){ "+
 				"var "+x[0]+"=_dpextend("+x[1]+",ops||{}); "+x[2]+
 			"})");
 
-			_extend(extend.prototype,aix[origin].prototype);
+			_extend(extend.prototype,ax[origin].prototype);
 			return extend;
 		};
 	}
@@ -1814,8 +1814,8 @@
 		return this.emit(type,[_ajax(st),st]);
 	}
 
-	// Aix Model
-	aix.model = aM = function(obj){
+	// Ax Model
+	ax.model = aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
 			events = config.events,
 			validate = config.validate,
@@ -1865,7 +1865,7 @@
 			.unbind("init");
 	};
 
-	// Extend aix model method 
+	// Extend ax model method 
 	// Model Prototype extend
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
@@ -1917,8 +1917,8 @@
 		emit : emit,
 		unbind : unbind,
 
-		// Aix Restful API design for
-		// [Aix Model] data format serialize
+		// Ax Restful API design for
+		// [Ax Model] data format serialize
 		toJSON : function(){
 			return _isPrim(this.data) ? 
 				this.data : 
@@ -2036,7 +2036,7 @@
 	}
 
 	// bind selector
-	aix.view = aV = function(obj){
+	ax.view = aV = function(obj){
 		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
 			vroot = config.root,
 			render = config.render,
@@ -2172,7 +2172,7 @@
 	}
 
 	// define route for SPA
-	aix.route = aR = function(obj){
+	ax.route = aR = function(obj){
 		var _this = this,
 			history = { old: "", now: root.location.href },
 			config = _extend(_clone(ROUTE_DEFAULT),obj||{}),
@@ -2206,7 +2206,7 @@
 			.unbind("init");
 	};
 
-	// Aix-Route for SPA Architecture
+	// Ax-Route for SPA Architecture
 	// auto trigger regex event when route change
 	aR.prototype = {
 		on : on,
@@ -2294,15 +2294,15 @@
 	],genertor_$);
 
 	// Extend method
-	// Create Aix Pack extends
+	// Create Ax Pack extends
 	// Prepare for component
-	aix.VERSION = struct.VERSION;
+	ax.VERSION = struct.VERSION;
 
 	aV.extend = createExtend("view");
 	aM.extend = createExtend("model");
 	aR.extend = createExtend("route");
 
-	_lock(aM,aV,aR,v8(aix));
+	_lock(aM,aV,aR,v8(ax));
 
-	return aix;
+	return ax;
 });

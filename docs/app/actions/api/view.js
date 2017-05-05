@@ -1,15 +1,15 @@
 define("actions/api/view",
 [
-	"aix",
+	"ax",
 	"modules/tags",
 	"modules/code",
 
 	// template 
 	"text!actions/api/tpl"
 ],
-function(aix,tags,code,tpl){
+function(ax,tags,code,tpl){
 	// mount at elment[#app]
-	return new aix.view({
+	return new ax.view({
 		root:document.getElementById("app"),
 		template:tpl,
 		events:{

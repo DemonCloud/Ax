@@ -4,15 +4,15 @@
 			<i class="ion-ios-navigate"></i>
 			{{#main}}
 		</h3>
-		<p><b><i class="ion-ios-navigate"></i> Aix</b> is a fast MVR JavaScript Framework.</p>
+		<p><b><i class="ion-ios-navigate"></i> Ax</b> is a fast MVR JavaScript Framework.</p>
 
 		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
 		<br>
 		
-		<p><b><i class="ion-ios-circle-filled"></i> Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Aix</b> call build with <b>Saucelabs</b>, support all the <b style="color:#000">ECMAScript5</b> compatible Browser.</p>
+		<p><b><i class="ion-ios-circle-filled"></i> Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Ax</b> call build with <b>Saucelabs</b>, support all the <b style="color:#000">ECMAScript5</b> compatible Browser.</p>
 		<p><b style="color:#e25106">Browserstack</b> pass: <code>IE9+</code> <code>Chrome 30+</code> <code>Firefox 3+(>30)</code> <code>Opera 20+</code> <code>Yandex</code> <code><i class="ion-social-apple"></i> Safari 6+(Lion)</code> <code><i class="ion-social-android"></i> Android 4+</code></p>
 		<br>
-		<p style="min-height:125px"><img style="display:block; width:100%; max-width:700px; overflow:hidden; pointer-events: none; zoom:1;" src="app/styles/imgs/testing.png" alt="Aix Test by Saucelabs"></p>
+		<p style="min-height:125px"><img style="display:block; width:100%; max-width:700px; overflow:hidden; pointer-events: none; zoom:1;" src="app/styles/imgs/testing.png" alt="Ax Test by Saucelabs"></p>
 		<br>
 
 		<br>
@@ -21,16 +21,16 @@
 		<mark style="margin-bottom:20px"><i class="ion-erlenmeyer-flask"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
 		<p>
 			<span><b>Download pack</b> with <code>struct</code>&nbsp;&nbsp;</span>
-			<a href="./aixs.min.js" title="download it" alt="download it" rel="download" download='aixs.min.js'>
+			<a href="./axs.min.js" title="download it" alt="download it" rel="download" download='axs.min.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				aixs.min.js (1.0) (57k)
+				axs.min.js (1.0) (57k)
 			</a>
 		</p>
 		<p style="margin-bottom:0">The compress file with <b>GZIP</b> only <b>19KB</b> </p>
 		<br>
 		<p>
 			<span class="it-outlink">
-				<a href="https://github.com/DemonCloud/aix" target="_blank"><i class="ion-social-github"></i> Encourage a Star</a> 
+				<a href="https://github.com/DemonCloud/ax" target="_blank"><i class="ion-social-github"></i> Encourage a Star</a> 
 			</span> 
 			<span class="it-outlink">
 				<a href="test" target="_blank"><i class="ion-ios-analytics"></i> See Unit test</a> 
@@ -53,7 +53,7 @@
 					<i class="ion-gear-a"></i> 
 					<b> Struct</b>
 				</a>
-				<span> - Struct is basic utils in aix, Salute to K&amp;R <b>&lt;The C Programming Language&gt;</b>. It contains more than 100 practical function, also it can be used as a single tool. focus on functional programming, the limits of performance, and the function of packaging more easily</span>
+				<span> - Struct is basic utils in ax, Salute to K&amp;R <b>&lt;The C Programming Language&gt;</b>. It contains more than 100 practical function, also it can be used as a single tool. focus on functional programming, the limits of performance, and the function of packaging more easily</span>
 			</li>
 			<li>
 				<a href="javascript:;" tc=2>
@@ -88,7 +88,7 @@
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
-var view = new aix.view({
+var view = new ax.view({
 	template:"&lt;div class='name'&gt;"+
 							"Hello &#123;&#123;-name&#125;&#125;"+
 					 "&lt;/div&gt;"
@@ -112,7 +112,7 @@ view.mount(
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
-var view = new aix.view({
+var view = new ax.view({
 	template:"&lt;input value='&#123;&#123;-text&#125;&#125;'&gt;"+
 					 "&lt;h2&gt;&#123;&#123;-text&#125;&#125;&lt;/h2&gt;",
 	events:{
@@ -122,7 +122,7 @@ var view = new aix.view({
 	}
 });
 
-var model = new aix.model({
+var model = new ax.model({
 	events:{
 		change:function(){
 			view.render(this.get());
@@ -150,7 +150,7 @@ view.mount(
 				<pre class="sh_javascript">
 var trim = struct.string("trim");
 
-var view = new aix.view({
+var view = new ax.view({
 	template:'&lt;input id="name" maxlength=10&gt;'+
 		'&lt;button id="add"&gt;add&lt;/button&gt;'+
 		'&lt;ul&gt;'+
@@ -183,7 +183,7 @@ var view = new aix.view({
 	}
 });
 
-var model = new aix.model({
+var model = new ax.model({
 	data:{
 		list:[]
 	},
@@ -209,7 +209,7 @@ view.mount(
 
 	<div class="it-block">
 		<h3 t=4>{{#cap3}}</h3>
-		<p>These examples were simple described the behavior of <b>Aix</b> and way of writing. u can get more example in here <a target="_blank" href="examples">More Examples</a>. Flexible and simple way of assembly is main design objective for Aix .</p>
+		<p>These examples were simple described the behavior of <b>Ax</b> and way of writing. u can get more example in here <a target="_blank" href="examples">More Examples</a>. Flexible and simple way of assembly is main design objective for Ax</p>
 	</div>
 
 	<footer>

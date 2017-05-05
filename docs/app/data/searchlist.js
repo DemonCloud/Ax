@@ -1,7 +1,7 @@
 define("data/searchlist",
 [],function(){
 	return Object.freeze([
-		/* aix search */
+		/* ax search */
 		{ n:"model:get",        k: ["get","json","data"], t:1 },
 		{ n:"model:set",        k: ["set","data"], t:1 },
 		{ n:"model:rm",         k: ["remove","data"], t:1 },

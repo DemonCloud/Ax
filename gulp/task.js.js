@@ -17,11 +17,11 @@ const colors = require('colors');
 
 // back the js
 function taskjs(){
-	gulp.src(cfg.path.base+"src/aix.js")
+	gulp.src(cfg.path.base+"src/ax.js")
 				.pipe(filter(["**"], { restore:true }))
 				.pipe(eslint(cfg.eslintConfig))
 				.pipe(eslint.result(cfg.result))
-				.pipe(rename('aix.min.js'))
+				.pipe(rename('ax.min.js'))
 				.pipe(uglify())
 				.pipe(optimizejs())
 				.pipe(gulp.dest(cfg.path.jsl));

@@ -1,13 +1,13 @@
 define("actions/introduce/view",
 [
-	"aix",
+	"ax",
 	"modules/tags",
 	// template 
 	"text!actions/introduce/tpl"
 ],
-function(aix,tags,tpl){
+function(ax,tags,tpl){
 	// mount at elment[#app]
-	return new aix.view({
+	return new ax.view({
 		root:document.getElementById("app"),
 		template:tpl,
 		events:{
@@ -18,7 +18,7 @@ function(aix,tags,tpl){
 				sh_highlightDocument(tags.make());
 
 				//#example1
-				var view = new aix.view({
+				var view = new ax.view({
 					template:"<div class='name'>"+
 											"Hello {{-name}}"+
 									 "</div>"
@@ -30,7 +30,7 @@ function(aix,tags,tpl){
 				);
 
 				//#example2
-				var view2 = new aix.view({
+				var view2 = new ax.view({
 					template:"<input value='{{-text}}' style='margin-bottom:5px'>"+
 									 "<h2>{{-text}}</h2>",
 					events:{
@@ -40,7 +40,7 @@ function(aix,tags,tpl){
 					}
 				});
 
-				var model2 = new aix.model({
+				var model2 = new ax.model({
 					events:{
 						change:function(){
 							view2.render(this.get());
@@ -56,7 +56,7 @@ function(aix,tags,tpl){
 				//example3
 				var trim = struct.string("trim");
 
-				var view3 = new aix.view({
+				var view3 = new ax.view({
 					template:'<input id="name" maxlength=10>'+
 									 '<button id="add">add</button>'+
 									 '<ul>'+
@@ -88,7 +88,7 @@ function(aix,tags,tpl){
 					}
 				});
 
-				var model3 = new aix.model({
+				var model3 = new ax.model({
 					data:{
 						list:[]
 					},

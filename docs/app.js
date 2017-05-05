@@ -7,16 +7,16 @@
 
 			"route" : "route",
 			"struct":"scripts/libs/struct.min",
-			"aix":"scripts/libs/aix.min"
+			"ax":"scripts/libs/ax.min"
 		},
 
 		shim : {
-			aix : {
+			ax : {
 				deps : ["struct"],
-				exports : "aix"
+				exports : "ax"
 			},
 		},
 	});
 
-	require(['route']);
+	return require(['route']);
 }());
