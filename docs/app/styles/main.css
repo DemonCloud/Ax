@@ -421,7 +421,7 @@ a i{
 	-ms-flex:10;
   -webkit-flex:10;
   flex:10;
-  max-width: 790px;
+  max-width: 720px;
   min-width: 0;
   background-color:#fff;
 }
@@ -526,7 +526,7 @@ a i{
 	padding: 20px;
 
 	top: 30px;
-	left: 1050px;
+	left: 990px;
 	width:240px;
 	max-width:240px;
 	border: 1px solid #ccc;
