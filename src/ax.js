@@ -24,7 +24,7 @@
 	"use strict";
 
 	// Define DOM frame
-	var z,Z,aM,aV,aR,
+	var z,Z,aM,aV,aR,aS,
 	// Define Setting
 		VIEW_DEFAULT  = { },
 		MODEL_DEFAULT = { data:{}, validate:{} },
@@ -1759,19 +1759,39 @@
 		return target;
 	}
 
-	function setStore(url,data){
-		localStorage.setItem(
-			"Ax@"+_utob(url),
-			_utob(JSON.stringify(data)+"\r")
-		);
+	function parseKey(key){
+		return "Ax@"+_utob(key);
 	}
 
-	function getStore(url){
-		if(toString(url)){
-			var str = _btou(localStorage.getItem("Ax@"+_utob(url)));
-			return _size(str) > 1 ? JSON.parse(str) : "";
-		}
+	function parseResult(data){
+		data = toString(data) ? _btou(data) : "";
+		return _size(data) > 1 ? JSON.parse(data) : (data||"");
 	}
+
+	ax.store = aS = function(){
+		var key = _find(_keys(localStorage),/Ax@/),res = {};
+		_fal(key,function(k){ 
+			res[_btou(k.slice(3))] = parseResult(
+				localStorage.getItem(k)); 
+		});
+		return res;
+	};
+
+	aS.get = function(key){
+		if(toString(key)) 
+			return parseResult(localStorage.getItem(parseKey(key)));
+	};
+
+	aS.set = function(key,data){
+		return localStorage.setItem(
+			parseKey(key),
+			_trim(_utob(JSON.stringify(data)+"\r"))
+		);
+	};
+
+	aS.rm = function(key){
+		return localStorage.removeItem(parseKey(key));
+	};
 
 	function pipe(type,url,param,fns,fnf,header){
 		//param must be object typeof
@@ -1820,7 +1840,7 @@
 			events = config.events,
 			validate = config.validate,
 			store = (config.store === true && toString(config.url)),
-			data = store ? (getStore(config.url)||config.data) : config.data; 
+			data = store ? (aS.get(config.url)||config.data) : config.data; 
 
 		delete config.data;
 		delete config.store;
@@ -1843,7 +1863,7 @@
 					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
 						this.change=true,
-						(store && setStore(this.url,newdata)),
+						(store && aS.set(this.url,newdata)),
 						this.emit("validate:success,change",args),
 						newdata;
 
@@ -2302,7 +2322,7 @@
 	aM.extend = createExtend("model");
 	aR.extend = createExtend("route");
 
-	_lock(aM,aV,aR,v8(ax));
+	_lock(aM,aV,aR,aS,v8(ax));
 
 	return ax;
 });

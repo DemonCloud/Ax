@@ -436,6 +436,7 @@ m.sync({\n\
 			],
 			info:"<p><code>store</code> property should define with <code>url</code> at the same time, otherwise the storage will not take effect!</p><p>Persistent storage data can be shared by multiple models at the same time, as long as they define the <b>same</b> <code>url</code>.</p><p>store data will be synced when the model <b>changed</b></p>",
 			related:[
+				{ name:"store", target:"store:store" },
 				{ name:"model.set", target:"model:set" },
 				{ name:"model.moc", target:"model:moc" },
 				{ name:"model.fetch", target:"model:fetch" }
@@ -1182,6 +1183,80 @@ route.assign(\"post\",{ id : 10243 });"
 \n\
 // extend route\n\
 var r = new route();"
+				}
+			]
+		},
+
+		//#store.store
+		"store:store" : {
+			title:"Store",
+			introduce:"Easy check and manger model <code>store</code>",
+			usages:[
+				"ax.store()",
+			],
+			info:"<p>fast to parse all the store data for appliction</p>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"console.log(ax.store());"
+				}
+			]
+		},
+
+		//#store.get
+		"store:get" : {
+			title:"Store.get",
+			introduce:"get model storedata for locally",
+			usages:[
+				"ax.store.get(key)",
+			],
+			params:[
+				{ name:"key", type:"String" },
+			],
+			info:"the key mean's model <code>url</code>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"console.log(ax.store.get('todolist'));"
+				}
+			]
+		},
+
+		//#store.set
+		"store:set" : {
+			title:"Store.set",
+			introduce:"set locally storedata",
+			usages:[
+				"ax.store.set(key,data)",
+			],
+			params:[
+				{ name:"key", type:"String" },
+				{ name:"data", type:"AnyType" },
+			],
+			info:"the key mean's model <code>url</code>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"console.log(ax.store.set('todolist',{ list:[{name:'Buke'}] }));"
+				}
+			]
+		},
+
+		//#store.rm
+		"store:rm" : {
+			title:"Store.rm",
+			introduce:"<code>remove</code> model storedata for locally",
+			usages:[
+				"ax.store.rm(key)",
+			],
+			params:[
+				{ name:"key", type:"String" },
+			],
+			info:"the key mean's model <code>url</code>",
+			examples:[
+				{ 
+					title: "Basic usage",
+					code:"ax.store.rm('todolist');"
 				}
 			]
 		},
