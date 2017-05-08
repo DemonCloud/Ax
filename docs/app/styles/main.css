@@ -379,10 +379,22 @@ a i{
 }
 
 .loader{
+	position: fixed;
 	display: block;
+	background-color: #fff;
 	text-align: center;
-	width: 480px;
-	padding-top: 50px;
+
+	width: 100%;
+	height: 100%;
+	left:0;
+	top: 0;
+
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	user-select:none;
+
+	z-index: 999;
+	zoom:1;
 }
 
 .loader>svg path,

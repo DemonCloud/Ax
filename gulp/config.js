@@ -10,11 +10,13 @@ const config = {};
 config.path = {
 	base : path.resolve('./')+'/',
 	pub  : path.resolve('./')+'/dest/',
-	dest : path.resolve('./')+'/docs/',
+	html : path.resolve('./')+'/docs/template/',
 	js   : path.resolve('./')+'/'+base+"",
 	css  : path.resolve('./')+'/'+base+"/styles/",
 	jsl  : path.resolve('./')+'/'+base+"/scripts/libs/",
-	tmp  : path.resolve('./')+'/tmp/'
+	tmp  : path.resolve('./')+'/tmp/',
+
+	dest : path.resolve('./')+'/docs/',
 };
 
 config.filter = {
