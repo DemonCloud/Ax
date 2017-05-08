@@ -1796,38 +1796,23 @@
 	function pipe(type,url,param,fns,fnf,header){
 		//param must be object typeof
 		var st = {
-			type  : RESTFUL[_toString(type).toLowerCase()]||"GET",
-			aysnc : true
-		}, _fns, _fnf, isFn= _isFn(param);
+			url : url,
+			type  : RESTFUL[type],
+			aysnc : true,
+			param : param,
+			header : header
+		};
 
 		// deel with arguments 
-		if(typeof url === 'string'){
-			st.url = url;
-			st.param = isFn ? {} : (param || {});
-			_fns = isFn ?  param : (fns || _noop);
-			_fnf = isFn ? (fns || _noop) : (fnf || _noop);
-		}else if(_isObj(url)){
-			st.url = this.url || "/";
-			st.param = isFn ? url : (param || {});
-			_fns = isFn ?  param : (fns || _noop);
-			_fnf = isFn ? (fns || _noop) : (fnf || _noop);
-		}else{
-			// no param
-			st.url = this.url || "/";
-			_fns = _noop;
-			_fnf = _noop;
-		}
-
 		// set http header param
-		st.header = header;
-		st.success = function(responseText,xhr,event){
+		st.success = function(){
 			// change the data before dispatch event;
-			_fns.call(this,responseText,xhr,event);
-			this.emit(type+":success",[responseText,xhr,event]);
+			(fns||_noop).apply(this,arguments);
+			this.emit(type+":success",arguments);
 		}.bind(this);
-		st.fail = function(xhr,event){
-			_fnf.call(this,xhr,event);
-			this.emit(type+":fail",[xhr,event]);
+		st.fail = function(){
+			(fnf||_noop).apply(this,arguments);
+			this.emit(type+":fail",arguments);
 		}.bind(this);
 
 		// trigger ajax events
@@ -2003,8 +1988,8 @@
 		}
 	};
 
-	function packRender(view,render,pack){
-		pack = _link(
+	function packRender(view,render){
+		var pack = _link(
 			packBefore(view),
 			packMain(view,render),
 			packComplete(view)
@@ -2035,12 +2020,9 @@
 	function setRender(view,render){
 		var that = packRender(view,render);
 		_define(view,"render",{
-			get : function(){
-				return that;
-			},
+			get : function(){ return that; },
 			set : function(fn){
-				if(_isFn(fn))
-					that = packRender(view,fn);
+				if(_isFn(fn)) that = packRender(view,fn);
 				return that;
 			},
 			enumerable:true,
@@ -2313,15 +2295,14 @@
 		"index"
 	],genertor_$);
 
+	ax.VERSION = struct.VERSION;
 	// Extend method
 	// Create Ax Pack extends
 	// Prepare for component
-	ax.VERSION = struct.VERSION;
-
 	aV.extend = createExtend("view");
 	aM.extend = createExtend("model");
 	aR.extend = createExtend("route");
-
+	// lock the export
 	_lock(aM,aV,aR,aS,v8(ax));
 
 	return ax;
