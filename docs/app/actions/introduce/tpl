@@ -184,9 +184,9 @@ var view = new ax.view({
 });
 
 var model = new ax.model({
-	data:{
-		list:[]
-	},
+	url:"todolist",
+	store: true,
+	data:{ list:[] },
 	events:{
 		change:function(){
 			view.render(this.data);

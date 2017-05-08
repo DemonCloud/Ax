@@ -90,9 +90,10 @@ function(ax,tags,title,tpl){
 				});
 
 				var model3 = new ax.model({
-					data:{
-						list:[]
-					},
+					store: true,
+					url:"todolist",
+					data:{ list:[] },
+
 					events:{
 						"change:list":function(){
 							view3.render(this.get());
