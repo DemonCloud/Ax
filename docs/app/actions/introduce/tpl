@@ -151,21 +151,12 @@ view.mount(
 var trim = struct.string("trim");
 
 var view = new ax.view({
-	template:'&lt;input id="name" maxlength=10&gt;'+
-		'&lt;button id="add"&gt;add&lt;/button&gt;'+
-		'&lt;ul&gt;'+
-		'&#123;&#123;* each [item,i] in list &#125;&#125;'+
-			'&lt;li&gt;&#123;&#123;-cap(item.name)&#125;&#125;'+
-			'&lt;b class="del" key=&#123;&#123;-i&#125;&#125;&gt;×&lt;/b&gt;&lt;/li&gt;'+
-		'&#123;&#123;* end &#125;&#125;'+
-		'&lt;/ul&gt;',
-	props:{
-		cap: struct.string("capit")
-	},
+	template:/* html ... */"",
+	props:{ cap: struct.string("capit") },
 	events:{
 		"click:#add":function(){
-			var getName = trim(
-				document.getElementById("name").value
+			var getName = trim( 
+				document.getElementById("name").value 
 			);
 			if(getName)
 				model.moc("list",{ name : getName });
