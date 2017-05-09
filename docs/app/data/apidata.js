@@ -1194,6 +1194,9 @@ var r = new route();"
 			usages:[
 				"ax.store()",
 			],
+			related:[
+				{ name:"model.store", target:"model:store" }
+			],
 			info:"<p>fast to parse all the store data for appliction</p>",
 			examples:[
 				{ 
@@ -1259,6 +1262,12 @@ var r = new route();"
 					code:"ax.store.rm('todolist');"
 				}
 			]
+		},
+
+		"store:clear" : {
+			title:"Store.clear",
+			introduce:"One key clear all locally data",
+			usages:[ "ax.store.clear()" ]
 		},
 
 		//#struct.define

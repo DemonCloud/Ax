@@ -30,6 +30,7 @@ function(){
 			"store:get",
 			"store:set",
 			"store:rm",
+			"store:clear",
 			"struct:define",
 			"struct:extend",
 			"struct:depextend",

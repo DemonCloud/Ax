@@ -1793,6 +1793,8 @@
 		return localStorage.removeItem(parseKey(key));
 	};
 
+	aS.clear = localStorage.clear;
+
 	function pipe(type,url,param,fns,fnf,header){
 		//param must be object typeof
 		var st = {
@@ -1803,7 +1805,7 @@
 			header : header
 		};
 
-		// deel with arguments 
+		// deal with arguments 
 		// set http header param
 		st.success = function(){
 			// change the data before dispatch event;
