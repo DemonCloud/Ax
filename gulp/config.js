@@ -84,6 +84,7 @@ config.eslintConfig = {
 		'requirejs',
 		'define',
 		'require',
+		'console',
 		'module'
 	],
 	env:{

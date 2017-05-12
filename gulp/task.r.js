@@ -3,7 +3,7 @@
 const cfg = global.cfg;
 
 const gulp = require("gulp");
-const eslint = require("gulp-eslint")
+const eslint = require("gulp-eslint");
 const concat = require("gulp-concat");
 const rename = require("gulp-rename");
 const filter = require("gulp-filter");
