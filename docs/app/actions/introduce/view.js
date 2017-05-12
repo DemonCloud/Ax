@@ -58,30 +58,21 @@ function(ax,tags,title,tpl){
 				var trim = struct.string("trim");
 
 				var view3 = new ax.view({
-					template:'<input id="name" maxlength=10>'+
-									 '<button id="add">add</button>'+
+					template:'<form id="form"><input id="name" maxlength=10>'+
+									 '<button id="add">Add</button></form>'+
 									 '<ul>'+
 									 '{{* each [item,i] in list }}'+
 									 ' 	 <li style="max-width:168px">'+
-									 '    {{-cap(item.name)}}'+
+									 '    {{-item.name}}'+
 									 '    <b class="del" key={{-i}}>×</b>'+
 									 ' 	 </li>'+
 									 '{{* end }}'+
 									 '</ul>',
-					props:{
-						cap: struct.string("capit")
-					},
 					events:{
-						"click:#add":function(event){
-							var getName = trim(
-								document.getElementById("name").value
-							);
-							if(getName)
-								model3.moc("list",{ name : getName });
-						},
-						"keypress:#name":function(event){
-							if(event.keyCode === 13)
-								event.data.self.emit("click:#add");
+						"submit:#form":function(event){
+							event.preventDefault();
+							var getName = trim(document.getElementById("name").value);
+							if(getName) model3.moc("list",{ name : getName });
 						},
 						"click:.del":function(event){
 							model3.rm("list."+this.getAttribute("key"));
@@ -90,9 +81,9 @@ function(ax,tags,title,tpl){
 				});
 
 				var model3 = new ax.model({
-					store: true,
 					url:"todolist",
 					data:{ list:[] },
+					store: true,
 
 					events:{
 						"change:list":function(){

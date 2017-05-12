@@ -152,35 +152,31 @@ var trim = struct.string("trim");
 
 var view = new ax.view({
 	template:/* html ... */"",
-	props:{ cap: struct.string("capit") },
 	events:{
-		"click:#add":function(){
-			var getName = trim( 
-				document.getElementById("name").value 
+		"submit:#form":function(event){
+			event.preventDefault();
+			var getName = trim(
+				document.getElementById("name").value
 			);
-			if(getName)
-				model.moc("list",{ name : getName });
+			if(getName) 
+				model3.moc("list",{ name : getName });
 		},
 		"click:.del":function(event){
-			model.rm(
+			model3.rm(
 				"list."+this.getAttribute("key")
 			);
-		},
-		"keypress:#name":function(event){
-			// keypress [ Enter ] trigger add action
-			if(event.keyCode === 13)
-				event.data.self.emit("click:#add");
 		}
 	}
 });
 
 var model = new ax.model({
 	url:"todolist",
-	store: true,
 	data:{ list:[] },
+	store:true,
+
 	events:{
 		change:function(){
-			view.render(this.data);
+			view.render(this.get());
 		}
 	}
 });
@@ -207,5 +203,3 @@ view.mount(
 		{{#copy}}
 	</footer>
 </article>
-
-
