@@ -2,7 +2,6 @@
 # Ax - [ version 1.0 ]
 
 <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
-<br>
 
 Ax is a fast MVR JavaScript Framework. 
 
