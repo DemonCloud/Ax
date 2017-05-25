@@ -165,7 +165,11 @@
 		focusinSupported = 'onfocusin' in window,
 		focus = { focus: 'focusin', blur: 'focusout' },
 		hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' },
-		change = { change: 'input', input: 'input' };
+		check = { check: 'change' },
+		change = { change: 'input', input: 'input' },
+		prevent = ["compositionstart","compositionupdate"],
+		ininput = ["input","keypress","keydown","keyup"],
+		notdata = prevent.concat(["compositionend"]);
 	
 	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
 		eventMethods = {
@@ -240,6 +244,7 @@
 	function realEvent(type) {
 		return hover[type] || 
 					 change[type] || 
+					 check[type] ||
 					 (focusinSupported && focus[type]) || 
 					 type;
 	}
@@ -252,45 +257,66 @@
 			var handler   = parse(event);
 			handler.fn    = fn;
 			handler.sel   = selector;
+
 			// emulate mouseenter, mouseleave
-			if (handler.e in hover) 
+			if (handler.e in hover)
 				fn = function(e){
 					var related = e.relatedTarget;
 					if (!related || (related !== this && ! this.contains(related)))
 						return handler.fn.apply(this, arguments);
 				};
 
-			handler.del   = delegator;
+			handler.del = delegator;
 			var callback  = delegator || fn;
+
 			handler.proxy = function(e){
 				var pos,
-					type = e.type,
-					tname = e.target.nodeName, 
-					editable = e.target.contentEditable === "true";
+						type = e.type,
+						tname = e.target.nodeName, 
+						editable = e.target.contentEditable === "true",
+						isinput = _has(ininput,type) && (tname === "INPUT" || tname === "TEXTAREA" || editable );
+
 				e = compatible(e);
-	
-				if (e.isImmediatePropagationStopped()) 
+
+				if (e.isImmediatePropagationStopped() || (isinput && e.target._compositionIn)) 
 					return false;
-	
-				e.data = data;
-				if((type==="input" || type==="keypress" || type==="keyup")&&
-					 (tname === "INPUT" || tname === "TEXTAREA" || editable ))
+
+				// # Chrome event handler assign Error with CompositionEvent
+				if(!_has(notdata,type))
+					e.data = data;
+
+				if(isinput)
 					pos = capCursor(e.target);
+
 				var result = callback.apply(element, 
-					e._args === undefined ? [e] : [e].concat(e._args));
+					e._args === void 0 ? [e] : [e].concat(e._args));
 
 				if(result === false)
-					e.preventDefault(), e.stopPropagation();
+					e.preventDefault(),e.stopPropagation();
+
 				if(pos)
 					setCursor(e.target,pos);
+
 				return result;
 			};
 	
 			handler.i = set.length;
 			set.push(handler);
-	
+
+			var tEvent = realEvent(handler.e);
+
+			if(tEvent in change){
+				element.addEventListener("compositionstart",function(e){
+					e.target._compositionIn = true;
+				});
+				element.addEventListener("compositionend",function(e){
+					e.target._compositionIn = false;
+					z(e.target).trigger("input");
+				});
+			}
+
 			element.addEventListener(
-				realEvent(handler.e), 
+				tEvent, 
 				handler.proxy, 
 				eventCapture(handler, capture)
 			);
