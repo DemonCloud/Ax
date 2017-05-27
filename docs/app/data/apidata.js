@@ -470,7 +470,82 @@ if(size(m.data)){\n\
 			params:[
 				{ name:"validate", type:"Object" }
 			],
-			info:"<p><code>validate</code> should be defined at <code>model</code> initialize, if u set <code>model.validate</code>, it would not be any sense.</p><p><code>validate</code> function should return boolean type for checker</p>",
+			info:"<p><code>validate</code> should be defined at <code>model</code> initialize, if u set <code>model.validate</code>, it would not be any sense.</p><p><code>validate</code> function should return boolean type for checker</p><p><code>ax.va</code> given more ways to easy checker value's type and msg console in browser</p>\n\
+<table style=\"table-layout:auto\">\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Validate</th>\n\
+			<th>Type</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>ax.va.string</td>\n\
+			<td>String</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.object</td>\n\
+			<td>Instance form Object</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.number</td>\n\
+			<td>Number ( Int or Float )</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.int</td>\n\
+			<td>Integer</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.float</td>\n\
+			<td>Floating-point number</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.array</td>\n\
+			<td>Pure Array</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.arrayLike</td>\n\
+			<td>Array Like ( Contain iterator and length )</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.primitive</td>\n\
+			<td>Not Object</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.fn</td>\n\
+			<td>Function</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.bool</td>\n\
+			<td>Boolean</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.dom</td>\n\
+			<td>DOM Element or DOM Node</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.element</td>\n\
+			<td>DOM Element</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.node</td>\n\
+			<td>DOM Node</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.model</td>\n\
+			<td>ax.model (or custom model)</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.view</td>\n\
+			<td>ax.view (or custom view)</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>ax.va.route</td>\n\
+			<td>ax.route (or custom route)</td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+",
 			related:[
 				{ name:"model.set", target:"model:set" },
 				{ name:"model.moc", target:"model:moc" },
@@ -481,9 +556,7 @@ if(size(m.data)){\n\
 					title: "Basic usage",
 					code:"var m = new ax.model({\n\
 	validate:{\n\
-		a : function(value){\n\
-			return typeof value === \"number\";\n\
-		}\n\
+		a : ax.va.number\n\
 	},\n\
 	events:{\n\
 		\"validate:success\":function(){\n\
@@ -502,9 +575,7 @@ m.set(\"a\",6);"
 					title: "Deeping checking",
 					code:"var m = new ax.model({\n\
 	validate:{\n\
-		\"a.b\" : function(value){\n\
-			return typeof value === \"string\";\n\
-		}\n\
+		\"a.b\" : ax.va.string\n\
 	},\n\
 	events:{\n\
 		\"validate:success\":function(){\n\
@@ -525,12 +596,8 @@ m.set(\"a\",{ b : \"7\" });"
 					title: "Error handling",
 					code:"var m = new ax.model({\n\
 	validate:{\n\
-		\"a.b\" : function(value){\n\
-			return typeof value === \"string\";\n\
-		},\n\
-		\"a.c\" : function(value){\n\
-			return +value === value;\n\
-		}\n\
+		\"a.b\" : ax.va.string ,\n\
+		\"a.c\" : ax.va.number\n\
 	},\n\
 	events:{\n\
 		\"validate:fail\":function(set,key,value){\n\

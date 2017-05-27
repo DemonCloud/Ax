@@ -24,7 +24,7 @@
 	"use strict";
 
 	// Define DOM frame
-	var z,Z,aM,aV,aR,aS,
+	var z,Z,aM,aV,aR,aS,vA,
 	// Define Setting
 		VIEW_DEFAULT  = { },
 		MODEL_DEFAULT = { data:{}, validate:{} },
@@ -63,6 +63,10 @@
 		_isAry    = struct.type('array'),
 		_isAryL   = struct.type('arraylike'),
 		_isPrim   = struct.type('primitive'),
+		_isFloat  = struct.type('float'),
+		_isDOM    = struct.type('dom'),
+		_isElm    = struct.type('elm'),
+		_isNode   = struct.type('node'),
 		_loop     = struct.op(),
 		_fol      = struct.op('object'),
 		_fal      = struct.op('array'),
@@ -126,12 +130,14 @@
 
 	function createExtend(origin){
 		return function(def){
+			def = _isObj(def) ? def : {};
 			var x = hackAx(ax[origin],ax[origin].extend);
 			var extend = eval("(function(ops){ "+
 				"var "+x[0]+"=_dpextend("+x[1]+",ops||{}); "+x[2]+
 			"})");
 
 			_extend(extend.prototype,ax[origin].prototype);
+			extend._base = ax[origin];
 			return extend;
 		};
 	}
@@ -1794,6 +1800,107 @@
 		return _size(data) > 1 ? JSON.parse(data) : (data||"");
 	}
 
+	function warn(value,msg){
+		console.warn(vahandler({
+			value: value,
+			type : _type(value),
+			msg : msg||""
+		}));
+		return false;
+	}
+
+	var checker = _doom("[ checker -> ax.va.{{#type}} ]");
+	var vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
+
+	// ax validate functional
+	ax.va = vA = {
+		string : function(value){
+			return (typeof value === "string" && value+"" === value) || 
+				warn(value,checker({ type:"string" }));
+		},
+
+		object : function(value){
+			return _isObj(value) || warn(value,checker({ type:"object" }));
+		},
+
+		number : function(value){
+			return (value === +value && typeof value === "number") || 
+				warn(value,checker({ type:"number" }));
+		},
+
+		int : function(value){
+			return  _isInt(value) || warn(value,checker({ type:"int" }));
+		},
+
+		float : function(value){
+			return _isFloat(value) || warn(value,checker({ type:"float" }));
+		},
+
+		array : function(value){
+			return _isAry(value) || warn(value,checker({ type:"array" }));
+		},
+
+		arrayLike : function(value){
+			return _isAryL(value) || warn(value,checker({ type:"arrayLike" }));
+		},
+
+		primitive : function(value){
+			return _isPrim(value) || warn(value,checker({ type:"primitive" }));
+		},
+
+		fn : function(value){
+			return _isFn(value) || warn(value,checker({ type:"fn" }));
+		},
+
+		bool : function(value){
+			return (typeof value === "boolean" && (!!value) === value) || 
+				warn(value,checker({ type:"bool" }));
+		},
+
+		dom : function(value){
+			return _isDOM(value) || warn(value,checker({ type:"dom" }));
+		},
+
+		element : function(value){
+			return _isElm(value) || warn(value,checker({ type:"element" }));
+		},
+
+		node : function(value){
+			return _isNode(value) || warn(value,checker({ type:"node" }));
+		},
+
+		model : function(value){
+			var v;
+			if(_isObj(value) && value !== null){
+				if(value instanceof ax.model) v = true;
+				else if(value.constructor) 
+					v = (value.constructor._base === ax.model);
+			}
+			return v || warn(value,checker({ type:"model" }));
+		},
+
+		view : function(value){
+			var v;
+			if(_isObj(value) && value !== null){
+				if(value instanceof ax.view) v = true;
+				else if(value.constructor) 
+					v = (value.constructor._base === ax.view);
+			}
+			return v || warn(value,checker({ type:"model" }));
+		},
+
+		route : function(value){
+			var v;
+			if(_isObj(value) && value !== null){
+				if(value instanceof ax.route) v = true;
+				else if(value.constructor) 
+					v = (value.constructor._base === ax.route);
+			}
+			return v || warn(value,checker({ type:"model" }));
+		}
+	};
+
+	// ax store
 	ax.store = aS = function(){
 		var key = _find(_keys(localStorage),/Ax@/),res = {};
 		_fal(key,function(k){ 
@@ -2060,7 +2167,7 @@
 	}
 
 	function checkElm(el){
-		if(!(el instanceof Element || _isAryL(el)))
+		if(!(_isElm(el) || _isAryL(el)))
 				throw new TypeError("el must be typeof DOMElement or NodeList collections -> not " + el);
 		return true;
 	}
@@ -2331,7 +2438,7 @@
 	aM.extend = createExtend("model");
 	aR.extend = createExtend("route");
 	// lock the export
-	_lock(aM,aV,aR,aS,v8(ax));
+	_lock(aM,aV,aR,aS,vA,v8(ax));
 
 	return ax;
 });

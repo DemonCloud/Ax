@@ -215,8 +215,16 @@ function isEmpty(n){
 	return isPrimitive(n) ? false : !size(n);
 }
 
+function isDOM(e){
+	return isObject(e) && e.nodeType > 0 && (e instanceof Node || e instanceof Element);
+}
+
 function isElement(e){
-	return isObject(e) && e.nodeType > 0 && e instanceof Node;
+	return e instanceof Element;
+}
+
+function isNode(e){
+	return e instanceof Node;
 }
 
 // Detect if a Function is Native Code with JavaScript
@@ -1994,9 +2002,13 @@ function $type(c){
 		case "empty":
 			return isEmpty;
 		case "dom":
+			return isDOM;
 		case "elm":
 		case "element":
 			return isElement;
+		case "node":
+		case "text":
+			return isNode;
 		case "native":
 			return isNative;
 		default:
