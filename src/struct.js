@@ -291,6 +291,19 @@ function v8(obj){
 	eval(obj);
 }
 
+// #NEW V8 compress
+// function v8(obj){
+// 	function Sub(){}
+// 	Sub.prototype = obj;
+// 	var receiver = new Sub();
+
+// 	function ic(){ return typeof receiver._ }
+// 	ic(); ic();
+
+// 	return obj;
+// 	eval('o'+o);
+// }
+
 // noop function pointer
 // cool function return origin value
 function noop(){}

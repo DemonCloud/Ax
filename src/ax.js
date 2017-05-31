@@ -1926,7 +1926,9 @@
 		return localStorage.removeItem(parseKey(key));
 	};
 
-	aS.clear = localStorage.clear;
+	aS.clear = function(){
+		return _fol(aS(),function(item,key){ aS.rm(key); });
+	};
 
 	function pipe(type,url,param,fns,fnf,header){
 		//param must be object typeof
