@@ -1745,6 +1745,12 @@
 		}
 	};
 
+	// checker template;
+	var checker = _doom("[ checker -> ax.va.{{#type}} ]");
+	var vahandler = _doom(
+		"The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}"
+	);
+
 	function checkValidate(olddata,newdata,validate){
 		var res = [],s=_size(validate);
 		if(!s) return res;
@@ -1808,95 +1814,55 @@
 		return false;
 	}
 
-	var checker = _doom("[ checker -> ax.va.{{#type}} ]");
-	var vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
+	function makeChecker(checker,type){
+		return function(value){
+			return checker(value) || warn(value,checker({ type:type }));
+		};
+	}
+
+	function isStr(value){
+		return typeof value === "string" && value+"" === value;
+	}
+
+	function isNum(value){
+		return typeof value === "number" && value === +value;
+	}
+
+	function isBool(value){
+		return typeof value === "boolean" && (!!value) === value;
+	}
+
+	function isAx(child){
+		return function(value){
+			var v = false;
+			if(_isObj(value) && value !== null){
+				if(value instanceof ax[child]) 
+					v = true;
+				else if(value.constructor) 
+					v = (value.constructor._base === ax[child]);
+			}
+			return v;
+		};
+	}
 
 	// ax validate functional
 	ax.va = vA = {
-		string : function(value){
-			return (typeof value === "string" && value+"" === value) || 
-				warn(value,checker({ type:"string" }));
-		},
-
-		object : function(value){
-			return _isObj(value) || warn(value,checker({ type:"object" }));
-		},
-
-		number : function(value){
-			return (value === +value && typeof value === "number") || 
-				warn(value,checker({ type:"number" }));
-		},
-
-		int : function(value){
-			return  _isInt(value) || warn(value,checker({ type:"int" }));
-		},
-
-		float : function(value){
-			return _isFloat(value) || warn(value,checker({ type:"float" }));
-		},
-
-		array : function(value){
-			return _isAry(value) || warn(value,checker({ type:"array" }));
-		},
-
-		arrayLike : function(value){
-			return _isAryL(value) || warn(value,checker({ type:"arrayLike" }));
-		},
-
-		primitive : function(value){
-			return _isPrim(value) || warn(value,checker({ type:"primitive" }));
-		},
-
-		fn : function(value){
-			return _isFn(value) || warn(value,checker({ type:"fn" }));
-		},
-
-		bool : function(value){
-			return (typeof value === "boolean" && (!!value) === value) || 
-				warn(value,checker({ type:"bool" }));
-		},
-
-		dom : function(value){
-			return _isDOM(value) || warn(value,checker({ type:"dom" }));
-		},
-
-		element : function(value){
-			return _isElm(value) || warn(value,checker({ type:"element" }));
-		},
-
-		node : function(value){
-			return _isNode(value) || warn(value,checker({ type:"node" }));
-		},
-
-		model : function(value){
-			var v;
-			if(_isObj(value) && value !== null){
-				if(value instanceof ax.model) v = true;
-				else if(value.constructor) 
-					v = (value.constructor._base === ax.model);
-			}
-			return v || warn(value,checker({ type:"model" }));
-		},
-
-		view : function(value){
-			var v;
-			if(_isObj(value) && value !== null){
-				if(value instanceof ax.view) v = true;
-				else if(value.constructor) 
-					v = (value.constructor._base === ax.view);
-			}
-			return v || warn(value,checker({ type:"model" }));
-		},
-
-		route : function(value){
-			var v;
-			if(_isObj(value) && value !== null){
-				if(value instanceof ax.route) v = true;
-				else if(value.constructor) 
-					v = (value.constructor._base === ax.route);
-			}
-			return v || warn(value,checker({ type:"model" }));
-		}
+		fn        : makeChecker(_isFn,"function"),
+		int       : makeChecker(_isInt,"int"),
+		array     : makeChecker(_isAry,"array"),
+		float     : makeChecker(_isFloat,"float"),
+		string    : makeChecker(isStr,"string"),
+		object    : makeChecker(_isObj,"object"),
+		number    : makeChecker(isNum,"number"),
+		arrayLike : makeChecker(_isAryL,"arrayLike"),
+		primitive : makeChecker(_isPrim,"primitive"),
+		bool      : makeChecker(isBool,"boolean"),
+		dom       : makeChecker(_isDOM,"dom"),
+		element   : makeChecker(_isElm,"element"),
+		node      : makeChecker(_isNode,"node"),
+		model     : makeChecker(isAx("model"),"model"),
+		view      : makeChecker(isAx("view"),"view"),
+		route     : makeChecker(isAx("route"),"route")
 	};
 
 	// ax store
@@ -2205,6 +2171,10 @@
 						))
 				);
 			};
+
+			if(config.model)
+				if(vA.model(config.model))
+					config.model.on("change",render.bind(this));
 		}
 
 		// if userobj has more events
@@ -2212,6 +2182,7 @@
 			// bind events
 			this.root = vroot;
 			_fol(events,uon,setRender(this,render));
+
 		}else{
 			this.mount = function(el){
 				if(checkElm(el)){
@@ -2219,9 +2190,14 @@
 					this.root = vroot = el; 
 					_fol(events,uon,setRender(this,render));
 
+					if(config.model)
+						if(vA.model(config.model))
+							config.model.on("change",this.render.bind(this));
+
 					// trigger render 
 					if(1 in arguments)
 						this.render.apply(this,_slice(arguments,1));
+
 					// delete mount
 					return delete this.mount, this;
 				}
