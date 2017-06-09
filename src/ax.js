@@ -2172,9 +2172,6 @@
 				);
 			};
 
-			if(config.model)
-				if(vA.model(config.model))
-					config.model.on("change",render.bind(this));
 		}
 
 		// if userobj has more events
@@ -2182,6 +2179,11 @@
 			// bind events
 			this.root = vroot;
 			_fol(events,uon,setRender(this,render));
+
+			if(config.model)
+				if(vA.model(config.model))
+					config.model.on("change",
+						this.render.bind(this));
 
 		}else{
 			this.mount = function(el){
@@ -2192,7 +2194,8 @@
 
 					if(config.model)
 						if(vA.model(config.model))
-							config.model.on("change",this.render.bind(this));
+							config.model.on("change",
+								this.render.bind(this));
 
 					// trigger render 
 					if(1 in arguments)
