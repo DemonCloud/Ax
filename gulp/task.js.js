@@ -30,6 +30,7 @@ function taskjs(){
 				.pipe(uglify())
 				.pipe(optimizejs())
 				.pipe(gulp.dest(cfg.path.jsl))
+				.pipe(rename('struct.js'))
 				.pipe(gulp.dest(cfg.path.pub));
 }
 

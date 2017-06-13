@@ -9,7 +9,7 @@ const config = {};
 
 config.path = {
 	base : path.resolve('./')+'/',
-	pub  : path.resolve('./')+'/dest/',
+	pub  : path.resolve('./')+'/dist/',
 	html : path.resolve('./')+'/docs/template/',
 	js   : path.resolve('./')+'/'+base+"",
 	css  : path.resolve('./')+'/'+base+"/styles/",
