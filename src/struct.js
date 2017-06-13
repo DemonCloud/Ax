@@ -129,18 +129,18 @@ function citd(fn,check){
 
 // @ exprot type[name] 
 var reHostCtor = /^\[object .+?Constructor\]$/,
-		// Compile a regexp using a common native method as a template.
-		// We chose `Object#toString` because there's a good chance it is not being mucked with.
-		reNative = RegExp('^' +
-			// Coerce `Object#toString` to a string
-			String(ts)
-			// Escape any special regexp characters
-			.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&')
-			// Replace mentions of `toString` with `.*?` to keep the template generic.
-			// Replace thing like `for ...` to support environments like Rhino which add extra info
-			// such as method arity.
-			.replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-		);
+	// Compile a regexp using a common native method as a template.
+	// We chose `Object#toString` because there's a good chance it is not being mucked with.
+	reNative = RegExp('^' +
+		// Coerce `Object#toString` to a string
+		String(ts)
+		// Escape any special regexp characters
+		.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&')
+		// Replace mentions of `toString` with `.*?` to keep the template generic.
+		// Replace thing like `for ...` to support environments like Rhino which add extra info
+		// such as method arity.
+		.replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+	);
 
 // Object [ type ]
 function isObject(e){
@@ -1510,7 +1510,7 @@ function aix(option){
 	// send request
 	return xhr.send(config.param ? 
 		(isObject(config.param) ? 
-			dataMIME(config.contentType,cType,config.param) :
+			dataMIME(config.contentType,MIME[cType],config.param) :
 			config.param ) : null),xhr;
 }
 
@@ -1599,7 +1599,8 @@ var _events = {} , _eid=0;
 
 function addEvent(obj,type,fn){
 	var id = obj._eid || 0;
-	if(id === 0) define(obj,"_eid",{ value : (id = (++_eid)), writable : false, enumerable: false, configurable: true });
+	if(id === 0) define(obj, "_eid",
+		{ value : (id = (++_eid)), writable : false, enumerable: false, configurable: true });
 	if(!_events[id]) _events[id] = {};
 	if(!_events[id][type]) _events[id][type] = [];
 	if(!has(_events[id][type],fn)) _events[id][type].push(fn);

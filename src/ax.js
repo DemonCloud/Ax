@@ -80,7 +80,7 @@
 		_param    = struct.param(),
 		_paramStr = struct.param("string"),
 		_trim     = struct.string('trim'),
-        _has      = struct.has(),
+		_has      = struct.has(),
 		_find     = struct.find(),
 		_ajax     = struct.ajax(),
 		_size     = struct.size(),
@@ -1562,7 +1562,7 @@
 
 	// Doom Events
 	// Dom fired api
-	var capEvents = [
+	/*	var capEvents = [
 		"blur"       , "invalid"     ,
 		"focusin"    , "focusout"    , "focus",
 		"abort"      , "afterprint"  , "beforeprint" ,
@@ -1571,7 +1571,7 @@
 		"loadend"    , "loadstart"   ,
 		"mouseenter" , "mouseleave"  ,
 		"resize"     , "show"        , "select"
-	];
+	];*/
 
 	var capTypes = {
 		"UIEvent"       : [
@@ -1674,8 +1674,6 @@
 		},
 
 		off : function(event, selector, callback){
-			var $this = this;
-
 			if (event && typeof event !== "string") {
 				_loop(event, function(fn, type){
 					this.off(type, selector, fn);
@@ -1721,7 +1719,8 @@
 				e.target = element;
 				_loop(findHandlers(element, event.type || event), function(handler){
 					result = handler.proxy(e);
-					if (e.isImmediatePropagationStopped()) return false;
+					if (e.isImmediatePropagationStopped())
+						return false;
 				});
 			});
 	
@@ -1737,9 +1736,7 @@
 		render : function(newhtml){
 			return this.each(function(elm){
 				this.apply(elm,this.diff(elm,
-					createDOM(elm,newhtml.nodeType === 1 ? 
-						newhtml.outerHTML : _toString(newhtml))
-					)
+					createDOM(elm,newhtml.nodeType === 1 ? newhtml.outerHTML : _toString(newhtml)))
 				);
 			},_DIFF);
 		}
@@ -1747,9 +1744,7 @@
 
 	// checker template;
 	var checker = _doom("[ checker -> ax.va.{{#type}} ]");
-	var vahandler = _doom(
-		"The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}"
-	);
+	var vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
 
 	function checkValidate(olddata,newdata,validate){
 		var res = [],s=_size(validate);
@@ -2014,9 +2009,7 @@
 		},
 
 		moc: function(key,val){
-			return this.set(key,
-				moc(_prop(this.data,key),val)
-			);
+			return this.set(key, moc(_prop(this.data,key),val));
 		},
 
 		// API event
