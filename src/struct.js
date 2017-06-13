@@ -1267,13 +1267,13 @@ function compSaze(usestruct,who,useargs,assign){
 }
 
 function DOOM(txt,bounds,name){
-	var position = 0,
-		render,
+	var d, render, position = 0,
 		res = "_p+='",
+
 		rname = isObject(bounds) ? 
 		name : (typeof bounds === "string" ? bounds : ""),
-		methods = isObject(bounds) ?
-		bounds : {},
+		methods = isObject(bounds) ? bounds : {},
+
 		args = slice(arguments,2),
 		exp = new RegExp((this.escape||no) +
 			"|" + (this.interpolate||no) + 
@@ -1282,7 +1282,8 @@ function DOOM(txt,bounds,name){
 			"|$","g");
 
 	// start replace
-	trim(txt||"").replace(exp,function(
+	trim(txt)
+	.replace(exp,function(
 		match,
 		escape,
 		interpolate,
@@ -1302,22 +1303,19 @@ function DOOM(txt,bounds,name){
 		else if(command)
 			res += makeComand(command,res);
 		else if(evaluate)
-			res += "';\n" + evaluate + "\n_p+='";
+			res += "';" + evaluate + " _p+='";
 
 		return match;
 	}).replace(/_p\+=\'\'/gim,'');
 	// End wrap res@ String
 	// use default paramKey to compline
-	res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){\n" + res + "';\n}";
-	res = "var _t,_d,_ext=struct.exist(),_=struct.html('encode'),__=struct.extend(),_p='';\n" + res + "\nreturn _p;";
+	res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){ " + res + "'; }";
+	res = "var _t,_d,_ext=struct.exist(),_=struct.html('encode'),__=struct.extend(),_p=''; " + res + " return _p;";
 
 	// Complete building Function string
 	// try to build anmousyous function
 	try{
-		render = ev("(function("+(rname||"_x_")+
-			",_bounds,struct"+(args.length?","+args.toString():"")+"){"+ 
-			res + 
-			"})"
+		render = ev("(function("+(rname||"_x_")+",_bounds,struct"+(args.length?","+args.toString():"")+"){"+ res + "})"
 		);
 	}catch(e){
 		console.error(e.res = res);
@@ -1327,12 +1325,15 @@ function DOOM(txt,bounds,name){
   // @ Precomplete JavaScript Template Function
   // @ the you build once template that use diff Data, not use diff to build function again
 	// @ protect your template code other can observe it?
-	return function(data){
-		return eq(arguments,render.pre) ? (render.complete) : 
-			(render.pre=arguments, render.complete = trim(render.apply(this,
-				[data,methods,struct].concat(slice(arguments,1))
-			)));
+	d = function(data){ return eq(arguments,render.pre) ? (render.complete) : 
+		(render.pre=arguments, render.complete = trim(render.apply(this,
+			[data,methods,struct].concat(slice(arguments,1))
+		)));
 	};
+
+	return d;
+
+	eval(d);
 }
 
 // Browser cookie
