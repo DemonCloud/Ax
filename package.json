@@ -1,5 +1,5 @@
 {
-  "name": "Ax",
+  "name": "ax-js",
   "version": "1.0.0",
   "description": "[ Ax ] is a Fast Javascript MVR Framework",
   "main": "dest/ax.min.js",
@@ -30,7 +30,8 @@
   "bugs": {
     "url": "https://github.com/DemonCloud/Ax/issues"
   },
-  "dependencies": {
+  "dependencies":{},
+  "devDependencies": {
     "browser-sync": "latest",
     "colors": "latest",
     "gulp": "latest",
