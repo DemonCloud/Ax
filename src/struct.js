@@ -1222,7 +1222,7 @@ function makeComand(command){
 	if(cmd){
 		switch(cmd.toLowerCase()){
 			case "end":
-				res = "';\n}); _p+='";
+				res = "';}); _p+='";
 				break;
 			case "if":
 			case "exist":
@@ -1255,8 +1255,8 @@ function makeComand(command){
 }
 
 function compiLing(usestruct,who,useargs){
-	return "';\n struct."+usestruct+'()('+who+","+ 
-				 "function("+useargs.replace(agExec,'')+"){\n _p+='";
+	return "'; struct."+usestruct+'()('+who+","+ 
+				 "function("+useargs.replace(agExec,'')+"){ _p+='";
 }
 
 function compSaze(usestruct,who,useargs,assign){
@@ -1267,7 +1267,7 @@ function compSaze(usestruct,who,useargs,assign){
 }
 
 function DOOM(txt,bounds,name){
-	var d, render, position = 0,
+	var _, render, position = 0,
 		res = "_p+='",
 
 		rname = isObject(bounds) ? 
@@ -1281,7 +1281,7 @@ function DOOM(txt,bounds,name){
 			"|" + (this.evaluate||no) + 
 			"|$","g");
 
-	// start replace
+	// Start parse
 	trim(txt)
 	.replace(exp,function(
 		match,
@@ -1303,10 +1303,17 @@ function DOOM(txt,bounds,name){
 		else if(command)
 			res += makeComand(command,res);
 		else if(evaluate)
-			res += "';" + evaluate + " _p+='";
-
+			res += "';" + evaluate + ";_p+='";
 		return match;
-	}).replace(/_p\+=\'\'/gim,'');
+	});
+
+	// Minix compline
+	res = res.replace(/[\r\n\f]/gim,'')
+					 .replace(/_p\+=\'[\\n]*\'/gim,'')
+		 			 .replace(/\s*;;\s*/gim,';')
+					 .replace(/[\x20\xA0\uFEFF]+/gim,' ')
+					 .replace(/>\s{2,}/gim,'> ')
+					 .replace(/\s{2,}</gim,' <');
 	// End wrap res@ String
 	// use default paramKey to compline
 	res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){ " + res + "'; }";
@@ -1314,26 +1321,20 @@ function DOOM(txt,bounds,name){
 
 	// Complete building Function string
 	// try to build anmousyous function
-	try{
-		render = ev("(function("+(rname||"_x_")+",_bounds,struct"+(args.length?","+args.toString():"")+"){"+ res + "})"
-		);
-	}catch(e){
-		console.error(e.res = res);
-		throw e;
-	}
+	// console.warn(res);
+	try{ render = ev("(function("+(rname||"_x_")+",_bounds,struct"+(args.length?","+args.toString():"")+"){ "+ res + " })"); 
+	}catch(e){ console.error(e.res = res); throw e; }
 
   // @ Precomplete JavaScript Template Function
   // @ the you build once template that use diff Data, not use diff to build function again
 	// @ protect your template code other can observe it?
-	d = function(data){ return eq(arguments,render.pre) ? (render.complete) : 
+	_ = function(data){ return eq(arguments,render.pre) ? (render.complete) : 
 		(render.pre=arguments, render.complete = trim(render.apply(this,
 			[data,methods,struct].concat(slice(arguments,1))
 		)));
 	};
 
-	return d;
-
-	eval(d);
+	return _; eval(_)
 }
 
 // Browser cookie
