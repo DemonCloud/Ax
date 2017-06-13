@@ -1,32 +1,35 @@
 {
-  "name": "ax",
+  "name": "Ax",
   "version": "1.0.0",
-  "description": "[ Aix ] is a simple javascript mvc framework",
-  "main": "ax.js",
+  "description": "[ Ax ] is a Fast Javascript MVR Framework",
+  "main": "dest/ax.min.js",
+  "homepage": "https://demoncloud.github.io/Ax",
+  "author": {
+    "name": "YiJun",
+    "url": "https://demoncloud.github.io"
+  },
   "directories": {
     "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DemonCloud/Ax.git"
   },
   "scripts": {
     "start": "browser-sync start --server --files **/*.html",
     "build": "gulp",
     "test": "gulp test"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DemonCloud/ax.git"
-  },
   "keywords": [
+    "ax",
     "javascript",
-    "mvc",
-    "aixjs",
-    "ax"
+    "framework",
+    "mvc"
   ],
-  "author": "YiJun",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/DemonCloud/ax/issues"
+    "url": "https://github.com/DemonCloud/Ax/issues"
   },
-  "homepage": "https://github.com/DemonCloud/ax#readme",
   "dependencies": {
     "browser-sync": "latest",
     "colors": "latest",
