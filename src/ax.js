@@ -15,7 +15,7 @@
 		define('ax',['struct'],function(struct){ return factory(ax,struct); });
 	else if(typeof exports === "object" && typeof module !== "undefined")
 		// support CommonJS exports
-		module.exports = factory(ax,struct);
+		module.exports = factory(ax,require('struct'));
 	else
 		// build on browser global object
 		root.ax = factory(ax,struct);

@@ -39,7 +39,7 @@
 
 // Strict mode
 // define const
-struct.VERSION = "1.0";
+struct.VERSION = "1.2";
 
 // base method
 var or = {},
