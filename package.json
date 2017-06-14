@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/DemonCloud/Ax/issues"
   },
-  "dependencies":{},
+  "dependencies": {},
   "devDependencies": {
     "browser-sync": "latest",
     "colors": "latest",
