@@ -22,7 +22,6 @@
  */
 
 (function(root,struct,factory){
-
 	if(typeof define === 'function' && define.amd)
 		// Ruler by UMD Javascript
 		// support AMD define
@@ -34,7 +33,8 @@
 		// build on browser global object
 		root.struct = factory(struct);
 
-}(this, struct=function(){return this;}, function(struct){
+	// due to [ Webpack ] fucking
+}(this, function(){ return window; }, function(struct){
 'use strict';
 
 // Strict mode
