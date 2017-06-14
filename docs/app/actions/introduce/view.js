@@ -1,12 +1,14 @@
 define("actions/introduce/view",
 [
 	"ax",
+	"struct",
+
 	"modules/tags",
 	"modules/title",
 	// template 
 	"text!actions/introduce/tpl"
 ],
-function(ax,tags,title,tpl){
+function(ax,struct,tags,title,tpl){
 	// mount at elment[#app]
 	return new ax.view({
 		root:document.getElementById("app"),
