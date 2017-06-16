@@ -458,9 +458,10 @@
 	 * This should really be a predefined function in Array...
 	 */
 	function makeArray(n, v) {
-		return Array.apply(null, new Array(n)).map(function() {
-			return v;
-		});
+		var a = [];
+		for(var i=0; i<n; i++)
+			a[i] = v;
+		return a;
 	}
 
 	var diffcount,
