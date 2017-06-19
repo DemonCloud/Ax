@@ -26,6 +26,7 @@ api
 	'use strict';
 
 	// make ax as GLOBAL
+	struct.root.struct = struct;
 	struct.root.ax = ax;
 
 	var has = struct.has(),
