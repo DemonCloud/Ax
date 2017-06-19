@@ -1725,13 +1725,6 @@ function rmProp(obj,prop){
 	return obj;
 }
 
-// #not need api
-// function watch(obj,prop,handle){
-// }
-
-// function unwatch(obj,prop){
-// }
-
 // return random element [ method ]
 // auto([1,2,3,4,5]) => random(in ary);
 function auto(ary,num){
@@ -1869,68 +1862,6 @@ chain.prototype.value = function(){
 	return wrap.apply(null,this["="].splice(0,size(this['='])))
 						 .apply(null,this['-']===void 0 ? arguments : this['-']);
 };
-
-var xhooklist = {},
-		xxhr = root.XMLHttpRequest,
-		xdef = {
-			readyState:0,
-			response:{},
-			responseText:null,
-			responseType:null,
-			responseURL:null,
-			timeout:0,
-			status:0
-		};
-
-function xhookmatch(url){
-	return xhooklist[url];
-}
-
-function XHookRequest(){
-	this._xhr = new xxhr();
-
-	extend(this,xdef);
-}
-
-XHookRequest.prototype = {
-	abort:function(){
-		return this._xhr.abort();
-	},
-	open:function(type,url){
-		var res;
-		if(res = xhookmatch(url)){
-			return extend(this,{
-				responseURL : url,
-				responseType : "appliction/json",
-				responseText : res,
-				readyState : 4,
-				status : 304
-			});
-		}
-		return this._xhr.open.apply(this._xhr,arguments);
-	},
-	send:function(param){
-		if(this.responseText&&this.readyState)
-			return this.onreadystatechange(broken),extend(this,xdef);
-		return this._xhr.send.apply(this._xhr,arguments);
-	},
-	start:function(){
-		root.XMLHttpRequest = XHookRequest;
-	},
-	detect:function(url,response){
-		xhooklist[url] = toString(response);
-	},
-	remove:function(url){
-		return delete xhooklist[url];
-	},
-	stop:function(){
-		root.XMLHttpRequest = xxhr;
-	},
-	addEventListener:noop,
-	setRequestHeader:noop
-};
-
-var xhr = new XHookRequest();
 
 // atob && btoa
 // base IE9 not support this method;
@@ -2405,7 +2336,6 @@ ol(zublist,function(fn,key){
 	zub.apply(null,arguments);
 });
 
-struct.xhr = xhr;
 struct.root = root;
 struct.toString = toString;
 struct.broken = broken;
