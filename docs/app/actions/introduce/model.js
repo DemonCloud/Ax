@@ -3,7 +3,7 @@ define("actions/introduce/model",
 "ax"
 ],
 function(ax,introduceinfo){
-	return new ax.model({
+	return ax.model({
 		data:{
 			main:"Ax",
 			cap1:"Modules",

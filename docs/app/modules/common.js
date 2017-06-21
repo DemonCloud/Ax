@@ -12,7 +12,7 @@ function(struct,ax){
 		elm.setAttribute("class",elm.getAttribute("class").replace(/\s+active/,''));
 	};
 
-	return new ax.view({
+	return ax.view({
 		root: document.getElementById("menu"),
 
 		events:{

@@ -31,15 +31,15 @@
 		module.exports = factory(struct);
 	else
 		// build on browser global object
-		root.struct = factory(struct);
+		root.struct = root._ = factory(struct);
 
-	// due to [ Webpack ] fucking
+	// due to [ Webpack ] fucking should return [ Window ]
 }(this, function(){ return window; }, function(struct){
 'use strict';
 
 // Strict mode
 // define const
-struct.VERSION = "1.2";
+struct.VERSION = "2.0";
 
 // base method
 var or = {},
@@ -147,19 +147,24 @@ function isFn(e){
 	return typeof e === "function" && e === e && !!e;
 }
 
-// Number [ type ]
-function isNumber(e){
-	return typeof e === "number" && +e===e;
-}
-
 // Object [ type ]
 function isObj(e){
-	return e && (typeof e === "object" || isFn(e));
+	return !!e && (typeof e === "object" || isFn(e));
 }
 
 // String [ type ]
 function isStr(e){
 	return typeof e === "string" || e+"" === e;
+}
+
+// Boolean [ type ]
+function isBool(e){
+	return typeof e === "boolean" && (!!e) === e;
+}
+
+// Number [ type ]
+function isNum(e){
+	return typeof e === "number" && e === +e;
 }
 
 // Primitive [ type ]
@@ -830,11 +835,30 @@ function intersection(){
 }
 
 // Merge array [ method ]
-// *use eq or not [ ...ary(values),useeq? ]
 // @export merge
-// merge([1,2,3],[2,1,3],[3,4],[1,5]) => [1,2,3,4,5]
-function merge(){
-	return slimUnique(concat.apply([],arguments),true);
+// merge([1,2,3],[2,1,3],[3,4],[1,5]) => [1,5,3]
+// merge({ a:1 },{ a:2,b:{c:1} },{ b:{d:4} }) => { a:1,b:{c:1,d:4} }
+function mergeCompare(v,n){
+	return (!isPrimitive(v) && !isPrimitive(n)) && 
+		( (isDefine(v,"Object") && isDefine(n,"Object")) || 
+			(isArrayLike(v) && isArrayLike(n)) );
+}
+
+function merge(f){
+	var res, collect = slice(arguments);
+	if(isArray(f)){
+		// deeping reduce to merge
+		collect.reduce(function(val,next){
+			return al(next,function(v,i){ if(v!=null) val[i] = v; }), (res=val);
+		},[]);
+	}else if(isObj(f)){
+		collect.reduce(function(val,next){
+			var vk = keys(val) , nk = keys(next);
+			return al(nk,function(key){ var v = val[key], n = next[key];
+				val[key] = mergeCompare(v,n) ? merge(v,n) : n; }), (res=val);
+		},{});
+	}
+	return res;
 }
 
 // Drop array [ method ]
@@ -893,7 +917,7 @@ var rNumber = '0123456789',
 
 // Random static Int [ method ]
 function randomInt(min,max){
-	if(!isNumber(max)){
+	if(!isNum(max)){
 		max = min; min = 0;
 	}
 	return min + Math.floor(Math.random()*(max-min+1));
@@ -901,7 +925,7 @@ function randomInt(min,max){
 
 // Random static Float [ method ]
 function randomFloat(min,max,fix){
-	if(!isNumber(max)){
+	if(!isNum(max)){
 		max = min; min = 0;
 	}
 	var num = Math.random()*(max-min)+min;
@@ -1314,7 +1338,7 @@ function DOOM(txt,bounds,name){
 
 	// Minix compline
 	res = res.replace(/[\r\n\f]/gim,'')
-					 .replace(/_p\+=\'[\\n]*\'/gim,'')
+					 .replace(/_p\+=\'(\\n)*\'[^\+]/gim,'')
 		 			 .replace(/\s*;;\s*/gim,';')
 					 .replace(/[\x20\xA0\uFEFF]+/gim,' ')
 					 .replace(/>\s{2,}/gim,'> ')
@@ -1938,11 +1962,19 @@ function $type(c){
 			return isObj;
 		case "array":
 			return isArray;
+		case "arraylike":
+			return isArrayLike;
 		case "str":
 		case "string":
 			return isStr;
-		case "arraylike":
-			return isArrayLike;
+		case "bool":
+		case "boolean":
+			return isBool;
+		case "num":
+		case "number":
+			return isNum;
+		case "error":
+			return isError;
 		case "function":
 		case "fn":
 			return isFn;
@@ -2328,16 +2360,14 @@ var zublist = {
 // Generators
 // @define base symbol
 ol(nublist,function(fn,key){
-	chain.prototype[key] = function(){
-		return this['='].push(fn),this;
-	};
+	chain.prototype[key] = function(){ 
+		return this['='].push(fn),this; };
 	nub.apply(null,arguments);
 }); 
 
 ol(zublist,function(fn,key){
 	chain.prototype[key] = function(){
-		return this['='].push(fn.apply(null,arguments)),this;
-	};
+		return this['='].push(fn.apply(null,arguments)),this; };
 	zub.apply(null,arguments);
 });
 

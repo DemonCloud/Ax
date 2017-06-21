@@ -4,7 +4,7 @@ define("actions/api/model",
 	"data/apidata"
 ],
 function(ax,apidata){
-	return new ax.model({
+	return ax.model({
 		data:apidata
 	});
 });

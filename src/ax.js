@@ -59,6 +59,9 @@
 		_type     = struct.type(),
 		_isObj    = struct.type('object'),
 		_isFn     = struct.type('function'),
+		_isNum    = struct.type('num'),
+		_isBool   = struct.type("bool"),
+		_isStr    = struct.type("str"),
 		_isInt    = struct.type('int'),
 		_isAry    = struct.type('array'),
 		_isAryL   = struct.type('arraylike'),
@@ -89,7 +92,8 @@
 		_link     = struct.link(),
 		_utob     = struct.assembly("u2b"),
 		_btou     = struct.assembly("b2u"),
-		_doom     = struct.doom();
+		_doom     = struct.doom(),
+		_merge    = struct.merge();
 
 	// ax genertor function
 	function genertor_(api){
@@ -110,34 +114,12 @@
 		};
 	}
 
-	function hackAx(origin,extend){
-		var fnstr = _toString(origin),
-			oargs = _toString(origin),
-			eargs = _toString(extend),
-
-		body = fnstr.slice(
-					 fnstr.indexOf("{")+1, 
-					 fnstr.lastIndexOf("}"));
-
-		oargs = oargs.slice(oargs.indexOf('(')+1, oargs.indexOf(')'))
-								 .match(/([^\s,]+)/g)[0];
-		eargs = eargs.slice(eargs.indexOf('(')+1, eargs.indexOf(')'))
-								 .match(/([^\s,]+)/g)[0];
-  	
-  	return [_toString(oargs),_toString(eargs),body];
-	}
-
 	function createExtend(origin){
-		return function(def){
-			def = _isObj(def) ? def : {};
-			var x = hackAx(ax[origin],ax[origin].extend);
-			var extend = eval("(function(ops){ "+
-				"var "+x[0]+"=_dpextend("+x[1]+",ops||{}); "+x[2]+
-			"})");
-
-			_extend(extend.prototype,ax[origin].prototype);
-			extend._base = ax[origin];
-			return extend;
+		return function(opt){
+			var malloc = opt; 
+			return function(o){ 
+				return ax[origin](_merge(malloc,_isObj(o)?o:{})); 
+			}; 
 		};
 	}
 
@@ -161,9 +143,7 @@
 							(elm instanceof Element ? [elm] : []);
 	};
 
-	z = function(x){
-		return z.init.call(root,x);
-	};
+	z = function(x){ return z.init.call(root,x); };
 
 	var _zid = 1,
 		handlers = {},
@@ -1423,7 +1403,7 @@
 		// ===== Apply a diff =====
 		apply: function(tree, diffs) {
 			_fal(diffs,function(diff){
-				this.applyDiff(tree, diff)
+				this.applyDiff(tree, diff);
 			},this);
 			return true;
 		},
@@ -1816,50 +1796,11 @@
 		};
 	}
 
-	function isStr(value){
-		return typeof value === "string" && value+"" === value;
-	}
-
-	function isNum(value){
-		return typeof value === "number" && value === +value;
-	}
-
-	function isBool(value){
-		return typeof value === "boolean" && (!!value) === value;
-	}
-
-	function isAx(child){
-		return function(value){
-			var v = false;
-			if(_isObj(value) && value !== null){
-				if(value instanceof ax[child]) 
-					v = true;
-				else if(value.constructor) 
-					v = (value.constructor._base === ax[child]);
-			}
-			return v;
+	function isAx(compare){
+		return function(value){ 
+			return value instanceof compare;
 		};
 	}
-
-	// ax validate functional
-	ax.va = vA = {
-		fn        : makeChecker(_isFn,"function"),
-		int       : makeChecker(_isInt,"int"),
-		array     : makeChecker(_isAry,"array"),
-		float     : makeChecker(_isFloat,"float"),
-		string    : makeChecker(isStr,"string"),
-		object    : makeChecker(_isObj,"object"),
-		number    : makeChecker(isNum,"number"),
-		arrayLike : makeChecker(_isAryL,"arrayLike"),
-		primitive : makeChecker(_isPrim,"primitive"),
-		bool      : makeChecker(isBool,"boolean"),
-		dom       : makeChecker(_isDOM,"dom"),
-		element   : makeChecker(_isElm,"element"),
-		node      : makeChecker(_isNode,"node"),
-		model     : makeChecker(isAx("model"),"model"),
-		view      : makeChecker(isAx("view"),"view"),
-		route     : makeChecker(isAx("route"),"route")
-	};
 
 	// ax store
 	ax.store = aS = function(){
@@ -1918,7 +1859,9 @@
 	}
 
 	// Ax Model
-	ax.model = aM = function(obj){
+	// Ax build -> 2.0
+	// model constructor
+	aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
 			events = config.events,
 			validate = config.validate,
@@ -2133,8 +2076,9 @@
 		return true;
 	}
 
-	// bind selector
-	ax.view = aV = function(obj){
+	// Ax View
+	// View container
+	aV = function(obj){
 		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
 			vroot = config.root,
 			render = config.render,
@@ -2152,7 +2096,7 @@
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
-			stencil = (typeof stencil === "string") ? 
+			stencil = _isStr(stencil) ? 
 				_doom(stencil, _isObj(props) ? props : {}) : 
 				(_isFn(stencil) ? stencil : _noop);
 
@@ -2276,14 +2220,14 @@
 	function hashChangeReg(fn,args){
 		if(_isFn(fn))
 			fn.apply(this,args);
-		else
-			// array or string
-			_fal(typeof fn === "string" ? fn.split(",") : fn,
+		else // array or string
+			_fal(_isStr(fn) ? fn.split(",") : fn,
 				function(reg){ this.actions[reg].apply(this,args); },this);
 	}
 
+	// Ax Route
 	// define route for SPA
-	ax.route = aR = function(obj){
+	aR = function(obj){
 		var _this = this,
 			history = { old: "", now: root.location.href },
 			config = _extend(_clone(ROUTE_DEFAULT),obj||{}),
@@ -2365,52 +2309,42 @@
 		}
 	};
 
-	// #genertor api
-	_fal([
-		"extend",
-		"not",
-		"cat",
-		"find",
-		"filter",
-		"reject",
-		"chunk",
-		"compact",
-		"pluck",
-		"groupBy",
-		"countBy",
-		"pairs",
-		"shuffle",
-		"flat",
-		"merge",
-		"map",
-		"sort",
-		"unique",
-		"concat"
-	],genertor_);
-
-	_fal([
-		"keys",
-		"diff",
-		"intsec",
-		"first",
-		"last",
-		"auto",
-		"eq",
-		"values",
-		"size",
-		"each",
-		"has",
-		"type",
-		"index"
-	],genertor_$);
+	// #genertor minmix api
+	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat"],genertor_);
+	_fal(["keys","diff","intsec","first","last","auto","eq","values","size","each","has","type","index"],genertor_$);
 
 	ax.VERSION = struct.VERSION;
+	ax.route = function(opt){ return new aR(_isObj(opt) ? opt : {}); };
+	ax.model = function(opt){ return new aM(_isObj(opt) ? opt : {}); };
+	ax.view  = function(opt){ return new aV(_isObj(opt) ? opt : {}); };
+
 	// Extend method
 	// Create Ax Pack extends
 	// Prepare for component
-	aV.extend = createExtend("view");
-	aM.extend = createExtend("model");
-	aR.extend = createExtend("route");
+	ax.route.extend = createExtend("route");
+	ax.model.extend = createExtend("model");
+	ax.view.extend  = createExtend("view");
+
+	// ax validate functional
+	ax.va = vA = {
+		fn        : makeChecker(_isFn,"function"),
+		int       : makeChecker(_isInt,"int"),
+		array     : makeChecker(_isAry,"array"),
+		float     : makeChecker(_isFloat,"float"),
+		string    : makeChecker(_isStr,"string"),
+		object    : makeChecker(_isObj,"object"),
+		number    : makeChecker(_isNum,"number"),
+		arrayLike : makeChecker(_isAryL,"arrayLike"),
+		primitive : makeChecker(_isPrim,"primitive"),
+		bool      : makeChecker(_isBool,"boolean"),
+		dom       : makeChecker(_isDOM,"dom"),
+		element   : makeChecker(_isElm,"element"),
+		node      : makeChecker(_isNode,"node"),
+		model     : makeChecker(isAx(aM),"model"),
+		view      : makeChecker(isAx(aV),"view"),
+		route     : makeChecker(isAx(aR),"route")
+	};
+
 	// lock the export
 	_lock(aM,aV,aR,aS,vA,v8(ax));
 

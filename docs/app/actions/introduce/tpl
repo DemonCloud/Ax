@@ -6,7 +6,7 @@
 		</h3>
 		<p><b><i class="ion-ios-navigate"></i> Ax</b> is a fast MVR JavaScript Framework.</p>
 
-		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React</b> very well.</p>
+		<p>It require <b>Struct</b> utils lib, for the sake of better organization application structure with modular architecture<b>( AMD or CommonJS specification )</b>. This is not to replace <b>Backbone</b> or <b>Angular</b> etc, maybe it boring form of entertainment. Of course, it cooperate with <b>React & Vue</b> very well.</p>
 		<br>
 		
 		<p><b><i class="ion-ios-circle-filled"></i> Struct</b> pass over <b>300 test case by Qunit</b> , and <b>Ax</b> call build with <b>Saucelabs</b>, support all the <b style="color:#000">ECMAScript5</b> compatible Browser.</p>
@@ -23,7 +23,7 @@
 			<span><b>Download pack</b> with <code>struct</code>&nbsp;&nbsp;</span>
 			<a href="./axs.min.js" title="download it" alt="download it" rel="download" download='axs.min.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				axs.min.js (1.0) (57k)
+				axs{{#struct.VERSION}}.min.js (57k)
 			</a>
 		</p>
 		<p style="margin-bottom:0">The compress file with <b>GZIP</b> only <b>19KB</b> </p>
@@ -88,10 +88,8 @@
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
-var view = new ax.view({
-	template:"&lt;div class='name'&gt;"+
-							"Hello &#123;&#123;-name&#125;&#125;"+
-					 "&lt;/div&gt;"
+var view = ax.view({
+	template:"Hello &#123;&#123;-name&#125;&#125;"
 });
 
 view.mount(
@@ -112,20 +110,17 @@ view.mount(
 		<div class="it-example">
 			<div class="ite-code">
 				<pre class="sh_javascript">
-var view = new ax.view({
+var model = ax.model();
+
+var view = ax.view({
 	template:"&lt;input value='&#123;&#123;-text&#125;&#125;'&gt;"+
 					 "&lt;h2&gt;&#123;&#123;-text&#125;&#125;&lt;/h2&gt;",
+
+	model:model,
+
 	events:{
 		"change:input":function(){
 			 model.set("text",this.value);
-		}
-	}
-});
-
-var model = new ax.model({
-	events:{
-		change:function(){
-			view.render(this.get());
 		}
 	}
 });
@@ -150,8 +145,19 @@ view.mount(
 				<pre class="sh_javascript">
 var trim = struct.string("trim");
 
-var view = new ax.view({
+var model = ax.model({
+	url:"todolist",
+
+	data:{ list:[] },
+	store:true,
+});
+
+var view = ax.view({
 	template:/* html ... */"",
+
+	// auto [ data ] -> [ view ] binding
+	model: model,
+
 	events:{
 		"submit:#form":function(event){
 			event.preventDefault();
@@ -165,18 +171,6 @@ var view = new ax.view({
 			model3.rm(
 				"list."+this.getAttribute("key")
 			);
-		}
-	}
-});
-
-var model = new ax.model({
-	url:"todolist",
-	data:{ list:[] },
-	store:true,
-
-	events:{
-		change:function(){
-			view.render(this.get());
 		}
 	}
 });

@@ -27,7 +27,7 @@ function(struct,slist){
 		
 		var val = trim(this.value);
 		if(size(val) > 1){
-			var reg = new RegExp(val,'i');
+			var reg = RegExp(val,'i');
 			var res = find(list,function(item){
 				return has(item.k,reg);
 			});

@@ -42,7 +42,7 @@ api
 		}
 	};
 
-	var app = new ax.route({
+	var app = ax.route({
 		routes:{
 			"^introduce$" : "index",
 			"^api$"       : "api"

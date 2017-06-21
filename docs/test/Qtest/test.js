@@ -242,10 +242,8 @@ console.time("struct pref");
 		var arr2 = [1,3,4];
 		var arr3 = [1,3];
 		var arr4 = [2];
-		var no = 6;
-		var no2 = 1;
 
-		a.equal(eq(merge(arr,arr2,arr3,arr4,no,no2),[1,2,3,4,5,6]),true,"merge array");
+		a.equal(eq(merge(arr,arr2,arr3,arr4),[2,3,4,4,5]),true,"merge array");
 	});
 
 	Q.test(" - [ flat ]",function(a){

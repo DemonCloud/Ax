@@ -10,7 +10,7 @@ define("actions/api/view",
 ],
 function(ax,tags,code,title,tpl){
 	// mount at elment[#app]
-	return new ax.view({
+	return ax.view({
 		root:document.getElementById("app"),
 		template:tpl,
 		events:{

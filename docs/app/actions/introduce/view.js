@@ -10,7 +10,7 @@ define("actions/introduce/view",
 ],
 function(ax,struct,tags,title,tpl){
 	// mount at elment[#app]
-	return new ax.view({
+	return ax.view({
 		root:document.getElementById("app"),
 		template:tpl,
 		events:{
@@ -21,10 +21,8 @@ function(ax,struct,tags,title,tpl){
 				sh_highlightDocument(tags.make());
 
 				//#example1
-				var view = new ax.view({
-					template:"<div class='name'>"+
-											"Hello {{-name}}"+
-									 "</div>"
+				var view = ax.view({
+					template: "Hello {{-name}}"
 				});
 
 				view.mount(
@@ -33,20 +31,17 @@ function(ax,struct,tags,title,tpl){
 				);
 
 				//#example2
-				var view2 = new ax.view({
+				var model2 = ax.model();
+
+				var view2 = ax.view({
 					template:"<input value='{{-text}}' style='margin-bottom:5px'>"+
 									 "<h2>{{-text}}</h2>",
+
+					model : model2,
+
 					events:{
 						"change:input":function(event){
 							model2.set("text",this.value);
-						}
-					}
-				});
-
-				var model2 = new ax.model({
-					events:{
-						change:function(){
-							view2.render(this.get());
 						}
 					}
 				});
@@ -59,7 +54,14 @@ function(ax,struct,tags,title,tpl){
 				//example3
 				var trim = struct.string("trim");
 
-				var view3 = new ax.view({
+				var model3 = ax.model({
+					url:"todolist",
+
+					data:{ list:[] },
+					store: true,
+				});
+
+				var view3 = ax.view({
 					template:'<form id="form"><input id="name" maxlength=10>'+
 									 '<button id="add">Add</button></form>'+
 									 '<ul>'+
@@ -70,6 +72,9 @@ function(ax,struct,tags,title,tpl){
 									 ' 	 </li>'+
 									 '{{* end }}'+
 									 '</ul>',
+
+					model: model3,
+
 					events:{
 						"submit:#form":function(event){
 							event.preventDefault();
@@ -78,18 +83,6 @@ function(ax,struct,tags,title,tpl){
 						},
 						"click:.del":function(event){
 							model3.rm("list."+this.getAttribute("key"));
-						}
-					}
-				});
-
-				var model3 = new ax.model({
-					url:"todolist",
-					data:{ list:[] },
-					store: true,
-
-					events:{
-						"change:list":function(){
-							view3.render(this.get());
 						}
 					}
 				});
