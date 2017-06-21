@@ -90,7 +90,7 @@ function depextend(a,b,nothisproperty){
 // define Property [ ES5 method ]
 // @use object.defineProperty
 function define(obj,prop,st){
-	return isObject(prop) ?
+	return isObj(prop) ?
 		Object.defineProperties(obj,prop) :
 		Object.defineProperty(obj,prop,st);
 }
@@ -142,11 +142,6 @@ var reHostCtor = /^\[object .+?Constructor\]$/,
 		.replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
 	);
 
-// Object [ type ]
-function isObject(e){
-	return typeof e === "function" || typeof e === "object" && !!e;
-}
-
 // Function [ type ]
 function isFn(e){
 	return typeof e === "function" && e === e && !!e;
@@ -155,6 +150,16 @@ function isFn(e){
 // Number [ type ]
 function isNumber(e){
 	return typeof e === "number" && +e===e;
+}
+
+// Object [ type ]
+function isObj(e){
+	return e && (typeof e === "object" || isFn(e));
+}
+
+// String [ type ]
+function isStr(e){
+	return typeof e === "string" || e+"" === e;
 }
 
 // Primitive [ type ]
@@ -186,7 +191,7 @@ function isDefine(obj,name){
 
 // ArrayLike [ type ] 
 function isArrayLike(obj){
-	return obj !==null && (typeof obj.length === "number" && isObject(obj)) &&(
+	return obj !==null && (typeof obj.length === "number" && isObj(obj)) &&(
 				 isArray(obj) ||
 				 isDefine(obj,"Arguments") ||
 				 isDefine(obj,"NodeList") ||
@@ -216,7 +221,7 @@ function isEmpty(n){
 }
 
 function isDOM(e){
-	return isObject(e) && e.nodeType > 0 && (e instanceof Node || e instanceof Element);
+	return isObj(e) && e.nodeType > 0 && (e instanceof Node || e instanceof Element);
 }
 
 function isElement(e){
@@ -348,7 +353,7 @@ function toHEX(rgb){
 
 function toArray(n){
 	var res = [];
-	if(isObject(n)||isDefine(n,"String"))
+	if(isObj(n)||isDefine(n,"String"))
 		res = values(n);
 	else if(n!=null)
 		res.push(n);
@@ -405,7 +410,7 @@ function ol(obj,fn,ts){
 function fov(list){
 	if(isArray(list))
 		return al.apply(list,arguments);
-	else if(isObject(list) && !isFn(list) && list !== null)
+	else if(isObj(list) && !isFn(list) && list !== null)
 		return ol.apply(list,arguments);
 	return list;
 }
@@ -605,7 +610,7 @@ function cat(list,idf){
 		for(var i=0,l=list.length; i<l; i++)
 			if(fn.call(list,list[i],i,list))
 				res.push(list.splice(i,1).pop(i--));
-	}else if(isObject(list)){
+	}else if(isObj(list)){
 		for(var k in list){
 			if(list.hasOwnProperty(k))
 				if(fn.call(list,list[k],k,list)){
@@ -1053,7 +1058,7 @@ function paramStringify(param){
 
 	for(var key in Cparam)
 		Cparam[key] = rInsignia(
-			isObject(Cparam[key]) ?
+			isObj(Cparam[key]) ?
 			JSON.stringify(Cparam[key]) :
 			Cparam[key]
 		);
@@ -1270,9 +1275,9 @@ function DOOM(txt,bounds,name){
 	var _, render, position = 0,
 		res = "_p+='",
 
-		rname = isObject(bounds) ? 
+		rname = isObj(bounds) ? 
 		name : (typeof bounds === "string" ? bounds : ""),
-		methods = isObject(bounds) ? bounds : {},
+		methods = isObj(bounds) ? bounds : {},
 
 		args = slice(arguments,2),
 		exp = new RegExp((this.escape||no) +
@@ -1465,11 +1470,11 @@ function aix(option){
 	);
 
 	// with POST method
-	cType = isObject(config.header) ? 
+	cType = isObj(config.header) ? 
 		(config.header["Content-Type"] || "application/x-www-form-urlencoded" ) : 
 		"application/x-www-form-urlencoded";
 
-	if(config.header !== broken && isObject(config.header))
+	if(config.header !== broken && isObj(config.header))
 		ol(config.header,function(val,key){ xhr.setRequestHeader(key,val); });
 
 	if(config.type.toUpperCase() === "POST" && 
@@ -1511,7 +1516,7 @@ function aix(option){
 
 	// send request
 	return xhr.send(config.param ? 
-		(isObject(config.param) ? 
+		(isObj(config.param) ? 
 			dataMIME(config.contentType,MIME[cType],config.param) :
 			config.param ) : null),xhr;
 }
@@ -1635,7 +1640,7 @@ function hasEvent(obj,type,fn){
 }
 
 function copyEvent(toobj,related){
-	var rid = (isObject(related) ? related._eid : 0) || 0;
+	var rid = (isObj(related) ? related._eid : 0) || 0;
 	if(rid){
 		define(toobj,"_eid",{ 
 			value : ++_eid, 
@@ -1742,7 +1747,7 @@ function auto(ary,num){
 function size(n){
 	if(!isFn(n) && n!= null && !isNaN(n))
 		return typeof n.length === 'number' ?
-			n.length : (isObject(n) ? keys(n).length : 0);
+			n.length : (isObj(n) ? keys(n).length : 0);
 	return 0;
 }
 
@@ -1800,7 +1805,7 @@ function wrap(){
 }
 
 function sort(ary,key){
-	if(isObject(ary)&&!isArray(ary)&&typeof key === "string"){
+	if(isObj(ary)&&!isArray(ary)&&typeof key === "string"){
 		var target = getProp(ary,key);
 		return target.sort.apply(target,slice(arguments,2)),ary;
 	}
@@ -1822,13 +1827,11 @@ function frozen(){
 
 // create frequency function
 function hz(fn,time,context){
-	var fq = function(){
-		if(!fq.intime)
-			setTimeout((fn.apply((fq.intime=1,context),arguments),
-				function(){ fq.intime = 0; }),time);
+	var fq;
+	return function(){
+		if(!fq) setTimeout((fn.apply((fq = 1,context),arguments),
+				function(){ fq = 0; }),time);
 	};
-
-	return fq;
 }
 
 // _ chain stack [ method ]
@@ -1932,9 +1935,12 @@ function btou(input){
 function $type(c){
 	switch((c||"").toLowerCase()){
 		case "object":
-			return isObject;
+			return isObj;
 		case "array":
 			return isArray;
+		case "str":
+		case "string":
+			return isStr;
 		case "arraylike":
 			return isArrayLike;
 		case "function":
@@ -2081,9 +2087,8 @@ function $drop(c){
 
 // TODO 
 // @ add error contruction
-function $error(){
-
-}
+// function $error(){
+// }
 
 function $random(c){
 	switch((c||"").toLowerCase()){
@@ -2315,7 +2320,7 @@ var zublist = {
 	index    : $index,
 	random   : $random,
 	string   : $string,
-	error    : $error,
+	// error    : $error,
 	assembly : $assembly,
 	doom     : $doom
 };

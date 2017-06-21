@@ -2741,25 +2741,92 @@ console.log(has(a,\"a\"))"
 			title:"type [ ... ]",
 			introduce:"<code>struct.type</code> ",
 			usages:[
-				"type -> struct.type()",
+				"type -> struct.type(cmd)",
 				"",
 				"isObject -> struct.type(\"object\")",
-				"isArray -> struct.type(\"array\")",
-				"isArrayLike -> struct.type(\"arraylike\")",
-				"isFunction -> struct.type(\"function\")",
-				"isNaN -> struct.type(\"nan\")",
-				"isPrimitive -> struct.type(\"prim\")",
-				"isIdentifier -> struct.type(\"idt\")",
-				"isDefine -> struct.type(\"define\")",
-				"isInt -> struct.type(\"int\")",
-				"isFloat -> struct.type(\"float\")",
-				"isDate -> struct.type(\"date\")",
-				"isEmpty -> struct.type(\"empty\")",
-				"isElement -> struct.type(\"elm\")",
-				"isNative -> struct.type(\"native\")",
-				"",
-				"isDefine(val,defineName)"
+				"...",
 			],
+			info:"<p>use to checker static type</p>\n\
+\n\
+<table>\n\
+	<thead>\n\
+		<tr>\n\
+			<th>Type [ CMD ]</th>\n\
+			<th>Equal</th>\n\
+		</tr>\n\
+	</thead>\n\
+	<tbody>\n\
+		<tr>\n\
+			<td>object</td>\n\
+			<td>Object,Null,Function</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>array</td>\n\
+			<td>Array</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>arraylike</td>\n\
+			<td>Array,ArrayLike</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>str,string</td>\n\
+			<td>String</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>fn,function</td>\n\
+			<td>Function</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>nan</td>\n\
+			<td>NaN</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>prim,primitive</td>\n\
+			<td>*If is not Object (exclude null)</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>idt,identifier</td>\n\
+			<td>*Identifier is legal varisable</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>int</td>\n\
+			<td>Number(as static int)</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>float,double</td>\n\
+			<td>Number(as static float)</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>date</td>\n\
+			<td>*Is instanceof Date</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>empty</td>\n\
+			<td>*Object Array is empty</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>dom</td>\n\
+			<td>*HTML Elmment or Node</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>elm,elmment</td>\n\
+			<td>*HTML Elmment</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>node,text</td>\n\
+			<td>*HTML Node</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>native</td>\n\
+			<td>*Browser default api(like alert)</td>\n\
+		</tr>\n\
+		<tr>\n\
+			<td>define</td>\n\
+			<td>*A Chcker for any [defined] type</td>\n\
+		</tr>\n\
+	</tbody>\n\
+</table>\n\
+			",
 			params:[
 				{ name:"val", type:"AnyType" },
 				{ name:"defineName", type:"String" }
