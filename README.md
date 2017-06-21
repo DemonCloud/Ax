@@ -1,11 +1,11 @@
 
-# Ax - [ version 1.2 ]
+# Ax - [ version 2.0 ]
 
 <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
 
-Ax is a fast MVR JavaScript Framework. 
+##### Ax is a fast MVR JavaScript Framework. 
 
-It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` very well.
+It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` & `Vue` very well.
 
 require [ Struct ] : [ Struct - the C Lang JavaScript Utils Lib ](https://github.com/DemonCloud/struct)
 
