@@ -235,7 +235,10 @@ console.log(m.get());"
 	}\n\
 });\n\
 // moc the data\n\
-m.moc(\"a\",{b:2, c:3})\n\
+m.moc(\"a\",{a:2, c:3})\n\
+console.log(m.get());\n\
+\n\
+m.moc(\"a.c\",\"Like\");\n\
 console.log(m.get());"
 				},
 			]

@@ -443,25 +443,21 @@ function clone(l,deep){
 	return l;
 }
 
+var p_ = function(){};
 // Deeping Clone [ fast , complicated ]
 function depclone(l){
+	var res = l;
 	if(isArrayLike(l)){
 		// clone array 
-		return slice(l).map(citd(depclone,negate(isPrimitive)));
+		res = slice(l).map(citd(depclone,negate(isPrimitive)));
 	}else if(!isPrimitive(l) && !(l instanceof Node)){
-		var res = {};
+		var prt = p_.prototype = l.constructor.prototype;
 		// clone object ^ with copy prototype
-		if(l.constructor.prototype !== Object.prototype){
-			var _ = function(){};
-			_.prototype = l.constructor.prototype;
-			res = new _();
-		}
 		ol(l, function(val,key){
 			this[key] = isPrimitive(val) ? val : depclone(val);
-		},res);
-		return res;
+		},res = (prt !== Object.prototype ? new p_ : {} ));
 	}
-	return l;
+	return res;
 }
 
 function regCheck(reg,n){
@@ -1853,7 +1849,7 @@ function exist(check){
 }
 
 function frozen(){
-	al(castArray.apply(null,arguments),Object.freeze);
+	return al(castArray.apply(null,arguments),Object.freeze).pop();
 }
 
 // create frequency function
@@ -2383,5 +2379,5 @@ struct.broken = broken;
 struct.toString = toString;
 struct.prototype = struct.__proto__ = null;
 
-return Object.freeze(v8(struct));
+return frozen(v8(struct));
 }, void 0));

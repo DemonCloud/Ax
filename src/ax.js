@@ -25,8 +25,10 @@
 })(this, {}, function(ax,struct){
 	"use strict";
 
+	ax.VERSION = struct.VERSION;
+
 	// Define DOM frame
-	var z,Z,aM,aV,aR,aS,vA,
+	var z,Z,aM,aV,aR,aT,aS,vA,
 	// Define Setting
 		VIEW_DEFAULT  = { },
 		MODEL_DEFAULT = { data:{}, validate:{} },
@@ -113,6 +115,12 @@
 		aM.prototype[api] = function(){
 			var args = [this.data].concat(_slice(arguments));
 			return struct[api]().apply(this,args);
+		};
+	}
+
+	function createAx(use){
+		return function(o){ 
+			return new use(_isObj(o) ? o : {}); 
 		};
 	}
 
@@ -1768,9 +1776,11 @@
 		if(_isAry(target))
 			target = target.concat(val);
 		else if(_isObj(target))
-			target = _extend(_clone(target),_isObj(val) ? val : {});
-		else if(typeof target === "string" || +val === val)
+			target = _merge(target,val);
+		else if(_isStr(target))
 			target += val;
+		else
+			target = val;
 		return target;
 	}
 
@@ -1919,43 +1929,31 @@
 	// because it much as MVC-M logs 
 	aM.prototype = {
 		get : function(key){
-			if(key != null && key !== "")
+			if(!_isBool(key) && ( key || key===0 ))
 				return _prop.apply(this,
 					[this.data].concat(_slice(arguments)));
-			return key === true ? _dpclone(this.data) : this.data;
+			return this.data;
 		},
 
-		set : function(){
-			var param;
-			this.data = arguments.length > 1 ?
-				(param = arguments[0],
-				_setProp(this.data,param,arguments[1])) : 
-				arguments[0];
-			return param ? this.emit(
-				"change:"+param.split(".").shift() + "," +
-				"change:"+param,[arguments[1]]
-			) : this;
+		set : function(key,val){
+			this.data = 1 in arguments ?
+				_setProp(this.data,key,val) : 
+				key === void 0 ? this.data : key;
+			return _isStr(key) ? this.emit(
+				"change:" + key, [val]) : this;
 		},
 
 		rm : function(prop){
-			var tmp = null;
-			if(prop){
-				tmp = this.data;
-				this.data = _isAry(tmp) ? 
-					(tmp.splice(+prop,1),tmp) : 
-					_rmProp(tmp,prop);
-			}else{
-				this.data = tmp;
-			}
-
-			return prop ? this.emit(
-				"change:"+prop.split(".").shift() + "," +
-				"change:"+prop
-			) : this;
+			var tmp = this.data;
+			return (this.data = prop ? (_isAry(tmp) ? 
+				(tmp.splice(+prop,1),tmp) : 
+				_rmProp(tmp,prop)) : null) !== null && 
+				this.emit("remove:"+prop);
 		},
 
 		moc: function(key,val){
-			return this.set(key, moc(_prop(this.data,key),val));
+			return this.set(key, 
+				moc(_prop(this.data,key),val));
 		},
 
 		// API event
@@ -2025,7 +2023,7 @@
 		},
 
 		toString: function(){
-			return this.data;
+			return _toString(this.toJSON());
 		}
 	};
 
@@ -2311,21 +2309,28 @@
 		}
 	};
 
+	// Ax atom 
+	// Useful models manager
+	aT = function(obj){
+	
+	};
+
 	// #genertor minmix api
 	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat"],genertor_);
 	_fal(["keys","diff","intsec","first","last","auto","eq","values","size","each","has","type","index"],genertor_$);
 
-	ax.VERSION = struct.VERSION;
-	ax.route = function(opt){ return new aR(_isObj(opt) ? opt : {}); };
-	ax.model = function(opt){ return new aM(_isObj(opt) ? opt : {}); };
-	ax.view  = function(opt){ return new aV(_isObj(opt) ? opt : {}); };
-
 	// Extend method
 	// Create Ax Pack extends
 	// Prepare for component
+	ax.route = createAx(aR);
+	ax.model = createAx(aM);
+	ax.view  = createAx(aV);
+	ax.atom  = createAx(aT);
+
 	ax.route.extend = createExtend("route");
 	ax.model.extend = createExtend("model");
 	ax.view.extend  = createExtend("view");
+	ax.atom.extend  = createExtend("atom");
 
 	// ax validate functional
 	ax.va = vA = {
@@ -2344,11 +2349,10 @@
 		node      : makeChecker(_isNode,"node"),
 		model     : makeChecker(isAx(aM),"model"),
 		view      : makeChecker(isAx(aV),"view"),
+		atom      : makeChecker(isAx(aT),"atom"),
 		route     : makeChecker(isAx(aR),"route")
 	};
 
 	// lock the export
-	_lock(aM,aV,aR,aS,vA,v8(ax));
-
-	return ax;
+	return _lock(aM,aV,aR,aT,aS,vA,v8(ax));
 });
