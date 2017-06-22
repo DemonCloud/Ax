@@ -16,7 +16,7 @@
 	else if(typeof exports !== "undefined"){
 		// support CommonJS exports
 		// * fuck the npm package rubbish
-		var _ = require('ax-struct-js');
+		var _ = require('struct');
 		factory(exports,_);
 	}else
 		// build on browser global object
