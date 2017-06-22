@@ -12,13 +12,15 @@
 	if(typeof define === 'function' && define.amd)
 		// support AMD require.js
 		// ruler by UMD Javascript
-		define('ax',['struct'],function(struct){ return factory(ax,struct); });
-	else if(typeof exports === "object" && typeof module !== "undefined")
+		define('ax',['struct'],function(_){ return factory(ax,_); });
+	else if(typeof exports !== "undefined"){
 		// support CommonJS exports
-		module.exports = factory(ax,require('struct'));
-	else
+		// * fuck the npm package rubbish
+		var _ = require('ax-struct-js');
+		factory(exports,_);
+	}else
 		// build on browser global object
-		root.ax = factory(ax,struct);
+		root.ax = factory(ax,root._);
 
 })(this, {}, function(ax,struct){
 	"use strict";
@@ -147,7 +149,7 @@
 
 	var _zid = 1,
 		handlers = {},
-		focusinSupported = 'onfocusin' in window,
+		focusinSupported = 'onfocusin' in struct.root,
 		focus = { focus: 'focusin', blur: 'focusout' },
 		hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' },
 		check = { check: 'change' },

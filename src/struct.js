@@ -21,20 +21,27 @@
  * @Date    : 2017.2.28 - now
  */
 
-(function(root,struct,factory){
+(function(root,struct,factory,_){
+	_ = factory(struct);
+
 	if(typeof define === 'function' && define.amd)
 		// Ruler by UMD Javascript
 		// support AMD define
-		define('struct',[],function(){ return factory(struct); });
-	else if(typeof exports === "object" && typeof module !== "undefined")
-		// support CommonJS exports
-		module.exports = factory(struct);
-	else
+		define('struct',[],function(){ return _; });
+	else if(typeof exports === "object" && typeof module !== "undefined"){
+		if(module.exports && !module.nodeType) // support CommonJS exports
+			exports = module.exports = _;
+		exports.struct = _;
+	} else
 		// build on browser global object
-		root.struct = root._ = factory(struct);
+		root.struct = root._ = _;
 
 	// due to [ Webpack ] fucking should return [ Window ]
-}(this, function(){ return window; }, function(struct){
+}(this, function(root){ 
+	if(typeof self !== "undefined") root = self; 
+	else root = this || global;
+	return root;
+}, function(struct){
 'use strict';
 
 // Strict mode
@@ -2372,9 +2379,9 @@ ol(zublist,function(fn,key){
 });
 
 struct.root = root;
-struct.toString = toString;
 struct.broken = broken;
+struct.toString = toString;
 struct.prototype = struct.__proto__ = null;
 
 return Object.freeze(v8(struct));
-}));
+}, void 0));

@@ -16,15 +16,6 @@ const rjs = require('requirejs');
 const colors = require('colors');
 
 function taskReuqireJS(){
-	gulp.src([
-		cfg.path.jsl+"struct.min.js",
-		cfg.path.jsl+"ax.min.js"
-	])
-	.pipe(filter(["**"], { restore:true }))
-	.pipe(concat("axs.min.js"))
-	.pipe(gulp.dest(cfg.path.pub))
-	.pipe(gulp.dest(cfg.path.dest));
-
 	return rjs.optimize(cfg.rjs,function(){ 
 		return gulp.src([
 					cfg.path.dest+'app.js',
