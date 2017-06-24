@@ -101,24 +101,55 @@
 		_doom     = struct.doom(),
 		_merge    = struct.merge(),
 		_index    = struct.index(),
+		_one      = struct.index("one"),
 		cool      = struct.cool();
 
 	// ax genertor function
 	function genertor_(api){
-		aM.prototype[api] = function(){
+		var apiName, apiUse, apiSelect;
+		if(_isAry(api)){
+			apiUse = api[1]; 
+			apiName = api[0];
+			apiSelect = api[2]; }
+		else{
+			apiUse = api; 
+			apiName = api;
+			apiSelect = void 0; }
+
+		aM.prototype[apiName] = function(){
 			var tmp = this.data,
 					args = [tmp].concat(_slice(arguments));
-			if(!_eq(tmp = struct[api]().apply(tmp,args),this.data))
+			if(!_eq(tmp = struct[apiUse](apiSelect).apply(tmp,args),this.data))
 				this.emit((this.data = tmp,api),args);
 			return this;
+		};
+
+		aT.prototype[apiName] = function(){
+			return struct[apiUse](apiSelect).apply(this,
+			[this.toData()].concat(_slice(arguments)));
 		};
 	}
 
 	// not change rebase data
 	function genertor_$(api){
-		aM.prototype[api] = function(){
+		var apiName, apiUse, apiSelect;
+		if(_isAry(api)){
+			apiUse = api[1]; 
+			apiName = api[0];
+			apiSelect = api[2]; }
+		else{
+			apiUse = api; 
+			apiName = api;
+			apiSelect = void 0; }
+
+		aM.prototype[apiName] = function(){
 			var args = [this.data].concat(_slice(arguments));
-			return struct[api]().apply(this,args);
+			return struct[apiUse](apiSelect).apply(this,args);
+		};
+
+		aT.prototype[apiName] = function(){
+			return struct[apiUse](apiSelect).apply(this,
+			[this.toData()].concat(_slice(arguments)));
 		};
 	}
 
@@ -1799,7 +1830,7 @@
 
 	function warn(value,msg){
 		console.warn(vahandler({
-			value: value,
+			value : value,
 			type : _type(value),
 			msg : msg||""
 		}));
@@ -1994,14 +2025,14 @@
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
 	aM.prototype = {
-		get : function(key){
+		get: function(key){
 			if(!_isBool(key) && ( key || key===0 ))
 				return _prop.apply(this,
 					[this.data].concat(_slice(arguments)));
 			return this.data;
 		},
 
-		set : function(key,val){
+		set: function(key,val){
 			this.data = 1 in arguments ?
 				_setProp(this.data,key,val) : 
 				key === void 0 ? this.data : key;
@@ -2009,7 +2040,7 @@
 				"change:" + key, [val]) : this;
 		},
 
-		rm : function(prop){
+		rm: function(prop){
 			var tmp = this.data;
 			return (this.data = prop ? (_isAry(tmp) ? 
 				(tmp.splice(+prop,1),tmp) : 
@@ -2023,13 +2054,13 @@
 		},
 
 		// API event
-		on : on,
-		emit : emit,
-		unbind : unbind,
+		on: on,
+		emit: emit,
+		unbind: unbind,
 
 		// Ax Restful API design for
 		// [Ax Model] data format serialize
-		toJSON : function(){
+		toJSON: function(){
 			return _isPrim(this.data) ? 
 				this.data : 
 				JSON.stringify(this.data);
@@ -2218,7 +2249,7 @@
 	};
 
 	aV.prototype = {
-		on : function(type,fn){
+		on: function(type,fn){
 			return _fal((type||"").split(","),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
@@ -2229,7 +2260,7 @@
 			},this),this;
 		},
 
-		unbind : function(type,fn){
+		unbind: function(type,fn){
 			return _fal((type||"").split(","),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
@@ -2240,7 +2271,7 @@
 			},this),this;
 		},
 
-		emit : function(type,args){
+		emit: function(type,args){
 			var k = (type||"").split(":");
 
 			if(k.length>2){
@@ -2256,7 +2287,7 @@
 			return _emit(this,type,args);
 		},
 
-		toString : function(){
+		toString: function(){
 			return this.root;
 		}
 	};
@@ -2330,9 +2361,9 @@
 	// Ax-Route for SPA Architecture
 	// auto trigger regex event when route change
 	aR.prototype = {
-		on : on,
-		emit : emit,
-		unbind : unbind,
+		on: on,
+		emit: emit,
+		unbind: unbind,
 
 		listen: function(hash,param){
 			if(!this._listen){
@@ -2356,7 +2387,7 @@
 			return this;
 		},
 
-		assign : function(hash,param){
+		assign: function(hash,param){
 			if(this._listen){
 				var url = root.location.href; 
 				var hashindex = url.search("#");
@@ -2370,31 +2401,59 @@
 			return this;
 		},
 
-		toString : function(){
+		toString: function(){
 			return this;
 		}
 	};
 
-
-
 	var __ = [];
+
 	function assert(LIST){
 		return function(tdo,_){ 
 			return (_isFn(tdo)&&_===__) ? tdo(LIST) : []; 
 		};
 	}
 	
-	function assertModel(model){
-		return model.name === this;
-	}
-
 	function aTite(cmd,args){
 		return function(model){
 			model[cmd].apply(model,args||[]);
 		};
 	}
 
-	// Ax atom 
+	function assertModel(model){
+		return model.name === this;
+	}
+
+	function assertMake(list,callback){
+		var LIST = this._assert(cool,__);
+		var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
+		return _fal(target,function(name){ 
+			callback.call(this,LIST,name);
+		},this),this;
+	}
+
+	function assertMatch(list,match){
+		var use = [];
+		switch(_type(match)){
+			case "regexp":
+				_fal(list,function(m){
+					if(match.test(m.name))
+						use.push(m.name);
+				});
+				break;
+			case "string":
+				use.push(match);
+				break;
+			case "array":
+				use = match;
+				break;
+			default:
+				break;
+		}
+		return use;
+	}
+
+	// Ax atom * stom
 	// Useful models manager
 	aT = function(obj){
 		var config = _extend(_clone(ATOM_DEFAULT),obj||{}),
@@ -2414,54 +2473,59 @@
 			.emit("init")
 			.unbind("init");
 	};
+
+	var stom = function(atom,list){
+		var c = ax.atom({ use:list });
+		c.back = function(){ c=null; return atom; };
+		return c;
+	};
 		
 	aT.prototype = {
-		all: function(){
-			return this._assert(_slice,__);
-		},
+		all: function(){ return this._assert(_slice,__); },
 		// API event
-		on : on,
-		emit : emit,
-		unbind : unbind,
+		on: on,
+		emit: emit,
+		unbind: unbind,
 
 		use: function(list){
-			var LIST = this._assert(cool,__);
-			var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
-
-			return _fal(target,function(name){
-				var M = RAM[name];
+			return assertMake.call(this,list,function(LIST,name,M){
+				M = RAM[name];
 				if(name && M && vA.model(M) && !_has(LIST,M))
 					LIST.push(M);
-			}),this;
+			});
 		},
 
 		out: function(list){
-			var LIST = this._assert(cool,__);
-			var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
-			
-			return _fal(target,function(name){
+			return assertMake.call(this,list,function(LIST,name){
 				LIST.splice(_index(LIST,assertModel.bind(name)),1);
-			}),this;
-		},
-
-		get: function(name){
-			return _find(this.all(),assertModel.bind(name)).pop();
-		},
-
-		of : function(fn,args){
-			return _fal(this.all(),(_isFn(fn) ? fn : aTite(fn,args)));
-		},
-
-		noti: function(event,args){
-			return this.of(function(model){
-				return model.emit(event,args);
 			});
+		},
+
+		p: function(name){
+			return _one(this.all(),assertModel.bind(name));
+		},
+
+		of: function(fn,args){
+			return _fal(this.all(),
+				(_isFn(fn) ? fn : aTite(fn,args))),this;
+		},
+
+		select: function(match){
+			return stom(this,assertMatch(this.all(),match));
+		},
+
+		toData: function(){
+			return this.all().map(function(m){ return m.get(); });
+		},
+
+		toJSON: function(){
+			return JSON.stringify(this.toData());
 		}
 	};
 
-	// #genertor minmix api
-	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat"],genertor_);
-	_fal(["keys","diff","intsec","first","last","auto","eq","values","size","each","has","type","index"],genertor_$);
+	// #genertor minmix [ struct ] api
+	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat","pull","drop","pairs",["hook","map","hook"],["mapKey","map","key"],["uniqueFast","unique","fast"],["pullAt","pull","at"],["dropLeft","drop","left"],["dropRight","drop","right"],["dropLeftTo","drop","leftto"],["dropRightTo","drop","rightto"],["unpairs","pairs","un"]],genertor_);
+	_fal(["keys","every","some","diff","intsec","first","last","auto","eq","values","size","each","has","type","index",["hasKey","has","key"],["findex","index","first"],["lindex","index","last"],["single","index","one"],["one","index","one"]],genertor_$);
 
 	// Extend method
 	// Create Ax Pack extends

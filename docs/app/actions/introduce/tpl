@@ -23,10 +23,9 @@
 			<span><b>Download pack</b> with <code>struct</code>&nbsp;&nbsp;</span>
 			<a href="./axs.min.js" title="download it" alt="download it" rel="download" download='axs.min.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				axs{{#struct.VERSION}}.min.js (57k)
+				axs{{#struct.VERSION}}.min.js (GZIP 20K)
 			</a>
 		</p>
-		<p style="margin-bottom:0">The compress file with <b>GZIP</b> only <b>19KB</b> </p>
 		<br>
 		<p>
 			<span class="it-outlink">
@@ -64,7 +63,7 @@
 			</li>
 			<li>
 				<a href="javascript:;" tc=2>
-					<i class="ion-ionic"></i> 
+					<i class="ion-cube"></i> 
 					<b> View</b>
 				</a>
 				<span> - The simple view is one of the essential of the app, it provides a flexible way to build the user interface, or use it as container for other view's lib (framework). it was given the complete events emitter and virtual DOM rendering mechanism by default way.</span>
@@ -75,6 +74,13 @@
 					<b> Route</b>
 				</a>
 				<span> - A routing manager for application, support regular expressions to match the router with multiple actions. Detection of hash change and carry any parameters at the same time.</span>
+			</li>
+			<li>
+				<a href="javascript:;" tc=2>
+					<i class="ion-ionic"></i> 
+					<b> Atom</b>
+				</a>
+				<span> - Aggregation model management way, it provides powerful Mixmin API to perform operations on data collection, and can be implemented across the pointer call closure model, looks like a powerful connector</span>
 			</li>
 		</ul>
 	</div>

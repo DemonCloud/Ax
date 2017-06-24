@@ -16,6 +16,16 @@ const rjs = require('requirejs');
 const colors = require('colors');
 
 function taskReuqireJS(){
+	gulp.src([
+			cfg.path.jsl+"struct.min.js",
+			cfg.path.jsl+"ax.min.js",
+		])
+		.pipe(filter(["**"], { restore:true }))
+		.pipe(concat('axs.min.js'))
+		.pipe(uglify())
+		.pipe(optimizejs())
+		.pipe(gulp.dest(cfg.path.dest));
+
 	return rjs.optimize(cfg.rjs,function(){ 
 		return gulp.src([
 					cfg.path.dest+'app.js',
@@ -27,23 +37,6 @@ function taskReuqireJS(){
 				.pipe(optimizejs())
 				.pipe(gulp.dest(cfg.path.dest));
 	});
-	
-	// return gulp.src(
-	// 						cfg.path.js+"**/*.js",
-	// 						{cwd:cfg.path.base, base:cfg.path.base}
-	// 					).pipe(filter(cfg.filter.r, { restore: true }))
-	// 					 .pipe(ro(function(file){
-	// 							return {
-	// 								name : file.path,
-	// 								baseUrl : cfg.path.js,
-	// 								paths : cfg.rjs.paths,
-	// 								optimize : 'none'
-	// 							};
-	// 					 }))
-	// 					 .pipe(concat('pub.min.js'))
-	// 					 .pipe(uglify())
-	// 					 .pipe(optimizejs())
-	// 					 .pipe(gulp.dest(cfg.path.dest));
 }
 
 module.exports = taskReuqireJS;
