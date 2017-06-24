@@ -146,8 +146,7 @@ view.mount(
 var trim = struct.string("trim");
 
 var model = ax.model({
-	url:"todolist",
-
+	name:"todolist",
 	data:{ list:[] },
 	store:true,
 });

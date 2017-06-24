@@ -31,6 +31,7 @@
 	var z,Z,aM,aV,aR,aT,aS,vA,
 	// Define Setting
 		VIEW_DEFAULT  = { },
+		ATOM_DEFAULT  = { use:[] },
 		MODEL_DEFAULT = { data:{}, validate:{} },
 		ROUTE_DEFAULT = { char:"@", routes:{}, actions:{} },
 
@@ -77,6 +78,7 @@
 		_loop     = struct.op(),
 		_fol      = struct.op('object'),
 		_fal      = struct.op('array'),
+		_cat      = struct.cat(),
 		_ey       = struct.every(),
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
@@ -97,7 +99,9 @@
 		_utob     = struct.assembly("u2b"),
 		_btou     = struct.assembly("b2u"),
 		_doom     = struct.doom(),
-		_merge    = struct.merge();
+		_merge    = struct.merge(),
+		_index    = struct.index(),
+		cool      = struct.cool();
 
 	// ax genertor function
 	function genertor_(api){
@@ -1814,36 +1818,6 @@
 		};
 	}
 
-	// ax store
-	ax.store = aS = function(){
-		var key = _find(_keys(localStorage),/Ax@/),res = {};
-		_fal(key,function(k){ 
-			res[_btou(k.slice(3))] = parseResult(
-				localStorage.getItem(k)); 
-		});
-		return res;
-	};
-
-	aS.get = function(key){
-		if(toString(key)) 
-			return parseResult(localStorage.getItem(parseKey(key)));
-	};
-
-	aS.set = function(key,data){
-		return localStorage.setItem(
-			parseKey(key),
-			_trim(_utob(JSON.stringify(data)+"\r"))
-		);
-	};
-
-	aS.rm = function(key){
-		return localStorage.removeItem(parseKey(key));
-	};
-
-	aS.clear = function(){
-		return _fol(aS(),function(item,key){ aS.rm(key); });
-	};
-
 	function pipe(type,url,param,fns,fnf,header){
 		//param must be object typeof
 		var st = {
@@ -1865,20 +1839,111 @@
 			(fnf||_noop).apply(this,arguments);
 			this.emit(type+":fail",arguments);
 		}.bind(this);
-
 		// trigger ajax events
 		return this.emit(type,[_ajax(st),st]);
 	}
 
+	function revs(str){
+		return str.split("").reverse().join("");
+	}
+
+	var RAM = [],
+			LS = root.localStorage,
+			SN = "Ax@",
+			FCD = String.fromCharCode;
+
+	aS = {
+		t: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+
+		kAt: function(key,i){
+			return key.charCodeAt(~~(i%key.length));
+		},
+
+		ecd: function(data) {
+    	var o1, o2, o3, h1, h2, h3, h4, bits, r, i = 0, enc = "";
+    	if (!data) { return data; }
+    	do {
+      	o1 = data[i++];
+      	o2 = data[i++];
+      	o3 = data[i++];
+      	bits = o1 << 16 | o2 << 8 | o3;
+      	h1 = bits >> 18 & 0x3f;
+      	h2 = bits >> 12 & 0x3f;
+      	h3 = bits >> 6 & 0x3f;
+      	h4 = bits & 0x3f;
+      	enc += this.t.charAt(h1) + this.t.charAt(h2) + this.t.charAt(h3) + this.t.charAt(h4);
+    	} while (i < data.length);
+    	r = data.length % 3;
+    	return (r ? enc.slice(0, r - 3) : enc) + "===".slice(r || 3);
+  	},
+
+  	dcd: function(data) {
+    	var o1, o2, o3, h1, h2, h3, h4, bits, i = 0, result = [];
+    	if (!data) { return data; }
+    	data += "";
+    	do {
+      	h1 = this.t.indexOf(data.charAt(i++));
+      	h2 = this.t.indexOf(data.charAt(i++));
+      	h3 = this.t.indexOf(data.charAt(i++));
+      	h4 = this.t.indexOf(data.charAt(i++));
+      	bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+      	o1 = bits >> 16 & 0xff;
+      	o2 = bits >> 8 & 0xff;
+      	o3 = bits & 0xff;
+      	result.push(o1);
+      	if (h3 !== 64) {
+        	result.push(o2);
+        	if (h4 !== 64) {
+          	result.push(o3);
+        	}
+      	}
+    	} while (i < data.length);
+    	return result;
+  	},
+
+		incry: function(s,key){
+			var res = [];
+			for(var i=0,l=s.length; i<l; i++)
+				res[i] = s[i].charCodeAt(0)^this.kAt(key,i);
+			return this.ecd(res);
+		},
+
+		decyt: function(s,key){
+			s = this.dcd(s);
+			for(var i=0,l=s.length; i<l; i++)
+				s[i] = FCD(s[i]^this.kAt(key,i));
+			return s.join("");
+		},
+
+		set: function(name,data){
+			LS.setItem(
+				(SN+this.incry(name,revs(name))),
+				this.incry(JSON.stringify(data),name)
+			);
+		},
+
+		get: function(name){
+			var str = LS.getItem(SN+this.incry(name,revs(name)));
+			return str ? JSON.parse(this.decyt(str,name)) : 0;
+		},
+
+		rm: function(name){
+			LS.removeItem(SN+this.incry(name,revs(name)));
+		}
+	};
+	
 	// Ax Model
 	// Ax build -> 2.0
 	// model constructor
 	aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
-			events = config.events,
-			validate = config.validate,
-			store = (config.store === true && toString(config.url)),
-			data = store ? (aS.get(config.url)||config.data) : config.data; 
+				events = config.events,
+				validate = config.validate,
+
+				existname = _isStr(config.name || 0),
+				usestore = config.store && existname,
+				usedata = config.data || {},
+				data = usestore ? (aS.get(config.name) || usedata) : usedata;
 
 		delete config.data;
 		delete config.store;
@@ -1896,12 +1961,11 @@
 
 				var args = [_clone(newdata)], error;
 				if((this.emit("validate",args),
-					_isPrim(newdata) ?
-					(_isFn(validate) ? validate(newdata) : true) :
+					_isPrim(newdata) ? (_isFn(validate) ? validate(newdata) : true) :
 					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
 						this.change=true,
-						(store && aS.set(this.url,newdata)),
+						usestore && aS.set(this.name,newdata),
 						this.emit("validate:success,change",args),
 						newdata;
 
@@ -1921,6 +1985,8 @@
 		_extend(this,config)
 			.emit("init",[this.data])
 			.unbind("init");
+
+		RAM[existname ? this.name : "_"] = this;
 	};
 
 	// Extend ax model method 
@@ -2309,10 +2375,88 @@
 		}
 	};
 
+
+
+	var __ = [];
+	function assert(LIST){
+		return function(tdo,_){ 
+			return (_isFn(tdo)&&_===__) ? tdo(LIST) : []; 
+		};
+	}
+	
+	function assertModel(model){
+		return model.name === this;
+	}
+
+	function aTite(cmd,args){
+		return function(model){
+			model[cmd].apply(model,args||[]);
+		};
+	}
+
 	// Ax atom 
 	// Useful models manager
 	aT = function(obj){
-	
+		var config = _extend(_clone(ATOM_DEFAULT),obj||{}),
+				initList = config.use,
+				events = config.events,
+				LIST = [];
+
+		delete config.use;
+		delete config.events;
+
+
+		_fol(events,uon,this);
+
+		this._assert = assert(LIST);
+
+		_extend(this.use(initList),config)
+			.emit("init")
+			.unbind("init");
+	};
+		
+	aT.prototype = {
+		all: function(){
+			return this._assert(_slice,__);
+		},
+		// API event
+		on : on,
+		emit : emit,
+		unbind : unbind,
+
+		use: function(list){
+			var LIST = this._assert(cool,__);
+			var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
+
+			return _fal(target,function(name){
+				var M = RAM[name];
+				if(name && M && vA.model(M) && !_has(LIST,M))
+					LIST.push(M);
+			}),this;
+		},
+
+		out: function(list){
+			var LIST = this._assert(cool,__);
+			var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
+			
+			return _fal(target,function(name){
+				LIST.splice(_index(LIST,assertModel.bind(name)),1);
+			}),this;
+		},
+
+		get: function(name){
+			return _find(this.all(),assertModel.bind(name)).pop();
+		},
+
+		of : function(fn,args){
+			return _fal(this.all(),(_isFn(fn) ? fn : aTite(fn,args)));
+		},
+
+		noti: function(event,args){
+			return this.of(function(model){
+				return model.emit(event,args);
+			});
+		}
 	};
 
 	// #genertor minmix api
@@ -2353,6 +2497,5 @@
 		route     : makeChecker(isAx(aR),"route")
 	};
 
-	// lock the export
 	return _lock(aM,aV,aR,aT,aS,vA,v8(ax));
 });

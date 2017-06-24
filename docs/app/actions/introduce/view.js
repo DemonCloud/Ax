@@ -55,8 +55,7 @@ function(ax,struct,tags,title,tpl){
 				var trim = struct.string("trim");
 
 				var model3 = ax.model({
-					url:"todolist",
-
+					name:"todolist",
 					data:{ list:[] },
 					store: true,
 				});

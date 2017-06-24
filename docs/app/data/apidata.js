@@ -437,7 +437,7 @@ m.sync({\n\
 			params:[
 				{ name:"store", type:"Boolean" }
 			],
-			info:"<p><code>store</code> property should define with <code>url</code> at the same time, otherwise the storage will not take effect!</p><p>Persistent storage data can be shared by multiple models at the same time, as long as they define the <b>same</b> <code>url</code>.</p><p>store data will be synced when the model <b>changed</b></p>",
+			info:"<p><code>store</code> property should define with <code>model.name</code> at the same time, otherwise the storage will not take effect!</p><p>Persistent storage data can be shared by multiple models at the same time, as long as they define the <b>same</b> <code>name</code>.</p><p>store data will be synced when the model <b>changed</b></p>",
 			related:[
 				{ name:"store", target:"store:store" },
 				{ name:"model.set", target:"model:set" },
@@ -449,7 +449,7 @@ m.sync({\n\
 					title: "Basic usage",
 					code:"var size = struct.size();\n\
 var m = ax.model({\n\
-	url:\"myCustom\",\n\
+	name:\"myCustom\",\n\
 	store:true,\n\
 });\n\
 // store data at locally\n\

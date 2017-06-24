@@ -2331,6 +2331,7 @@ var nublist = {
 	sort      : sort,
 	exist     : exist,
 	lock      : frozen,
+	cool      : cool,
 	hz        : hz,
 	v8        : v8
 };
