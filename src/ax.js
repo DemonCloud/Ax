@@ -56,9 +56,7 @@
 		_define   = struct.define(),
 		_slice    = struct.slice(),
 		_clone    = struct.clone(),
-		_dpclone  = struct.depclone(),
 		_extend   = struct.extend(),
-		_dpextend = struct.depextend(),
 		_eq       = struct.eq(),
 		_toString = struct.convert('string'),
 		_type     = struct.type(),
@@ -90,7 +88,6 @@
 		_paramStr = struct.param("string"),
 		_trim     = struct.string('trim'),
 		_has      = struct.has(),
-		_find     = struct.find(),
 		_ajax     = struct.ajax(),
 		_size     = struct.size(),
 		_first    = struct.first(),
@@ -159,25 +156,25 @@
 		};
 	}
 
-	function createExtend(origin){
+	function createExtend(use){
 		return function(opt){
 			var malloc = opt; 
 			return function(o){ 
-				return ax[origin](_merge(malloc,_isObj(o)?o:{})); 
+				return new use(_merge(malloc,_isObj(o)?o:{})); 
 			}; 
 		};
 	}
 
 	// get childNodes and filter by selector
 	// cant use Global matcher
-	var isId    = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
-			isClass = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
-			isTag   = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
-			isAttr  = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
-			mreSl   = /^[^\s]+,[^\s]+/gi,
-			cidSl   = /[\s|\r]+/im,
-			pitSl   = /[>|\+|\~]+/im,
-			isHTML  = /<[a-zA-Z][\s\S]*>/;
+	//var isId    = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
+	//	isClass = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
+	//	isTag   = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
+	//	isAttr  = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
+	//	mreSl   = /^[^\s]+,[^\s]+/gi,
+	//	cidSl   = /[\s|\r]+/im,
+	//	pitSl   = /[>|\+|\~]+/im,
+	//	isHTML  = /<[a-zA-Z][\s\S]*>/;
 
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
@@ -2025,6 +2022,8 @@
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
 	aM.prototype = {
+		constructor: aM,
+
 		get: function(key){
 			if(!_isBool(key) && ( key || key===0 ))
 				return _prop.apply(this,
@@ -2249,6 +2248,8 @@
 	};
 
 	aV.prototype = {
+		constructor:aV,
+
 		on: function(type,fn){
 			return _fal((type||"").split(","),function(mk){
 				var param = mk.split(":");
@@ -2361,6 +2362,8 @@
 	// Ax-Route for SPA Architecture
 	// auto trigger regex event when route change
 	aR.prototype = {
+		constructor: aR,
+
 		on: on,
 		emit: emit,
 		unbind: unbind,
@@ -2408,18 +2411,16 @@
 
 	var __ = [];
 
-	function assert(LIST){
-		return function(tdo,_){ 
-			return (_isFn(tdo)&&_===__) ? tdo(LIST) : []; 
-		};
-	}
-	
 	function aTite(cmd,args){
 		return function(model){
-			model[cmd].apply(model,args||[]);
-		};
+			model[cmd].apply(model,args||[]); };
 	}
 
+	function assert(LIST){
+		return function(tdo,_){ 
+			return (_isFn(tdo)&&_===__) ? tdo(LIST) : []; };
+	}
+	
 	function assertModel(model){
 		return model.name === this;
 	}
@@ -2455,7 +2456,7 @@
 
 	// Ax atom * stom
 	// Useful models manager
-	aT = function(obj){
+	aT = function(obj,isStom){
 		var config = _extend(_clone(ATOM_DEFAULT),obj||{}),
 				initList = config.use,
 				events = config.events,
@@ -2464,23 +2465,26 @@
 		delete config.use;
 		delete config.events;
 
-
-		_fol(events,uon,this);
-
+		// create assert
 		this._assert = assert(LIST);
+		_extend(this.use(initList),config);
 
-		_extend(this.use(initList),config)
-			.emit("init")
-			.unbind("init");
+		if(!isStom){
+			_fol(events,uon,this);
+			this.emit("init")
+				.unbind("init");
+		}
 	};
 
 	var stom = function(atom,list){
-		var c = ax.atom({ use:list });
-		c.back = function(){ c=null; return atom; };
+		var c = ax.atom({ use:list },true);
+		c.back = function(){ return atom; };
 		return c;
 	};
 		
 	aT.prototype = {
+		constructor: aT,
+
 		all: function(){ return this._assert(_slice,__); },
 		// API event
 		on: on,
@@ -2534,11 +2538,10 @@
 	ax.model = createAx(aM);
 	ax.view  = createAx(aV);
 	ax.atom  = createAx(aT);
-
-	ax.route.extend = createExtend("route");
-	ax.model.extend = createExtend("model");
-	ax.view.extend  = createExtend("view");
-	ax.atom.extend  = createExtend("atom");
+	ax.route.extend = createExtend(aR);
+	ax.model.extend = createExtend(aM);
+	ax.view.extend  = createExtend(aV);
+	ax.atom.extend  = createExtend(aT);
 
 	// ax validate functional
 	ax.va = vA = {

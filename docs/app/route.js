@@ -11,8 +11,7 @@ define("route",
 "actions/api/export",
 
 // module
-"modules/common",
-
+"modules/common"
 ],
 function(
 ax,
@@ -37,8 +36,8 @@ api
 			if(has(ruleList.api,param.s))
 				return param.s;
 			else
-				alert("do not get fuck off hash change?");
-			throw new TypeError("fuck you with make bich off hash url?");
+				alert("This API gona to building!");
+			throw new TypeError("(* _*) 凸");
 		}
 	};
 
