@@ -16,21 +16,22 @@ const rjs = require('requirejs');
 
 // back the js
 function taskjs(){
-	gulp.src(cfg.path.base+"src/ax.js")
-				.pipe(filter(["**"], { restore:true }))
-				.pipe(rename('ax.min.js'))
-				.pipe(uglify())
-				.pipe(optimizejs())
-				.pipe(gulp.dest(cfg.path.jsl))
-				.pipe(gulp.dest(cfg.path.pub));
+	// gulp.src(cfg.path.base+"src/ax.js")
+	// 			.pipe(filter(["**"], { restore:true }))
+	// 			.pipe(rename('ax.min.js'))
+	// 			.pipe(uglify())
+	// 			.pipe(optimizejs())
+	// 			.pipe(gulp.dest(cfg.path.jsl))
+	// 			.pipe(gulp.dest(cfg.path.pub));
 
-	return gulp.src(cfg.path.base+"src/struct.js")
-				.pipe(filter(["**"], { restore:true }))
-				.pipe(rename('struct.min.js'))
-				.pipe(uglify())
-				.pipe(optimizejs())
-				.pipe(gulp.dest(cfg.path.jsl))
-				.pipe(gulp.dest(cfg.path.pub));
+	// return gulp.src(cfg.path.base+"src/struct.js")
+	// 			.pipe(filter(["**"], { restore:true }))
+	// 			.pipe(rename('struct.min.js'))
+	// 			.pipe(uglify())
+	// 			.pipe(optimizejs())
+	// 			.pipe(gulp.dest(cfg.path.jsl))
+	// 			.pipe(gulp.dest(cfg.path.pub));
+	return true;
 }
 
 module.exports = taskjs;
