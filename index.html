@@ -9,8 +9,52 @@
 
 <script src="./src/struct.js"></script>
 <script src="./src/ax.js"></script>
-<script>
+<script id="tpl" type='text/tpl'>
+</script>
 
+<script>
+			//example3
+			var trim = struct.string("trim");
+			var model3 = ax.model({
+				name:"todolist",
+				data:{ list:[] },
+				store: true,
+			});
+
+			var view3 = ax.view({
+				template:'<form id="form"><input id="name" maxlength=10 />'+
+								 '<button id="add">Add</button>'+
+								 '<ul>'+
+								 '{{* each [item,i] in list }}'+
+								 ' 	 <li style="max-width:168px">'+
+								 '    <span>{{-item.name}}</span>'+
+								 '    <b class="del" key={{-i}}>×</b>'+
+								 ' 	 </li>'+
+								 '{{* end }}'+
+								 '</ul>></form>',
+
+				model: model3,
+
+				events:{
+					"submit:#form":function(event){
+						event.preventDefault();
+						var getName = trim(document.getElementById("name").value);
+						if(getName){
+							document.getElementById("name").value="";
+							model3.moc("list",{ name : getName })
+						}
+					},
+
+					"click:.del":function(event){
+						model3.rm("list."+this.key);
+					}
+				}
+			});
+
+			view3.mount(
+				document.getElementById("tree"),
+				model3.get()
+			);
 </script>
 </body>
 </html>

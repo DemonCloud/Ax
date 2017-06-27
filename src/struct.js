@@ -1128,7 +1128,7 @@ var escapes = {
 var encodeReg    = /[&<">'](?:(amp|lt|quot|gt|#39);)?/g,
 		decodeReg    = /&((g|l|quo)t|amp|#39);/g,
 		stripReg     = /<script\b[^>]*>(.*?)<\/script>/gi,
-		commentReg   = /<!--[\s\S]*?-->/gi,
+		commentReg   = /<!--([\s\S]*?)-->/gi,
 		zipReg       = /[\t\r\n\f]/gim,
 		upperReg     = /[A-Z]/g,
 		sReg         = '[\\s\\x20\\xA0\\uFEFF]+',
@@ -1321,7 +1321,8 @@ function DOOM(txt,bounds,name){
 		interpolate,
 		command,
 		evaluate,
-		offset ){
+		offset 
+	){
 		res += txt.slice(position,offset).replace(escaper,c_escape);
 		// refresh index where to find text string
 		position = offset + match.length;
@@ -1340,7 +1341,7 @@ function DOOM(txt,bounds,name){
 
 	// Minix compline
 	res = res.replace(/[\r\n\f]/gim,'')
-					 .replace(/<!--(.*?)-->/gim,'')
+	  			 .replace(/<!--(.*?)-->/gim,'')
 					 .replace(/_p\+=\'(\\n)*\'[^\+]/gim,'')
 		 			 .replace(/\s*;;\s*/gim,';')
 					 .replace(/[\x20\xA0\uFEFF]+/gim,' ')

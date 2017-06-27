@@ -76,6 +76,7 @@
 		_loop     = struct.op(),
 		_fol      = struct.op('object'),
 		_fal      = struct.op('array'),
+		_map      = struct.map(),
 		_cat      = struct.cat(),
 		_ey       = struct.every(),
 		_on       = struct.event('on'),
@@ -502,9 +503,9 @@
 	];
 
 	var slikReg = new RegExp(
-		"</([\\s\\S]+?)>|" +
-		"<([\\s\\S]+?)/>|" +
-		"<([\\s\\S]+?)>|"  +
+		"</([^><]+?)>|" +
+		"<([^><]+?)/>|" +
+		"<([^><]+?)>|"  +
 		"([^><]+)|$" ,"g");
 
 	var tagList = { 
@@ -527,7 +528,8 @@
 		wbr:1
 	};
 
-	var attrexec = /([^\s]+)=['"]?([^'"]+)['"]?/gi;
+	var attrexec = /([^\s]+)=['"]?([^'"]+)['"]?/gi,
+			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi;
 
 	var attrName = function(attr){
 		return attrList[attr] || attr; 
@@ -536,54 +538,54 @@
 	var patchHack = [
 		function(){},  //0
  		//1 replace
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			t.parentNode.insertBefore(patch.n,t);
 			t.parentNode.removeChild(t);
 		}, 
  		//2 append
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			t.appendChild(patch.n);
 		},
  		//3 remove
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			t.parentNode.removeChild(t);;
 		},
  		//4 modifytext
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			t.innerText = patch.c; 
 		},
  		//5 withtext
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			t.innerHTML = "";
 			t.innerText = patch.c;
 		},
 		//6 removetext
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			t.innerHTML = patch.n.innerHTML;
 		},
 		//7 addattr
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			_fol(patch.a,function(value,key){
 				_set(t,attrName(key),value);
 			});
 		},
 		//8 modifyattr
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			_fol(patch.a,function(value,key){
 				_set(t,attrName(key),value);
 			});
 		},
 		//8 removeattr
-		function(patch){
-			var t = this.querySelector(patch.s);
+		function(patch,t){
+			t = patch.s;
 			_fol(patch.a,function(value,key){
 				t.removeAttribute(key); });
 		},
@@ -591,10 +593,10 @@
 
 	var slik = {
 
-		treeDiff: function(org,tag,patch){
-			if(org === void 0)
+		treeDiff: function(org,tag,patch,orgParent,tagParent){
+			if(org === void 0){
 				// new node
-				patch.unshift( slik.createPatch(org,tag,2));
+				patch.unshift( slik.createPatch(orgParent,tag,2));}
 			else if(tag === void 0)
 				// remove node
 				patch.push( slik.createPatch(org,tag,3));
@@ -624,9 +626,8 @@
 				
 				// with child diff
 				if(org.child.length || tag.child.length){
-					var len = Math.max(org.child.length,tag.child.length);
-					for(var i=len; i--;)
-						slik.treeDiff(org.child[i],tag.child[i],patch);
+					for(var i=Math.max(org.child.length,tag.child.length); i--;)
+						slik.treeDiff(org.child[i],tag.child[i],patch,org,tag);
 				}
 			}else if(org.tagName !== tag.tagName){
 				patch.push( slik.createPatch(org,tag,1));
@@ -636,7 +637,10 @@
 		},
 
 		applyPatch:function(oDOM,patchs,callback){
-			_fal(patchs,function(patch){
+			_fal(_map(patchs,function(patch){
+				patch.s = oDOM.querySelector(patch.s);
+				return patch;
+			}),function(patch){
 				patchHack[patch.t].call(oDOM,patch);});
 			return callback ? callback(oDOM) : oDOM;
 		},
@@ -659,7 +663,7 @@
 					patch = { t:1,s:sl,n:node };
 					break;
 				case "append":
-					sl = slik.createSelector(org.parent);
+					sl = slik.createSelector(org);
 					node = slik.createDOMElememnt(tag);
 					patch = { t:2,s:sl,n:node };
 					break;
@@ -699,22 +703,24 @@
 			};
 
 			var p = root , c = root.child;
-
 			html.replace(slikReg,function(match,close,stag,tag,text,offset){
+				if(!match || !(match.replace(excapetab,"")))
+					return match;
+
 				if(close){
-				p = p.parent; c = p.child;
-			}else if(stag){
-				var node = slik.createObjElement(stag);
-				node.i= c.length+1; c.push(node); node.parent = p;
-			}else if(tag){
-				var node = slik.createObjElement(tag);
-				node.i= c.length+1; c.push(node); node.parent = p;
-				if(!(node.tagName in tagList))
-				p = node; c = node.child;
-			}else if(text){
-				if(text.trim())
-					p.text = text;
-			}
+					p = p.parent; c = p.child;
+				}else if(stag){
+					var node = slik.createObjElement(stag);
+					node.i= c.length+1; c.push(node); node.parent = p;
+				}else if(tag){
+					var node = slik.createObjElement(tag);
+					node.i= c.length+1; c.push(node); node.parent = p;
+					if(!(node.tagName in tagList))
+					p = node; c = node.child;
+				}else if(text){
+					if(text.trim())
+						p.text = text;
+				}
 				return match;
 			});
 			return root;
@@ -740,12 +746,17 @@
 			var elm = document.createElement(obj.tagName); 
 
 			if(obj.attributes)
-				_fol(obj.attributes,function(val,key){ _set(elm,key,val); });
+				_fol(obj.attributes,function(val,key){ 
+					_set(elm,attrName(key),val); 
+				});
 
 			if(obj.text)
 				elm.innerText = obj.text;
 			else if(obj.child.length)
-				_fal(obj.child,function(obj){ elm.appendChild(slik.createDOMElememnt(obj)); });
+				_fal(obj.child,function(obj){ 
+					elm.appendChild(slik.createDOMElememnt(obj)); 
+				});
+
 			return elm;
 		}
 	};
@@ -910,12 +921,21 @@
 			});
 		},
 		// virtual render
-		render : function(newhtml){
+		render : function(newhtml,view){
 			return this.each(function(elm){
-				if(!elm.axdom)
-					return (elm.axdom = slik.createTreeFromHTML(elm.innerHTML = newhtml)); 
-				var target = slik.createTreeFromHTML(newhtml);
-				return slik.applyPatch(elm,slik.treeDiff(elm.axdom,target,[]));
+				if(elm._vid !== view._vid){
+					elm._vid = view._vid;
+					elm.setAttribute("ax-root","");
+					return elm.appendChild(slik.createDOMElememnt(
+						view.axml = slik.createTreeFromHTML(
+							view.axcomplete = newhtml)).firstElementChild,
+						elm.innerHTML = null
+					);
+				}
+				var target = slik.createTreeFromHTML(newhtml),
+						patch = slik.treeDiff(view.axml,target,[]);
+				return slik.applyPatch(elm, patch,
+					function(){ view.axml = target; });
 			});
 		}
 	};
@@ -1328,8 +1348,10 @@
 
 	// Ax View
 	// View container
+	var vid = 0;
 	aV = function(obj){
 		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
+			view = this,
 			vroot = config.root,
 			render = config.render,
 			events = config.events,
@@ -1351,15 +1373,11 @@
 				(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){ 
-				var t = z(vroot), args = _slice(arguments);
-				return (stencil !== _noop && (
-						(_trim(t.get(0).innerHTML) === "" ? 
-							t.html(stencil.apply(this,args)) : 
-							t.render(stencil.apply(this,args))
-						))
-				);
+				return stencil !== _noop && 
+					z(vroot).render(
+						stencil.apply(this,_slice(arguments)),
+						view);
 			};
-
 		}
 
 		// if userobj has more events
@@ -1396,6 +1414,7 @@
 		}
 
 		// first trigger "init" event
+		this._vid = vid++;
 		_extend(this,config)
 			.emit("init")
 			.unbind("init");

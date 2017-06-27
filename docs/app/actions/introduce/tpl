@@ -95,7 +95,7 @@
 			<div class="ite-code">
 				<pre class="sh_javascript">
 var view = ax.view({
-	template:"Hello &#123;&#123;-name&#125;&#125;"
+	template:"&lt;span&gt;Hello &#123;&#123;-name&#125;&#125;&lt;/span&gt;"
 });
 
 view.mount(
@@ -119,8 +119,7 @@ view.mount(
 var model = ax.model();
 
 var view = ax.view({
-	template:"&lt;input value='&#123;&#123;-text&#125;&#125;'&gt;"+
-					 "&lt;h2&gt;&#123;&#123;-text&#125;&#125;&lt;/h2&gt;",
+	template:"...", /* html */
 
 	model:model,
 
@@ -166,16 +165,16 @@ var view = ax.view({
 	events:{
 		"submit:#form":function(event){
 			event.preventDefault();
-			var getName = trim(
-				document.getElementById("name").value
-			);
-			if(getName) 
+			var name = document.getElementById("name"),
+					getName = name.value.trim();
+
+			if(getName){
+				name.value="";
 				model3.moc("list",{ name : getName });
+			}
 		},
 		"click:.del":function(event){
-			model3.rm(
-				"list."+this.getAttribute("key")
-			);
+			model3.rm("list."+this.key);
 		}
 	}
 });
