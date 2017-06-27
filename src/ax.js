@@ -13,7 +13,7 @@
 		// support AMD require.js
 		// ruler by UMD Javascript
 		define('ax',['struct'],function(_){ return factory(ax,_); });
-	else if(typeof exports !== "void 0"){
+	else if(typeof exports !== "undefined"){
 		// support CommonJS exports
 		// * fuck the npm package rubbish
 		var _ = require('struct');
