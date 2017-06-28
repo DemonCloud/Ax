@@ -734,8 +734,9 @@
 				}else if(tag){
 					n = slik.createObjElement(tag);
 					n.i= c.length+1; c.push(n); n.parent = p;
-					if(!(n.tagName in tagList))
+					if(!(n.tagName in tagList)){
 						p = n; c = n.child;
+					}
 				}else if(text){
 					if(text.trim()) p.text = text;
 				}

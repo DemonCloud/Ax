@@ -14,46 +14,24 @@
 
 <script>
 			//example3
-			var trim = struct.string("trim");
-			var model3 = ax.model({
-				name:"todolist",
-				data:{ list:[] },
-				store: true,
-			});
+			var model = ax.model();
 
-			var view3 = ax.view({
-				template:'<form id="form"><input id="name" maxlength=10 />'+
-								 '<button id="add">Add</button>'+
+			var view = ax.view({
+				template:'<form id="form">'+
+								 '<input id="name" maxlength=10><i>x</i>'+
 								 '<ul>'+
-								 '{{* each [item,i] in list }}'+
 								 ' 	 <li style="max-width:168px">'+
-								 '    <span>{{-item.name}}</span>'+
-								 '    <b class="del" key={{-i}}>×</b>'+
+								 '    <span>213</span>'+
+								 '    <b class="del" key=1>o</b>'+
 								 ' 	 </li>'+
-								 '{{* end }}'+
 								 '</ul>></form>',
 
-				model: model3,
-
-				events:{
-					"submit:#form":function(event){
-						event.preventDefault();
-						var getName = trim(document.getElementById("name").value);
-						if(getName){
-							document.getElementById("name").value="";
-							model3.moc("list",{ name : getName })
-						}
-					},
-
-					"click:.del":function(event){
-						model3.rm("list."+this.key);
-					}
-				}
+				model: model,
 			});
 
-			view3.mount(
+			view.mount(
 				document.getElementById("tree"),
-				model3.get()
+				model.get()
 			);
 </script>
 </body>
