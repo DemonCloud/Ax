@@ -489,7 +489,7 @@
 	var attrList = {
 		class : "className",
 		style : "style.cssText",
-		placeholder: "@palceholder",
+		placeholder: "@placeholder",
 		href  : "@href"
 	};
 
@@ -532,7 +532,7 @@
 		wbr:1
 	};
 
-	var attrexec = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gi,
+	var attrexec = /(\S+)=[\'"]?((?:(?!\/>|>|"|\'|\s).)+)/gi,
 			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi;
 
 	var attrSetter = function(elm,attr,val){
@@ -747,13 +747,13 @@
 		createObjElement:function(str){
 			var arr = str.split(" ");
 			var tagName = arr.shift();
-			var attrbutes = arr.join(" ").trim();
+			var attributes = arr.join(" ").trim();
 			var elm =  { tagName: tagName, child:[] };
 
-			if(attrbutes){
+			if(attributes){
 				var attrs = {};
-				var s, len = attrbutes.length;
-				while((s=attrexec.exec(attrbutes)))
+				var s, len = attributes.length;
+				while((s=attrexec.exec(attributes)))
 					attrs[s[1]] = s[2];
 				elm.attributes = attrs;
 			}
@@ -763,9 +763,10 @@
 		createDOMElememnt:function(obj){
 			var elm = document.createElement(obj.tagName); 
 
-			_fol(obj.attributes,function(value,key){ 
-				attrSetter(elm,key,value);
-			});
+			if(obj.attributes)
+				_fol(obj.attributes,function(value,key){ 
+					attrSetter(elm,key,value);
+				});
 
 			if(obj.text)
 				elm.innerText = obj.text;
