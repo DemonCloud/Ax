@@ -764,7 +764,7 @@
 			var elm = document.createElement(obj.tagName); 
 
 			_fol(obj.attributes,function(value,key){ 
-				attrSetter(t,key,value);
+				attrSetter(elm,key,value);
 			});
 
 			if(obj.text)
