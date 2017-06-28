@@ -472,21 +472,25 @@
 		return compatible(event);
 	};
 
-	var supportTemplate = "content" in document.createElement("template");
-	function createDOM(rootElm,html){
-		var r = rootElm.cloneNode(),t;
-		if(supportTemplate)
-			r.appendChild((t=document.createElement("template"),
-				t.innerHTML=html,
-				t.content));
-		else
-			r.innerHTML = html;
-		return r;
-	}
+	// var supportTemplate = "content" in document.createElement("template");
 
+	// function createDOM(rootElm,html){
+	// 	var r = rootElm.cloneNode(),t;
+	// 	if(supportTemplate)
+	// 		r.appendChild((t=document.createElement("template"),
+	// 			t.innerHTML=html,
+	// 			t.content));
+	// 	else
+	// 		r.innerHTML = html;
+	// 	return r;
+	// }
+
+	// attr list mapping
 	var attrList = {
 		class : "className",
-		style : "style.cssText"
+		style : "style.cssText",
+		placeholder: "@palceholder",
+		href  : "@href"
 	};
 
 	var patchList = [
@@ -528,11 +532,15 @@
 		wbr:1
 	};
 
-	var attrexec = /([^\s]+)=['"]?([^'"]+)['"]?/gi,
+	var attrexec = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gi,
 			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi;
 
-	var attrName = function(attr){
-		return attrList[attr] || attr; 
+	var attrSetter = function(elm,attr,val){
+		var attrName = attrList[attr] || attr;
+		if(!~attrName.indexOf("@"))
+			_set(elm,attrName,val); 
+		else
+			elm.setAttribute(attrName.slice(1),val);
 	};
 
 	var patchHack = [
@@ -540,8 +548,10 @@
  		//1 replace
 		function(patch,t){
 			t = patch.s;
-			t.parentNode.insertBefore(patch.n,t);
-			t.parentNode.removeChild(t);
+			if(t) if(t.parentNode){
+				t.parentNode.insertBefore(patch.n,t);
+				t.parentNode.removeChild(t);
+			}
 		}, 
  		//2 append
 		function(patch,t){
@@ -551,7 +561,8 @@
  		//3 remove
 		function(patch,t){
 			t = patch.s;
-			t.parentNode.removeChild(t);;
+			if(t) if(t.parentNode) 
+				t.parentNode.removeChild(t);
 		},
  		//4 modifytext
 		function(patch,t){
@@ -573,7 +584,7 @@
 		function(patch,t){
 			t = patch.s;
 			_fol(patch.a,function(value,key){
-				_set(t,attrName(key),value);
+				attrSetter(t,key,value);
 			});
 		},
 		//8 modifyattr
@@ -587,7 +598,7 @@
 					t.removeAttribute(key);
 			});
 			_fol(patch.a,function(value,key){
-				_set(t,attrName(key),value);
+				attrSetter(t,key,value);
 			});
 		},
 		//8 removeattr
@@ -654,7 +665,7 @@
 
 		createSelector:function(org){
 			var selector = org.tagName + ":nth-child("+org.i+")";
-			while(org=org.parent)
+			while((org=org.parent))
 				if(org.i !== void 0)
 					selector = org.tagName + ":nth-child("+org.i+")"+">"+ selector;
 			return selector;
@@ -709,7 +720,8 @@
 				child:[]
 			};
 
-			var p = root , c = root.child;
+			var p = root , c = root.child, n;
+
 			html.replace(slikReg,function(match,close,stag,tag,text,offset){
 				if(!match || !(match.replace(excapetab,"")))
 					return match;
@@ -717,16 +729,15 @@
 				if(close){
 					p = p.parent; c = p.child;
 				}else if(stag){
-					var node = slik.createObjElement(stag);
-					node.i= c.length+1; c.push(node); node.parent = p;
+					n = slik.createObjElement(stag);
+					n.i= c.length+1; c.push(n); n.parent = p;
 				}else if(tag){
-					var node = slik.createObjElement(tag);
-					node.i= c.length+1; c.push(node); node.parent = p;
-					if(!(node.tagName in tagList))
-					p = node; c = node.child;
+					n = slik.createObjElement(tag);
+					n.i= c.length+1; c.push(n); n.parent = p;
+					if(!(n.tagName in tagList))
+						p = n; c = n.child;
 				}else if(text){
-					if(text.trim())
-						p.text = text;
+					if(text.trim()) p.text = text;
 				}
 				return match;
 			});
@@ -742,7 +753,7 @@
 			if(attrbutes){
 				var attrs = {};
 				var s, len = attrbutes.length;
-				while(s=attrexec.exec(attrbutes))
+				while((s=attrexec.exec(attrbutes)))
 					attrs[s[1]] = s[2];
 				elm.attributes = attrs;
 			}
@@ -752,16 +763,16 @@
 		createDOMElememnt:function(obj){
 			var elm = document.createElement(obj.tagName); 
 
-			if(obj.attributes)
-				_fol(obj.attributes,function(val,key){ 
-					_set(elm,attrName(key),val); 
-				});
+			_fol(obj.attributes,function(value,key){ 
+				attrSetter(t,key,value);
+			});
 
 			if(obj.text)
 				elm.innerText = obj.text;
 			else if(obj.child.length)
 				_fal(obj.child,function(obj){ 
 					elm.appendChild(slik.createDOMElememnt(obj)); });
+
 			return elm;
 		}
 	};
