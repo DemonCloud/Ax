@@ -1141,7 +1141,8 @@
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
 				events = config.events,
 				validate = config.validate,
-
+				
+				filter = _isFn(config.filter) ? config.filter : cool ,
 				existname = _isStr(config.name || 0),
 				usestore = config.store && existname,
 				usedata = config.data || {},
@@ -1151,6 +1152,7 @@
 		delete config.store;
 		delete config.change;
 		delete config.events;
+		delete config.filter;
 		delete config.validate;
 
 		// define data
@@ -1159,7 +1161,8 @@
 				return _clone(data);
 			},
 			set : function(newdata){
-				if(_eq(data,newdata)) return data;
+				if(_eq(data,newdata = filter(newdata))) 
+					return data;
 
 				var args = [_clone(newdata)], error;
 				if((this.emit("validate",args),
