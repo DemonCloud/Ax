@@ -21,9 +21,9 @@
 		<mark style="margin-bottom:20px"><i class="ion-erlenmeyer-flask"></i>&nbsp; Latest version - {{#struct.VERSION}}</mark>
 		<p>
 			<span><b>Download pack</b> with <code>struct</code>&nbsp;&nbsp;</span>
-			<a href="./axs.min.js" title="download it" alt="download it" rel="download" download='axs.min.js'>
+			<a href="./axs.min.js" title="Download it" alt="Download it" rel="download" download='axs.min.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				axs{{#struct.VERSION}}.min.js (GZIP 20K)
+				axs{{#struct.VERSION}}.min.js (GZIP 15K)
 			</a>
 		</p>
 		<br>

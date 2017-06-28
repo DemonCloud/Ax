@@ -579,6 +579,13 @@
 		//8 modifyattr
 		function(patch,t){
 			t = patch.s;
+			_fol(patch.o,function(value,key){
+				if(t[key]){
+					if(!(delete t[key])) 
+						try{ t[key] = null; }catch(e){}
+				} else
+					t.removeAttribute(key);
+			});
 			_fol(patch.a,function(value,key){
 				_set(t,attrName(key),value);
 			});
@@ -685,7 +692,7 @@
 					patch = { t:7, s:sl ,a:tag.attributes };
 					break;
 				case "modifyattr":
-					patch = { t:8, s:sl ,a:tag.attributes };
+					patch = { t:8, s:sl ,a:tag.attributes, o:org.attributes };
 					break;
 				case "removeattr":
 					patch = { t:9, s:sl ,a:org.attributes };
@@ -754,9 +761,7 @@
 				elm.innerText = obj.text;
 			else if(obj.child.length)
 				_fal(obj.child,function(obj){ 
-					elm.appendChild(slik.createDOMElememnt(obj)); 
-				});
-
+					elm.appendChild(slik.createDOMElememnt(obj)); });
 			return elm;
 		}
 	};
@@ -923,18 +928,13 @@
 		// virtual render
 		render : function(newhtml,view){
 			return this.each(function(elm){
-				if(elm._vid !== view._vid){
-					elm._vid = view._vid;
-					elm.setAttribute("ax-root","");
+				if(elm._vid !== view._vid)
 					return elm.appendChild(slik.createDOMElememnt(
-						view.axml = slik.createTreeFromHTML(
-							view.axcomplete = newhtml)).firstElementChild,
-						elm.innerHTML = null
-					);
-				}
-				var target = slik.createTreeFromHTML(newhtml),
-						patch = slik.treeDiff(view.axml,target,[]);
-				return slik.applyPatch(elm, patch,
+						view.axml = slik.createTreeFromHTML(newhtml)
+					).firstElementChild, elm.innerHTML = null);
+
+				var target = slik.createTreeFromHTML(newhtml);
+				return slik.applyPatch(elm, slik.treeDiff(view.axml,target,[]),
 					function(){ view.axml = target; });
 			});
 		}
@@ -1298,18 +1298,16 @@
 	};
 
 	function packRender(view,render){
-		var pack = _link(
+		return _link(
 			packBefore(view),
 			packMain(view,render),
 			packComplete(view)
 		);
-		return function(){
-			return pack(arguments);
-		};
 	}
 
 	function packBefore(view){
-		return function(args){
+		return function(){
+			var args = _slice(arguments);
 			return view.emit("beforeRender",args),args;
 		};
 	}
@@ -1322,7 +1320,9 @@
 
 	function packComplete(view){
 		return function(args){
-			return view.emit("completed",args),view;
+			view.root._vid = view._vid;
+			view.root.setAttribute("ax-root","");
+			return view.emit("completed",args);
 		};
 	}
 
