@@ -17,20 +17,21 @@
 var model2 = ax.model();
 
 var view2 = ax.view({
-	template:"<div><input style='margin-bottom:5px' defaultValue='{{-text}}'>"+
-	"<h2>{{-text}}</h2></div>",
+	template:"<div>\
+<input id='id' type='checkbox' checked='{{#check}}'>"+
+	"<h2>{{#check}}</h2></div>",
 	model : model2,
 
 	events:{
-		"change:input":function(event){
-			model2.set("text",this.value);
+		"check:#id":function(event){
+			model2.set("check",this.checked);
 		}
 	}
 });
 
 view2.mount(
 	document.getElementById("tree"),
-	{ text: "Hello World" }
+	{ check: true }
 );
 </script>
 </body>

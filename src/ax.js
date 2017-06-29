@@ -485,11 +485,15 @@
 
 	// attr list mapping
 	var attrList = {
-		class : "className",
-		style : "style.cssText",
-		placeholder: "@placeholder",
-		maxlength: "@maxlength",
-		href  : "@href"
+		class       : "className",
+		style       : "style.cssText",
+		placeholder : "@placeholder",
+		maxlength   : "@maxlength",
+		href        : "@href",
+		checked     : "*checked",
+		disabled    : "*disabled",
+		readonly    : "*readonly",
+		required    : "*required",
 	};
 
 	var patchList = [
@@ -547,10 +551,21 @@
 			if(inval == null || inval === "")
 				attrSetter(elm,attrName,val);
 		}
-		else if(!~attrName.indexOf("@"))
-			_set(elm,attrName,val); 
-		else 
+		else if(attrName[0] === "*")
+			_set(elm,attrName.slice(1),val==="true"); 
+		else if(attrName[0] === "@" || attrName[0] === ":")
 			elm.setAttribute(attrName.slice(1),val);
+		else 
+			_set(elm,attrName,val); 
+	};
+
+	var patchAttr = function(o,t){
+		var s = {};
+		_fol(t,function(v,k){
+			if(o[k] === v)
+				s[k]=1;
+		});
+		return s;
 	};
 
 	var patchHack = [
@@ -600,15 +615,18 @@
 		//8 modifyattr
 		function(patch,t){
 			t = patch.s;
+			var s = patchAttr(patch.o,patch.t);
 			_fol(patch.o,function(value,key){
-				if(t[key]){
-					if(!(delete t[key])) 
+				if(!(key in s)){
+					if(t[key] && !(delete t[key]))
 						try{ t[key] = null; }catch(e){}
-				} else
-					t.removeAttribute(key);
+					else 
+						t.removeAttribute(key);
+				}
 			});
 			_fol(patch.a,function(value,key){
-				attrSetter(t,key,_decode(value));
+				if(!(key in s))
+					attrSetter(t,key,_decode(value));
 			});
 		},
 		//8 removeattr

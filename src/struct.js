@@ -1210,13 +1210,13 @@ function c_escape(et){ return '\\' + escapes[et]; }
 function encodeHTML(str){
 	return +str===str ? 
 					str :
-					str.replace(encodeReg,c_ecode);
+					toString(str).replace(encodeReg,c_ecode);
 }
 
 function decodeHTML(str){
 	return +str===str ? 
 					str : 
-					str.replace(decodeReg,c_dcode);
+					toString(str).replace(decodeReg,c_dcode);
 }
 
 function stripHTML(str){
