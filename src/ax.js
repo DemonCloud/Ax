@@ -579,11 +579,12 @@
 		if(attrprops.test(val)){
 			fn = props[val.replace(attreval,'')];
 			res = fn !== void 0 ? fn : val;
-
-			if(key[0]===":")
-				res = _isFn(fn) ? fn : 
-				Function("event", _toString(val));
 		}
+
+		if(key[0]===":")
+			res = _isFn(fn) ? fn : 
+			Function("event", _toString(val));
+
 		return res;
 	};
 
