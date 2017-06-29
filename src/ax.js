@@ -575,7 +575,6 @@
 
 	var attrEvent = function(key,val,props){
 		var res=val,fn;
-
 		// parse props
 		if(attrprops.test(val)){
 			fn = props[val.replace(attreval,'')];
@@ -585,7 +584,6 @@
 				res = _isFn(fn) ? fn : 
 				Function("event", _toString(val));
 		}
-
 		return res;
 	};
 
@@ -803,15 +801,13 @@
 					elm =  { tagName: tagName, child:[] };
 
 			if(attributes){
-				var attrs = {};
-				var s, tg; 
+				var attrs = {} ,s, tg; 
 				while(s=attrexec.exec(attributes)){
 					if(!s[1]){
 						if(!tg)
 							tg = s[0];
 						else{
-							attrs[tg] = attrEvent(tg,s[tg],props);
-							tg=0;
+							attrs[tg] = attrEvent(tg,s[0],props); tg=0;
 						}
 					}else
 						attrs[s[1]] = attrEvent(s[1],s[2],props);
@@ -1243,8 +1239,8 @@
 				if((this.emit("validate",args),
 					_isPrim(newdata) ? (_isFn(validate) ? validate(newdata) : true) :
 					(error=checkValidate(data,newdata,validate),!_size(error))))
-					return data=newdata,
-						usestore && aS.set(this.name,newdata,this.change=true),
+					return data=newdata,this.change=true,
+						usestore && aS.set(this.name,newdata),
 						this.emit("validate:success,change",args),
 						newdata;
 

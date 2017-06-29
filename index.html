@@ -13,33 +13,48 @@
 </script>
 
 <script>
-				//#example2
-var model = ax.model();
+				//example3
+				var model3 = ax.model({
+					name:"todolist",
+					data:{ list:[] },
+					store: true,
+				});
 
-var view = ax.view({
-	template:"<div>\
-	<input id='id' type='checkbox' name='{name}' :check='{detect}' checked='{{#check}}'>"+
-	"<h2>{{#check}}</h2></div>",
-	model : model,
+				var view3 = ax.view({
+					template:'<form id="form"><input id="name" maxlength=10 />'+
+					'<button id="add">Add</button>'+
+					'<ul>'+
+					'{{* each [item,i] in list }}'+
+					'<li style="max-width:168px">'+
+					'  <span>{{-item.name}}</span>'+
+					'  <b class="del" key={{-i}}>×</b>'+
+					'</li>'+
+					'{{* end }}'+
+					'</ul>></form>',
 
-	props:{
-		detect: function(e){
-			console.log(this.checked);
-		},
-		name: "wode"
-	},
+					model: model3,
 
-	events:{
-		"check:#id":function(event){
-			model.set("check",this.checked);
-		}
-	}
-});
+					events:{
+						"submit:#form":function(event){
+							event.preventDefault();
+							var name = document.getElementById("name");
+							var getName = name.value.trim();
+							if(getName){
+								name.value="";
+								model3.moc("list",{ name : getName });
+							}
+						},
 
-view.mount(
-	document.getElementById("tree"),
-	{ check: true }
-);
+						"click:.del":function(event){
+							model3.rm("list."+this.key);
+						}
+					}
+				});
+
+				view3.mount(
+					document.getElementById("tree"),
+					model3.get()
+				);
 </script>
 </body>
 </html>
