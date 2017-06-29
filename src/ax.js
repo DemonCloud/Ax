@@ -539,11 +539,14 @@
 	// /(\S+)\s*?=\s*([\'"])(.*?|)\2/gi
 	// (\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gi
 	var attrexec = /(\S+)=["'](.*?)["']|([\w\-]+)/gi,
+			attreval = /^\{|\}$/gi,
+			attrprops = /^\{([^'"\s]+)\}$/i,
 			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi,
 			defaultAttr = /^default[^\s]+/i;
 
 	var attrSetter = function(elm,attr,val){
 		var attrName = attrList[attr] || attr;
+		val = _isStr(val) ?  _decode(val) : val;
 		if(defaultAttr.test(attrName)){
 			// is defaultAttr
 			attrName = attrName.slice(7).toLowerCase();
@@ -552,11 +555,38 @@
 				attrSetter(elm,attrName,val);
 		}
 		else if(attrName[0] === "*")
-			_set(elm,attrName.slice(1),val==="true"); 
-		else if(attrName[0] === "@" || attrName[0] === ":")
+			_set(elm,attrName.slice(1),(val==="true"||val===true)); 
+		else if(attrName[0] === "@")
 			elm.setAttribute(attrName.slice(1),val);
-		else 
+		else if(attrName[0] === ":"){
+			z(elm).on(attrName.slice(1),val);
+		}else 
 			_set(elm,attrName,val); 
+	};
+
+	var attrClear = function(elm,key,val){
+		if(key[0] === ":" && _isFn(val))
+			z(elm).off(key.slice(1),val);
+		else if(elm[key] && !(delete elm[key]))
+			try{ elm[key] = null; }catch(e){}
+		else 
+			elm.removeAttribute(key);
+	};
+
+	var attrEvent = function(key,val,props){
+		var res=val,fn;
+
+		// parse props
+		if(attrprops.test(val)){
+			fn = props[val.replace(attreval,'')];
+			res = fn !== void 0 ? fn : val;
+
+			if(key[0]===":")
+				res = _isFn(fn) ? fn : 
+				Function("event", _toString(val));
+		}
+
+		return res;
 	};
 
 	var patchAttr = function(o,t){
@@ -606,34 +636,26 @@
 			t.innerHTML = patch.n.innerHTML;
 		},
 		//7 addattr
-		function(patch,t){
-			t = patch.s;
+		function(patch){
 			_fol(patch.a,function(value,key){
-				attrSetter(t,key,_decode(value));
+				attrSetter(patch.s,key,value);
 			});
 		},
 		//8 modifyattr
-		function(patch,t){
+		function(patch,t,s){
 			t = patch.s;
-			var s = patchAttr(patch.o,patch.t);
+			s = patchAttr(patch.o,patch.a);
 			_fol(patch.o,function(value,key){
-				if(!(key in s)){
-					if(t[key] && !(delete t[key]))
-						try{ t[key] = null; }catch(e){}
-					else 
-						t.removeAttribute(key);
-				}
+				if(!(key in s)) attrClear(t,key,value);
 			});
 			_fol(patch.a,function(value,key){
-				if(!(key in s))
-					attrSetter(t,key,_decode(value));
+				if(!(key in s)) attrSetter(t,key,value);
 			});
 		},
 		//8 removeattr
-		function(patch,t){
-			t = patch.s;
+		function(patch){
 			_fol(patch.a,function(value,key){
-				t.removeAttribute(key); });
+				attrClear(patch.s,key,value); });
 		}
 	];
 
@@ -742,7 +764,7 @@
 			return patch;
 		},
 
-		createTreeFromHTML: function(html){
+		createTreeFromHTML: function(html,vprops){
 			var root = {
 				tagName:"root",
 				child:[]
@@ -757,10 +779,10 @@
 				if(close){
 					p = p.parent; c = p.child;
 				}else if(stag){
-					n = slik.createObjElement(stag);
+					n = slik.createObjElement(stag,vprops);
 					n.i= c.length+1; c.push(n); n.parent = p;
 				}else if(tag){
-					n = slik.createObjElement(tag);
+					n = slik.createObjElement(tag, vprops);
 					n.i= c.length+1; c.push(n); n.parent = p;
 					if(!(n.tagName in tagList)){
 						p = n; c = n.child;
@@ -773,11 +795,12 @@
 			return root;
 		},
 
-		createObjElement:function(str){
-			var arr = str.split(" ");
-			var tagName = arr.shift();
-			var attributes = arr.join(" ");
-			var elm =  { tagName: tagName, child:[] };
+		createObjElement:function(str,vprops){
+			var arr = str.split(" "),
+					props = _isObj(vprops) ? vprops : {},
+					tagName = arr.shift(),
+					attributes = arr.join(" "),
+					elm =  { tagName: tagName, child:[] };
 
 			if(attributes){
 				var attrs = {};
@@ -786,10 +809,12 @@
 					if(!s[1]){
 						if(!tg)
 							tg = s[0];
-						else
-							attrs[tg] = s[tg=0];
+						else{
+							attrs[tg] = attrEvent(tg,s[tg],props);
+							tg=0;
+						}
 					}else
-						attrs[s[1]] = s[2];
+						attrs[s[1]] = attrEvent(s[1],s[2],props);
 				}
 				elm.attributes = attrs;
 			}
@@ -802,7 +827,7 @@
 
 			if(obj.attributes)
 				_fol(obj.attributes,function(value,key){ 
-					attrSetter(elm,key,_decode(value));
+					attrSetter(elm,key,value);
 				});
 
 			if(obj.text)
@@ -976,14 +1001,14 @@
 			});
 		},
 		// virtual render
-		render : function(newhtml,view){
+		render : function(newhtml,view,props){
 			return this.each(function(elm){
 				if(elm._vid !== view._vid)
 					return elm.appendChild(slik.createDOMElememnt(
-						view.axml = slik.createTreeFromHTML(newhtml)
+						view.axml = slik.createTreeFromHTML(newhtml,props)
 					).firstElementChild, elm.innerHTML = null);
 
-				var target = slik.createTreeFromHTML(newhtml);
+				var target = slik.createTreeFromHTML(newhtml,props);
 				return slik.applyPatch(elm, slik.treeDiff(view.axml,target,[]),
 					function(){ view.axml = target; });
 			});
@@ -1219,8 +1244,7 @@
 					_isPrim(newdata) ? (_isFn(validate) ? validate(newdata) : true) :
 					(error=checkValidate(data,newdata,validate),!_size(error))))
 					return data=newdata,
-						this.change=true,
-						usestore && aS.set(this.name,newdata),
+						usestore && aS.set(this.name,newdata,this.change=true),
 						this.emit("validate:success,change",args),
 						newdata;
 
@@ -1409,7 +1433,7 @@
 			render = config.render,
 			events = config.events,
 			stencil = config.template,
-			props = config.props;
+			props = _lock(_isObj(config.props) ? config.props : {});
 
 		delete config.root;
 		delete config.mount;
@@ -1422,14 +1446,13 @@
 		// building the render function
 		if(!_isFn(render)){
 			stencil = _isStr(stencil) ? 
-				_doom(stencil, _isObj(props) ? props : {}) : 
+				_doom(stencil, props) : 
 				(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){ 
 				return stencil !== _noop && 
-					z(vroot).render(
-						stencil.apply(this,_slice(arguments)),
-						view);
+					z(vroot).render(stencil.apply(this,
+					_slice(arguments)),view,props);
 			};
 		}
 
@@ -1461,7 +1484,7 @@
 						this.render.apply(this,_slice(arguments,1));
 
 					// delete mount
-					return delete this.mount, this;
+					return delete this.mount,this;
 				}
 			};
 		}

@@ -14,22 +14,29 @@
 
 <script>
 				//#example2
-var model2 = ax.model();
+var model = ax.model();
 
-var view2 = ax.view({
+var view = ax.view({
 	template:"<div>\
-<input id='id' type='checkbox' checked='{{#check}}'>"+
+	<input id='id' type='checkbox' name='{name}' :check='{detect}' checked='{{#check}}'>"+
 	"<h2>{{#check}}</h2></div>",
-	model : model2,
+	model : model,
+
+	props:{
+		detect: function(e){
+			console.log(this.checked);
+		},
+		name: "wode"
+	},
 
 	events:{
 		"check:#id":function(event){
-			model2.set("check",this.checked);
+			model.set("check",this.checked);
 		}
 	}
 });
 
-view2.mount(
+view.mount(
 	document.getElementById("tree"),
 	{ check: true }
 );
