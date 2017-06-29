@@ -77,8 +77,6 @@
 		_fol      = struct.op('object'),
 		_fal      = struct.op('array'),
 		_map      = struct.map(),
-		_cat      = struct.cat(),
-		_ey       = struct.every(),
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
 		_emit     = struct.event('emit'),
@@ -87,7 +85,6 @@
 		_rmProp   = struct.prop('not'),
 		_param    = struct.param(),
 		_paramStr = struct.param("string"),
-		_trim     = struct.string('trim'),
 		_has      = struct.has(),
 		_ajax     = struct.ajax(),
 		_size     = struct.size(),
@@ -100,6 +97,7 @@
 		_merge    = struct.merge(),
 		_index    = struct.index(),
 		_one      = struct.index("one"),
+		_decode   = struct.html("decode"),
 		cool      = struct.cool();
 
 	// ax genertor function
@@ -594,7 +592,7 @@
 		function(patch,t){
 			t = patch.s;
 			_fol(patch.a,function(value,key){
-				attrSetter(t,key,value);
+				attrSetter(t,key,_decode(value));
 			});
 		},
 		//8 modifyattr
@@ -608,7 +606,7 @@
 					t.removeAttribute(key);
 			});
 			_fol(patch.a,function(value,key){
-				attrSetter(t,key,value);
+				attrSetter(t,key,_decode(value));
 			});
 		},
 		//8 removeattr
@@ -616,7 +614,7 @@
 			t = patch.s;
 			_fol(patch.a,function(value,key){
 				t.removeAttribute(key); });
-		},
+		}
 	];
 
 	var slik = {
@@ -784,7 +782,7 @@
 
 			if(obj.attributes)
 				_fol(obj.attributes,function(value,key){ 
-					attrSetter(elm,key,value);
+					attrSetter(elm,key,_decode(value));
 				});
 
 			if(obj.text)
@@ -1581,7 +1579,7 @@
 					value:!root.addEventListener("hashchange",this.event),
 					writable : false,
 					enumerable : false,
-					configurable: true,
+					configurable: true
 				});
 				
 				return hash ? 
