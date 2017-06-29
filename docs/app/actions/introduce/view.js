@@ -9,6 +9,8 @@ define("actions/introduce/view",
 	"text!actions/introduce/tpl"
 ],
 function(ax,struct,tags,title,tpl){
+	// var sh_highlightDocument = sh_highlightDocument || struct.noop();
+
 	var dom = struct.doom()(tpl);
 	// mount at elment[#app]
 	return ax.view({

@@ -888,7 +888,7 @@ v.mount(\n\
 					preview:"base2",
 					code:"var v = ax.view({\n\
 	root:document.getElementById(\"base2\"),\n\
-	template:\"Hi! &#123;&#123;-text&#125;&#125;\",\n\
+	template:\"&lt;span&gt;Hi! &#123;&#123;-text&#125;&#125;&lt;span&gt;\",\n\
 	events:{\n\
 		init: function(){\n\
 			this.render({ text: \"Cloud\" });\n\
@@ -932,7 +932,7 @@ v.render({ text: rs(5) });"
 					title: "Basic usage",
 					preview:"base",
 					code:"var v = ax.view({\n\
-	template:\"Hi! &#123;&#123;#capit(random(length))&#125;&#125;\",\n\
+	template:\"&lt;div&gt;Hi! &#123;&#123;#capit(random(length))&#125;&#125;&lt;/div&gt;\",\n\
 	props:{\n\
 		// dont make method name as 'length'\n\
 		capit : struct.string(\"capitalize\"),\n\
@@ -992,7 +992,7 @@ v.mount(\n\
 					preview:"v1",
 					code:"var v = ax.view({\n\
 	root:document.getElementById(\"v1\"),\n\
-	template:\"&#123;&#123;-number&#125;&#125;\",\n\
+	template:\"&lt;div&gt;&#123;&#123;-number&#125;&#125;&lt;/div&gt;\",\n\
 	events:{\n\
 		init: function(){\n\
 			this.render({ number: 2 });\n\
@@ -1005,7 +1005,7 @@ v.mount(\n\
 					preview:"v2",
 					code:"var v = ax.view({\n\
 	root:document.getElementById(\"base\"),\n\
-	template:\"&#123;&#123;-number&#125;&#125;\"\n\
+	template:\"&lt;div&gt;&#123;&#123;-number&#125;&#125;&lt;/div&gt;\"\n\
 });\n\
 \n\
 v.on(\"beforeRender\",function(data){\n\
@@ -1021,8 +1021,8 @@ v.mount(\n\
 					title: "Custom event",
 					preview:"v3",
 					code:"var v = ax.view({\n\
-	template:\"&lt;input id='t' &gt;\" +\n\
-					 \"&lt;button&gt;send&lt;/button&gt;\",\n\
+	template:\"&lt;div&gt;&lt;input id='t' &gt;\" +\n\
+					 \"&lt;button&gt;send&lt;/button&gt;&lt;/div&gt;\",\n\
 	events:{\n\
 		\"click:button\":function(event){\n\
 			event.preventDefault();\n\

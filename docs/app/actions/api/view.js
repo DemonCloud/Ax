@@ -10,6 +10,8 @@ define("actions/api/view",
 	"text!actions/api/tpl"
 ],
 function(ax,struct,tags,code,title,tpl){
+	// var sh_highlightDocument = sh_highlightDocument || struct.noop();
+	
 	var dom = struct.doom()(tpl);
 
 	// mount at elment[#app]
