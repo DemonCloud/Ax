@@ -40,7 +40,7 @@ function(ax,struct,tags,title,tpl){
 				var model2 = ax.model();
 
 				var view2 = ax.view({
-					template:"<div><input style='margin-bottom:5px' value='{{-text}}' />"+
+					template:"<div><input style='margin-bottom:5px' defaultValue='{{-text}}'>"+
 					"<h2>{{-text}}</h2></div>",
 
 					model : model2,

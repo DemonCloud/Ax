@@ -490,6 +490,7 @@
 		class : "className",
 		style : "style.cssText",
 		placeholder: "@placeholder",
+		maxlength: "@maxlength",
 		href  : "@href"
 	};
 
@@ -532,14 +533,23 @@
 		wbr:1
 	};
 
-	var attrexec = /(\S+)=[\'"]?((?:(?!\/>|>|"|\'|\s).)+)/gi,
-			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi;
+	// /(\S+)=["'](.*?)["']|([\w\-]+)/gi
+	// /(\S+)\s*?=\s*([\'"])(.*?|)\2/gi
+	// (\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gi
+	var attrexec = /(\S+)=["'](.*?)["']|([\w\-]+)/gi,
+			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi,
+			defaultState = /^default[^\s]+/i;
 
 	var attrSetter = function(elm,attr,val){
 		var attrName = attrList[attr] || attr;
 		if(!~attrName.indexOf("@"))
 			_set(elm,attrName,val); 
-		else
+		else if(defaultState.test(attr)){
+			// is defaultAttr
+			attrName = attrName.slice(7);
+			if(elm.getAttribute(attrName) != null || elm[attrName] != null)
+				attrSetter(elm,attrName,val);
+		}else 
 			elm.setAttribute(attrName.slice(1),val);
 	};
 
@@ -567,13 +577,13 @@
  		//4 modifytext
 		function(patch,t){
 			t = patch.s;
-			t.innerText = patch.c; 
+			t.innerHTML = patch.c; 
 		},
  		//5 withtext
 		function(patch,t){
 			t = patch.s;
 			t.innerHTML = "";
-			t.innerText = patch.c;
+			t.innerHTML = patch.c;
 		},
 		//6 removetext
 		function(patch,t){
@@ -748,16 +758,24 @@
 		createObjElement:function(str){
 			var arr = str.split(" ");
 			var tagName = arr.shift();
-			var attributes = arr.join(" ").trim();
+			var attributes = arr.join(" ");
 			var elm =  { tagName: tagName, child:[] };
 
 			if(attributes){
 				var attrs = {};
-				var s, len = attributes.length;
-				while((s=attrexec.exec(attributes)))
-					attrs[s[1]] = s[2];
+				var s, tg; 
+				while(s=attrexec.exec(attributes)){
+					if(!s[1]){
+						if(!tg)
+							tg = s[0];
+						else
+							attrs[tg] = s[tg=0];
+					}else
+						attrs[s[1]] = s[2];
+				}
 				elm.attributes = attrs;
 			}
+
 			return elm;
 		},
 
@@ -770,7 +788,7 @@
 				});
 
 			if(obj.text)
-				elm.innerText = obj.text;
+				elm.innerHTML = obj.text;
 			else if(obj.child.length)
 				_fal(obj.child,function(obj){ 
 					elm.appendChild(slik.createDOMElememnt(obj)); });
