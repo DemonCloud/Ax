@@ -13,26 +13,25 @@
 </script>
 
 <script>
-			//example3
-			var model = ax.model();
+				//#example2
+var model2 = ax.model();
 
-			var view = ax.view({
-				template:'<form id="form">'+
-								 '<input maxlength=10 data-mid=2 id="2017.1.20" defaultValue="Hello Buke"><i>x</i>'+
-								 '<ul>'+
-								 ' 	 <li style="max-width:168px">'+
-								 '    <span>213</span>'+
-								 '    <b class="del" key=1>o</b>'+
-								 ' 	 </li>'+
-								 '</ul>></form>',
+var view2 = ax.view({
+	template:"<div><input style='margin-bottom:5px' defaultValue='{{-text}}'>"+
+	"<h2>{{-text}}</h2></div>",
+	model : model2,
 
-				model: model,
-			});
+	events:{
+		"change:input":function(event){
+			model2.set("text",this.value);
+		}
+	}
+});
 
-			view.mount(
-				document.getElementById("tree"),
-				model.get()
-			);
+view2.mount(
+	document.getElementById("tree"),
+	{ text: "Hello World" }
+);
 </script>
 </body>
 </html>

@@ -536,18 +536,20 @@
 	// (\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gi
 	var attrexec = /(\S+)=["'](.*?)["']|([\w\-]+)/gi,
 			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi,
-			defaultState = /^default[^\s]+/i;
+			defaultAttr = /^default[^\s]+/i;
 
 	var attrSetter = function(elm,attr,val){
 		var attrName = attrList[attr] || attr;
-		if(!~attrName.indexOf("@"))
-			_set(elm,attrName,val); 
-		else if(defaultState.test(attr)){
+		if(defaultAttr.test(attrName)){
 			// is defaultAttr
-			attrName = attrName.slice(7);
-			if(elm.getAttribute(attrName) != null || elm[attrName] != null)
+			attrName = attrName.slice(7).toLowerCase();
+			var inval = elm.getAttribute(attrName) || elm[attrName];
+			if(inval == null || inval === "")
 				attrSetter(elm,attrName,val);
-		}else 
+		}
+		else if(!~attrName.indexOf("@"))
+			_set(elm,attrName,val); 
+		else 
 			elm.setAttribute(attrName.slice(1),val);
 	};
 
@@ -787,6 +789,7 @@
 
 			if(obj.text)
 				elm.innerHTML = obj.text;
+
 			else if(obj.child.length)
 				_fal(obj.child,function(obj){ 
 					elm.appendChild(slik.createDOMElememnt(obj)); });
