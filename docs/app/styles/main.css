@@ -383,10 +383,6 @@ a i{
 	min-width: 100%;
 	max-width: 100%;
   padding: 0;
-  border-top: 1px solid #8a3838;
-  border-bottom: 5px solid #8a3838;
-  border-left: 0;
-  border-right: 0;
   overflow: hidden;
 
   zoom:1;
@@ -397,12 +393,11 @@ a i{
   -webkit-flex:2;
   flex:2;
   min-width: 210px;
-  max-width:210px;
-  background-color:#eee;
-	border-right: 1px solid #8a3838;
+  max-width: 210px;
+  background-color:#e8e8e8;
   overflow:hidden;
 
-  box-shadow: inset -6px 0 18px rgba(0, 0, 0, 0.1);
+  box-shadow: inset -6px 0 24px rgba(0, 0, 0, 0.08);
 }
 
 .main .content{
