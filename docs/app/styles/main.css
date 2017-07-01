@@ -588,9 +588,15 @@ a i{
 .s-search-result a {
 	position: relative;
 	display: block;
+	border: 1px solid transparent;
 	padding: 1px 8px;
 	color: #afbac5;
 	font-size: 14px;
+}
+
+.s-search-result a:focus {
+	border-color:#8a3838;
+	outline: 0;
 }
 
 .s-search-result a:after{
