@@ -404,7 +404,7 @@ a i{
 	-ms-flex:10;
   -webkit-flex:10;
   flex:10;
-  max-width: 720px;
+  max-width: 730px;
   min-width: 0;
   background-color:#fff;
 }
@@ -509,7 +509,7 @@ a i{
 	padding: 20px;
 
 	top: 30px;
-	left: 990px;
+	left: 1000px;
 	width:240px;
 	max-width:240px;
 	border: 1px solid #ccc;
@@ -990,12 +990,14 @@ a i{
 	padding:30px 0;
 }
 
-.it-example .ite-code,
+.it-example .ite-code{
+	position:relative;
+	flex:5
+}
+
 .it-example .ite-preview{
 	position:relative;
-	min-width:0;
-	max-width:100%;
-	flex:5
+	flex:4
 }
 
 .it-example .ite-code:before,
@@ -1105,7 +1107,7 @@ a i{
 .api-examples .example{
 	display:block;
 	max-width:100%;
-	margin-bottom:15px;
+	margin-bottom:35px;
 	z-index:1;
 	zoom:1;
 }
@@ -1143,7 +1145,7 @@ a i{
 }
 
 .api-examples .example-preview{
-	flex:5;
+	flex:4;
 }
 
 .api-examples .example-code .btn{
