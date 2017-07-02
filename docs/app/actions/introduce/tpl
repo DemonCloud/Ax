@@ -1,7 +1,6 @@
 <article class="introduce">
 	<header>
 		<h3 t=1 style="color:#8a3838">
-			<i class="ion-ios-navigate"></i>
 			{{#main}}
 		</h3>
 		<p><b><i class="ion-ios-navigate"></i> Ax</b> is a fast MVR JavaScript Framework.</p>

@@ -31,14 +31,12 @@ api
 	var has = struct.has(),
 			_   = struct.link();
 
-	var check = {
-		api:function(param){
-			if(has(ruleList.api,param.s))
-				return param.s;
-			else
-				alert("This API gona to building!");
-			throw new TypeError("(* _*) 凸");
-		}
+	var check = function(param){
+		if(has(ruleList.api,param.s))
+			return param.s;
+		else
+			alert("This API gona to building!");
+		throw new TypeError("(* _*) 凸");
 	};
 
 	var app = ax.route({
@@ -48,7 +46,7 @@ api
 		},
 		actions:{
 			index : introduce,
-			api   : _(check.api,api)
+			api   : _(check,api)
 		}
 	});
 

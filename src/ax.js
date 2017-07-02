@@ -113,10 +113,10 @@
 			apiSelect = void 0; }
 
 		aM.prototype[apiName] = function(){
-			var tmp = this.data,
+			var tmp = this.get(),
 					args = [tmp].concat(_slice(arguments));
-			if(!_eq(tmp = struct[apiUse](apiSelect).apply(tmp,args),this.data))
-				this.emit((this.data = tmp,api),args);
+			if(!_eq(tmp = struct[apiUse](apiSelect).apply(tmp,args),this.get()))
+				this.emit((this.set(tmp),api),args);
 			return this;
 		};
 
@@ -139,7 +139,7 @@
 			apiSelect = void 0; }
 
 		aM.prototype[apiName] = function(){
-			var args = [this.data].concat(_slice(arguments));
+			var args = [this.get()].concat(_slice(arguments));
 			return struct[apiUse](apiSelect).apply(this,args);
 		};
 
@@ -1015,22 +1015,34 @@
 	var checker = _doom("[ checker -> ax.va.{{#type}} ]");
 	var vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
 
-	function checkValidate(olddata,newdata,validate){
-		var res = [],s=_size(validate);
-		if(!s) return res;
-		if(!_eq(olddata,newdata)){
-			var key = _keys(validate);
-			for(var i=0,isRequired,value; i<s; i++){
-				// get validate funtion
-				isRequired = validate[key[i]];
-				value=_prop(newdata,key[i]);
-				if(!isRequired(value)){
-					res.push(key[i],value);
-					break;
-				}
+	function checkValidate(newdata,model){
+		var validate = model._asv(_),
+		error = [], valid=true, s=_size(validate);
+
+		if(!s) return valid;
+
+		var key = _keys(validate);
+		for(var i=0,isRequired,value; i<s; i++){
+			// get validate funtion
+			isRequired = validate[key[i]];
+			value= _prop(newdata,key[i]);
+			if(!isRequired(value)){
+				error.push(key[i],value); break;
 			}
 		}
-		return res;
+
+		valid = !_size(error);
+		model.emit("validate:"+(valid?"success":"fail"),
+								valid?[_clone(newdata)]:error);
+			
+		return valid;
+	}
+
+
+	function singleValidate(key,val,model){
+		var data = model.get();
+		_set(data,key,val);
+		return checkValidate(data,model);
 	}
 
 	function on(type,fn){
@@ -1051,15 +1063,14 @@
 	}
 
 	function moc(target,val){
+		var res;
 		if(_isAry(target))
-			target = target.concat(val);
+			res = target.concat(val);
 		else if(_isObj(target))
-			target = _merge(target,val);
-		else if(_isStr(target))
-			target += val;
+			res = _merge(_clone(target),val);
 		else
-			target = val;
-		return target;
+			res = val;
+		return res;
 	}
 
 	function parseKey(key){
@@ -1205,18 +1216,20 @@
 			LS.removeItem(SN+this.incry(name,revs(name)));
 		}
 	};
-	
+
+	var _ = [];
+
 	// Ax Model
-	// Ax build -> 2.0
+	// Ax build -> 3.0
 	// model constructor
 	aM = function(obj){
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
 				events = config.events,
-				validate = config.validate,
+				validate = config.validate||{},
 				
 				filter = _isFn(config.filter) ? config.filter : cool ,
 				existname = _isStr(config.name || 0),
-				usestore = config.store && existname,
+				usestore = !!(config.store && existname),
 				usedata = config.data || {},
 				data = usestore ? (aS.get(config.name) || usedata) : usedata;
 
@@ -1224,45 +1237,88 @@
 		delete config.store;
 		delete config.change;
 		delete config.events;
-		delete config.filter;
 		delete config.validate;
 
-		// define data
-		_define(this,"data",{
-			get : function(){
-				return _clone(data);
-			},
-			set : function(newdata){
-				if(_eq(data,newdata = filter(newdata))) 
-					return data;
+		if(existname){
+			_define(this,"name",{
+				value: config.name,
+				writable: false,
+				enumerable: false,
+				configurable: false
+			});
 
-				var args = [_clone(newdata)], error;
-				if((this.emit("validate",args),
-					_isPrim(newdata) ? (_isFn(validate) ? validate(newdata) : true) :
-					(error=checkValidate(data,newdata,validate),!_size(error))))
-					return data=newdata,this.change=true,
-						usestore && aS.set(this.name,newdata),
-						this.emit("validate:success,change",args),
-						newdata;
+			delete config.name;
+		}
 
-				this.emit("validate:fail",args.concat(error));
-				if(_isAry(error)&&_size(error)===2)
-					this.emit("validate:fail:"+_first(error),[_last(error)]);
-				return data;
+		_define(this,{
+			_ast:{
+				value: function(todo,v){
+					return v===_? todo(data) : {};
+				},
+				writable: false,
+				enumerable: false,
+				configurable: false
 			},
-			enumerable:true,
-			configurable:false
+			_asv:{
+				value: function(v){
+					return v===_? validate : {};
+				},
+				writable: false,
+				enumerable: false,
+				configurable: false
+			},
+			_c:{
+				value: function(newdata,v){
+					return v===_? (data = newdata) : {};
+				},
+				writable: false,
+				enumerable: false,
+				configurable: false
+			},
+			_store:{
+				value: usestore,
+				writable: false,
+				enumerable: false,
+				configurable: false
+			}
 		});
+
+		// // define data
+		// _define(this,"data",{
+		// 	get : function(){
+		// 		return _clone(data);
+		// 	},
+		// 	set : function(newdata){
+		// 		if(_eq(data,newdata = filter(newdata))) 
+		// 			return data;
+
+		// 		var args = [_clone(newdata)], error;
+		// 		if((this.emit("validate",args),
+		// 			_isPrim(newdata) ? (_isFn(validate) ? validate(newdata) : true) :
+		// 			(error=checkValidate(data,newdata,validate),!_size(error))))
+		// 			return data=newdata,this.change=true,
+		// 				usestore && aS.set(this.name,newdata),
+		// 				this.emit("validate:success,change",args),
+		// 				newdata;
+
+		// 		this.emit("validate:fail",args.concat(error));
+		// 		if(_isAry(error)&&_size(error)===2)
+		// 			this.emit("validate:fail:"+_first(error),[_last(error)]);
+		// 		return data;
+		// 	},
+		// 	enumerable:true,
+		// 	configurable:false
+		// });
 
 		// if userobj has more events
 		_fol(events,uon,this);
 
+		if(existname){ RAM[this.name] = this;}
+
 		// init event
 		_extend(this,config)
-			.emit("init",[this.data])
+			.emit("init")
 			.unbind("init");
-
-		RAM[existname ? this.name : "_"] = this;
 	};
 
 	// Extend ax model method 
@@ -1272,32 +1328,54 @@
 	aM.prototype = {
 		constructor: aM,
 
-		get: function(key){
-			if(!_isBool(key) && ( key || key===0 ))
-				return _prop.apply(this,
-					[this.data].concat(_slice(arguments)));
-			return this.data;
+		get: function(key,by){
+			var data = _clone(this._ast(cool,_));
+			return  (key || key===0) ? _prop.call(this,data,key,by) : data;
 		},
 
 		set: function(key,val){
-			this.data = 1 in arguments ?
-				_set(this.data,key,val) : 
-				key === void 0 ? this.data : key;
-			return _isStr(key) ? this.emit(
-				"change:" + key, [val]) : this;
+			var assert = this._ast(cool,_);
+
+			if(1 in arguments){
+				if(!_eq(_prop(assert,key),val) &&
+					singleValidate(key,val,this)){
+					_set(assert,key,val);
+					this.change = true;
+					if(this._store) aS.set(this.name,assert);
+					this.emit("change",[_clone(assert)]);
+					this.emit("change:"+key,[val]);
+				}
+			}else{
+				if(!_isPrim(key)&&
+					!_eq(assert,key)&&
+					checkValidate(key,this)){
+					this._c(key,_);
+					this.change = true;
+					if(this._store) aS.set(this.name,key);
+					this.emit("change",[_clone(key)]);
+				}
+			}
+
+			return this;
 		},
 
 		rm: function(prop){
-			var tmp = this.data;
-			return (this.data = prop ? (_isAry(tmp) ? 
-				(tmp.splice(+prop,1),tmp) : 
-				_rmProp(tmp,prop)) : null) !== null && 
+			var assert = this._ast(cool,_);
+
+			if(_isPrim(prop) && 
+				 prop!=null && 
+				 _prop(assert,prop) !== void 0){
+				_rmProp(assert,prop);
+				if(this._store) aS.set(this.name,assert);
+				this.emit("change",[_clone(assert)]);
 				this.emit("remove:"+prop);
+			}
+
+			return this;
 		},
 
 		moc: function(key,val){
-			return this.set(key, 
-				moc(_prop(this.data,key),val));
+			return this.set(key,moc(this.get(key),val));
 		},
 
 		// API event
@@ -1308,9 +1386,7 @@
 		// Ax Restful API design for
 		// [Ax Model] data format serialize
 		toJSON: function(){
-			return _isPrim(this.data) ? 
-				this.data : 
-				JSON.stringify(this.data);
+			return JSON.stringify(this.get());
 		},
 
 		// Fetch mean Restful "GET"
@@ -1324,7 +1400,7 @@
 			return pipe.apply(this,[
 				"send",
 				url || this.url,
-				this.data,
+				this.get(),
 				_noop,
 				_noop,
 				header
@@ -1359,7 +1435,7 @@
 		  return pipe.apply(this,[
 		  	"sync",
 		  	url || this.url,
-		  	this.data,
+		  	this.get(),
 		  	_noop,
 		  	_noop,
 		  	header
@@ -1655,16 +1731,15 @@
 		}
 	};
 
-	var __ = [];
-
 	function aTite(cmd,args){
 		return function(model){
-			model[cmd].apply(model,args||[]); };
+			return model[cmd].apply(model,args); 
+		};
 	}
 
 	function assert(LIST){
-		return function(tdo,_){ 
-			return (_isFn(tdo)&&_===__) ? tdo(LIST) : []; };
+		return function(tdo,v){ 
+			return (_isFn(tdo)&&v===_) ? tdo(LIST) : []; };
 	}
 	
 	function assertModel(model){
@@ -1672,7 +1747,7 @@
 	}
 
 	function assertMake(list,callback){
-		var LIST = this._assert(cool,__);
+		var LIST = this._assert(cool,_);
 		var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
 		return _fal(target,function(name){ 
 			callback.call(this,LIST,name);
@@ -1731,7 +1806,7 @@
 	aT.prototype = {
 		constructor: aT,
 
-		all: function(){ return this._assert(_slice,__); },
+		all: function(){ return this._assert(_slice,_); },
 		// API event
 		on: on,
 		emit: emit,
@@ -1768,8 +1843,12 @@
 			return this.all().map(function(m){ return m.get(); });
 		},
 
-		toJSON: function(){
-			return JSON.stringify(this.toData());
+		toChunk: function(){
+			var res = {};
+			this.of(function(model){
+				res[model.name] = model.get();
+			});
+			return res;
 		}
 	};
 

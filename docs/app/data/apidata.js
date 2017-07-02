@@ -1257,6 +1257,255 @@ var r = route();"
 			]
 		},
 
+		//#atom.use
+		"atom:use" : {
+			title:"Atom.use",
+			introduce:"<code>atom.use</code>, use the defined model of exist name",
+			usages:[
+				"atom.use(models)",
+			],
+			params:[
+				{ name:"models", type:"String,Array" }
+			],
+			info:"model defined <code>name</code> must exist in RAM, the you can use it with atom collect",
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({\n\
+		// must defined name\n\
+		name: \"m1\",\n\
+		data: { a:1, b:2 , c:3 }\n\
+});\n\
+\n\
+var model2 = ax.model({\n\
+	name: \"m2\",\n\
+	data: { d:1,e:2,f:3 }\n\
+});\n\
+\n\
+var at = ax.atom();\n\
+at.use([\"m1\",\"m2\"]);\n\
+\n\
+console.log(at.all());\n\
+"
+				}
+			]
+		},
+
+		//#atom.all
+		"atom:all" : {
+			title:"Atom.all",
+			introduce:"<code>atom.all</code>,return all the useage models list",
+			usages:[
+				"atom.all()",
+			],
+			info:"immutable list means delete or add will not make sense",
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({\n\
+		name: \"model1\",\n\
+		data: { a:1, b:2 , c:3 }\n\
+});\n\
+\n\
+var model2 = ax.model({\n\
+	name: \"model2\",\n\
+	data: { d:1,e:2,f:3 }\n\
+});\n\
+\n\
+var at = ax.atom({\n\
+	use: [\"model1\",\"model2\"]\n\
+});\n\
+\n\
+console.log(at.all());\n\
+"
+				}
+			]
+		},
+
+		//#atom.p
+		"atom:p" : {
+			title:"Atom.p",
+			introduce:"<code>atom.p</code>,return singe pointer model",
+			usages:[
+				"atom.p(model)",
+			],
+			params:[
+				{ name:"model", type:"String" }
+			],
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({\n\
+		name: \"model1\",\n\
+		data: { a:1, b:2 , c:3 }\n\
+});\n\
+\n\
+var at = ax.atom({\n\
+	use: [\"model1\"]\n\
+});\n\
+\n\
+console.log(at.p(\"model1\"));\n\
+"
+				}
+			]
+		},
+
+		//#atom.of
+		"atom:of" : {
+			title:"Atom.of",
+			introduce:"call each models assert",
+			usages:[
+				"atom.of(fn,args)",
+			],
+			params:[
+				{ name:"fn", type:"Function,String" },
+				{ name:"args", type:"Array" }
+			],
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({\n\
+		name: \"model1\",\n\
+});\n\
+\n\
+var model2 = ax.model({\n\
+		name: \"model2\",\n\
+});\n\
+var model3 = ax.model({\n\
+		name: \"model3\",\n\
+});\n\
+var model4 = ax.model({\n\
+		name: \"model4\",\n\
+});\n\
+\n\
+var at = ax.atom({\n\
+	use: [\"model1\",\"model2\",\"model3\",\"model4\"]\n\
+});\n\
+\n\
+// arguments list typeof array\n\
+at.of(\"set\",[{same:\"data\"}]);\n\
+\n\
+console.log(at.all());\n\
+console.log(at.toData());\n\
+"
+				},
+				{
+					title: "Loop Every",
+					code:"var model1 = ax.model({\n\
+		name: \"model1\",\n\
+});\n\
+\n\
+var model2 = ax.model({\n\
+		name: \"model2\",\n\
+});\n\
+var model3 = ax.model({\n\
+		name: \"model3\",\n\
+});\n\
+var model4 = ax.model({\n\
+		name: \"model4\",\n\
+});\n\
+\n\
+var at = ax.atom({\n\
+	use: [\"model1\",\"model2\",\"model3\",\"model4\"]\n\
+});\n\
+\n\
+at.of(function(model){ console.dir(model) });\n\
+"
+				}
+			]
+		},
+
+		//#atom.select
+		"atom:select" : {
+			title:"Atom.select",
+			introduce:"models selector and return new list",
+			usages:[
+				"atom.select(match)",
+			],
+			params:[
+				{ name:"match", type:"Array,RegExp" },
+			],
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({\n\
+		name: \"model1\",\n\
+});\n\
+\n\
+var model2 = ax.model({\n\
+		name: \"model2\",\n\
+});\n\
+var model3 = ax.model({\n\
+		name: \"model3\",\n\
+});\n\
+var model4 = ax.model({\n\
+		name: \"model4\",\n\
+});\n\
+\n\
+var at = ax.atom({\n\
+	use: [\"model1\",\"model2\",\"model3\",\"model4\"]\n\
+});\n\
+\n\
+// select what u want to use\n\
+var select = at.select([\"model1\",\"model2\"]);\n\
+\n\
+console.log(select.all());\n\
+"
+				},
+				{
+					title: "Use Back to return prev Selector",
+					code:"var model1 = ax.model({\n\
+		name: \"model1\",\n\
+});\n\
+\n\
+var model2 = ax.model({\n\
+		name: \"model2\",\n\
+});\n\
+var model3 = ax.model({\n\
+		name: \"model3\",\n\
+});\n\
+var model4 = ax.model({\n\
+		name: \"model4\",\n\
+});\n\
+\n\
+var at = ax.atom({\n\
+	use: [\"model1\",\"model2\",\"model3\",\"model4\"]\n\
+});\n\
+\n\
+var select = at.select([\"model1\"]);\n\
+console.log(select.all());\n\
+console.log(select.back().all());\n\
+"
+				},
+				{
+					title: "Match name use RegExp",
+					code:"var model1 = ax.model({\n\
+		name: \"ms1\",\n\
+});\n\
+var model2 = ax.model({\n\
+		name: \"ms2\",\n\
+});\n\
+var model3 = ax.model({\n\
+		name: \"ms3\",\n\
+});\n\
+var model4 = ax.model({\n\
+		name: \"as1\",\n\
+});\n\
+var model5 = ax.model({\n\
+		name: \"as2\",\n\
+});\n\
+\n\
+var at = ax.atom({\n\
+	use: [\"ms1\",\"ms2\",\"ms3\",\"as1\",\"as2\"]\n\
+});\n\
+\n\
+var select = at.select(/^as\\d+/);\n\
+console.log(select.all());\n\
+"
+				}
+			]
+		},
+
 		//#struct.define
 		"struct:define" : {
 			title:"define",

@@ -18,12 +18,16 @@ var model = ax.model();
 
 var view = ax.view({
 	template:"<div>\
-	<input id='id' type='checkbox' name='{name}' :check='console.log(this.checked)' checked='{{#check}}'>"+
+	<input id='id' type='checkbox' name='{name}' :check='{log}' checked='{{#check}}'>"+
 	"<h2>{{#check}}</h2></div>",
+
 	model : model,
 
 	props:{
-		name: "wode"
+		name: "wode",
+		log:function(){
+			console.log(this.checked);
+		}
 	},
 
 	events:{

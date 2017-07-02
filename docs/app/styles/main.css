@@ -455,7 +455,7 @@ a i{
 	border: 65px solid;
   border-left-width: 40px;
   border-right-width: 40px;
-  border-bottom-color: #eee;
+  border-bottom-color: #e8e8e8;
   top: -10px;
   z-index: 2;
 }
@@ -512,7 +512,9 @@ a i{
 	left: 1000px;
 	width:240px;
 	max-width:240px;
-	border: 1px solid #ccc;
+  border: 1px solid #d8d8d8;
+  border-top: 1px solid #dcdcdc;
+  border-bottom: 1px solid #cecece;
 	border-radius: 3px;
 	box-shadow: 0 6px 18px -1px rgba(0, 0, 0, 0.1);
 }
