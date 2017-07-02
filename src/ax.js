@@ -80,7 +80,7 @@
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
 		_emit     = struct.event('emit'),
-		_prop     = struct.prop('get'),
+		_get     = struct.prop('get'),
 		_set      = struct.prop('set'),
 		_rmProp   = struct.prop('not'),
 		_param    = struct.param(),
@@ -1016,16 +1016,14 @@
 	var vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
 
 	function checkValidate(newdata,model){
-		var validate = model._asv(_),
-		error = [], valid=true, s=_size(validate);
+		if(!model._v) return true;
+		var validate = model._asv(_), 
+				error = [], valid=true, key = _keys(validate);
 
-		if(!s) return valid;
-
-		var key = _keys(validate);
 		for(var i=0,isRequired,value; i<s; i++){
 			// get validate funtion
 			isRequired = validate[key[i]];
-			value= _prop(newdata,key[i]);
+			value= _get(newdata,key[i]);
 			if(!isRequired(value)){
 				error.push(key[i],value); break;
 			}
@@ -1034,15 +1032,12 @@
 		valid = !_size(error);
 		model.emit("validate:"+(valid?"success":"fail"),
 								valid?[_clone(newdata)]:error);
-			
 		return valid;
 	}
 
 
 	function singleValidate(key,val,model){
-		var data = model.get();
-		_set(data,key,val);
-		return checkValidate(data,model);
+		return !model._v || checkValidate(_set(model.get(),key,val),model);
 	}
 
 	function on(type,fn){
@@ -1083,11 +1078,7 @@
 	}
 
 	function warn(value,msg){
-		console.warn(vahandler({
-			value : value,
-			type : _type(value),
-			msg : msg||""
-		}));
+		console.warn(vahandler({ value : value, type : _type(value), msg : msg||""}));
 		return false;
 	}
 
@@ -1219,6 +1210,18 @@
 
 	var _ = [];
 
+	var modelDefined = function(model,props){
+		_fol(props,function(t,n){
+			_define(this,n,{
+				value: t,
+				writable: false,
+				enumerable: false,
+				configurable: false
+			});
+		},model);
+		return model;
+	};
+
 	// Ax Model
 	// Ax build -> 3.0
 	// model constructor
@@ -1226,94 +1229,35 @@
 		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
 				events = config.events,
 				validate = config.validate||{},
-				
 				filter = _isFn(config.filter) ? config.filter : cool ,
-				existname = _isStr(config.name || 0),
+
+				existname = _isStr(config.name),
 				usestore = !!(config.store && existname),
 				usedata = config.data || {},
 				data = usestore ? (aS.get(config.name) || usedata) : usedata;
 
+		_fol(events,uon,modelDefined(this,{
+			name: existname ? config.name : "_",
+			_ast: function(todo,v){
+				return v===_? todo(data) : {}; },
+			_asv: function(v){
+				return v===_? validate : {}; },
+			_v: !!_size(validate),
+			_f: filter,
+			_c:function(newdata,v){
+				return v===_? (data = newdata) : {};},
+			_s: usestore
+		}));
+
+		if(existname){ RAM[this.name] = this;}
+
+		delete config.name;
 		delete config.data;
 		delete config.store;
 		delete config.change;
 		delete config.events;
 		delete config.validate;
-
-		if(existname){
-			_define(this,"name",{
-				value: config.name,
-				writable: false,
-				enumerable: false,
-				configurable: false
-			});
-
-			delete config.name;
-		}
-
-		_define(this,{
-			_ast:{
-				value: function(todo,v){
-					return v===_? todo(data) : {};
-				},
-				writable: false,
-				enumerable: false,
-				configurable: false
-			},
-			_asv:{
-				value: function(v){
-					return v===_? validate : {};
-				},
-				writable: false,
-				enumerable: false,
-				configurable: false
-			},
-			_c:{
-				value: function(newdata,v){
-					return v===_? (data = newdata) : {};
-				},
-				writable: false,
-				enumerable: false,
-				configurable: false
-			},
-			_store:{
-				value: usestore,
-				writable: false,
-				enumerable: false,
-				configurable: false
-			}
-		});
-
-		// // define data
-		// _define(this,"data",{
-		// 	get : function(){
-		// 		return _clone(data);
-		// 	},
-		// 	set : function(newdata){
-		// 		if(_eq(data,newdata = filter(newdata))) 
-		// 			return data;
-
-		// 		var args = [_clone(newdata)], error;
-		// 		if((this.emit("validate",args),
-		// 			_isPrim(newdata) ? (_isFn(validate) ? validate(newdata) : true) :
-		// 			(error=checkValidate(data,newdata,validate),!_size(error))))
-		// 			return data=newdata,this.change=true,
-		// 				usestore && aS.set(this.name,newdata),
-		// 				this.emit("validate:success,change",args),
-		// 				newdata;
-
-		// 		this.emit("validate:fail",args.concat(error));
-		// 		if(_isAry(error)&&_size(error)===2)
-		// 			this.emit("validate:fail:"+_first(error),[_last(error)]);
-		// 		return data;
-		// 	},
-		// 	enumerable:true,
-		// 	configurable:false
-		// });
-
-		// if userobj has more events
-		_fol(events,uon,this);
-
-		if(existname){ RAM[this.name] = this;}
+		delete config.filter;
 
 		// init event
 		_extend(this,config)
@@ -1329,30 +1273,33 @@
 		constructor: aM,
 
 		get: function(key,by){
-			var data = _clone(this._ast(cool,_));
-			return  (key || key===0) ? _prop.call(this,data,key,by) : data;
+			var data = this._ast(_clone,_);
+			return  (key || key===0) ? _get.call(this,data,key,by) : data;
 		},
 
 		set: function(key,val){
-			var assert = this._ast(cool,_);
+			var assert = this._ast(cool,_), ref;
 
 			if(1 in arguments){
-				if(!_eq(_prop(assert,key),val) &&
+				if(!_eq(_get(assert,key),val) &&
 					singleValidate(key,val,this)){
+
 					_set(assert,key,val);
 					this.change = true;
-					if(this._store) aS.set(this.name,assert);
+					if(this._s) aS.set(this.name,assert);
 					this.emit("change",[_clone(assert)]);
 					this.emit("change:"+key,[val]);
 				}
 			}else{
-				if(!_isPrim(key)&&
-					!_eq(assert,key)&&
-					checkValidate(key,this)){
-					this._c(key,_);
+				if(!_isPrim(key)&& 
+					(ref=this._f(key))&&
+					!_eq(assert,ref)&&
+					checkValidate(ref,this)){
+
+					this._c(ref,_);
 					this.change = true;
-					if(this._store) aS.set(this.name,key);
-					this.emit("change",[_clone(key)]);
+					if(this._s) aS.set(this.name,ref);
+					this.emit("change",[_clone(ref)]);
 				}
 			}
 
@@ -1364,9 +1311,9 @@
 
 			if(_isPrim(prop) && 
 				 prop!=null && 
-				 _prop(assert,prop) !== void 0){
+				 _get(assert,prop) !== void 0){
 				_rmProp(assert,prop);
-				if(this._store) aS.set(this.name,assert);
+				if(this._s) aS.set(this.name,assert);
 				this.emit("change",[_clone(assert)]);
 				this.emit("remove:"+prop);
 			}
