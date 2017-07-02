@@ -80,7 +80,7 @@
 		_on       = struct.event('on'),
 		_unbind   = struct.event('unbind'),
 		_emit     = struct.event('emit'),
-		_get     = struct.prop('get'),
+		_get      = struct.prop('get'),
 		_set      = struct.prop('set'),
 		_rmProp   = struct.prop('not'),
 		_param    = struct.param(),
@@ -88,11 +88,7 @@
 		_has      = struct.has(),
 		_ajax     = struct.ajax(),
 		_size     = struct.size(),
-		_first    = struct.first(),
-		_last     = struct.last(),
 		_link     = struct.link(),
-		_utob     = struct.assembly("u2b"),
-		_btou     = struct.assembly("b2u"),
 		_doom     = struct.doom(),
 		_merge    = struct.merge(),
 		_index    = struct.index(),
@@ -239,32 +235,32 @@
 	}
 
 	function capCursor(elm){
-	  var pos = 0;
-  	if (elm.selectionStart != null)
-    	pos = elm.selectionStart;
-  	// IE Support
-  	else if (document.selection) {
-    	elm.focus();
+		var pos = 0;
+		if (elm.selectionStart != null)
+			pos = elm.selectionStart;
+		// IE Support
+		else if (document.selection) {
+			elm.focus();
 
-    	var sel = document.selection.createRange();
-    	sel.moveStart('character', -elm.value.length);
-    	// The caret position is selection length
-    	pos = sel.text.length;
-  	}
-  	return pos;
+			var sel = document.selection.createRange();
+			sel.moveStart('character', -elm.value.length);
+			// The caret position is selection length
+			pos = sel.text.length;
+		}
+		return pos;
 	}
 
 	function setCursor(elm,pos){
-    if(elm.createTextRange) {
-      var range = elm.createTextRange();
-      range.move('character', pos);
-      range.select();
-    } else {
-      if(elm.selectionStart)
-        elm.setSelectionRange(pos, pos, elm.focus());
-      else
-        elm.focus();
-    }
+		if(elm.createTextRange) {
+			var range = elm.createTextRange();
+			range.move('character', pos);
+			range.select();
+		} else {
+			if(elm.selectionStart)
+				elm.setSelectionRange(pos, pos, elm.focus());
+			else
+				elm.focus();
+		}
 	}
 
 	function realEvent(type) {
@@ -489,11 +485,13 @@
 		style       : "style.cssText",
 		placeholder : "@placeholder",
 		maxlength   : "@maxlength",
+		max         : "@max",
+		min         : "@min",
 		href        : "@href",
 		checked     : "*checked",
 		disabled    : "*disabled",
 		readonly    : "*readonly",
-		required    : "*required",
+		required    : "*required"
 	};
 
 	var patchList = [
@@ -535,9 +533,6 @@
 		wbr:1
 	};
 
-	// /(\S+)=["'](.*?)["']|([\w\-]+)/gi
-	// /(\S+)\s*?=\s*([\'"])(.*?|)\2/gi
-	// (\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gi
 	var attrexec = /(\S+)=["'](.*?)["']|([\w\-]+)/gi,
 			attreval = /^\{|\}$/gi,
 			attrprops = /^\{([^'"\s]+)\}$/i,
@@ -546,7 +541,7 @@
 
 	var attrSetter = function(elm,attr,val){
 		var attrName = attrList[attr] || attr;
-		val = _isStr(val) ?  _decode(val) : val;
+				val = _isStr(val) ?  _decode(val) : val;
 		if(defaultAttr.test(attrName)){
 			// is defaultAttr
 			attrName = attrName.slice(7).toLowerCase();
@@ -558,9 +553,9 @@
 			_set(elm,attrName.slice(1),(val==="true"||val===true)); 
 		else if(attrName[0] === "@")
 			elm.setAttribute(attrName.slice(1),val);
-		else if(attrName[0] === ":"){
+		else if(attrName[0] === ":")
 			z(elm).on(attrName.slice(1),val);
-		}else 
+		else 
 			_set(elm,attrName,val); 
 	};
 
@@ -771,7 +766,7 @@
 
 			var p = root , c = root.child, n;
 
-			html.replace(slikReg,function(match,close,stag,tag,text,offset){
+			html.replace(slikReg,function(match,close,stag,tag,text){
 				if(!match || !(match.replace(excapetab,"")))
 					return match;
 
@@ -1068,15 +1063,6 @@
 		return res;
 	}
 
-	function parseKey(key){
-		return "Ax@"+_utob(key);
-	}
-
-	function parseResult(data){
-		data = toString(data) ? _btou(data) : "";
-		return _size(data) > 1 ? JSON.parse(data) : (data||"");
-	}
-
 	function warn(value,msg){
 		console.warn(vahandler({ value : value, type : _type(value), msg : msg||""}));
 		return false;
@@ -1136,46 +1122,45 @@
 		},
 
 		ecd: function(data) {
-    	var o1, o2, o3, h1, h2, h3, h4, bits, r, i = 0, enc = "";
-    	if (!data) { return data; }
-    	do {
-      	o1 = data[i++];
-      	o2 = data[i++];
-      	o3 = data[i++];
-      	bits = o1 << 16 | o2 << 8 | o3;
-      	h1 = bits >> 18 & 0x3f;
-      	h2 = bits >> 12 & 0x3f;
-      	h3 = bits >> 6 & 0x3f;
-      	h4 = bits & 0x3f;
-      	enc += this.t.charAt(h1) + this.t.charAt(h2) + this.t.charAt(h3) + this.t.charAt(h4);
-    	} while (i < data.length);
-    	r = data.length % 3;
-    	return (r ? enc.slice(0, r - 3) : enc) + "===".slice(r || 3);
-  	},
+			var o1, o2, o3, h1, h2, h3, h4, bits, r, i = 0, enc = "";
+			if (!data) { return data; }
+			do {
+				o1 = data[i++];
+				o2 = data[i++];
+				o3 = data[i++];
+				bits = o1 << 16 | o2 << 8 | o3;
+				h1 = bits >> 18 & 0x3f;
+				h2 = bits >> 12 & 0x3f;
+				h3 = bits >> 6 & 0x3f;
+				h4 = bits & 0x3f;
+				enc += this.t.charAt(h1) + this.t.charAt(h2) + this.t.charAt(h3) + this.t.charAt(h4);
+			} while (i < data.length);
+			r = data.length % 3;
+			return (r ? enc.slice(0, r - 3) : enc) + "===".slice(r || 3);
+		},
 
-  	dcd: function(data) {
-    	var o1, o2, o3, h1, h2, h3, h4, bits, i = 0, result = [];
-    	if (!data) { return data; }
-    	data += "";
-    	do {
-      	h1 = this.t.indexOf(data.charAt(i++));
-      	h2 = this.t.indexOf(data.charAt(i++));
-      	h3 = this.t.indexOf(data.charAt(i++));
-      	h4 = this.t.indexOf(data.charAt(i++));
-      	bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
-      	o1 = bits >> 16 & 0xff;
-      	o2 = bits >> 8 & 0xff;
-      	o3 = bits & 0xff;
-      	result.push(o1);
-      	if (h3 !== 64) {
-        	result.push(o2);
-        	if (h4 !== 64) {
-          	result.push(o3);
-        	}
-      	}
-    	} while (i < data.length);
-    	return result;
-  	},
+		dcd: function(data) {
+			var o1, o2, o3, h1, h2, h3, h4, bits, i = 0, result = [];
+			if (!data) { return data; }
+			data += "";
+			do {
+				h1 = this.t.indexOf(data.charAt(i++));
+				h2 = this.t.indexOf(data.charAt(i++));
+				h3 = this.t.indexOf(data.charAt(i++));
+				h4 = this.t.indexOf(data.charAt(i++));
+				bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+				o1 = bits >> 16 & 0xff;
+				o2 = bits >> 8 & 0xff;
+				o3 = bits & 0xff;
+				result.push(o1);
+				if (h3 !== 64) {
+					result.push(o2);
+					if (h4 !== 64)
+						result.push(o3);
+				}
+			} while (i < data.length);
+			return result;
+		},
 
 		incry: function(s,key){
 			var res = [];
@@ -1208,16 +1193,12 @@
 		}
 	};
 
+	// defined verify key
 	var _ = [];
 
 	var modelDefined = function(model,props){
 		_fol(props,function(t,n){
-			_define(this,n,{
-				value: t,
-				writable: false,
-				enumerable: false,
-				configurable: false
-			});
+			_define(this,n,{ value: t, writable: false, enumerable: false, configurable: false });
 		},model);
 		return model;
 	};
@@ -1265,8 +1246,7 @@
 			.unbind("init");
 	};
 
-	// Extend ax model method 
-	// Model Prototype extend
+
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
 	aM.prototype = {
@@ -1466,8 +1446,7 @@
 		// building the render function
 		if(!_isFn(render)){
 			stencil = _isStr(stencil) ? 
-				_doom(stencil, props) : 
-				(_isFn(stencil) ? stencil : _noop);
+				_doom(stencil, props) : (_isFn(stencil) ? stencil : _noop);
 
 			render = function(){ 
 				return stencil !== _noop && 
@@ -1761,8 +1740,7 @@
 
 		use: function(list){
 			return assertMake.call(this,list,function(LIST,name,M){
-				M = RAM[name];
-				if(name && M && vA.model(M) && !_has(LIST,M))
+				if(name && (M = RAM[name]) && vA.model(M) && !_has(LIST,M))
 					LIST.push(M);
 			});
 		},

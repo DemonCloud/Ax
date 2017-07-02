@@ -1,5 +1,5 @@
 
-# Ax - [ VERSION 3.2.2 ]
+# Ax - [ VERSION 3.2.5+ ]
 
 <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
 
@@ -11,7 +11,7 @@ It require `Struct` utils lib, for the sake of better organization application s
 
 * **model** - immutable, fast, persistence, safety
 * **view** - simple, fast, container, virtualDOM
-* **route** - simple, parameterized, onlyhash
+* **route** - simple, parameterized, hashonly
 * **atom** - connector, fast, independent
 
 

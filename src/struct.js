@@ -44,9 +44,10 @@
 }, function(struct){
 'use strict';
 
-// Strict mode
+// Strict model
+// Link to Ax.VERSION
 // define const
-struct.VERSION = "3.2.2";
+struct.VERSION = "3.2.5";
 
 // base method
 var or = {},
