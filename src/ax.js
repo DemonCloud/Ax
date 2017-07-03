@@ -593,7 +593,7 @@
 	};
 
 	var patchHack = [
-		function(){},  //0
+		_noop,  //0
  		//1 replace
 		function(patch,t){
 			t = patch.s;
@@ -709,32 +709,25 @@
 		},
 
 		mapTreeNode: function(ODOM,path){
-			var finder = path.split("."),
-					pointer = ODOM.children,
-					target;
-
-			for(var i=0,l=finder.length; i<l; i++){
-				if(pointer[finder[i]]){
-					target = pointer[finder[i]];
-					pointer = target.children;
+			var target;
+			for(var i=0,l=path.length,p=ODOM.children; i<l; i++){
+				if(p[path[i]]){
+					target = p[path[i]]; p = target.children;
 				}else{ break; }
 			}
-			
 			return target;
 		},
 
 		createSelector:function(org){
-			var path = ""+org.i;
+			var path = [org.i];
 			while((org=org.parent))
 				if(org.i !== void 0)
-					path = org.i + "." + path;
+					 path.unshift(org.i);
 			return path;
 		},
 
 		createPatch: function(org,tag,type){
-			var node;
-			var patch, sl = slik.createSelector(org);
-
+			var node, patch, sl = slik.createSelector(org);
 			switch(patchList[type]){
 				case "replace":
 					node = slik.createDOMElememnt(tag);
@@ -767,6 +760,7 @@
 					patch = { t:9, s:sl ,a:org.attributes };
 					break;
 				default:
+					patch = { t:0 };
 					break;
 			}
 			return patch;
@@ -1828,5 +1822,5 @@
 		route     : makeChecker(isAx(aR),"route")
 	};
 
-	return _lock(aM,aV,aR,aT,aS,vA,v8(ax));
+	return _lock(aM,aV,aR,aT,aS,vA,v8(slik),v8(ax));
 });
