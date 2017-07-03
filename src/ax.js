@@ -653,6 +653,7 @@
 		}
 	];
 
+	// SLIK SINGE virtualDOM DIFF
 	var slik = {
 
 		treeDiff: function(org,tag,patch,orgParent,tagParent){
@@ -700,24 +701,39 @@
 
 		applyPatch:function(oDOM,patchs,callback){
 			_fal(_map(patchs,function(patch){
-				patch.s = oDOM.querySelector(patch.s);
+				patch.s = slik.mapTreeNode(oDOM,patch.s);
 				return patch;
 			}),function(patch){
 				patchHack[patch.t].call(oDOM,patch);});
 			return callback ? callback(oDOM) : oDOM;
 		},
 
+		mapTreeNode: function(ODOM,path){
+			var finder = path.split("."),
+					pointer = ODOM.children,
+					target;
+
+			for(var i=0,l=finder.length; i<l; i++){
+				if(pointer[finder[i]]){
+					target = pointer[finder[i]];
+					pointer = target.children;
+				}else{ break; }
+			}
+			
+			return target;
+		},
+
 		createSelector:function(org){
-			var selector = org.tagName + ":nth-child("+org.i+")";
+			var path = ""+org.i;
 			while((org=org.parent))
 				if(org.i !== void 0)
-					selector = org.tagName + ":nth-child("+org.i+")"+">"+ selector;
-			return selector;
+					path = org.i + "." + path;
+			return path;
 		},
 
 		createPatch: function(org,tag,type){
 			var node;
-			var patch,sl = slik.createSelector(org);
+			var patch, sl = slik.createSelector(org);
 
 			switch(patchList[type]){
 				case "replace":
@@ -725,12 +741,10 @@
 					patch = { t:1,s:sl,n:node };
 					break;
 				case "append":
-					sl = slik.createSelector(org);
 					node = slik.createDOMElememnt(tag);
 					patch = { t:2,s:sl,n:node };
 					break;
 				case "remove":
-					sl = slik.createSelector(org);
 					patch = { t:3,s:sl };
 					break;
 				case "modifytext":
@@ -774,10 +788,10 @@
 					p = p.parent; c = p.child;
 				}else if(stag){
 					n = slik.createObjElement(stag,vprops);
-					n.i= c.length+1; c.push(n); n.parent = p;
+					n.i= c.length; c.push(n); n.parent = p;
 				}else if(tag){
 					n = slik.createObjElement(tag, vprops);
-					n.i= c.length+1; c.push(n); n.parent = p;
+					n.i= c.length; c.push(n); n.parent = p;
 					if(!(n.tagName in tagList)){
 						p = n; c = n.child;
 					}
@@ -1728,7 +1742,7 @@
 		c.back = function(){ return atom; };
 		return c;
 	};
-		
+
 	aT.prototype = {
 		constructor: aT,
 
