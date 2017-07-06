@@ -1895,6 +1895,13 @@ chain.prototype.value = function(){
 						 .apply(null,this['-']===void 0 ? arguments : this['-']);
 };
 
+function fill(len,value) {
+	var res = [];
+	for(var i=0; i<len; i++)
+		res[i] = value;
+	return res;
+}
+
 // atob && btoa
 // base IE9 not support this method;
 // ASCII to Base64 encoding and decoding
@@ -2335,6 +2342,7 @@ var nublist = {
 	lock      : frozen,
 	cool      : cool,
 	hz        : hz,
+	fill      : fill,
 	v8        : v8
 };
 

@@ -313,8 +313,10 @@
 				var result = callback.apply(element, 
 					e._args === void 0 ? [e] : [e].concat(e._args));
 
-				if(result === false)
-					e.preventDefault(),e.stopPropagation();
+				if(result === false){
+					e.preventDefault();
+					e.stopPropagation();
+				}
 
 				if(pos)
 					setCursor(e.target,pos);
@@ -522,6 +524,7 @@
 		area:1,
 		base:1,
 		col:1,
+		isindex:1,
 		command:1,
 		embed:1,
 		keygen:1,
@@ -530,7 +533,16 @@
 		param:1,
 		source:1,
 		track:1,
-		wbr:1
+		wbr:1,
+		path:1,
+		circle:1,
+		ellipse:1,
+		line:1,
+		rect:1,
+		use:1,
+		stop:1,
+		polyline:1,
+		polygon:1
 	};
 
 	var attrexec = /(\S+)=["'](.*?)["']|([\w\-]+)/gi,
@@ -769,8 +781,7 @@
 		createTreeFromHTML: function(html,vprops){
 			var root = {
 				tagName:"root",
-				child:[]
-			};
+				child:[] };
 
 			var p = root , c = root.child, n;
 
@@ -1015,8 +1026,8 @@
 		}
 	};
 	// checker template;
-	var checker = _doom("[ checker -> ax.va.{{#type}} ]");
-	var vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
+	var checker = _doom("[ checker -> ax.va.{{#type}} ]"),
+			vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
 
 	function checkValidate(newdata,model){
 		if(!model._v) return true;
@@ -1065,15 +1076,14 @@
 		if(_isAry(target))
 			res = target.concat(val);
 		else if(_isObj(target))
-			res = _merge(_clone(target),val);
+			res = _merge(_extend({},target),val);
 		else
 			res = val;
 		return res;
 	}
 
 	function warn(value,msg){
-		console.warn(vahandler({ value : value, type : _type(value), msg : msg||""}));
-		return false;
+		return !console.warn(vahandler({ value : value, type : _type(value), msg : msg||""}));
 	}
 
 	function makeChecker(checker,type){
@@ -1203,7 +1213,6 @@
 
 	// defined verify key
 	var _ = [];
-
 	var modelDefined = function(model,props){
 		_fol(props,function(t,n){
 			_define(this,n,{ value: t, writable: false, enumerable: false, configurable: false });
