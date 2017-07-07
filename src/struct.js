@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "3.2.5";
+struct.VERSION = "3.3.0";
 
 // base method
 var or = {},
@@ -1902,6 +1902,16 @@ function fill(len,value) {
 	return res;
 }
 
+function combined(nameArr,valueArr){
+	var res = {};
+
+	if(isArray(nameArr) && isArray(valueArr))
+		al(nameArr,function(name,index){ 
+			res[name] = valueArr[index]; });
+
+	return res;
+}
+
 // atob && btoa
 // base IE9 not support this method;
 // ASCII to Base64 encoding and decoding
@@ -2343,6 +2353,7 @@ var nublist = {
 	cool      : cool,
 	hz        : hz,
 	fill      : fill,
+	combined  : combined,
 	v8        : v8
 };
 
