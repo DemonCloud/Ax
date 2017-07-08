@@ -204,8 +204,8 @@ aws4@^1.2.1:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
 ax-struct-js@latest:
-  version "3.2.9"
-  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-3.2.9.tgz#948d3330b9ccb7945641c823ab02a1c1c3f19725"
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-3.3.0.tgz#b023adc1219841d9f2a616d04b16d669471dbbe3"
 
 babel-code-frame@^6.22.0:
   version "6.22.0"
@@ -3704,8 +3704,8 @@ ua-parser-js@0.7.12:
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.12.tgz#04c81a99bdd5dc52263ea29d24c6bf8d4818a4bb"
 
 uglify-js@3.0.x, uglify-js@^3.0.5:
-  version "3.0.23"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.0.23.tgz#a58c6b97e6d6763d94dbc265fe8e8c1725e64666"
+  version "3.0.24"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.0.24.tgz#ee93400ad9857fb7a1671778db83f6a23f033121"
   dependencies:
     commander "~2.9.0"
     source-map "~0.5.1"

@@ -1034,7 +1034,7 @@
 		var validate = model._asv(_), 
 				error = [], valid=true, key = _keys(validate);
 
-		for(var i=0,isRequired,value; i<s; i++){
+		for(var i=0,s=key.length,isRequired,value; i<s; i++){
 			// get validate funtion
 			isRequired = validate[key[i]];
 			value= _get(newdata,key[i]);

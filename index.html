@@ -18,7 +18,7 @@ var model = ax.model();
 
 var view = ax.view({
 	template:"<div>\
-	<input id='id' type='checkbox' name='{name}' :check='{log}' checked='{{#check}}'>"+
+	<input id='id' type='checkbox' name='{name}' wo='你好吗' :check='{log}' checked='{{#check}}'>"+
 	"<h2>{{#check}}</h2></div>",
 
 	model : model,
@@ -41,6 +41,31 @@ view.mount(
 	document.getElementById("tree"),
 	{ check: true }
 );
+
+
+var valid = ax.model({
+	validate:{
+		name: ax.va.string,
+		grade: ax.va.number,
+		category_type: ax.va.number,
+		category_status: ax.va.number,
+		sequence: ax.va.number,
+		category_desc: ax.va.string,
+	}
+});
+
+var datas = {
+category_desc:"asdsad",
+category_status:1,
+category_type:1,
+grade:2,
+name:"asdasd",
+pId:11,
+sequence:1
+}
+
+valid.set(datas);
+console.log(valid.get());
 </script>
 </body>
 </html>
