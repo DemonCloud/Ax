@@ -1,5 +1,5 @@
 
-# Ax - [ VERSION 3.2.5+ ]
+# Ax - [ VERSION 3.3.2+ ]
 
 <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
 

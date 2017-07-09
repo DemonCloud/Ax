@@ -73,6 +73,7 @@
 		_isDOM    = struct.type('dom'),
 		_isElm    = struct.type('elm'),
 		_isNode   = struct.type('node'),
+		_isNeed   = struct.type('required'),
 		_loop     = struct.op(),
 		_fol      = struct.op('object'),
 		_fal      = struct.op('array'),
@@ -82,7 +83,7 @@
 		_emit     = struct.event('emit'),
 		_get      = struct.prop('get'),
 		_set      = struct.prop('set'),
-		_rmProp   = struct.prop('not'),
+		_rm       = struct.prop('not'),
 		_param    = struct.param(),
 		_paramStr = struct.param("string"),
 		_has      = struct.has(),
@@ -589,8 +590,7 @@
 		}
 
 		if(key[0]===":")
-			res = _isFn(fn) ? fn : 
-			Function("event", _toString(val));
+			res = _isFn(fn) ? fn : Function("event", _toString(val));
 
 		return res;
 	};
@@ -1309,7 +1309,7 @@
 			if(_isPrim(prop) && 
 				 prop!=null && 
 				 _get(assert,prop) !== void 0){
-				_rmProp(assert,prop);
+				_rm(assert,prop);
 				if(this._s) aS.set(this.name,assert);
 				this.emit("change",[_clone(assert)]);
 				this.emit("remove:"+prop);
@@ -1812,6 +1812,7 @@
 
 	// ax validate functional
 	ax.va = vA = {
+		required  : makeChecker(_isNeed,"required"),
 		fn        : makeChecker(_isFn,"function"),
 		int       : makeChecker(_isInt,"int"),
 		array     : makeChecker(_isAry,"array"),

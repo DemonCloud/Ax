@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "3.3.0";
+struct.VERSION = "3.3.2";
 
 // base method
 var or = {},
@@ -69,8 +69,15 @@ var root = struct();
 
 // Sub struct return pointer
 // Zub struct with custom method in function
-function nub(fn,name){ struct[name] = function(){ return fn; };}
-function zub(fn,name){ struct[name] = function(){ return fn.apply(this,arguments); };}
+function nub(fn,name){ 
+	struct[name] = function(){ return fn; };
+}
+
+function zub(fn,name){ 
+	struct[name] = function(use){ 
+		return fn[trim(toString(use).toLowerCase())] || fn.default; 
+	};
+}
 
 // extend Object-assign or pub struct method
 // @use has
@@ -187,6 +194,10 @@ var isArray = Array.isArray;
 var rident = /^[a-z$_]+[a-z$_0-9]*$/i;
 function isIdentifier(e){
 	return e!=null ? rident.test(e) : false;
+}
+
+function isRequired(e){
+	return 0 in arguments && e !== void 0;
 }
 
 // Error [ type ]
@@ -1977,332 +1988,227 @@ function btou(input){
 	return decodeURIComponent(escape(atob(toString(input).replace(/\s/g,''))));
 }
 
-// Type export
-function $type(c){
-	switch((c||"").toLowerCase()){
-		case "object":
-			return isObj;
-		case "array":
-			return isArray;
-		case "arraylike":
-			return isArrayLike;
-		case "str":
-		case "string":
-			return isStr;
-		case "bool":
-		case "boolean":
-			return isBool;
-		case "num":
-		case "number":
-			return isNum;
-		case "error":
-			return isError;
-		case "function":
-		case "fn":
-			return isFn;
-		case "nan":
-			return isNaN;
-		case "prim":
-		case "primitive":
-			return isPrimitive;
-		case "idt":
-		case "identifier":
-			return isIdentifier;
-		case "define":
-			return isDefine;
-		case "int":
-			return isInt;
-		case "float":
-		case "double":
-			return isFloat;
-		case "date":
-			return isDate;
-		case "empty":
-			return isEmpty;
-		case "dom":
-			return isDOM;
-		case "elm":
-		case "element":
-			return isElement;
-		case "node":
-		case "text":
-			return isNode;
-		case "native":
-			return isNative;
-		default:
-			return typec;
-	}
+var $type = {
+	obj: isObj,
+	object: isObj,
+	arr: isArray,
+	array: isArray,
+	arraylike: isArrayLike,
+	str: isStr,
+	string: isStr,
+	bool: isBool,
+	boolean: isBool,
+	num: isNum,
+	number: isNum,
+	fn: isFn,
+	function:isFn,
+	nan: isNaN,
+	prim: isPrimitive,
+	primitive: isPrimitive,
+	idt: isIdentifier,
+	identifier: isIdentifier,
+	def: isDefine,
+	define: isDefine,
+	int: isInt,
+	float: isFloat,
+	double: isFloat,
+	date: isDate,
+	ept: isEmpty,
+	empty: isEmpty,
+	dom: isDOM,
+	elm: isElement,
+	element: isElement,
+	node: isNode,
+	text: isNode,
+	native: isNative,
+	require: isRequired,
+	required: isRequired,
+	type: typec,
+	default: typec
+};
+
+var $convert = {
+	str: toString,
+	string: toString,
+	num: toNumber,
+	number: toNumber,
+	arr: toArray,
+	array: toArray,
+	hex: toHEX,
+	rgb: toRGB,
+	minus: toMinus,
+	default: toString
+};
+
+var $op = {
+	arr: al,
+	array: al,
+	obj: ol,
+	object: ol,
+	each: fov,
+	default: fov
+};
+
+var $has = {
+	key: hasKey,
+	index: hasKey,
+	exist: has,
+	default: has
+};
+
+var $index = {
+	first: firstindex,
+	last: lastindex,
+	single: one,
+	one: one,
+	index: index,
+	default: index
+};
+
+var $map = {
+	key: mapKey,
+	hook: hook,
+	map: mapValue,
+	default: mapValue
+};
+
+var $unique = {
+	fast: fastUnique,
+	slim: slimUnique,
+	default: slimUnique
+};
+
+var $pair = {
+	un: unpairs,
+	unpair: unpairs,
+	pair: pairs,
+	default: pairs
+};
+
+var $pull = {
+	at: pullAt,
+	with: pullWith,
+	all: pullAll,
+	default: pullAll
+};
+
+var $drop = {
+	left: dropLeft,
+	right: dropRight,
+	lefto: dropTo,
+	leftto: dropTo,
+	righto: dropTo.bind(true),
+	rightto: dropTo.bind(true),
+	default: dropLeft
+};
+
+var $random = {
+	int: randomInt,
+	float: randomFloat,
+	double: randomFloat,
+	str: randomString,
+	word: randomString,
+	string: randomString,
+	bool: randomBool,
+	boolean: randomBool,
+	char: randomCharacter,
+	letter: randomCharacter,
+	character: randomCharacter,
+	date: randomDate,
+	hex: randomHex,
+	dice: randomDice,
+	default: Math.random
+};
+
+var $param = {
+	parse: paramParse,
+	str: paramStringify,
+	stringify: paramStringify,
+	serialize: paramStringify,
+	query: requery,
+	requery: requery,
+	default: paramParse
+};
+
+var $html = {
+	encode: encodeHTML,
+	decode: decodeHTML,
+	strip: stripHTML,
+	zip: zipHTML,
+	default: wrap(stripHTML,zipHTML)
+};
+
+var $string = {
+	trim : trim,
+	trimleft: trimLeft,
+	trimright: trimRight,
+	came: camelize,
+	camelize: camelize,
+	capit: capitalize,
+	capitalize: capitalize,
+	collapse: collapse,
+	rize: rize,
+	rizewith: rize,
+	default: toString
+};
+
+var $ajax = {
+	get: ajaxGET,
+	fetch: ajaxGET,
+	put: ajaxPOST,
+	post: ajaxPOST,
+	jsonp: JSONP,
+	cors: JSONP,
+	ajax: aix,
+	default: aix
+};
+
+var $event = {
+	on: addEvent,
+	add: addEvent,
+	bind: addEvent,
+	
+	off: removeEvent,
+	remove: removeEvent,
+	unbind: removeEvent,
+
+	has: hasEvent,
+	exist: hasEvent,
+
+	copy: copyEvent,
+	extend: copyEvent,
+
+	emit: emit,
+	trigger: emit,
+	dispatch: emit,
+
+	default: emit
+};
+
+var $prop = {
+	get: getProp,
+	set: setProp,
+	rm: rmProp,
+	not: rmProp,
+	remove: rmProp,
+	default: getProp
 }
 
-function $convert(c){
-	switch((c||"").toLowerCase()){
-		case "str":
-		case "string":
-			return toString;
-		case "num":
-		case "number":
-			return toNumber;
-		case "arr":
-		case "array":
-			return toArray;
-		case "hex":
-			return toHEX;
-		case "rgb":
-			return toRGB;
-		case "minus":
-			return toMinus;
-		default:
-			return toString;
-	}
-}
+var $assembly = {
+	a2b: atob,
+	atob: atob,
+	btoa: btoa,
+	b2a: btoa,
+	utob: utob,
+	u2b: utob,
+	btou: btou,
+	b2u: btou,
+	default: atob
+};
 
-// Loop function
-function $op(c){
-	switch((c||"").toLowerCase()){
-		case "array":
-			return al;
-		case "object":
-			return ol;
-		default :
-			return fov;
-	}
-}
-
-function $has(c){
-	return c==="key" ? hasKey : has;
-}
-
-function $index(c){
-	switch ((c||"").toLowerCase()) {
-		case 'first':
-			return firstindex;
-		case 'last':
-			return lastindex;
-		case 'single':
-		case 'one':
-			return one;
-		default:
-			return index;
-	}
-}
-
-function $map(c){
-	switch ((c||"").toLowerCase()) {
-		case 'key':
-			return mapKey;
-		case 'hook':
-			return hook;
-		default:
-			return mapValue;
-	}
-}
-
-function $unique(c){
-	return c==="fast" ? fastUnique : slimUnique;
-}
-
-function $pair(c){
-	switch(c){
-		case 'un':
-		case 're':
-			return unpairs;
-		default:
-			return pairs;
-	}
-}
-
-function $pull(c){
-	switch((c||"").toLowerCase()){
-		case "at":
-			return pullAt;
-		case "with":
-			return pullWith;
-		default:
-			return pullAll;
-	}
-}
-
-function $drop(c){
-	switch((c||"").toLowerCase()){
-		case "left":
-			return dropLeft;
-		case "right":
-			return dropRight;
-		case "lefto":
-		case "leftto":
-			return dropTo;
-		case "righto":
-		case "rightto":
-			return dropTo.bind(true);
-		default:
-			return dropLeft;
-	}
-}
-
-// TODO 
-// @ add error contruction
-// function $error(){
-// }
-
-function $random(c){
-	switch((c||"").toLowerCase()){
-		case "int" :
-			return randomInt;
-		case "float":
-		case "double":
-			return randomFloat;
-		case "string":
-			return randomString;
-		case "bool":
-		case "boolean":
-			return randomBool;
-		case "char":
-		case "character":
-		case "letter":
-			return randomCharacter;
-		case "date":
-			return randomDate;
-		case "hex":
-			return randomHex;
-		case "dice":
-			return randomDice;
-		default:
-			return Math.random;
-	}
-}
-
-function $param(c){
-	switch((c||"").toLowerCase()){
-		case "parse":
-			return paramParse;
-		case "string":
-		case "stringify":
-		case "serialize":
-			return paramStringify;
-		case "query":
-		case "requery":
-			return requery;
-		default:
-			return paramParse;
-	}
-}
-
-function $html(c){
-	switch((c||"").toLowerCase()){
-		case "encode":
-			return encodeHTML;
-		case "decode":
-			return decodeHTML;
-		case "strip":
-			return stripHTML;
-		case "zip":
-			return zipHTML;
-		default:
-			return wrap(stripHTML,zipHTML);
-	}
-}
-
-function $string(c){
-	switch((c||'').toLowerCase()){
-		case "trim":
-			return trim;
-		case "trimleft":
-			return trimLeft;
-		case "trimright":
-			return trimRight;
-		case "came":
-		case "camelize":
-			return camelize;
-		case "capit":
-		case "capitalize":
-			return capitalize;
-		case "collapse":
-			return collapse;
-		case "rize":
-		case "rizewith":
-			return rize;
-		default:
-			return toString;
-	}
-}
-
-function $ajax(c){
-	switch((c||"").toLowerCase()){
-		case "get":
-			return ajaxGET;
-		case "post":
-			return ajaxPOST;
-		case "jsonp":
-			return JSONP;
-		default:
-			return aix;
-	}
-}
-
-function $event(c){
-	switch((c||"").toLowerCase()){
-		case "add":
-		case "on":
-		case "bind":
-			return addEvent;
-		case "remove":
-		case "unbind":
-			return removeEvent;
-		case "has":
-		case "exist":
-			return hasEvent;
-		case "copy":
-		case "extend":
-			return copyEvent;
-		case "dispatch":
-		case "trigger":
-		case "emit":
-			return emit;
-		default:
-			return emit;
-	}
-}
-
-function $prop(c){
-	switch((c||"").toLowerCase()){
-		case "get":
-			return getProp;
-		case "set":
-			return setProp;
-		case "not":
-		case "remove":
-			return rmProp;
-		default:
-			return getProp;
-	}
-}
-
-function $assembly(c){
-	switch((c||"").toLowerCase()){
-		case "atob":
-		case "a2b":
-			return atob;
-		case "btoa":
-		case "b2a":
-			return btoa;
-		case "utob":
-		case "u2b":
-			return utob;
-		case "btou":
-		case "b2u":
-			return btou;
-		default:
-			return atob;
-	}
-}
-
-// bound DOOM settings
-function $doom(config){
-	return DOOM.bind((isDefine(config,"Object"))?
-		depextend(doomSetting,config):
-		doomSetting
-	);
-}
+var $doom = {
+	default: DOOM.bind(doomSetting)
+};
 
 // signet API
 var nublist = {
@@ -2379,7 +2285,8 @@ var zublist = {
 	string   : $string,
 	// error    : $error,
 	assembly : $assembly,
-	doom     : $doom
+	doom     : $doom,
+	vst      : $doom
 };
 
 // Generators
@@ -2387,13 +2294,14 @@ var zublist = {
 ol(nublist,function(fn,key){
 	chain.prototype[key] = function(){ 
 		return this['='].push(fn),this; };
-	nub.apply(null,arguments);
+	nub(fn,key);
 }); 
 
 ol(zublist,function(fn,key){
-	chain.prototype[key] = function(){
-		return this['='].push(fn.apply(null,arguments)),this; };
-	zub.apply(null,arguments);
+	chain.prototype[key] = function(use){
+		return this['='].push(
+			fn[trim(toString(use).toLowerCase())]),this; };
+	zub(frozen(fn),key);
 });
 
 struct.root = root;
