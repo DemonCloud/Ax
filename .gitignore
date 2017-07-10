@@ -9,6 +9,7 @@
 _aix.html
 _dom.html
 
+.eslintrc.json
 .idea
 .idea/
 .idea/*
