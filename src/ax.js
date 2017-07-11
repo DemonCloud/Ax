@@ -1720,7 +1720,7 @@
 
 	// Ax atom * stom
 	// Useful models manager
-	aT = function(obj,isStom){
+	aT = function(obj){
 		var config = _extend(_clone(ATOM_DEFAULT),obj||{}),
 				initList = config.use,
 				events = config.events,
@@ -1732,16 +1732,10 @@
 		// create assert
 		this._assert = assert(LIST);
 		_extend(this.use(initList),config);
-
-		if(!isStom){
-			_fol(events,uon,this);
-			this.emit("init")
-				.unbind("init");
-		}
 	};
 
 	var stom = function(atom,list){
-		var c = ax.atom({ use:list },true);
+		var c = ax.atom({ use:list });
 		c.back = function(){ return atom; };
 		return c;
 	};
@@ -1750,10 +1744,6 @@
 		constructor: aT,
 
 		all: function(){ return this._assert(_slice,_); },
-		// API event
-		on: on,
-		emit: emit,
-		unbind: unbind,
 
 		use: function(list){
 			return assertMake.call(this,list,function(LIST,name,M){
@@ -1764,7 +1754,8 @@
 
 		out: function(list){
 			return assertMake.call(this,list,function(LIST,name){
-				LIST.splice(_index(LIST,assertModel.bind(name)),1);
+				var find = _index(LIST,assertModel.bind(name));
+				if(_isNum(find)) LIST.splice(find,1);
 			});
 		},
 
@@ -1782,7 +1773,9 @@
 		},
 
 		toData: function(){
-			return this.all().map(function(m){ return m.get(); });
+			return _map(
+				this._assert(cool,_),
+				function(m){ return m.get(); });
 		},
 
 		toChunk: function(){

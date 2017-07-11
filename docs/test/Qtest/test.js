@@ -312,14 +312,8 @@ console.time("struct pref");
 
 	Q.test(" - [ doom[template] ]",function(a){
 		var doom = struct.doom();
-		var boom = struct.doom({
-			escape      : "<<-([\\s\\S]+?)>>",
-			interpolate : "<<#([\\s\\S]+?)>>",
-			evaluate    : "<<([\\s\\S]+?)>>"
-		});
 
 		var str = "{{-one}}{{#two}}{{#three}}";
-		var str2 = "<<-one>><<#two>><<#three>>";
 		var data ={
 			one:1,
 			two:2,
@@ -327,7 +321,6 @@ console.time("struct pref");
 		};
 		
 		a.equal(doom(str)(data),"123","base render");
-		a.equal(boom(str2)(data),"123","base render with escape");
 	});
 
 	Q.test(" - [ has(key) ]",function(a){

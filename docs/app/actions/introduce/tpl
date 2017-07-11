@@ -22,7 +22,7 @@
 			<span><b>Download pack</b> with <code>struct</code>&nbsp;&nbsp;</span>
 			<a href="./axs.min.js" title="Download it" alt="Download it" rel="download" download='axs.min.js'>
 				<i class="ion-android-checkmark-circle" style="vertical-align:-1px"></i>
-				axs{{#struct.VERSION}}.min.js (GZIP 15K)
+				axs-{{#struct.VERSION}}.min.js (GZIP 15K)
 			</a>
 		</p>
 		<br>
@@ -164,16 +164,17 @@ var view = ax.view({
 	events:{
 		"submit:#form":function(event){
 			event.preventDefault();
+
 			var name = document.getElementById("name"),
 					getName = name.value.trim();
 
 			if(getName){
 				name.value="";
-				model3.moc("list",{ name : getName });
+				model.moc("list",{ name : getName });
 			}
 		},
 		"click:.del":function(event){
-			model3.rm("list."+this.key);
+			model.rm("list."+this.key);
 		}
 	}
 });

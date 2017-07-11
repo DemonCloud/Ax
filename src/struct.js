@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "3.3.2";
+struct.VERSION = "3.3.3";
 
 // base method
 var or = {},
@@ -855,8 +855,8 @@ function intersection(){
 // merge({ a:1 },{ a:2,b:{c:1} },{ b:{d:4} }) => { a:1,b:{c:1,d:4} }
 function mergeCompare(v,n){
 	return (!isPrimitive(v) && !isPrimitive(n)) && 
-		( (isDefine(v,"Object") && isDefine(n,"Object")) || 
-			(isArrayLike(v) && isArrayLike(n)) );
+				 ((isDefine(v,"Object") && isDefine(n,"Object")) || 
+				 (isArrayLike(v) && isArrayLike(n)));
 }
 
 function merge(f){

@@ -944,6 +944,30 @@ v.mount(\n\
 	document.getElementById(\"base\"),\n\
 	{ length: 6 }\n\
 )"
+				},
+				{ 
+					title: "Embed props in DOM",
+					preview:"base2",
+					code:"var v = ax.view({\n\
+	template:\"&lt;button id='target' cs='\{cs\}'&gt;\"+\n\
+					 \"TARGET\"+\n\
+					 \"&lt;/button&gt;\",\n\
+	props:{\n\
+		cs :{ a:1, b:2 }\n\
+	},\n\
+\n\
+	events:{\n\
+		\"click:#target\":function(e){\n\
+			// see the embed props in DOMElement\n\
+			console.log(this.cs);\n\
+		}\n\
+	}\n\
+});\n\
+\n\
+v.mount(\n\
+	document.getElementById(\"base2\"),\n\
+	{ }\n\
+)"
 				}
 			]
 		},
@@ -1501,6 +1525,85 @@ var at = ax.atom({\n\
 \n\
 var select = at.select(/^as\\d+/);\n\
 console.log(select.all());\n\
+"
+				}
+			]
+		},
+
+		//#atom.out
+		"atom:out" : {
+			title:"Atom.out",
+			introduce:"out of the models from atom collection",
+			usages:[
+				"atom.out(match)",
+			],
+			params:[
+				{ name:"match", type:"String,Array,RegExp" },
+			],
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({ name:'a' });\n\
+var model2 = ax.model({ name: 'b' });\n\
+var model3 = ax.model({ name: 'c' });\n\
+var model4 = ax.model({ name: 'd' });\n\
+\n\
+var at = ax.atom({ use:['a','b','c','d'] });\n\
+\n\
+//not has 'e' model\n\
+at.out('e')\n\
+console.log(at.all());\n\
+at.out('a');\n\
+console.log(at.all());\n\
+at.out(['b','c']);\n\
+console.log(at.all());\n\
+"
+				}
+			]
+		},
+
+		//#atom.toData
+		"atom:toData" : {
+			title:"Atom.toData",
+			introduce:"convert Atom to JSON list of datas",
+			usages:[
+				"atom.toData()",
+			],
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({ name:'a', data:{ a:1 } });\n\
+var model2 = ax.model({ name: 'b', data:{ b:2 } });\n\
+var model3 = ax.model({ name: 'c', data:{ c:3 } });\n\
+var model4 = ax.model({ name: 'd', data:{ d:4 } });\n\
+\n\
+var at = ax.atom({ use:['a','b','c','d'] });\n\
+\n\
+console.log(at.toData())\n\
+console.log(at.all())\n\
+"
+				}
+			]
+		},
+
+		//#atom.toChunk
+		"atom:toChunk" : {
+			title:"Atom.toChunk",
+			introduce:"convert Atom to Chunk Mapping of datas",
+			usages:[
+				"atom.toChunk()",
+			],
+			examples:[
+				{ 
+					title: "Basic Usage",
+					code:"var model1 = ax.model({ name:'a', data:{ a:1 } });\n\
+var model2 = ax.model({ name: 'b', data:{ b:2 } });\n\
+var model3 = ax.model({ name: 'c', data:{ c:3 } });\n\
+var model4 = ax.model({ name: 'd', data:{ d:4 } });\n\
+\n\
+var at = ax.atom({ use:['a','b','c','d'] });\n\
+\n\
+console.log(at.toChunk())\n\
 "
 				}
 			]
