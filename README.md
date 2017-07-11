@@ -18,15 +18,12 @@ It require `Struct` utils lib, for the sake of better organization application s
 
 use **npm** or **yarn** install `ax` and `struct`
 
-```
+```shell
 npm install ax-js
 npm install ax-struct-js
 ```
 
-Directly download
-
-[ Link ](/DemonCloud/Ax/archive/master.zip);
-
+Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
 ## Document
 
