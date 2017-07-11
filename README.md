@@ -14,6 +14,19 @@ It require `Struct` utils lib, for the sake of better organization application s
 * **route** - simple, parameterized, hashonly
 * **atom** - connector, fast, independent
 
+## Install
+
+use **npm** or **yarn** install `ax` and `struct`
+
+```
+npm install ax-js
+npm install ax-struct-js
+```
+
+Directly download
+
+[ Link ](/DemonCloud/Ax/archive/master.zip);
+
 
 ## Document
 
