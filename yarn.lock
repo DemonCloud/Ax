@@ -213,8 +213,8 @@ aws4@^1.2.1:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
 ax-struct-js@latest:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-3.3.2.tgz#64eb1cfab6bb132f94977cefb7d0fcaf6ee5a039"
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-3.3.3.tgz#be786dbec904017b675ea517939ff133945fa094"
 
 babel-code-frame@^6.22.0:
   version "6.22.0"
@@ -1906,10 +1906,10 @@ is-path-inside@^1.0.0:
     path-is-inside "^1.0.1"
 
 is-plain-object@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.3.tgz#c15bf3e4b66b62d72efaf2925848663ecbc619b6"
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
   dependencies:
-    isobject "^3.0.0"
+    isobject "^3.0.1"
 
 is-posix-bracket@^0.1.0:
   version "0.1.1"
@@ -1975,7 +1975,7 @@ isobject@^2.0.0, isobject@^2.1.0:
   dependencies:
     isarray "1.0.0"
 
-isobject@^3.0.0:
+isobject@^3.0.0, isobject@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
 

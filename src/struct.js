@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "3.3.3";
+struct.VERSION = "3.3.31";
 
 // base method
 var or = {},
@@ -1798,12 +1798,14 @@ function now(){
 
 // object values [ method ]
 // @export values
-function values(obj){
-	var res=[];
+function values(obj,prop){
+	var res=[], withProp = isStr(prop);
 	if(isDefine(obj,"String"))
 		return obj.split('');
 	else
-		fov(obj,function(val){ res.push(val); });
+		fov(obj,function(val){ 
+			res.push(withProp ? getProp(val,prop) : val); 
+		});
 	return res;
 }
 

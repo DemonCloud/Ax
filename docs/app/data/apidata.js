@@ -2682,11 +2682,13 @@ console.log(eq(\n\
 			usages:[
 				"values -> struct.values()",
 				"values(obj)",
+				"values(obj,prop)",
 			],
 			params:[
 				{ name:"obj", type:"Object" },
+				{ name:"prop", type:"String,None" },
 			],
-			info:"<p>also use it for String, but not make sense</p>",
+			info:"<p>also use it for String Type, but not make sense</p>",
 			examples:[
 				{ 
 					title: "Basic usage",
@@ -2697,6 +2699,11 @@ console.log(values({ a:1, b:2, d:\"3\"}));"
 					title: "Complex data",
 					code:"var values = struct.values();\n\
 console.log((values(\"MyName\")));"
+				},
+				{ 
+					title: "Get values with key",
+					code:"var values = struct.values();\n\
+console.log(values({ a:{val:2}, b:{val:3}, c:{val:4}, d:{val:5} },\"val\"));"
 				},
 			]
 		},
