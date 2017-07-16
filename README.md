@@ -1,6 +1,8 @@
 
 # Ax - [ VERSION 3.3.3+ ]
 
+![Ax Logo](http://7j1zwt.com1.z0.glb.clouddn.com/logo.png)
+
 <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
 
 ### Ax is a fast MVR JavaScript Framework. 
