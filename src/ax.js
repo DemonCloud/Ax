@@ -28,7 +28,7 @@
 	ax.VERSION = struct.VERSION;
 
 	// Define DOM frame
-	var z,Z,aM,aV,aR,aT,aS,vA,
+	var z,Z,aM,aV,aR,aT,aS,vA, _ = [],
 	// Define Setting
 		VIEW_DEFAULT  = { },
 		ATOM_DEFAULT  = { use:[] },
@@ -50,6 +50,7 @@
 	// *use struct utils list
 		root      = struct.root,
 		v8        = struct.v8(),
+		_ayc      = struct.ayc(),
 		_lock     = struct.lock(),
 		_keys     = struct.keys(),
 		_noop     = struct.noop(),
@@ -164,13 +165,13 @@
 	// get childNodes and filter by selector
 	// cant use Global matcher
 	//var isId    = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
-	//	isClass = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
-	//	isTag   = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
-	//	isAttr  = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
-	//	mreSl   = /^[^\s]+,[^\s]+/gi,
-	//	cidSl   = /[\s|\r]+/im,
-	//	pitSl   = /[>|\+|\~]+/im,
-	//	isHTML  = /<[a-zA-Z][\s\S]*>/;
+	//	isClass   = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
+	//	isTag     = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
+	//	isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
+	//	mreSl     = /^[^\s]+,[^\s]+/gi,
+	//	cidSl     = /[\s|\r]+/im,
+	//	pitSl     = /[>|\+|\~]+/im,
+	//	isHTML    = /<[a-zA-Z][\s\S]*>/;
 
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
@@ -469,45 +470,51 @@
 		return compatible(event);
 	};
 
-	// var supportTemplate = "content" in document.createElement("template");
-
-	// function createDOM(rootElm,html){
-	// 	var r = rootElm.cloneNode(),t;
-	// 	if(supportTemplate)
-	// 		r.appendChild((t=document.createElement("template"),
-	// 			t.innerHTML=html,
-	// 			t.content));
-	// 	else
-	// 		r.innerHTML = html;
-	// 	return r;
-	// }
-
 	// attr list mapping
 	var attrList = {
 		class       : "className",
 		style       : "style.cssText",
 		placeholder : "@placeholder",
 		maxlength   : "@maxlength",
+		minLength   : "@minLength",
 		max         : "@max",
 		min         : "@min",
 		href        : "@href",
 		checked     : "*checked",
 		disabled    : "*disabled",
 		readonly    : "*readonly",
-		required    : "*required"
+		required    : "*required",
+		selected    : "*selected",
+		controls    : "*controls",
+		ended       : "*ended",
+		muted       : "*muted",
+		hidden      : "*hidden",
+		seeking     : "*seeking",
+		paused      : "*paused",
+		loop        : "*loop",
+		autoplay    : "*autoplay",
+		multiple    : "*multiple",
+		autofocus   : "*autofocus",
+		autocomplete : "*autocomplete",
+		draggable : "*draggable",
+		spellcheck : "*spellcheck",
+		translate : "*translate",
+		specified: "*specified",
+		defer : "*defer",
+		async : "*async"
 	};
 
 	var patchList = [
-		"no",  //0
-		"replace", //1
-		"append", //2
-		"remove", //3
-		"modifytext", //4
-		"withtext", //5
-		"removetext", //6
-		"addattr", //7
-		"modifyattr", //8
-		"removeattr" //9
+		"no",         // 0
+		"replace",    // 1
+		"append",     // 2
+		"remove",     // 3
+		"modifytext", // 4
+		"withtext",   // 5
+		"removetext", // 6
+		"addattr",    // 7
+		"modifyattr", // 8
+		"removeattr"  // 9
 	];
 
 	var slikReg = new RegExp(
@@ -700,13 +707,12 @@
 				}
 				
 				// with child diff
-				if(org.child.length || tag.child.length){
+				if(org.child.length || tag.child.length)
 					for(var i=Math.max(org.child.length,tag.child.length); i--;)
 						slik.treeDiff(org.child[i],tag.child[i],patch,org,tag);
-				}
-			}else if(org.tagName !== tag.tagName){
+
+			}else if(org.tagName !== tag.tagName)
 				patch.push( slik.createPatch(org,tag,1));
-			}
 
 			return patch;
 		},
@@ -723,9 +729,8 @@
 		mapTreeNode: function(ODOM,path){
 			var target;
 			for(var i=0,l=path.length,p=ODOM.children; i<l; i++){
-				if(p[path[i]]){
-					target = p[path[i]]; p = target.children;
-				}else{ break; }
+				if(p[path[i]]){ target = p[path[i]]; p = target.children; }
+				else{ break; }
 			}
 			return target;
 		},
@@ -788,7 +793,6 @@
 			html.replace(slikReg,function(match,close,stag,tag,text){
 				if(!match || !(match.replace(excapetab,"")))
 					return match;
-
 				if(close){
 					p = p.parent; c = p.child;
 				}else if(stag){
@@ -1008,9 +1012,16 @@
 	
 		html : function(html){
 			return this.each(function(elm){
-				elm.innerHTML = html;
+				elm.innerHTML = _toString(html);
 			});
 		},
+
+		remove: function(){
+			return this.each(function(elm){
+				elm.parentNode.removeChild(z(elm).off().get(0));
+			});
+		},
+
 		// virtual render
 		render : function(newhtml,view,props){
 			return this.each(function(elm){
@@ -1025,6 +1036,7 @@
 			});
 		}
 	};
+
 	// checker template;
 	var checker = _doom("[ checker -> ax.va.{{#type}} ]"),
 			vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
@@ -1036,16 +1048,16 @@
 
 		for(var i=0,s=key.length,isRequired,value; i<s; i++){
 			// get validate funtion
-			isRequired = validate[key[i]];
-			value= _get(newdata,key[i]);
+			isRequired = validate[key[i]]; value= _get(newdata,key[i]);
 			if(!isRequired(value)){
 				error.push(key[i],value); break;
 			}
 		}
 
 		valid = !_size(error);
-		model.emit("validate:"+(valid?"success":"fail"),
-								valid?[_clone(newdata)]:error);
+		model.emit("validate:"+(valid ? "success" : "fail"),
+								valid ? [_clone(newdata)] : error);
+
 		return valid;
 	}
 
@@ -1115,10 +1127,12 @@
 			(fns||_noop).apply(this,arguments);
 			this.emit(type+":success",arguments);
 		}.bind(this);
+
 		st.fail = function(){
 			(fnf||_noop).apply(this,arguments);
 			this.emit(type+":fail",arguments);
 		}.bind(this);
+
 		// trigger ajax events
 		return this.emit(type,[_ajax(st),st]);
 	}
@@ -1211,8 +1225,6 @@
 		}
 	};
 
-	// defined verify key
-	var _ = [];
 	var modelDefined = function(model,props){
 		_fol(props,function(t,n){
 			_define(this,n,{ value: t, writable: false, enumerable: false, configurable: false });
@@ -1278,7 +1290,8 @@
 			var assert = this._ast(cool,_), ref;
 
 			if(1 in arguments){
-				if(!_eq(_get(assert,key),val) &&
+				if(_isPrim(key) &&
+					!_eq(_get(assert,key),val) &&
 					singleValidate(key,val,this)){
 
 					_set(assert,key,val);
@@ -1458,24 +1471,26 @@
 		delete config.events;
 		delete config.render;
 		delete config.template;
+		delete config.destroy;
 
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
-			stencil = _isStr(stencil) ? 
-				_doom(stencil, props) : (_isFn(stencil) ? stencil : _noop);
+			stencil = _isStr(stencil) ? _doom(stencil.trim(), props) : 
+			(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){ 
 				return stencil !== _noop && 
-					z(vroot).render(stencil.apply(this,
-					_slice(arguments)),view,props);
-			};
+					z(this.root).render(stencil.apply(this,
+					_slice(arguments)),this,props);
+			}.bind(this);
 		}
 
 		// if userobj has more events
 		if(vroot&&checkElm(vroot)){
 			// bind events
 			this.root = vroot;
+
 			_fol(events,uon,setRender(this,render));
 
 			if(config.model)
@@ -1488,6 +1503,7 @@
 				if(checkElm(el)){
 					// bind events
 					this.root = vroot = el; 
+
 					_fol(events,uon,setRender(this,render));
 
 					if(config.model)
@@ -1507,6 +1523,7 @@
 
 		// first trigger "init" event
 		this._vid = vid++;
+
 		_extend(this,config)
 			.emit("init")
 			.unbind("init");
@@ -1553,8 +1570,16 @@
 			return _emit(this,type,args);
 		},
 
+		destroy: function(withRoot){
+			this.root.removeAttribute("ax-root",this.root._vid=void 0);
+			_ayc(function(){ 
+				z(this.root).off()[withRoot?"remove":"html"](); 
+				this.emit("destroy",delete this.root);
+			}.bind(this));
+		},
+
 		toString: function(){
-			return this.root;
+			return this.root ? this.root.outerHTML : "";
 		}
 	};
 

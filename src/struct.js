@@ -1990,6 +1990,14 @@ function btou(input){
 	return decodeURIComponent(escape(atob(toString(input).replace(/\s/g,''))));
 }
 
+function ayc(fn,time){
+	return setTimeout(fn,toNumber(time));
+}
+
+function cyc(st){
+	clearTimeout(st);
+}
+
 var $type = {
 	obj: isObj,
 	object: isObj,
@@ -2262,6 +2270,8 @@ var nublist = {
 	hz        : hz,
 	fill      : fill,
 	combined  : combined,
+	ayc       : ayc,
+	cyc       : cyc,
 	v8        : v8
 };
 
