@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "3.3.31";
+struct.VERSION = "3.3.33";
 
 // base method
 var or = {},
@@ -476,6 +476,38 @@ function regCheck(reg,n){
 	return reg.test(n);
 }
 
+// List reduce [ method ]
+// use reduce ( default left )
+// use reduceRight
+// @export *reduce
+function reduce(list,fn,initValue,context){
+	var result;
+
+	if(isObj(list) && isArrayLike(list)){
+		var key = keys(list), hasInit = 2 in arguments;
+		result = hasInit ? initValue : list[key[0]];
+
+		for(var i= hasInit ? 0 : 1 ,l=key.length; i<l; i++)
+			result = fn.call(context,result,list[key[i]],i,list);
+	}
+
+	return result;
+}
+
+function reduceRight(list,fn,initValue,context){
+	var result;
+
+	if(isObj(list) && isArrayLike(list)){
+		var key = keys(list), hasInit = 2 in arguments;
+		result = hasInit ? initValue : list[last(key)];
+
+		for(var i= key.length - (hasInit ? 0 : 1); i--;)
+			result = fn.call(context,result,list[key[i]],i,list);
+	}
+
+	return result;
+}
+
 // List has [ method ]
 // Identifier if has value in array
 // @use has
@@ -837,7 +869,7 @@ function diff(){
 // intersection([1,2],[2,3],[2,3,4]) => [2]
 function intersection(){
 	var res = [], pact = slice(arguments);
-	pact.reduce(function(cot,arr){
+	reduce(pact,function(cot,arr){
 		var r = [];
 		if(size(cot) && size(arr))
 			al(cot,function(value){
@@ -863,11 +895,11 @@ function merge(f){
 	var res, collect = slice(arguments);
 	if(isArray(f)){
 		// deeping reduce to merge
-		collect.reduce(function(val,next){
+		reduce(collect,function(val,next){
 			return al(next,function(v,i){ if(v!=null) val[i] = v; }), (res=val);
 		},[]);
 	}else if(isObj(f)){
-		collect.reduce(function(val,next){
+		reduce(collect,function(val,next){
 			var vk = keys(val) , nk = keys(next);
 			return al(nk,function(key){ var v = val[key], n = next[key];
 				val[key] = mergeCompare(v,n) ? merge(v,n) : n; }), (res=val);
@@ -912,7 +944,7 @@ function flatten(){
 	var args = concat.apply([],arguments),
 			deep = isDefine(last(args),'Boolean') ? args.pop() : false;
 
-	return slice(args).reduce(function(flat,toFlat){
+	return reduce(slice(args),function(flat,toFlat){
 		return flat.concat(deep ? 
 			(isArray(toFlat) ? flatten(toFlat,deep) : toFlat) : toFlat); 
 	},[]);
@@ -1840,7 +1872,7 @@ function negate(fn,context){
 function wrap(){ 
 	var arg = slice(arguments); 
 	return function(x){ 
-		return arg.reduce(function(val,fn){ 
+		return reduce(arg,function(val,fn){ 
 			return fn(val);
 		},x);
 	}; 
@@ -2216,6 +2248,12 @@ var $assembly = {
 	default: atob
 };
 
+var $reduce = {
+	left: reduce,
+	right: reduceRight,
+	default: reduce
+}
+
 var $doom = {
 	default: DOOM.bind(doomSetting)
 };
@@ -2295,6 +2333,7 @@ var zublist = {
 	index    : $index,
 	random   : $random,
 	string   : $string,
+	reduce   : $reduce,
 	// error    : $error,
 	assembly : $assembly,
 	doom     : $doom,

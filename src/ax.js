@@ -29,6 +29,8 @@
 
 	// Define DOM frame
 	var z,Z,aM,aV,aR,aT,aS,vA, _ = [],
+				  aMP,aVP,aRP,aTP,
+
 	// Define Setting
 		VIEW_DEFAULT  = { },
 		ATOM_DEFAULT  = { use:[] },
@@ -1278,7 +1280,7 @@
 
 	// model data usually define as pure data, not javascript event or function
 	// because it much as MVC-M logs 
-	aM.prototype = {
+	aMP = aM.prototype = {
 		constructor: aM,
 
 		get: function(key,by){
@@ -1529,7 +1531,7 @@
 			.unbind("init");
 	};
 
-	aV.prototype = {
+	aVP = aV.prototype = {
 		constructor:aV,
 
 		on: function(type,fn){
@@ -1651,7 +1653,7 @@
 
 	// Ax-Route for SPA Architecture
 	// auto trigger regex event when route change
-	aR.prototype = {
+	aRP = aR.prototype = {
 		constructor: aR,
 
 		on: on,
@@ -1765,7 +1767,7 @@
 		return c;
 	};
 
-	aT.prototype = {
+	aTP = aT.prototype = {
 		constructor: aT,
 
 		all: function(){ return this._assert(_slice,_); },
@@ -1814,15 +1816,15 @@
 
 	// #genertor minmix [ struct ] api
 	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat","pull","drop","pairs",["hook","map","hook"],["mapKey","map","key"],["uniqueFast","unique","fast"],["pullAt","pull","at"],["dropLeft","drop","left"],["dropRight","drop","right"],["dropLeftTo","drop","leftto"],["dropRightTo","drop","rightto"],["unpairs","pairs","un"]],genertor_);
-	_fal(["keys","every","some","diff","intsec","first","last","auto","eq","values","size","each","has","type","index",["hasKey","has","key"],["findex","index","first"],["lindex","index","last"],["single","index","one"],["one","index","one"]],genertor_$);
+	_fal(["keys","every","some","diff","intsec","first","last","auto","eq","values","size","each","has","type","index",["hasKey","has","key"],["findex","index","first"],["lindex","index","last"],["single","index","one"],["one","index","one"],["reduce","reduce","left"],["reduceRight","reduce","right"]],genertor_$);
 
 	// Extend method
 	// Create Ax Pack extends
-	// Prepare for component
 	ax.route = createAx(aR);
 	ax.model = createAx(aM);
 	ax.view  = createAx(aV);
 	ax.atom  = createAx(aT);
+
 	ax.route.extend = createExtend(aR);
 	ax.model.extend = createExtend(aM);
 	ax.view.extend  = createExtend(aV);
@@ -1850,5 +1852,7 @@
 		route     : makeChecker(isAx(aR),"route")
 	};
 
-	return _lock(aM,aV,aR,aT,aS,vA,v8(slik),v8(ax));
+	return _lock(aM,aV,aR,aT,aS,
+		v8(aMP),v8(aVP),v8(aRP),v8(aTP),
+		v8(vA),v8(slik),v8(ax));
 });

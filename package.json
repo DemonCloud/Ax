@@ -1,6 +1,6 @@
 {
   "name": "ax-js",
-  "version": "3.3.32",
+  "version": "3.3.33",
   "description": "[ Ax ] is a Fast Javascript MVR Framework",
   "main": "dist/ax.min.js",
   "homepage": "https://demoncloud.github.io/Ax",
