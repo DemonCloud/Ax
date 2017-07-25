@@ -407,8 +407,8 @@ function slice(ary,n,e){
 
 function keys(e){
 	if(e !=null){
-		if(isArray(e))
-			return Object.keys(e).map(toNumber);
+		if(isArray(e) || isStr(e))
+			return mapValue(Object.keys(e),toNumber);
 		return Object.keys(e);
 	}
 	return [];
@@ -481,31 +481,27 @@ function regCheck(reg,n){
 // use reduceRight
 // @export *reduce
 function reduce(list,fn,initValue,context){
-	var result;
-
 	if(isObj(list) && isArrayLike(list)){
-		var key = keys(list), hasInit = 2 in arguments;
-		result = hasInit ? initValue : list[key[0]];
+		var result, key = keys(list), init = !(2 in arguments);
+		result = !init ? initValue : list[first(key)];
 
-		for(var i= hasInit ? 0 : 1 ,l=key.length; i<l; i++)
+		for(var i= +init ,l=key.length; i<l; i++)
 			result = fn.call(context,result,list[key[i]],i,list);
-	}
 
-	return result;
+		return result;
+	}
 }
 
 function reduceRight(list,fn,initValue,context){
-	var result;
-
 	if(isObj(list) && isArrayLike(list)){
-		var key = keys(list), hasInit = 2 in arguments;
-		result = hasInit ? initValue : list[last(key)];
+		var result, key = keys(list), init = !(2 in arguments);
+		result = !init ? initValue : list[last(key)];
 
-		for(var i= key.length - (hasInit ? 0 : 1); i--;)
+		for(var i= key.length - (+init); i--;)
 			result = fn.call(context,result,list[key[i]],i,list);
-	}
 
-	return result;
+		return result;
+	}
 }
 
 // List has [ method ]
@@ -517,9 +513,9 @@ function reduceRight(list,fn,initValue,context){
 // has([1,2,3],2) => true;
 function has(list,n,ueq){
 	var compare = isDefine(n,"RegExp") ? regCheck : (ueq ? eq : seq),
-			idf = false , key = isPrimitive(list) ? [] : keys(list);
+			idf = false , key = keys(list);
 	for(var i=key.length; i--;)
-		if((idf=compare(n,list[key[i]])))
+		if(idf=compare(n,list[key[i]])) 
 			break;
 	return idf;
 }
@@ -527,7 +523,7 @@ function has(list,n,ueq){
 // hasKey({a:1,b:2},'a') => true;
 // hasKey({a:1,b:2},'c') => false;
 function hasKey(list,key,ueq){
-	return has(isPrimitive(list) ? [] : keys(list), key , ueq);
+	return has(keys(list), key , ueq);
 }
 
 // Array not [ array method ]
@@ -541,8 +537,7 @@ function notdel(list,k,isarr){
 // not([1,2,3,2,3,4,5],3) => [1,2,2,4,5]
 function not(list,n,useq){
 	var check = isDefine(n,"RegExp") ? regCheck : (useq ? eq : seq),
-			isarr = isArray(list),
-			p = keys(list);
+			isarr = isArray(list), p = keys(list);
 	for(var i=0 ; i<p.length ; i++)
 		if(check(n,list[p[i]]))
 			if(notdel(list,p[i],isarr) && isarr)
@@ -1872,9 +1867,7 @@ function negate(fn,context){
 function wrap(){ 
 	var arg = slice(arguments); 
 	return function(x){ 
-		return reduce(arg,function(val,fn){ 
-			return fn(val);
-		},x);
+		return reduce(arg,function(val,fn){ return fn(val); },x);
 	}; 
 }
 

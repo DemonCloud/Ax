@@ -1437,6 +1437,7 @@
 
 	function setRender(view,render){
 		var that = packRender(view,render);
+
 		_define(view,"render",{
 			get : function(){ return that; },
 			set : function(fn){
@@ -1446,6 +1447,7 @@
 			enumerable:true,
 			configurable:false
 		});
+
 		return view;
 	}
 
@@ -1516,6 +1518,7 @@
 					// trigger render 
 					if(1 in arguments)
 						this.render.apply(this,_slice(arguments,1));
+
 
 					// delete mount
 					return delete this.mount,this;
