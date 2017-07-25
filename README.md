@@ -5,7 +5,7 @@
 
 <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
 
-### Ax is a fast MVR JavaScript Framework. 
+### Ax is a fast MV JavaScript Framework. 
 
 It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` & `Vue` very well.
 
@@ -13,8 +13,14 @@ It require `Struct` utils lib, for the sake of better organization application s
 
 * **model** - immutable, fast, persistence, safety
 * **view** - simple, fast, container, virtualDOM
-* **route** - simple, parameterized, hashonly
+* **route** - simple, parameterized, hashonly (will delete in 4.0)
 * **atom** - connector, fast, independent
+
+## Prepare Feature VERSION 4.0+
+
+1. Remove `route` from `ax` , just focus `model` `view` and `atom`
+2. `model` extend more useful API, as `model.lock`
+3. `atom` more fast with use `struct` connect
 
 ## Install
 

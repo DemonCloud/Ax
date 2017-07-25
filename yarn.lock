@@ -213,8 +213,8 @@ aws4@^1.2.1:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
 ax-struct-js@latest:
-  version "3.3.32"
-  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-3.3.32.tgz#c9dd94ee7dd3ab7d60d183930183f2274f9ca04f"
+  version "3.3.33"
+  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-3.3.33.tgz#0454ac7e4894d02680e58e286df62ab4b3a657f2"
 
 babel-code-frame@^6.22.0:
   version "6.22.0"
@@ -2406,15 +2406,15 @@ micromatch@2.3.11, micromatch@^2.1.5, micromatch@^2.3.7:
     parse-glob "^3.0.4"
     regex-cache "^0.4.2"
 
-mime-db@~1.27.0:
-  version "1.27.0"
-  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.27.0.tgz#820f572296bbd20ec25ed55e5b5de869e5436eb1"
+mime-db@~1.29.0:
+  version "1.29.0"
+  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.29.0.tgz#48d26d235589651704ac5916ca06001914266878"
 
 mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.7:
-  version "2.1.15"
-  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.15.tgz#a4ebf5064094569237b8cf70046776d09fc92aed"
+  version "2.1.16"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.16.tgz#2b858a52e5ecd516db897ac2be87487830698e23"
   dependencies:
-    mime-db "~1.27.0"
+    mime-db "~1.29.0"
 
 mime@1.2.4:
   version "1.2.4"
