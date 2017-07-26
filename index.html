@@ -46,8 +46,12 @@ var view = ax.view({
 
 view.mount(
 	document.getElementById("tree"),
-	{ check: false }
+	{ check: true }
 );
+
+ax.module("loader",function(ax,struct){
+	return ax.model({ data:{ loader: true } });
+});
 
 </script>
 </body>

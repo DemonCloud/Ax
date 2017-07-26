@@ -30,8 +30,14 @@ Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 ## Prepare Feature VERSION 4.0+
 
 1. Remove `route` from `ax` , just focus `model` `view` and `atom`
+
 2. `model` extend more useful API, as `model.lock`
+
 3. `atom` more fast with use `struct` connect
+
+4. `moudle` interface to given way to make plugin in `ax`
+
+5. Make plugin use `moudle` API. prepare for `Ax-Loader` && `Ax-Router`
 
 ## Document (current version 3.3.33 -> v3)
 

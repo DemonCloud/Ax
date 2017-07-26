@@ -1,4 +1,4 @@
-/* 
+/*
  * Ax
  *
  * @Author  : YiJun
@@ -25,18 +25,18 @@
 })(this, {}, function(ax,struct){
 	"use strict";
 
-	ax.VERSION = struct.VERSION;
-
 	// Define DOM frame
-	var z,Z,aM,aV,aT,aS,vA, _ = [],
-				  aMP,aVP,aTP,
+	var aM,aV,aT,aS,vA,z,Z,
+			aMP,aVP,aTP, _ = [] ,maker = {}, root = struct.root,
+			RAM = [], LS = root.localStorage, SN = "Ax@",
+			FCD = String.fromCharCode,
 
 	// Define Setting
-		VIEW_DEFAULT  = { },
-		ATOM_DEFAULT  = { use:[] },
-		MODEL_DEFAULT = { data:{}, validate:{} },
+	VIEW_DEFAULT  = { },
+	ATOM_DEFAULT  = { use:[] },
+	MODEL_DEFAULT = { data:{}, validate:{} },
 
-	// resetful list 
+	// resetful list
 	// use for ax ajax-api
 	RESTFUL = {
 		get    : "GET",
@@ -49,7 +49,6 @@
 	},
 
 	// *use struct utils list
-	root      = struct.root,
 	v8        = struct.v8(),
 	_ayc      = struct.ayc(),
 	_lock     = struct.lock(),
@@ -103,11 +102,11 @@
 	function genertor_(api){
 		var apiName, apiUse, apiSelect;
 		if(_isAry(api)){
-			apiUse = api[1]; 
+			apiUse = api[1];
 			apiName = api[0];
 			apiSelect = api[2]; }
 		else{
-			apiUse = api; 
+			apiUse = api;
 			apiName = api;
 			apiSelect = void 0; }
 
@@ -129,11 +128,11 @@
 	function genertor_$(api){
 		var apiName, apiUse, apiSelect;
 		if(_isAry(api)){
-			apiUse = api[1]; 
+			apiUse = api[1];
 			apiName = api[0];
 			apiSelect = api[2]; }
 		else{
-			apiUse = api; 
+			apiUse = api;
 			apiName = api;
 			apiSelect = void 0; }
 
@@ -149,17 +148,17 @@
 	}
 
 	function createAx(use){
-		return function(o){ 
-			return new use(_isObj(o) ? o : {}); 
+		return function(o){
+			return new use(_isObj(o) ? o : {});
 		};
 	}
 
 	function createExtend(use){
 		return function(opt){
-			var malloc = opt; 
-			return function(o){ 
-				return new use(_merge(malloc,_isObj(o)?o:{})); 
-			}; 
+			var malloc = opt;
+			return function(o){
+				return new use(_merge(malloc,_isObj(o)?o:{}));
+			};
 		};
 	}
 
@@ -177,10 +176,10 @@
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
-	
+
 	Z = function(elm){
-		this.el = _isAryL(elm) ? 
-							_slice(elm) : 
+		this.el = _isAryL(elm) ?
+							_slice(elm) :
 							(elm instanceof Element ? [elm] : []);
 	};
 
@@ -196,7 +195,7 @@
 		prevent = ["compositionstart","compositionupdate"],
 		ininput = ["input","keypress","keydown","keyup"],
 		notdata = prevent.concat(["compositionend"]);
-	
+
 	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
 		eventMethods = {
 			preventDefault: 'isDefaultPrevented',
@@ -210,10 +209,10 @@
 
 	function findHandlers(element, event, fn, selector) {
 		event = parse(event);
-	
-		if (event.ns) 
+
+		if (event.ns)
 			var matcher = matcherFor(event.ns);
-	
+
 		return (handlers[zid(element)] || []).filter(function(handler) {
 			return handler &&
 				(!event.e  || handler.e == event.e) &&
@@ -268,18 +267,18 @@
 	}
 
 	function realEvent(type) {
-		return hover[type] || 
-					 change[type] || 
+		return hover[type] ||
+					 change[type] ||
 					 check[type] ||
-					 (focusinSupported && focus[type]) || 
+					 (focusinSupported && focus[type]) ||
 					 type;
 	}
 
 	// I Just want to fuck zepto, because the rubbish lib give not work for new browser
 	function zaddEvent(element, events, fn, data, selector, delegator, capture){
-		var id = zid(element), 
+		var id = zid(element),
 			set = (handlers[id] || (handlers[id] = []));
-	
+
 		_loop(events.split(/\s/),function(event){
 			var handler   = parse(event);
 			handler.fn    = fn;
@@ -299,13 +298,13 @@
 			handler.proxy = function(e){
 				var pos,
 						type = e.type,
-						tname = e.target.nodeName, 
+						tname = e.target.nodeName,
 						editable = e.target.contentEditable === "true",
 						isinput = _has(ininput,type) && (tname === "INPUT" || tname === "TEXTAREA" || editable );
 
 				var fe = new z.xEvent(e=compatible(e));
 
-				if (e.isImmediatePropagationStopped() || (isinput && e.target._compositionIn)) 
+				if (e.isImmediatePropagationStopped() || (isinput && e.target._compositionIn))
 					return false;
 
 				// # Chrome event handler assign Error with CompositionEvent
@@ -314,7 +313,7 @@
 				if(isinput)
 					pos = capCursor(e.target);
 
-				var result = callback.apply(element, 
+				var result = callback.apply(element,
 					fe._args === void 0 ? [fe] : [fe].concat(fe._args));
 
 				if(result === false){
@@ -327,7 +326,7 @@
 
 				return result;
 			};
-	
+
 			handler.i = set.length;
 			set.push(handler);
 
@@ -344,8 +343,8 @@
 			}
 
 			element.addEventListener(
-				tEvent, 
-				handler.proxy, 
+				tEvent,
+				handler.proxy,
 				eventCapture(handler, capture)
 			);
 		});
@@ -377,22 +376,22 @@
 	function compatible(event, source) {
 		if (source || !event.isDefaultPrevented) {
 			source || (source = event);
-	
+
 			_loop(eventMethods, function(predicate, name) {
 				var sourceMethod = source[name];
-	
+
 				event[name] = function(){
 					this[predicate] = returnTrue;
 					return sourceMethod && sourceMethod.apply(source, arguments);
 				};
-	
+
 				event[predicate] = returnFalse;
 			});
-	
+
 			try {
 				event.timeStamp || (event.timeStamp = Date.now());
 			} catch (ignored) { }
-	
+
 			if (source.defaultPrevented !== void 0 ? source.defaultPrevented :
 				'returnValue' in source ? source.returnValue === false :
 				source.getPreventDefault && source.getPreventDefault())
@@ -404,9 +403,9 @@
 	function createProxy(event) {
 		var key, proxy = { originalEvent: event };
 		for (key in event)
-			if (!ignoreProperties.test(key) && event[key] !== void 0) 
+			if (!ignoreProperties.test(key) && event[key] !== void 0)
 				proxy[key] = event[key];
-	
+
 		return compatible(proxy, event);
 	}
 
@@ -430,25 +429,25 @@
 		!_isStr(selector)) && matchzx.call(elm, selector);
 	};
 
-	z.event = { 
-		add: zaddEvent, 
-		remove: zremoveEvent 
+	z.event = {
+		add: zaddEvent,
+		remove: zremoveEvent
 	};
-	
+
 	z.proxy = function(fn, context) {
 		var args = (2 in arguments) && _slice(arguments, 2);
-	
+
 		if (_isFn(fn)) {
-			var proxyFn = function(){ 
+			var proxyFn = function(){
 				return fn.apply(
-					context, args ? 
+					context, args ?
 					args.concat(_slice(arguments)) : arguments
 				);
 			};
-	
+
 			proxyFn._zid = zid(fn);
 			return proxyFn;
-	
+
 		} else if (_isStr(context)) {
 			if (args)
 				return z.proxy.apply(null,(args.unshift(fn[context],fn),args));
@@ -463,14 +462,14 @@
 	z.Event = function(type, props) {
 		if (!_isStr(type))
 			props = type, type = props.type;
-	
+
 		var event = document.createEvent(
 			_has(capTypes['MouseEvent'],type) ? 'MouseEvent' : 'Events'), bubbles = true;
-	
-		if (props) 
-			for (var name in props) 
+
+		if (props)
+			for (var name in props)
 				(name === 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name]);
-	
+
 		event.initEvent(type, bubbles, true);
 		return compatible(event);
 	};
@@ -532,11 +531,11 @@
 		"<([^><]+?)>|"  +
 		"([^><]+)|$" ,"g");
 
-	var tagList = { 
-		input:1, 
-		br:1, 
-		hr:1, 
-		img:1, 
+	var tagList = {
+		input:1,
+		br:1,
+		hr:1,
+		img:1,
 		meta:1,
 		area:1,
 		base:1,
@@ -579,13 +578,13 @@
 				attrSetter(elm,attrName,val);
 		}
 		else if(attrName[0] === "*")
-			_set(elm,attrName.slice(1),(val==="true"||val===true)); 
+			_set(elm,attrName.slice(1),(val==="true"||val===true));
 		else if(attrName[0] === "@")
 			elm.setAttribute(attrName.slice(1),val);
 		else if(attrName[0] === ":")
 			z(elm).on(attrName.slice(1),val);
-		else 
-			_set(elm,attrName,val); 
+		else
+			_set(elm,attrName,val);
 	};
 
 	var attrClear = function(elm,key,val){
@@ -593,7 +592,7 @@
 			z(elm).off(key.slice(1),val);
 		else if(elm[key] && !(delete elm[key]))
 			try{ elm[key] = null; }catch(e){}
-		else 
+		else
 			elm.removeAttribute(key);
 	};
 
@@ -629,7 +628,7 @@
 				t.parentNode.insertBefore(patch.n,t);
 				t.parentNode.removeChild(t);
 			}
-		}, 
+		},
  		//2 append
 		function(patch,t){
 			t = patch.s;
@@ -638,13 +637,13 @@
  		//3 remove
 		function(patch,t){
 			t = patch.s;
-			if(t) if(t.parentNode) 
+			if(t) if(t.parentNode)
 				t.parentNode.removeChild(t);
 		},
  		//4 modifytext
 		function(patch,t){
 			t = patch.s;
-			t.innerHTML = patch.c; 
+			t.innerHTML = patch.c;
 		},
  		//5 withtext
 		function(patch,t){
@@ -714,7 +713,7 @@
 						patch.push( slik.createPatch(org,tag,6));
 					return patch;
 				}
-				
+
 				// with child diff
 				if(org.child.length || tag.child.length)
 					for(var i=Math.max(org.child.length,tag.child.length); i--;)
@@ -829,7 +828,7 @@
 					elm =  { tagName: tagName, child:[] };
 
 			if(attributes){
-				var attrs = {} ,s, tg; 
+				var attrs = {} ,s, tg;
 				while(s=attrexec.exec(attributes)){
 					if(!s[1]){
 						if(!tg)
@@ -847,10 +846,10 @@
 		},
 
 		createDOMElememnt:function(obj){
-			var elm = document.createElement(obj.tagName); 
+			var elm = document.createElement(obj.tagName);
 
 			if(obj.attributes)
-				_fol(obj.attributes,function(value,key){ 
+				_fol(obj.attributes,function(value,key){
 					attrSetter(elm,key,value);
 				});
 
@@ -858,7 +857,7 @@
 				elm.innerHTML = obj.text;
 
 			else if(obj.child.length)
-				_fal(obj.child,function(obj){ 
+				_fal(obj.child,function(obj){
 					elm.appendChild(slik.createDOMElememnt(obj)); });
 
 			return elm;
@@ -891,8 +890,8 @@
 
 	Z.prototype = {
 		get : function(index){
-			return 0 in arguments ? 
-				this.el[( +index + ( index < 0 ? this.length : 0 ) )] : 
+			return 0 in arguments ?
+				this.el[( +index + ( index < 0 ? this.length : 0 ) )] :
 				this.el;
 		},
 
@@ -901,7 +900,7 @@
 		},
 
 		find : function(sl){
-			var res = []; 
+			var res = [];
 			_fal(this.el,function(e){
 				res = _slice(e.querySelectorAll(sl)).concat(res);
 			});
@@ -913,7 +912,7 @@
 
 			for(var i=0,l=el.length;i<l;i++,tmp=el[i]){
 				while(tmp&&!find&&tmp!==element)
-					if(z.matchz((tmp=tmp.parentNode),selector)) 
+					if(z.matchz((tmp=tmp.parentNode),selector))
 						find = tmp;
 				if(find) break;
 			}
@@ -923,44 +922,44 @@
 
 		on : function(event, selector, data, callback, one){
 			var autoRemove, delegator, $this = this;
-	
+
 			if (event && !_isStr(event)) {
 				_loop(event, function(fn, type){
 					$this.on(type, selector, data, fn, one);
 				});
-	
+
 				return $this;
 			}
-	
-			if (!_isStr(selector) && 
-				!_isFn(callback) && 
+
+			if (!_isStr(selector) &&
+				!_isFn(callback) &&
 				callback !== false)
 				callback = data, data = selector, selector = void 0;
 			if (callback === void 0 || data === false)
 				callback = data, data = void 0;
-	
-			if (callback === false) 
+
+			if (callback === false)
 				callback = returnFalse;
-	
+
 			return $this.each(function(element){
-				if (one) 
+				if (one)
 					autoRemove = function(e){
 						zremoveEvent(element, e.type, callback);
 						return callback.apply(this, arguments);
 					};
-	
-				if (selector) 
+
+				if (selector)
 					delegator = function(e){
-						var evt, match = !z.matchz(e.target,selector) ? 
+						var evt, match = !z.matchz(e.target,selector) ?
 											z(e.target).closest(selector, element).get(0) : e.target;
 
 						if (match && match !== element)
 							return (autoRemove || callback).apply(
-								match, 
+								match,
 								[_extend(e, {currentTarget: match, liveFired: element})].concat(_slice(arguments,1))
 							);
 					};
-	
+
 				zaddEvent(element, event, callback, data, selector, delegator || autoRemove);
 			});
 		},
@@ -972,15 +971,15 @@
 				},this);
 				return this;
 			}
-	
-			if (!_isStr(selector) && 
-				!_isFn(callback) && 
+
+			if (!_isStr(selector) &&
+				!_isFn(callback) &&
 				callback !== false)
 				callback = selector, selector = void 0;
-	
-			if (callback === false) 
+
+			if (callback === false)
 				callback = returnFalse;
-	
+
 			return this.each(function(element){
 				zremoveEvent(element, event, callback, selector);
 			});
@@ -989,24 +988,24 @@
 		trigger : function(event, args){
 			event = _isStr(event) ? z.Event(event) : compatible(event);
 			event._args = args;
-	
+
 			return this.each(function(element){
 				// handle focus(), blur() by calling them directly
-				if (event.type in focus && _isFn(element[event.type])) 
+				if (event.type in focus && _isFn(element[event.type]))
 					element[event.type]();
 				// items in the collection might not be DOM elements
-				else if ('dispatchEvent' in element) 
+				else if ('dispatchEvent' in element)
 					element.dispatchEvent(event);
-				else 
+				else
 					z(element).triggerHandler(event, args);
 			});
 		},
-	
+
 		triggerHandler : function(event, args){
 			var e, result;
 			this.each(function(element){
 				e = createProxy(_isStr(event) ? z.Event(event) : event);
-	
+
 				e._args = args;
 				e.target = element;
 				_loop(findHandlers(element, event.type || event), function(handler){
@@ -1015,10 +1014,10 @@
 						return false;
 				});
 			});
-	
+
 			return result;
 		},
-	
+
 		html : function(html){
 			return this.each(function(elm){
 				elm.innerHTML = _toString(html);
@@ -1052,7 +1051,7 @@
 
 	function checkValidate(newdata,model){
 		if(!model._v) return true;
-		var validate = model._asv(_), 
+		var validate = model._asv(_),
 				error = [], valid=true, key = _keys(validate);
 
 		for(var i=0,s=key.length,isRequired,value; i<s; i++){
@@ -1114,7 +1113,7 @@
 	}
 
 	function isAx(compare){
-		return function(value){ 
+		return function(value){
 			return value instanceof compare;
 		};
 	}
@@ -1129,7 +1128,7 @@
 			header : header
 		};
 
-		// deal with arguments 
+		// deal with arguments
 		// set http header param
 		st.success = function(){
 			// change the data before dispatch event;
@@ -1149,11 +1148,6 @@
 	function revs(str){
 		return str.split("").reverse().join("");
 	}
-
-	var RAM = [],
-			LS = root.localStorage,
-			SN = "Ax@",
-			FCD = String.fromCharCode;
 
 	aS = {
 		t: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
@@ -1286,7 +1280,7 @@
 
 
 	// model data usually define as pure data, not javascript event or function
-	// because it much as MVC-M logs 
+	// because it much as MVC-M logs
 	aMP = aM.prototype = {
 		constructor: aM,
 
@@ -1310,7 +1304,7 @@
 					this.emit("change:"+key,[val]);
 				}
 			}else{
-				if(!_isPrim(key)&& 
+				if(!_isPrim(key)&&
 					(ref=this._f(key))&&
 					!_eq(assert,ref)&&
 					checkValidate(ref,this)){
@@ -1328,8 +1322,8 @@
 		rm: function(prop){
 			var assert = this._ast(cool,_);
 
-			if(_isPrim(prop) && 
-				 prop!=null && 
+			if(_isPrim(prop) &&
+				 prop!=null &&
 				 _get(assert,prop) !== void 0){
 				_rm(assert,prop);
 				if(this._s) aS.set(this.name,assert);
@@ -1487,11 +1481,11 @@
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
-			stencil = _isStr(stencil) ? _doom(stencil.trim(), props) : 
+			stencil = _isStr(stencil) ? _doom(stencil.trim(), props) :
 			(_isFn(stencil) ? stencil : _noop);
 
-			render = function(){ 
-				return stencil !== _noop && 
+			render = function(){
+				return stencil !== _noop &&
 					z(this.root).render(stencil.apply(this,
 					_slice(arguments)),this,props);
 			}.bind(this);
@@ -1513,7 +1507,7 @@
 			this.mount = function(el){
 				if(checkElm(el)){
 					// bind events
-					this.root = vroot = el; 
+					this.root = vroot = el;
 
 					_fol(events,uon,setRender(this,render));
 
@@ -1522,7 +1516,7 @@
 							config.model.on("change",
 								this.render.bind(this));
 
-					// trigger render 
+					// trigger render
 					if(1 in arguments)
 						this.render.apply(this,_slice(arguments,1));
 
@@ -1590,8 +1584,8 @@
 
 		destroy: function(withRoot){
 			this.root.removeAttribute("ax-root",this.root._vid=void 0);
-			_ayc(function(){ 
-				z(this.root).off()[withRoot?"remove":"html"](); 
+			_ayc(function(){
+				z(this.root).off()[withRoot?"remove":"html"]();
 				this.emit("destroy",delete this.root);
 			}.bind(this));
 		},
@@ -1603,15 +1597,15 @@
 
 	function aTite(cmd,args){
 		return function(model){
-			return model[cmd].apply(model,args); 
+			return model[cmd].apply(model,args);
 		};
 	}
 
 	function assert(LIST){
-		return function(tdo,v){ 
+		return function(tdo,v){
 			return (_isFn(tdo)&&v===_) ? tdo(LIST) : []; };
 	}
-	
+
 	function assertModel(model){
 		return model.name === this;
 	}
@@ -1619,7 +1613,7 @@
 	function assertMake(list,callback){
 		var LIST = this._assert(cool,_);
 		var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
-		return _fal(target,function(name){ 
+		return _fal(target,function(name){
 			callback.call(this,LIST,name);
 		},this),this;
 	}
@@ -1724,7 +1718,6 @@
 	ax.model = createAx(aM);
 	ax.view  = createAx(aV);
 	ax.atom  = createAx(aT);
-
 	ax.model.extend = createExtend(aM);
 	ax.view.extend  = createExtend(aV);
 	ax.atom.extend  = createExtend(aT);
@@ -1747,8 +1740,23 @@
 		node      : makeChecker(_isNode,"node"),
 		model     : makeChecker(isAx(aM),"model"),
 		view      : makeChecker(isAx(aV),"view"),
-		atom      : makeChecker(isAx(aT),"atom"),
+		atom      : makeChecker(isAx(aT),"atom")
 	};
+
+	ax.module = function(name,creater){
+		var make;
+		if(maker[name])
+			return maker[name];
+		if(make = creater.apply(struct.root,
+				[ax,struct].concat(_slice(arguments,2))))
+			return (maker[name] = make);
+	};
+
+	ax.use = function(name){
+		return maker[name];
+	};
+
+	ax.VERSION = struct.VERSION;
 
 	return _lock(aM,aV,aT,aS,
 		v8(aMP),v8(aVP),v8(aTP),
