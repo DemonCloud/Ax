@@ -17,13 +17,12 @@ const colors = require('colors');
 
 function taskReuqireJS(){
 	gulp.src([
-			cfg.path.jsl+"struct.min.js",
-			cfg.path.jsl+"ax.min.js",
+			cfg.path.pub+"struct.min.js",
+			cfg.path.pub+"ax.min.js",
 		])
 		.pipe(filter(["**"], { restore:true }))
 		.pipe(concat('axs.min.js'))
 		.pipe(uglify())
-		.pipe(optimizejs())
 		.pipe(gulp.dest(cfg.path.dest));
 
 	return rjs.optimize(cfg.rjs,function(){ 

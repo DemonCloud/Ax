@@ -1538,7 +1538,7 @@
 		constructor:aV,
 
 		on: function(type,fn){
-			return _fal((type||"").split(","),function(mk){
+			return _fal(_toString(type).split("|"),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
@@ -1549,7 +1549,7 @@
 		},
 
 		unbind: function(type,fn){
-			return _fal((type||"").split(","),function(mk){
+			return _fal(_toString(type).split("|"),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
@@ -1563,7 +1563,7 @@
 			var k = (type||"").split(":");
 
 			if(k.length>2){
-				return _fal((type||"").split(","),function(mk){
+				return _fal(_toString(type).split("|"),function(mk){
 					var mkf = mk.split(":");
 					z(this.root).find(mkf[1]).trigger(mkf[0],args);
 				},this),this;
