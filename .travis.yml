@@ -1,12 +1,11 @@
 language: node_js
 node_js:
-  - "4"
   - "6"
   - "7"
 sudo: required
 before_install:
 - |
-    echo "machine github.com login reactjs-bot password $GITHUB_TOKEN" >~/.netrc
+    echo "machine github.com login axjs-bot password $GITHUB_TOKEN" >~/.netrc
     unset GITHUB_TOKEN
     if [ "$TEST_TYPE" != build_website ] && \
       ! git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '(\.md$)|(^(docs|examples))/'
@@ -22,8 +21,8 @@ before_install:
 install: 
   - yarn install
 script:
-  - npm run test
-  - npm run build
+  # - npm run test
+  # - npm run build
 branches:
   only:
     - master

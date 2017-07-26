@@ -17,7 +17,6 @@
   },
   "scripts": {
     "start": "browser-sync start --server --files **/*.html",
-    "build": "gulp",
     "test": "gulp test"
   },
   "keywords": [

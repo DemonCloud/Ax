@@ -28,14 +28,13 @@
 	ax.VERSION = struct.VERSION;
 
 	// Define DOM frame
-	var z,Z,aM,aV,aR,aT,aS,vA, _ = [],
-				  aMP,aVP,aRP,aTP,
+	var z,Z,aM,aV,aT,aS,vA, _ = [],
+				  aMP,aVP,aTP,
 
 	// Define Setting
 		VIEW_DEFAULT  = { },
 		ATOM_DEFAULT  = { use:[] },
 		MODEL_DEFAULT = { data:{}, validate:{} },
-		ROUTE_DEFAULT = { char:"@", routes:{}, actions:{} },
 
 	// resetful list 
 	// use for ax ajax-api
@@ -178,6 +177,7 @@
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
+	
 	Z = function(elm){
 		this.el = _isAryL(elm) ? 
 							_slice(elm) : 
@@ -1588,122 +1588,6 @@
 		}
 	};
 
-	//get Hash param form URL
-	function hashGet(url,char){
-		var index = url.search("#"),
-			charindex = url.search(char);
-		return index>0 ? url.slice(index+1,!~charindex?void 0:charindex) : "";
-	}
-
-	function hashParam(url,char){
-		var charindex = url.search(char);
-		return _param(!~charindex ? void 0 : url.slice(charindex+1));
-	}
-
-	//if hashChange call
-	function hashChange(url,char,event){
-		var hash = hashGet(url,char), param = hashParam(url,char); 
-		_fol(this.routes,function(fn,key){
-			if((new RegExp(key,"i")).test(hash))
-				hashChangeReg.call(this,fn,[param,hash,event]);
-		},this);
-	}
-
-	// detect args callback
-	function hashChangeReg(fn,args){
-		if(_isFn(fn))
-			fn.apply(this,args);
-		else // array or string
-			_fal(_isStr(fn) ? fn.split(",") : fn,
-				function(reg){ this.actions[reg].apply(this,args); },this);
-	}
-
-	// Ax Route
-	// define route for SPA
-	aR = function(obj){
-		var _this = this,
-			history = { old: "", now: root.location.href },
-			config = _extend(_clone(ROUTE_DEFAULT),obj||{}),
-			events = config.events;
-
-		delete config.history;
-		delete config.events;
-		// if userobj has more events
-		// addEvent for this route object
-		// use dispatch event to trigger
-		// cant change regular hash title
-		_define(this, "event" ,{
-			value : function(event){
-				if(root.location.href === history.now)
-					return event.preventDefault();
-				// change the save hash url
-				history.old = history.now; 
-				return _this.emit("hashchange",
-					[history.now = root.location.href,config.char,event]);
-			},
-			writable : false,
-			enumerable : false,
-			configurable: false
-		});
-
-		_fol(events,uon,this);
-
-		_extend(this,config)
-			.on("hashchange",hashChange)
-			.emit("init")
-			.unbind("init");
-	};
-
-	// Ax-Route for SPA Architecture
-	// auto trigger regex event when route change
-	aRP = aR.prototype = {
-		constructor: aR,
-
-		on: on,
-		emit: emit,
-		unbind: unbind,
-
-		listen: function(hash,param){
-			if(!this._listen){
-				_define(this,"_listen",{
-					value:!root.addEventListener("hashchange",this.event),
-					writable : false,
-					enumerable : false,
-					configurable: true
-				});
-				
-				return hash ? 
-					this.assign(hash,param) : 
-					this.emit("hashchange",[root.location.href,this.char]);
-			}
-			return this;
-		},
-
-		stop: function(){
-			if(delete this._listen)
-				root.removeEventListener("hashchange",this.event);
-			return this;
-		},
-
-		assign: function(hash,param){
-			if(this._listen){
-				var url = root.location.href; 
-				var hashindex = url.search("#");
-				if(hashindex > 0)
-					url = url.slice(0,hashindex);
-
-				root.location.href = url + 
-					(hash.toString().slice(0,1)==="#"?"":"#") + hash + 
-					(_isObj(param) ? ((this.char||"@")+_paramStr(param)) : "");
-			}
-			return this;
-		},
-
-		toString: function(){
-			return this;
-		}
-	};
-
 	function aTite(cmd,args){
 		return function(model){
 			return model[cmd].apply(model,args); 
@@ -1823,12 +1707,10 @@
 
 	// Extend method
 	// Create Ax Pack extends
-	ax.route = createAx(aR);
 	ax.model = createAx(aM);
 	ax.view  = createAx(aV);
 	ax.atom  = createAx(aT);
 
-	ax.route.extend = createExtend(aR);
 	ax.model.extend = createExtend(aM);
 	ax.view.extend  = createExtend(aV);
 	ax.atom.extend  = createExtend(aT);
@@ -1852,10 +1734,9 @@
 		model     : makeChecker(isAx(aM),"model"),
 		view      : makeChecker(isAx(aV),"view"),
 		atom      : makeChecker(isAx(aT),"atom"),
-		route     : makeChecker(isAx(aR),"route")
 	};
 
-	return _lock(aM,aV,aR,aT,aS,
-		v8(aMP),v8(aVP),v8(aRP),v8(aTP),
+	return _lock(aM,aV,aT,aS,
+		v8(aMP),v8(aVP),v8(aTP),
 		v8(vA),v8(slik),v8(ax));
 });
