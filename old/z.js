@@ -10,7 +10,7 @@
  * * IE 9+ - Edge Support
  *
  * @Author  : YIJUN
- * @Date    : 2016.6.22 - now
+ * @Date    : 2016.6.22 - 2017
  * @Version : 0.1
  *
  * @License : Fuck any LISCENSE

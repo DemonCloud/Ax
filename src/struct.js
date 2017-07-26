@@ -2354,4 +2354,5 @@ struct.toString = toString;
 struct.prototype = struct.__proto__ = null;
 
 return frozen(v8(struct));
+
 }, void 0));

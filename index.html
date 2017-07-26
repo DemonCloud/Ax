@@ -15,7 +15,6 @@
 </script>
 
 <script>
-				//#example2
 var model = ax.model();
 
 var view = ax.view({
@@ -38,7 +37,9 @@ var view = ax.view({
 
 	events:{
 		"check:#id":function(event){
-			model.set("check",this.checked);
+			event.preventDefault();
+			event.stopPropagation();
+			model.set("check",event.target.checked);
 		}
 	}
 });

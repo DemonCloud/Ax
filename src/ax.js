@@ -49,55 +49,55 @@
 	},
 
 	// *use struct utils list
-		root      = struct.root,
-		v8        = struct.v8(),
-		_ayc      = struct.ayc(),
-		_lock     = struct.lock(),
-		_keys     = struct.keys(),
-		_noop     = struct.noop(),
-		_define   = struct.define(),
-		_slice    = struct.slice(),
-		_clone    = struct.clone(),
-		_extend   = struct.extend(),
-		_eq       = struct.eq(),
-		_toString = struct.convert('string'),
-		_type     = struct.type(),
-		_isObj    = struct.type('object'),
-		_isFn     = struct.type('function'),
-		_isNum    = struct.type('num'),
-		_isBool   = struct.type("bool"),
-		_isStr    = struct.type("str"),
-		_isInt    = struct.type('int'),
-		_isAry    = struct.type('array'),
-		_isAryL   = struct.type('arraylike'),
-		_isPrim   = struct.type('primitive'),
-		_isFloat  = struct.type('float'),
-		_isDOM    = struct.type('dom'),
-		_isElm    = struct.type('elm'),
-		_isNode   = struct.type('node'),
-		_isNeed   = struct.type('required'),
-		_loop     = struct.op(),
-		_fol      = struct.op('object'),
-		_fal      = struct.op('array'),
-		_map      = struct.map(),
-		_on       = struct.event('on'),
-		_unbind   = struct.event('unbind'),
-		_emit     = struct.event('emit'),
-		_get      = struct.prop('get'),
-		_set      = struct.prop('set'),
-		_rm       = struct.prop('not'),
-		_param    = struct.param(),
-		_paramStr = struct.param("string"),
-		_has      = struct.has(),
-		_ajax     = struct.ajax(),
-		_size     = struct.size(),
-		_link     = struct.link(),
-		_doom     = struct.doom(),
-		_merge    = struct.merge(),
-		_index    = struct.index(),
-		_one      = struct.index("one"),
-		_decode   = struct.html("decode"),
-		cool      = struct.cool();
+	root      = struct.root,
+	v8        = struct.v8(),
+	_ayc      = struct.ayc(),
+	_lock     = struct.lock(),
+	_keys     = struct.keys(),
+	_noop     = struct.noop(),
+	_define   = struct.define(),
+	_slice    = struct.slice(),
+	_clone    = struct.clone(),
+	_extend   = struct.extend(),
+	_eq       = struct.eq(),
+	_toString = struct.convert('string'),
+	_type     = struct.type(),
+	_isObj    = struct.type('object'),
+	_isFn     = struct.type('function'),
+	_isNum    = struct.type('num'),
+	_isBool   = struct.type("bool"),
+	_isStr    = struct.type("str"),
+	_isInt    = struct.type('int'),
+	_isAry    = struct.type('array'),
+	_isAryL   = struct.type('arraylike'),
+	_isPrim   = struct.type('primitive'),
+	_isFloat  = struct.type('float'),
+	_isDOM    = struct.type('dom'),
+	_isElm    = struct.type('elm'),
+	_isNode   = struct.type('node'),
+	_isNeed   = struct.type('required'),
+	_loop     = struct.op(),
+	_fol      = struct.op('object'),
+	_fal      = struct.op('array'),
+	_map      = struct.map(),
+	_on       = struct.event('on'),
+	_unbind   = struct.event('unbind'),
+	_emit     = struct.event('emit'),
+	_get      = struct.prop('get'),
+	_set      = struct.prop('set'),
+	_rm       = struct.prop('not'),
+	_param    = struct.param(),
+	_paramStr = struct.param("string"),
+	_has      = struct.has(),
+	_ajax     = struct.ajax(),
+	_size     = struct.size(),
+	_link     = struct.link(),
+	_doom     = struct.doom(),
+	_merge    = struct.merge(),
+	_index    = struct.index(),
+	_one      = struct.index("one"),
+	_decode   = struct.html("decode"),
+	cool      = struct.cool();
 
 	// ax genertor function
 	function genertor_(api){
@@ -275,6 +275,7 @@
 					 type;
 	}
 
+	// I Just want to fuck zepto, because the rubbish lib give not work for new browser
 	function zaddEvent(element, events, fn, data, selector, delegator, capture){
 		var id = zid(element), 
 			set = (handlers[id] || (handlers[id] = []));
@@ -302,20 +303,19 @@
 						editable = e.target.contentEditable === "true",
 						isinput = _has(ininput,type) && (tname === "INPUT" || tname === "TEXTAREA" || editable );
 
-				e = compatible(e);
+				var fe = new z.xEvent(e=compatible(e));
 
 				if (e.isImmediatePropagationStopped() || (isinput && e.target._compositionIn)) 
 					return false;
 
 				// # Chrome event handler assign Error with CompositionEvent
-				if(!_has(notdata,type))
-					e.data = data;
+				fe.data = data;
 
 				if(isinput)
 					pos = capCursor(e.target);
 
 				var result = callback.apply(element, 
-					e._args === void 0 ? [e] : [e].concat(e._args));
+					fe._args === void 0 ? [fe] : [fe].concat(fe._args));
 
 				if(result === false){
 					e.preventDefault();
@@ -424,7 +424,10 @@
 	};
 
 	z.matchz = function(elm,selector){
-		return !(elm===null||elm===document||typeof selector !== "string") && matchzx.call(elm, selector);
+		return !(
+		elm===null||
+		elm===document||
+		!_isStr(selector)) && matchzx.call(elm, selector);
 	};
 
 	z.event = { 
@@ -446,7 +449,7 @@
 			proxyFn._zid = zid(fn);
 			return proxyFn;
 	
-		} else if (typeof context === "string") {
+		} else if (_isStr(context)) {
 			if (args)
 				return z.proxy.apply(null,(args.unshift(fn[context],fn),args));
 			else
@@ -458,7 +461,7 @@
 
 	// z Custom Events
 	z.Event = function(type, props) {
-		if (typeof type !== "string") 
+		if (!_isStr(type))
 			props = type, type = props.type;
 	
 		var event = document.createEvent(
@@ -470,6 +473,10 @@
 	
 		event.initEvent(type, bubbles, true);
 		return compatible(event);
+	};
+
+	z.xEvent = function(event){
+		for(var key in event) this[key] = event[key];
 	};
 
 	// attr list mapping
@@ -917,7 +924,7 @@
 		on : function(event, selector, data, callback, one){
 			var autoRemove, delegator, $this = this;
 	
-			if (event && typeof event !== "string") {
+			if (event && !_isStr(event)) {
 				_loop(event, function(fn, type){
 					$this.on(type, selector, data, fn, one);
 				});
@@ -925,7 +932,7 @@
 				return $this;
 			}
 	
-			if ((typeof selector !== "string") && 
+			if (!_isStr(selector) && 
 				!_isFn(callback) && 
 				callback !== false)
 				callback = data, data = selector, selector = void 0;
@@ -945,13 +952,13 @@
 				if (selector) 
 					delegator = function(e){
 						var evt, match = !z.matchz(e.target,selector) ? 
-											z(e.target).closest(selector, element).get(0) :
-											e.target;
+											z(e.target).closest(selector, element).get(0) : e.target;
 
-						if (match && match !== element){
-							evt = _extend(createProxy(e), {currentTarget: match, liveFired: element});
-							return (autoRemove || callback).apply(match, [evt].concat(_slice(arguments,1)));
-						}
+						if (match && match !== element)
+							return (autoRemove || callback).apply(
+								match, 
+								[_extend(e, {currentTarget: match, liveFired: element})].concat(_slice(arguments,1))
+							);
 					};
 	
 				zaddEvent(element, event, callback, data, selector, delegator || autoRemove);
@@ -959,14 +966,14 @@
 		},
 
 		off : function(event, selector, callback){
-			if (event && typeof event !== "string") {
+			if (event && !_isStr(event)) {
 				_loop(event, function(fn, type){
 					this.off(type, selector, fn);
 				},this);
 				return this;
 			}
 	
-			if (typeof selector !== "string" && 
+			if (!_isStr(selector) && 
 				!_isFn(callback) && 
 				callback !== false)
 				callback = selector, selector = void 0;
@@ -980,7 +987,7 @@
 		},
 
 		trigger : function(event, args){
-			event = typeof event === "string" ? z.Event(event) : compatible(event);
+			event = _isStr(event) ? z.Event(event) : compatible(event);
 			event._args = args;
 	
 			return this.each(function(element){
@@ -998,7 +1005,7 @@
 		triggerHandler : function(event, args){
 			var e, result;
 			this.each(function(element){
-				e = createProxy( typeof event === "string" ? z.Event(event) : event);
+				e = createProxy(_isStr(event) ? z.Event(event) : event);
 	
 				e._args = args;
 				e.target = element;
@@ -1542,9 +1549,12 @@
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
-					z(this.root).on(param[0],param[1],{self:this},fn);
-				else
-					_on(this,mk,fn);
+					z(this.root).on(
+						param[0],
+						param[1],
+						fn._bind||(fn._bind=fn.bind(this))
+					);
+				else _on(this,mk,fn);
 			},this),this;
 		},
 
@@ -1553,9 +1563,12 @@
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
-					z(this.root).off(param[0],param[1],fn);
-				else
-					_unbind(this,mk,fn);
+					z(this.root).off(
+						param[0],
+						param[1],
+						fn ? (fn._bind||fn) : void 0
+					);
+				else _unbind(this,mk,fn);
 			},this),this;
 		},
 
@@ -1703,6 +1716,7 @@
 
 	// #genertor minmix [ struct ] api
 	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat","pull","drop","pairs",["hook","map","hook"],["mapKey","map","key"],["uniqueFast","unique","fast"],["pullAt","pull","at"],["dropLeft","drop","left"],["dropRight","drop","right"],["dropLeftTo","drop","leftto"],["dropRightTo","drop","rightto"],["unpairs","pairs","un"]],genertor_);
+
 	_fal(["keys","every","some","diff","intsec","first","last","auto","eq","values","size","each","has","type","index",["hasKey","has","key"],["findex","index","first"],["lindex","index","last"],["single","index","one"],["one","index","one"],["reduce","reduce","left"],["reduceRight","reduce","right"]],genertor_$);
 
 	// Extend method
