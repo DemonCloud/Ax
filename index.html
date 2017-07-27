@@ -62,6 +62,7 @@ view.mount(
 	}
 );
 
+var size = struct.size();
 var Router = ax.use("Router");
 
 var route = new Router({
@@ -84,6 +85,7 @@ var route = new Router({
 			});
 		},
 		bone: function(param,query,state){
+			console.log(size(param)+1,"bone");
 			app.render({
 				query: query
 			});

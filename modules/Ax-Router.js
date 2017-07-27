@@ -56,8 +56,14 @@ var delegatorView = ax.view.extend({
 //  - when the history go or back (popstate)
 
 // Active the routers
-function toActive(source,path,query,state,notpush){
-	if(this._status){
+function checkPath(path){
+	return path &&
+				 path !== location.pathname &&
+				 path !== location.pathname + "/";
+}
+
+function toActive(source,path,query,state,notpush,isLink){
+	if(!(isLink && !checkPath(path)) && this._status){
 		var _ROUTER = this, key = keys(source.mapping), route, param;
 
 		for(var i=0, l=key.length,checker; i<l; i++)
@@ -68,13 +74,12 @@ function toActive(source,path,query,state,notpush){
 			}
 
 		if(route){
-			if(!notpush && 
-				path !== location.pathname &&
-				path !== location.pathname + "/"
-			)
-				H.pushState(state,null,path+(isStr(query) ?
+			var queryString = (isStr(query) ?
 					(query.charAt(0) !== '?' ? "?":"")+query :
-					is(query,"Object") ? ("?"+qstr(query)) : ""));
+					is(query,"Object") ? ("?"+qstr(query)) : "");
+
+			if(!notpush)
+				H[checkPath(path) ? "pushState" : "replaceState"](state,null,path+queryString);
 
 			each(map(source.routes[route],function(name){
 				// setup funtion call
@@ -115,10 +120,13 @@ var Router = function(option){
 			e.stopPropagation();
 			var elm = e.target;
 
+			// click event trigger
 			return _this.to(
 				elm.to    || elm.getAttribute("to"),    //path
 				elm.query || elm.getAttribute("query"), //queryString
-				elm.state || elm.getAttribute("state")  //state
+				elm.state || elm.getAttribute("state"), //state
+				0,                                      //needpush
+				1                                       //isLink
 			);
 		};
 
@@ -162,13 +170,14 @@ var Router = function(option){
 
 Router.prototype = {
 	// goto take the initiative to trigger
-	to: function(path,query,state,notpush){
+	to: function(path,query,state,notpush,isLink){
 		return toActive.call(this,
 			this._assert(_),
 			path,
 			query,
 			state,
-			notpush
+			notpush,
+			isLink
 		);
 	},
 
@@ -191,11 +200,7 @@ Router.prototype = {
 		if(this._status) return this;
 		this._status = 1;
 		if(0 in arguments && path)
-			this.to(path,query,state,
-				path === location.pathname ||
-				path === location.pathname+"/"
-			);
-
+			this.to(path,query,state);
 		return this;
 	},
 
