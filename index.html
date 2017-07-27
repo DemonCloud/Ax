@@ -5,53 +5,78 @@
 	<title></title>
 </head>
 <body>
+<style>
+	.router{
+		color: #3f67a9;
+		cursor: pointer;
+		text-decoration: underline;
+	}
+</style>
 <div id="tree"></div>
 
 <script src="./src/struct.js"></script>
 <script src="./src/ax.js"></script>
+<script src="./modules/Ax-Router.js"></script>
+
 <script id="tpl" type='text/tpl'>
-	<div><input id='id' type='checkbox' sid='{sid}' :check='{log}' checked='{{#check}}'>
-	<h2 id='h2'>{{#check}}</h2></div>
+	{{ var r=struct.random("string") }}
+	{{ var ri=struct.random("int") }}
+	<div>
+		{{* each [route] in routes }}
+	<router class="router" href="javascript:;" to="{{#route.path}}" query="id={{#r(6)}}&cd={{#ri(1,10000)}}">
+				{{#route.name}}
+			</router>
+			<br>
+		{{* end}}
+	</div>
 </script>
 
 <script>
-var model = ax.model();
-
+var slice = struct.slice();
 var view = ax.view({
 	template:document.getElementById("tpl").innerHTML,
-
-	model : model,
-
-	$destroy: function(){
-		this.destroy(true);
-	},
-
-	props:{
-		sid:{
-			a:1, b:2
-		},
-		log:function(){
-			console.log(this.checked);
-		}
-	},
-
-	events:{
-		"check:#id":function(event){
-			event.preventDefault();
-			event.stopPropagation();
-			model.set("check",event.target.checked);
-		}
-	}
 });
 
 view.mount(
 	document.getElementById("tree"),
-	{ check: true }
+	{ 
+		routes : [
+			{ path: "/route", name:"Link1" },
+			{ path: "/route/213", name:"Link2" },
+			{ path: "/route/321/edit/2", name:"Link3"}
+		]
+	}
 );
 
-ax.module("loader",function(ax,struct){
-	return ax.model({ data:{ loader: true } });
+var Router = ax.use("Router");
+
+var route = new Router({
+	elements: [".router"],
+
+	routes:{
+		"/": ["default"],
+		"/route" : ["do","withdo"],
+		"/route/:id": ["bone"] ,
+		"/route/:id/edit/:store" : ["bone"]
+	},
+
+	actions:{
+		default: function(){
+			console.log("default");
+		},
+		do : function(){
+			console.log.apply(console,["do->/route"].concat(slice(arguments)))
+		},
+		withdo: function(){
+			console.log("withdo");
+		},
+		bone: function(param,query,state){
+			console.log.apply(console,["bone->/route/:id"].concat(slice(arguments)));
+		}
+	}
 });
+
+route.start("/");
 
 </script>
 </body>

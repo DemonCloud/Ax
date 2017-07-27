@@ -1744,9 +1744,8 @@
 	};
 
 	ax.module = function(name,creater){
-		var make;
-		if(maker[name])
-			return maker[name];
+		var make = maker[name];
+		if(make) return make;
 		if(make = creater.apply(struct.root,
 				[ax,struct].concat(_slice(arguments,2))))
 			return (maker[name] = make);

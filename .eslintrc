@@ -1,0 +1,27 @@
+{
+
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "ecmaFeatures": {
+      "globalReturn": true,
+      "modules": true,
+      "jsx": true
+    }
+  },
+
+  "env": {
+    "browser": true,
+    "node": true
+  },
+
+  "globals": {
+    "define" : true,
+    "global" : true,
+    "document": true,
+    "escape": true,
+    "navigator": false,
+    "unescape": true,
+    "window": true
+  }
+
+}
