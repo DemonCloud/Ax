@@ -412,11 +412,7 @@
 	var matchzx = Element.prototype.matches ||
 								Element.prototype.webkitMatchesSelector ||
 								Element.prototype.mozMatchesSelector ||
-								Element.prototype.msMatchesSelector ||
-								function(selector){
-									return (this.parentNode != null && this !== document) &&
-											 _has(this.parentNode.querySelectorAll(selector),this);
-								};
+								Element.prototype.msMatchesSelector;
 
 	z.init = function(x){
 		return new Z(x);
@@ -686,50 +682,50 @@
 		treeDiff: function(org,tag,patch,orgParent,tagParent){
 			if(org === void 0){
 				// new node
-				patch.unshift( slik.createPatch(orgParent,tag,2));}
+				patch.unshift(this.createPatch(orgParent,tag,2));}
 			else if(tag === void 0)
 				// remove node
-				patch.push( slik.createPatch(org,tag,3));
+				patch.push( this.createPatch(org,tag,3));
 			else if(org.tagName === tag.tagName){
 				if(!_eq(org.attributes,tag.attributes)){
 					if(org.attributes&&tag.attributes)
-						patch.push( slik.createPatch(org,tag,8));
+						patch.push( this.createPatch(org,tag,8));
 					else if(!org.attributes)
-						patch.push( slik.createPatch(org,tag,7));
+						patch.push( this.createPatch(org,tag,7));
 					else if(!tag.attributes)
-						patch.push( slik.createPatch(org,tag,9));
+						patch.push( this.createPatch(org,tag,9));
 				}
 
 				// some node , maybe modify
 				if(org.text !== tag.text){
 					if((org.text && tag.text) && org.text !== tag.text)
 						// modify text
-						patch.push( slik.createPatch(org,tag,4));
+						patch.push( this.createPatch(org,tag,4));
 					else if(!org.text)
 						// fill with text
-						patch.push( slik.createPatch(org,tag,5));
+						patch.push( this.createPatch(org,tag,5));
 					else if(!tag.text)
 						// modify to child DOM or empty
-						patch.push( slik.createPatch(org,tag,6));
+						patch.push( this.createPatch(org,tag,6));
 					return patch;
 				}
 
 				// with child diff
 				if(org.child.length || tag.child.length)
 					for(var i=Math.max(org.child.length,tag.child.length); i--;)
-						slik.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+						this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
 
 			}else if(org.tagName !== tag.tagName)
-				patch.push( slik.createPatch(org,tag,1));
+				patch.push( this.createPatch(org,tag,1));
 
 			return patch;
 		},
 
 		applyPatch:function(oDOM,patchs,callback){
 			_fal(_map(patchs,function(patch){
-				patch.s = slik.mapTreeNode(oDOM,patch.s);
+				patch.s = this.mapTreeNode(oDOM,patch.s);
 				return patch;
-			}),function(patch){
+			}.bind(this)),function(patch){
 				patchHack[patch.t].call(oDOM,patch);});
 			return callback ? callback(oDOM) : oDOM;
 		},
@@ -752,14 +748,14 @@
 		},
 
 		createPatch: function(org,tag,type){
-			var node, patch, sl = slik.createSelector(org);
+			var node, patch, sl = this.createSelector(org);
 			switch(patchList[type]){
 				case "replace":
-					node = slik.createDOMElememnt(tag);
+					node = this.createDOMElememnt(tag);
 					patch = { t:1,s:sl,n:node };
 					break;
 				case "append":
-					node = slik.createDOMElememnt(tag);
+					node = this.createDOMElememnt(tag);
 					patch = { t:2,s:sl,n:node };
 					break;
 				case "remove":
@@ -772,7 +768,7 @@
 					patch = { t:5,s:sl,c:tag.text };
 					break;
 				case "removetext":
-					node = slik.createDOMElememnt(tag);
+					node = this.createDOMElememnt(tag);
 					patch = { t:6,s:sl,n:node };
 					break;
 				case "addattr":
@@ -804,10 +800,10 @@
 				if(close){
 					p = p.parent; c = p.child;
 				}else if(stag){
-					n = slik.createObjElement(stag,vprops);
+					n = this.createObjElement(stag,vprops);
 					n.i= c.length; c.push(n); n.parent = p;
 				}else if(tag){
-					n = slik.createObjElement(tag, vprops);
+					n = this.createObjElement(tag, vprops);
 					n.i= c.length; c.push(n); n.parent = p;
 					if(!(n.tagName in tagList)){
 						p = n; c = n.child;
@@ -816,7 +812,7 @@
 					if(text.trim()) p.text = text;
 				}
 				return match;
-			});
+			}.bind(this));
 			return root;
 		},
 
@@ -858,7 +854,7 @@
 
 			else if(obj.child.length)
 				_fal(obj.child,function(obj){
-					elm.appendChild(slik.createDOMElememnt(obj)); });
+					elm.appendChild(this.createDOMElememnt(obj)); },this);
 
 			return elm;
 		}
@@ -950,7 +946,7 @@
 
 				if (selector)
 					delegator = function(e){
-						var evt, match = !z.matchz(e.target,selector) ?
+						var match = !z.matchz(e.target,selector) ?
 											z(e.target).closest(selector, element).get(0) : e.target;
 
 						if (match && match !== element)
@@ -1052,7 +1048,7 @@
 	function checkValidate(newdata,model){
 		if(!model._v) return true;
 		var validate = model._asv(_),
-				error = [], valid=true, key = _keys(validate);
+				error = [], valid, key = _keys(validate);
 
 		for(var i=0,s=key.length,isRequired,value; i<s; i++){
 			// get validate funtion
@@ -1463,7 +1459,6 @@
 	var vid = 0;
 	aV = function(obj){
 		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
-			view = this,
 			vroot = config.root,
 			render = config.render,
 			events = config.events,
@@ -1644,7 +1639,6 @@
 	aT = function(obj){
 		var config = _extend(_clone(ATOM_DEFAULT),obj||{}),
 				initList = config.use,
-				events = config.events,
 				LIST = [];
 
 		delete config.use;

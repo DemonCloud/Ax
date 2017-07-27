@@ -1,4 +1,4 @@
-// import ax from "ax-struct-js" 
+// import ax from "ax-struct-js"
 // import ax from "ax" #or from alias for webpack
 
 ax.module("Router",function(ax,struct){
@@ -8,13 +8,16 @@ ax.module("Router",function(ax,struct){
 
 // * use pushState or replaceState
 // * onpopstate event only trigger when the History go(+-1) (user trigger)
-// * state as a stack [ - - - - ]
+// * historyStates as a stack [ - - - - ]
+
+// *define assert;
+// *define history [H]
+// *define pathReg to exec
+var _ = [] ,
+		H = struct.root.history,
+		pathReg = /\/:([^\s\/]+)/g;
 
 // Define Utils [ struct ]
-// define assert;
-var _ = [];
-
-var H = struct.root.history;
 var merge = struct.merge(),
 		clone = struct.clone(),
 		is    = struct.type("def"),
@@ -30,46 +33,81 @@ var merge = struct.merge(),
 		noop  = struct.noop(),
 		qstr  = struct.param("stringify"),
 		toNum = struct.convert("number"),
-		qpars = struct.param("parse"),
-		aset  = struct.prop("set");
-	
-
-// delegator view
-var delegatorView = ax.view.extend({
-	root: document.documentElement,
-	render: noop
-});
+		qpars = struct.param("parse");
 
 // Default Options
+// for merge the keywords
 var DEFAULT_ROUTER_OPTION = {
 	routes: {},
 	actions: {}
 };
 
+// delegator view
+// view bind on root;
+// for reg Element to trigger the Router change;
+var delegatorView = ax.view.extend({
+	root: document.documentElement,
+	render: noop
+});
+
 // About trigger
 //  - when refresh browser at router init
 //  - when the click binder router-link
 //  - when the history go or back (popstate)
-var pathReg = /\/:([^\s\/]+)/g;
+
+// Active the routers
+function toActive(source,path,query,state,notpush){
+	if(this._status){
+		var _ROUTER = this, key = keys(source.mapping), route, param;
+
+		for(var i=0, l=key.length,checker; i<l; i++)
+			if((checker = source.mapping[key[i]]).test(path)){
+				route = key[i];
+				param = cmb(source.params[route], slice(checker.exec(path),1));
+				break;
+			}
+
+		if(route){
+			if(!notpush && 
+				path !== location.pathname &&
+				path !== location.pathname + "/"
+			)
+				H.pushState(state,null,path+(isStr(query) ?
+					(query.charAt(0) !== '?' ? "?":"")+query :
+					is(query,"Object") ? ("?"+qstr(query)) : ""));
+
+			each(map(source.routes[route],function(name){
+				// setup funtion call
+				return source.actions[name] || noop;
+			}),function(fn){
+				return fn.call(_ROUTER,
+					param,
+					is(query,"Object") ? query : qpars(query),
+					state
+				);
+			});
+		}
+	}
+
+	return this;
+}
 
 var Router = function(option){
-	var _this = this;
 	var source = merge(
 		clone(DEFAULT_ROUTER_OPTION),
 		is(option,"Object") ? option : {}
-	);
-	
+	), _this = this;
+
 	// create Assert method
 	this._status = 0;
-
-	this._assert = function(name,idf){
-		if(idf === _) 
-			return aget(source,name);
+	this._assert = function(idf){
+		if(idf === _) return source;
 	};
 
-	var delegatorEvents = {};
-	var events = map(source.elements,
-		function(elm){ return "click:"+elm; });
+	var delegatorEvents = {},
+	events = map(source.elements, function(elm){
+		return "click:"+elm;
+	});
 
 	if(events = events.join("|")){
 		delegatorEvents[events] = function(e){
@@ -84,10 +122,9 @@ var Router = function(option){
 			);
 		};
 
-		this.delegator = new delegatorView({ 
-			events: delegatorEvents 
-		});
-	};
+		// create delegatorView on root
+		delegatorView({ events: delegatorEvents });
+	}
 
 	source.mapping = {};
 	source.params =  {};
@@ -96,16 +133,14 @@ var Router = function(option){
 	});
 
 	each(source.routes,function(action,path){
-		var actions, argslength;
-		var routeParam = [];
-
-		var pathMatcher = trim(path).replace(pathReg,
-			function(match,param){ 
+		var routeParam = [],
+		pathMatcher = trim(path).replace(pathReg,
+			function(match,param){
 				routeParam.push(param);
 				return "/([^\\s\\/]+)";
 			}
-		); 
-		
+		);
+
 		source.params[path] = routeParam;
 		source.mapping[path] = RegExp("^"+pathMatcher+"[\/]?$");
 	});
@@ -114,84 +149,31 @@ var Router = function(option){
 	// path : location.pathname
 	// query : location.search
 	// state : event.state
-	window.addEventListener("popstate",function(event){
-		if(this._status){
-			var _ROUTER = this;
-			var route, param , path = location.pathname;
-			var key = keys(source.mapping);
-
-			for(var i =0, l=key.length,checker;i<l; i++){
-				checker = source.mapping[key[i]];
-				if(checker.test(path)){
-					route = key[i];
-					param = cmb(source.params[route],slice(checker.exec(path),1));
-					break;
-				}
-			}
-
-			if(route){
-				var query = location.search;
-				each(map(source.routes[route],function(name){
-					// setup funtion call
-					return source.actions[name] || noop;
-				}),function(fn){
-					return fn.call(_ROUTER, param,
-						is(query,"Object") ? query : qpars(query),
-						event.state
-					);
-				});
-			}
-		}
+	struct.root.addEventListener("popstate",function(event){
+		return toActive.call(this,
+			source,
+			location.pathname,
+			location.search,
+			event.state,
+			true
+		);
 	}.bind(this));
 };
 
 Router.prototype = {
 	// goto take the initiative to trigger
 	to: function(path,query,state,notpush){
-		if(this._status && path){
-			var _ROUTER = this;
-			var mapping = this._assert("mapping",_);
-			var params = this._assert("params",_);
-			var routes = this._assert("routes",_);
-			var actions = this._assert("actions",_);
-			var key = keys(mapping);
-	
-			var route, param;
-	
-			for(var i =0, l=key.length,checker;i<l; i++){
-				checker = mapping[key[i]];
-				if(checker.test(path)){
-					route = key[i];
-					param = cmb(params[route],slice(checker.exec(path),1));
-					break;
-				}
-			}
-	
-			if(route){
-				if(!notpush){
-					H.pushState(state,null,path+(isStr(query) ? 
-						(query.charAt(0) !== '?' ? "?":"")+query :
-						is(query,"Object") ? ("?"+qstr(query)) : ""));
-				}
-	
-				each(map(routes[route],function(name){
-				// setup funtion call
-					return actions[name] || noop;
-				}),function(fn){
-					return fn.call(_ROUTER, param,
-						is(query,"Object") ? query : qpars(query),
-						state
-					);
-				});
-			}
-		};
-
-		return this;
+		return toActive.call(this,
+			this._assert(_),
+			path,
+			query,
+			state,
+			notpush
+		);
 	},
 
 	back: function(){
 		H.back();
-
 		return this;
 	},
 
@@ -206,28 +188,22 @@ Router.prototype = {
 	},
 
 	start: function(path,query,state){
-		if(this._status) 
-			return this;
-
+		if(this._status) return this;
 		this._status = 1;
-
-		if(0 in arguments && path){
-			var notpush = (
+		if(0 in arguments && path)
+			this.to(path,query,state,
 				path === location.pathname ||
 				path === location.pathname+"/"
 			);
-			this.to.call(this,path,query,state,notpush);
-		}
 
 		return this;
 	},
 
 	stop: function(){
 		this._status = 0;
-
 		return this;
 	}
-}
+};
 
 return Router;
 

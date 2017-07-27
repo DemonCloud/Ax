@@ -13,21 +13,30 @@
 	}
 </style>
 <div id="tree"></div>
+<div id="app"></div>
 
 <script src="./src/struct.js"></script>
 <script src="./src/ax.js"></script>
 <script src="./modules/Ax-Router.js"></script>
 
-<script id="tpl" type='text/tpl'>
+<script id="tpl" type='ax/tpl'>
 	{{ var r=struct.random("string") }}
 	{{ var ri=struct.random("int") }}
 	<div>
 		{{* each [route] in routes }}
-	<router class="router" href="javascript:;" to="{{#route.path}}" query="id={{#r(6)}}&cd={{#ri(1,10000)}}">
-				{{#route.name}}
-			</router>
-			<br>
+	<router 
+		class="router" 
+		href="javascript:;"
+		to="{{#route.path}}"
+		query="id={{#r(6)}}&cd={{#ri(1,10000)}}">{{#route.name}}</router><br>
 		{{* end}}
+	</div>
+</script>
+
+<script id="state" type="ax/tpl">
+	<div>
+		<span>id =&gt; {{#query.id}}</span><br>
+		<span>cd =&gt; {{#query.cd}}</span>
 	</div>
 </script>
 
@@ -36,6 +45,11 @@ var slice = struct.slice();
 var view = ax.view({
 	template:document.getElementById("tpl").innerHTML,
 });
+
+var app = ax.view({
+	root: document.getElementById("app"),
+	template:document.getElementById("state").innerHTML,
+})
 
 view.mount(
 	document.getElementById("tree"),
@@ -55,23 +69,24 @@ var route = new Router({
 
 	routes:{
 		"/": ["default"],
-		"/route" : ["do","withdo"],
+		"/route" : ["bone"],
 		"/route/:id": ["bone"] ,
 		"/route/:id/edit/:store" : ["bone"]
 	},
 
 	actions:{
-		default: function(){
-			console.log("default");
-		},
-		do : function(){
-			console.log.apply(console,["do->/route"].concat(slice(arguments)))
-		},
-		withdo: function(){
-			console.log("withdo");
+		default: function(param,query,state){
+			app.render({
+				query: {
+					id: "default",
+					cd: "default"
+				}
+			});
 		},
 		bone: function(param,query,state){
-			console.log.apply(console,["bone->/route/:id"].concat(slice(arguments)));
+			app.render({
+				query: query
+			});
 		}
 	}
 });
