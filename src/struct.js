@@ -215,12 +215,10 @@ function isDefine(obj,name){
 
 // ArrayLike [ type ] 
 function isArrayLike(obj){
-	return obj !==null && (isNum(obj.length) && isObj(obj)) &&(
-				 isArray(obj) ||
-				 isDefine(obj,"Arguments") ||
-				 isDefine(obj,"NodeList") ||
-				 isDefine(obj,"HTMLCollection")||
-				 isDefine(obj,"Storage"));
+	return !!obj && 
+				 !isFn(obj) && 
+				 isObj(obj) && 
+				 isNum(obj.length);
 }
 
 // isNaN [ ES6 Method ]
@@ -241,11 +239,14 @@ function isDate(n){
 }
 
 function isEmpty(n){
-	return isPrimitive(n) ? false : !size(n);
+	return isStr(n) ? !size(n) : 
+	isPrimitive(n) || !size(n) ;
 }
 
 function isDOM(e){
-	return isObj(e) && e.nodeType > 0 && (e instanceof Node || e instanceof Element);
+	return isObj(e) 
+		&& e.nodeType > 0 
+		&& (e instanceof Node || e instanceof Element);
 }
 
 function isElement(e){
@@ -2117,6 +2118,7 @@ var $type = {
 	node: isNode,
 	text: isNode,
 	native: isNative,
+	need : isRequired,
 	require: isRequired,
 	required: isRequired,
 	type: typec,
@@ -2311,7 +2313,7 @@ var $reduce = {
 };
 
 var $sort = {
-	nactive: sort,
+	native: sort,
 	q: quickSort,
 	i: insertSort,
 	quick: quickSort,

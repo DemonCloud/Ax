@@ -1668,7 +1668,7 @@
 		_extend(this.use(initList),config);
 	};
 
-	var stom = function(atom,list){
+	function stom(atom,list){
 		var c = ax.atom({ use:list });
 		c.back = function(){ return atom; };
 		return c;

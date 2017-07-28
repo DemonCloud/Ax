@@ -78,18 +78,11 @@ var route = new Router({
 	actions:{
 		default: function(param,query,state){
 			console.log(0,"default");
-			app.render({
-				query: {
-					id: "default",
-					cd: "default"
-				}
-			});
+			app.render({ query: { id: "default", cd: "default" } });
 		},
 		bone: function(param,query,state){
 			console.log(size(param)+1,"bone");
-			app.render({
-				query: query
-			});
+			app.render({ query: query });
 		}
 	}
 });

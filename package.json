@@ -9,7 +9,7 @@
     "url": "https://demoncloud.github.io"
   },
   "directories": {
-    "test": "test"
+  	"test": "test"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "browser-sync start --server --files **/*.html",
-    "test": "gulp test"
+    "test": "jest"
   },
   "keywords": [
     "ax",
@@ -52,6 +52,7 @@
     "gulp-requirejs-optimize": "latest",
     "gulp-sequence": "latest",
     "gulp-uglify": "latest",
-    "requirejs": "latest"
+    "requirejs": "latest",
+    "jest": "latest"
   }
 }
