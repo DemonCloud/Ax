@@ -419,10 +419,11 @@
 	};
 
 	z.matchz = function(elm,selector){
-		return !(
-		elm===null||
-		elm===document||
-		!_isStr(selector)) && matchzx.call(elm, selector);
+		return (
+		elm!==null &&
+		elm!==document &&
+		_isStr(selector)) && 
+		matchzx.call(elm,selector);
 	};
 
 	z.event = {
@@ -609,8 +610,7 @@
 	var patchAttr = function(o,t){
 		var s = {};
 		_fol(t,function(v,k){
-			if(o[k] === v)
-				s[k]=1;
+			if(o[k] === v) s[k]=1;
 		});
 		return s;
 	};
@@ -689,24 +689,24 @@
 			else if(org.tagName === tag.tagName){
 				if(!_eq(org.attributes,tag.attributes)){
 					if(org.attributes&&tag.attributes)
-						patch.push( this.createPatch(org,tag,8));
+						patch.push(this.createPatch(org,tag,8));
 					else if(!org.attributes)
-						patch.push( this.createPatch(org,tag,7));
+						patch.push(this.createPatch(org,tag,7));
 					else if(!tag.attributes)
-						patch.push( this.createPatch(org,tag,9));
+						patch.push(this.createPatch(org,tag,9));
 				}
 
 				// some node , maybe modify
 				if(org.text !== tag.text){
 					if((org.text && tag.text) && org.text !== tag.text)
 						// modify text
-						patch.push( this.createPatch(org,tag,4));
+						patch.push(this.createPatch(org,tag,4));
 					else if(!org.text)
 						// fill with text
-						patch.push( this.createPatch(org,tag,5));
+						patch.push(this.createPatch(org,tag,5));
 					else if(!tag.text)
 						// modify to child DOM or empty
-						patch.push( this.createPatch(org,tag,6));
+						patch.push(this.createPatch(org,tag,6));
 					return patch;
 				}
 
@@ -716,7 +716,7 @@
 						this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
 
 			}else if(org.tagName !== tag.tagName)
-				patch.push( this.createPatch(org,tag,1));
+				patch.push(this.createPatch(org,tag,1));
 
 			return patch;
 		},
@@ -952,7 +952,8 @@
 						if (match && match !== element)
 							return (autoRemove || callback).apply(
 								match,
-								[_extend(e, {currentTarget: match, liveFired: element})].concat(_slice(arguments,1))
+								[_extend(e, {currentTarget: match, liveFired: element})]
+								.concat(_slice(arguments,1))
 							);
 					};
 
@@ -1022,7 +1023,9 @@
 
 		remove: function(){
 			return this.each(function(elm){
-				elm.parentNode.removeChild(z(elm).off().get(0));
+				elm.parentNode.removeChild(
+					z(elm).off().get(0)
+				);
 			});
 		},
 
@@ -1099,7 +1102,9 @@
 	}
 
 	function warn(value,msg){
-		return !console.warn(vahandler({ value : value, type : _type(value), msg : msg||""}));
+		return !console.warn(
+			vahandler({ value : value, type : _type(value), msg : msg||""})
+		);
 	}
 
 	function makeChecker(checker,type){
@@ -1145,6 +1150,29 @@
 		return str.split("").reverse().join("");
 	}
 
+	function modelDefined(model,props){
+		_fol(props,function(t,n){
+			_define(this,n,{ value: t, 
+				writable: false, 
+				enumerable: false, 
+				configurable: false 
+			});
+		},model);
+		return model;
+	};
+
+	ax.module = function(name,creater){
+		var make = maker[name];
+		if(make) return make;
+		if(make = creater.apply(struct.root,
+				[ax,struct].concat(_slice(arguments,2))))
+			return (maker[name] = make);
+	};
+
+	ax.use = function(name){
+		return maker[name];
+	};
+
 	aS = {
 		t: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
@@ -1164,7 +1192,10 @@
 				h2 = bits >> 12 & 0x3f;
 				h3 = bits >> 6 & 0x3f;
 				h4 = bits & 0x3f;
-				enc += this.t.charAt(h1) + this.t.charAt(h2) + this.t.charAt(h3) + this.t.charAt(h4);
+				enc += this.t.charAt(h1) 
+						+  this.t.charAt(h2) 
+						+  this.t.charAt(h3) 
+						+  this.t.charAt(h4);
 			} while (i < data.length);
 			r = data.length % 3;
 			return (r ? enc.slice(0, r - 3) : enc) + "===".slice(r || 3);
@@ -1222,13 +1253,6 @@
 		rm: function(name){
 			LS.removeItem(SN+this.incry(name,revs(name)));
 		}
-	};
-
-	var modelDefined = function(model,props){
-		_fol(props,function(t,n){
-			_define(this,n,{ value: t, writable: false, enumerable: false, configurable: false });
-		},model);
-		return model;
 	};
 
 	// Ax Model
@@ -1458,12 +1482,12 @@
 	// View container
 	var vid = 0;
 	aV = function(obj){
-		var config = _extend(_clone(VIEW_DEFAULT),obj||{}),
-			vroot = config.root,
-			render = config.render,
-			events = config.events,
-			stencil = config.template,
-			props = _lock(_isObj(config.props) ? config.props : {});
+		var config  = _extend(_clone(VIEW_DEFAULT),obj||{}),
+				props   = _lock(_isObj(config.props) ? config.props : {}),
+				vroot   = config.root,
+				render  = config.render,
+				events  = config.events,
+				stencil = config.template;
 
 		delete config.root;
 		delete config.mount;
@@ -1476,7 +1500,8 @@
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
-			stencil = _isStr(stencil) ? _doom(stencil.trim(), props) :
+			stencil = _isStr(stencil) ? 
+			_doom(stencil.trim(), props) :
 			(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){
@@ -1495,21 +1520,17 @@
 
 			if(config.model)
 				if(vA.model(config.model))
-					config.model.on("change",
-						this.render.bind(this));
+					config.model.on("change",this.render);
 
 		}else{
 			this.mount = function(el){
 				if(checkElm(el)){
 					// bind events
 					this.root = vroot = el;
-
 					_fol(events,uon,setRender(this,render));
-
 					if(config.model)
 						if(vA.model(config.model))
-							config.model.on("change",
-								this.render.bind(this));
+							config.model.on("change",this.render);
 
 					// trigger render
 					if(1 in arguments)
@@ -1523,9 +1544,7 @@
 		}
 
 		// first trigger "init" event
-		this._vid = vid++;
-
-		_extend(this,config)
+		_extend(this,config,this._vid=vid++)
 			.emit("init")
 			.unbind("init");
 	};
@@ -1562,10 +1581,9 @@
 		},
 
 		emit: function(type,args){
-			var k = (type||"").split(":");
-
+			var t = _toString(t), k = t.split(":");
 			if(k.length>2){
-				return _fal(_toString(type).split("|"),function(mk){
+				return _fal(t.split("|"),function(mk){
 					var mkf = mk.split(":");
 					z(this.root).find(mkf[1]).trigger(mkf[0],args);
 				},this),this;
@@ -1579,6 +1597,7 @@
 
 		destroy: function(withRoot){
 			this.root.removeAttribute("ax-root",this.root._vid=void 0);
+
 			_ayc(function(){
 				z(this.root).off()[withRoot?"remove":"html"]();
 				this.emit("destroy",delete this.root);
@@ -1718,35 +1737,23 @@
 
 	// ax validate functional
 	ax.va = vA = {
-		required  : makeChecker(_isNeed,"required"),
-		fn        : makeChecker(_isFn,"function"),
-		int       : makeChecker(_isInt,"int"),
-		array     : makeChecker(_isAry,"array"),
-		float     : makeChecker(_isFloat,"float"),
-		string    : makeChecker(_isStr,"string"),
-		object    : makeChecker(_isObj,"object"),
-		number    : makeChecker(_isNum,"number"),
-		arrayLike : makeChecker(_isAryL,"arrayLike"),
-		primitive : makeChecker(_isPrim,"primitive"),
-		bool      : makeChecker(_isBool,"boolean"),
-		dom       : makeChecker(_isDOM,"dom"),
-		element   : makeChecker(_isElm,"element"),
-		node      : makeChecker(_isNode,"node"),
-		model     : makeChecker(isAx(aM),"model"),
-		view      : makeChecker(isAx(aV),"view"),
-		atom      : makeChecker(isAx(aT),"atom")
-	};
-
-	ax.module = function(name,creater){
-		var make = maker[name];
-		if(make) return make;
-		if(make = creater.apply(struct.root,
-				[ax,struct].concat(_slice(arguments,2))))
-			return (maker[name] = make);
-	};
-
-	ax.use = function(name){
-		return maker[name];
+		required  : makeChecker(_isNeed  , "required")  ,
+		fn        : makeChecker(_isFn    , "function")  ,
+		int       : makeChecker(_isInt   , "int")       ,
+		array     : makeChecker(_isAry   , "array")     ,
+		float     : makeChecker(_isFloat , "float")     ,
+		string    : makeChecker(_isStr   , "string")    ,
+		object    : makeChecker(_isObj   , "object")    ,
+		number    : makeChecker(_isNum   , "number")    ,
+		arrayLike : makeChecker(_isAryL  , "arrayLike") ,
+		primitive : makeChecker(_isPrim  , "primitive") ,
+		bool      : makeChecker(_isBool  , "boolean")   ,
+		dom       : makeChecker(_isDOM   , "dom")       ,
+		element   : makeChecker(_isElm   , "element")   ,
+		node      : makeChecker(_isNode  , "node")      ,
+		model     : makeChecker(isAx(aM) , "model")     ,
+		view      : makeChecker(isAx(aV) , "view")      ,
+		atom      : makeChecker(isAx(aT) , "atom")
 	};
 
 	ax.VERSION = struct.VERSION;

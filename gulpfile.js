@@ -5,6 +5,7 @@
 
 // config
 const cfg = global.cfg = require('./gulp/config.js');
+
 const gulp = require('gulp');
 
 // const tasktest = require('./gulp/task.test');

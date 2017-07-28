@@ -203,9 +203,9 @@ function isRequired(e){
 // Error [ type ]
 function isError(obj){
 	return obj !== null &&
-		typeof obj === "object" &&
-		typeof obj.message === "string" &&
-		typeof obj.name === "string";
+		isObj(obj) &&
+		isStr(obj.message) &&
+		isStr(obj.name)
 }
 
 // Define the typename [ type ]
@@ -215,7 +215,7 @@ function isDefine(obj,name){
 
 // ArrayLike [ type ] 
 function isArrayLike(obj){
-	return obj !==null && (typeof obj.length === "number" && isObj(obj)) &&(
+	return obj !==null && (isNum(obj.length) && isObj(obj)) &&(
 				 isArray(obj) ||
 				 isDefine(obj,"Arguments") ||
 				 isDefine(obj,"NodeList") ||
@@ -699,7 +699,7 @@ function fseq(a){
 }
 
 function fastUnique(ary){
-	var u = {}, n = typeof first(ary) === 'number';
+	var u = {}, n = isNum(first(ary));
 
 	for(var i = 0 ; i<ary.length; i++){
 		if(u[ary[i]]) continue;
@@ -1356,8 +1356,7 @@ function DOOM(txt,bounds,name){
 	var _, render, position = 0,
 		res = "_p+='",
 
-		rname = isObj(bounds) ? 
-		name : (typeof bounds === "string" ? bounds : ""),
+		rname = isObj(bounds) ? name : (isStr(bounds) ? bounds : ""),
 		methods = isObj(bounds) ? bounds : {},
 
 		args = slice(arguments,2),
@@ -1774,7 +1773,7 @@ function getProp(obj,prop,dowith){
 		var args = slice(arguments,3);
 		if(isFn(dowith))
 			tmp = dowith.apply(tmp,(args.unshift(tmp),args));
-		else if(typeof dowith === "string")
+		else if(isStr(dowith))
 			tmp = isFn(tmp[dowith]) ? 
 				tmp[dowith].apply(tmp,args) :
 				tmp[dowith];
@@ -1828,14 +1827,14 @@ function auto(ary,num){
 // size(NaN) => 0
 function size(n){
 	if(!isFn(n) && n!= null && !isNaN(n))
-		return typeof n.length === 'number' ?
-			n.length : (isObj(n) ? keys(n).length : 0);
+		return isNum(n.length) ? n.length : 
+			 (isObj(n) ? keys(n).length : 0);
 	return 0;
 }
 
 // return now TimeStamp [ method ]
 function now(){
-	return (new Date()).getTime();
+	return (new Date).getTime();
 }
 
 // object values [ method ]
