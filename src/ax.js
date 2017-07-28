@@ -15,12 +15,12 @@
 		define('ax',['struct'],function(_){ return factory(ax,_); });
 	else if(typeof exports !== "undefined"){
 		// support CommonJS exports
-		// * fuck the npm package rubbish
-		var _ = require('struct');
-		factory(exports,_);
+		// * fuck the npm package rubbish, where package name use [ struct ]
+		// should defined webpack alias with [ "struct" : "ax-struct-js" ]
+		factory(exports,require('struct') || require("ax-struct-js"));
 	}else
 		// build on browser global object
-		root.ax = factory(ax,root._);
+		root.ax = factory(ax,root.struct);
 
 })(this, {}, function(ax,struct){
 	"use strict";
@@ -178,9 +178,8 @@
 	// @ much more need its better
 
 	Z = function(elm){
-		this.el = _isAryL(elm) ?
-							_slice(elm) :
-							(elm instanceof Element ? [elm] : []);
+		this.el = _isAryL(elm) ? _slice(elm) :
+							(_isElm(elm) ? [elm] : []);
 	};
 
 	z = function(x){ return z.init.call(root,x); };

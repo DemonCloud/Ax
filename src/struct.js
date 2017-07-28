@@ -32,9 +32,9 @@
 		if(module.exports && !module.nodeType) // support CommonJS exports
 			exports = module.exports = _;
 		exports.struct = _;
-	} else
+	} else 
 		// build on browser global object
-		root.struct = root._ = _;
+		root.struct = _;
 
 	// due to [ Webpack ] fucking should return [ Window ]
 }(this, function(root){ 
