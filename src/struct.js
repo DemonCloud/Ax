@@ -390,10 +390,16 @@ function toMinus(n){
 
 // XOR operation, 
 // details: http://en.wikipedia.org/wiki/XOR_swap_algorithm
-function swap(a,b){
-	a^=b;
-	b^=a;
-	a^=b;
+function swap(ary,a,b){
+	var tmp = ary[a];
+	ary[a] = ary[b];
+	ary[b] = tmp;
+
+	//[ a, b ] = [ b, a ]; 
+	
+	// a^=b;
+	// b^=a;
+	// a^=b;
 }
 
 // cast arguments to Array
@@ -1017,6 +1023,15 @@ function randomDate(){
 function randomDice(max){
 	max = toNumber(max) > 0 ? toNumber(max) : 2; 
 	return randomInt(1,(max%2===0?max:max+1));
+}
+
+// random Array [ method ]
+function randomArray(len,use){
+	var args = slice(arguments,2),
+			usemethod = $random[use] || $random.default;
+	return mapValue(fill(len,0),function(){
+		return usemethod.apply(null,args);
+	})
 }
 
 // Create Function caller [ method ]
@@ -1872,13 +1887,60 @@ function wrap(){
 }
 
 function sort(ary,key){
-	if(isObj(ary)&&!isArray(ary)&&typeof key === "string"){
+	if(isObj(ary)&&isStr(key)&&key){
 		var target = getProp(ary,key);
 		return target.sort.apply(target,slice(arguments,2)),ary;
 	}
 
 	if(isArray(ary))
 		return ary.sort.apply(ary,slice(arguments,1));
+	return ary;
+}
+
+function IST(ary){
+	for(var i = 0 ,len=ary.length,t,j; i < len;i++) {
+		t = ary[i]; j = i-1;
+		while (j>=0 && ary[j]>t) {
+			ary[j+1] = ary[j]; j--;
+		}
+		ary[j+1] =t;
+	}
+	return ary;
+}
+
+function insertSort(ary,key){
+	if(isObj(ary)&&isStr(key)&&key) return IST(getProp(ary,key)),ary;
+	if(isArray(ary)) return IST(ary);
+	return ary;
+}
+
+function QST_part(ary,left,right){
+	var pivotValue = ary[right], index = left;
+
+	for(var i=left; i<right; i++){
+		if(ary[i]<pivotValue) swap(ary,i,index,index++);
+	}
+
+	swap(ary,right,index);
+
+	return index;
+};
+
+function QST_sort(ary,left,right){
+	if(left>right) return;
+	var index = QST_part(ary,left,right);
+	QST_sort(ary,left,index-1);
+	QST_sort(ary,index+1,right);
+}
+
+function QST(ary){
+	QST_sort(ary,0,ary.length-1);
+	return ary;
+}
+
+function quickSort(ary,key){
+	if(isObj(ary)&&!isArray(ary)&&isStr(key)) return QST(getProp(ary,key)),ary;
+	if(isArray(ary)) return QST(ary);
 	return ary;
 }
 
@@ -2149,6 +2211,8 @@ var $random = {
 	char: randomCharacter,
 	letter: randomCharacter,
 	character: randomCharacter,
+	arr: randomArray,
+	array: randomArray,
 	date: randomDate,
 	hex: randomHex,
 	dice: randomDice,
@@ -2245,7 +2309,16 @@ var $reduce = {
 	left: reduce,
 	right: reduceRight,
 	default: reduce
-}
+};
+
+var $sort = {
+	nactive: sort,
+	q: quickSort,
+	i: insertSort,
+	quick: quickSort,
+	insert: insertSort,
+	default: sort
+};
 
 var $doom = {
 	default: DOOM.bind(doomSetting)
@@ -2294,7 +2367,6 @@ var nublist = {
 	link      : wrap,
 	size      : size,
 	now       : now,
-	sort      : sort,
 	exist     : exist,
 	lock      : frozen,
 	cool      : cool,
@@ -2313,6 +2385,7 @@ var zublist = {
 	map      : $map,
 	has      : $has,
 	type     : $type,
+	sort     : $sort,
 	html     : $html,
 	unique   : $unique,
 	convert  : $convert,

@@ -1703,7 +1703,7 @@
 	};
 
 	// #genertor minmix [ struct ] api
-	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat","pull","drop","pairs",["hook","map","hook"],["mapKey","map","key"],["uniqueFast","unique","fast"],["pullAt","pull","at"],["dropLeft","drop","left"],["dropRight","drop","right"],["dropLeftTo","drop","leftto"],["dropRightTo","drop","rightto"],["unpairs","pairs","un"]],genertor_);
+	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat","pull","drop","pairs",["hook","map","hook"],["mapKey","map","key"],["uniqueFast","unique","fast"],["pullAt","pull","at"],["dropLeft","drop","left"],["dropRight","drop","right"],["dropLeftTo","drop","leftto"],["dropRightTo","drop","rightto"],["unpairs","pairs","un"],["insertSort","sort","i"],["quickSort","sort","q"]],genertor_);
 
 	_fal(["keys","every","some","diff","intsec","first","last","auto","eq","values","size","each","has","type","index",["hasKey","has","key"],["findex","index","first"],["lindex","index","last"],["single","index","one"],["one","index","one"],["reduce","reduce","left"],["reduceRight","reduce","right"]],genertor_$);
 

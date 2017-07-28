@@ -39,6 +39,8 @@ Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
 5. Make plugin use `moudle` API. prepare for `Ax-Loader` && `Ax-Router`
 
+6. addMore `struct` function with benchmark, as `sort(inertSort)`,`sort(quickSort)`
+
 ## Document (current version 3.3.33 -> v3)
 
 > The document will rebuild on 4.0
