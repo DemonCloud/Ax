@@ -12,13 +12,13 @@
  *  FireFox 4+
  *  IE 9+
  *  Android 4+
- *  Safari 6+
+ *  Safari 5+
  *
  * Server Version With
  *  Node 6.0+ (Full support with ES6)
  *
- * @Author  : YiJun
- * @Date    : 2017.2.28 - now
+ * @Author : YiJun
+ * @Date   : 2017.2.28 - now
  */
 
 (function(root,struct,factory,_){
@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.0";
+struct.VERSION = "4.0.0-alpha0.1";
 
 // base method
 var or = {},
