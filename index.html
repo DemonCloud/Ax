@@ -18,6 +18,7 @@
 <script src="./src/struct.js"></script>
 <script src="./src/ax.js"></script>
 <script src="./modules/Ax-Router.js"></script>
+<script src="./modules/Ax-Loader.js"></script>
 
 <script id="tpl" type='ax/tpl'>
 	{{ var r=struct.random("string") }}
@@ -42,6 +43,8 @@
 
 <script>
 var slice = struct.slice();
+var merge = struct.merge();
+
 var view = ax.view({
 	template:document.getElementById("tpl").innerHTML,
 });
@@ -88,6 +91,11 @@ var route = new Router({
 });
 
 route.start("/");
+
+var a = [{a:1,b:2},{c:1}]
+var b = [{a:2},{c:2,d:{e:1}}]
+
+console.log(merge(a,b));
 </script>
 </body>
 </html>

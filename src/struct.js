@@ -895,18 +895,21 @@ function mergeCompare(v,n){
 
 function merge(f){
 	var res, collect = slice(arguments);
-	if(isArray(f)){
-		// deeping reduce to merge
-		reduce(collect,function(val,next){
-			return al(next,function(v,i){ if(v!=null) val[i] = v; }), (res=val);
-		},[]);
-	}else if(isObj(f)){
-		reduce(collect,function(val,next){
-			var vk = keys(val) , nk = keys(next);
-			return al(nk,function(key){ var v = val[key], n = next[key];
-				val[key] = mergeCompare(v,n) ? merge(v,n) : n; }), (res=val);
-		},{});
-	}
+
+	// deeping reduce to merge
+	if(isArray(f)) reduce(collect,function(val,next){
+		return al(next,function(nextval,i){ 
+			var v = val[i], n = nextval;
+			val[i] = mergeCompare(v,n) ? merge(v,n) : n ;
+		}),(res=val);
+	},[]);
+
+	else if(isObj(f)) reduce(collect,function(val,next){
+		var vk = keys(val) , nk = keys(next);
+		return al(nk,function(key){ var v = val[key], n = next[key];
+			val[key] = mergeCompare(v,n) ? merge(v,n) : n; }), (res=val);
+	},{});
+
 	return res;
 }
 

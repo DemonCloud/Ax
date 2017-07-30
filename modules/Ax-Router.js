@@ -1,4 +1,4 @@
-// import ax from "ax-struct-js"
+// import ax from "ax-js"
 // import ax from "ax" #or from alias for webpack
 
 ax.module("Router",function(ax,struct){
@@ -8,7 +8,7 @@ ax.module("Router",function(ax,struct){
 
 // * use pushState or replaceState
 // * onpopstate event only trigger when the History go(+-1) (user trigger)
-// * historyStates as a stack [ - - - - ]
+// * historyStates as a stack [ - - - = - - ]
 
 // *define assert;
 // *define history [H]
@@ -75,11 +75,15 @@ function toActive(source,path,query,state,notpush,isLink){
 
 		if(route){
 			var queryString = (isStr(query) ?
-					(query.charAt(0) !== '?' ? "?":"")+query :
+					(query.charAt(0) !== '?' ? "?" : "") + query:
 					is(query,"Object") ? ("?"+qstr(query)) : "");
 
 			if(!notpush)
-				H[checkPath(path) ? "pushState" : "replaceState"](state,null,path+queryString);
+				H[checkPath(path) ? "pushState" : "replaceState"](
+					{ state : state },
+					null,
+					path+queryString
+				);
 
 			each(map(source.routes[route],function(name){
 				// setup funtion call
