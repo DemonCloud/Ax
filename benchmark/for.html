@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<!-- <script src="../src/struct.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+	<script src="../dist/struct.min.js"></script>
+</head>
+<body>
+<script async>
+
+var r = struct.random("array");
+var al = struct.op("array");
+var _each = _.each;
+
+
+function todo(a){
+	return a+a;
+}
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Nactive For");
+for(var i=0; i<100000; i++){
+	var arr = r(88,"int",1,100);
+	for(var k=0; k<arr.length; k++)
+		todo(arr[k],k,arr);
+}
+console.timeEnd("Nactive For");
+
+console.time("Struct each Array");
+for(var ins=0; ins<100000; ins++){
+	al(r(108,"int",1,100),todo);
+}
+console.timeEnd("Struct each Array")
+
+console.time("Lodash each Array");
+for(var un=0; un<100000; un++){
+	_each(r(108,"int",1,100),todo);
+}
+console.timeEnd("Lodash each Array");
+
+console.time("ECMAScript5 Array forEach");
+for(var j=0; j<100000; j++)
+	r(108,"int",1,100).forEach(todo);
+console.timeEnd("ECMAScript5 Array forEach")
+
+console.time("Nactive For [With Context Binding]");
+for(var i=0; i<100000; i++){
+	var arr = r(88,"int",1,100);
+	for(var k=0; k<arr.length; k++)
+		todo.call(arr,arr[k],k,arr);
+}
+console.timeEnd("Nactive For [With Context Binding]");
+
+console.time("Struct each Array [With Context Binding]");
+for(var ins=0; ins<100000; ins++){
+	var arr = r(108,"int",1,100);
+	al(arr,todo,arr);
+}
+console.timeEnd("Struct each Array [With Context Binding]")
+
+console.time("Lodash each Array [With Context Binding]");
+for(var un=0; un<100000; un++){
+	var arr = r(108,"int",1,100);
+	_.each(arr,todo,arr);
+}
+console.timeEnd("Lodash each Array [With Context Binding]");
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>

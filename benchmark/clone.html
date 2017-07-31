@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<!-- <script src="../src/struct.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+	<script src="../dist/struct.min.js"></script>
+</head>
+<body>
+<script async>
+
+var lodashclone = _.clone;
+var structclone = struct.clone();
+var pvoit = {
+	a:1,
+	b:"2",
+	c: {
+		d: 2,
+	},
+	f: [1,2,3],
+	g:{
+		h: "dasjhkasd",
+		i:{
+			j: 4,
+			k: [3],
+			m: {
+				n: 2.3431123,
+				o: "sadsadd",
+				p:[]
+			}
+		},
+		q:[{
+			r: 2,
+			s: {
+				u: [2123,233,{
+					v:"12312"
+				}]
+			}
+		}]
+	}
+};
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Lodash clone");
+for(var un=0; un<1000000; un++)
+	lodashclone(pvoit);
+console.timeEnd("Lodash clone");
+
+console.time("Struct clone");
+for(var ins=0; ins<1000000; ins++)
+	structclone(pvoit,true);
+console.timeEnd("Struct clone")
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>

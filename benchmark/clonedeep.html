@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<!-- <script src="../src/struct.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+	<script src="../dist/struct.min.js"></script>
+</head>
+<body>
+<script async>
+
+var lodashclonedeep = _.cloneDeep;
+var structclonedeep = struct.clonedeep();
+var pvoit = {
+	a:1,
+	b:"2",
+	c: {
+		d: 2,
+		e: function(){}
+	},
+	f: [1,2,3],
+	g:{
+		h: "dasjhkasd",
+		i:{
+			j: 4,
+			k: [3],
+			l: function(){},
+			m: {
+				n: 2.3431123,
+				o: "sadsadd",
+				p:[]
+			}
+		},
+		q:[{
+			r: 2,
+			s: {
+				t: function(){},
+				u: [2123,233,{
+					v:"12312"
+				}]
+			}
+		}]
+	}
+};
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Struct clonedeep");
+for(var ins=0; ins<100000; ins++)
+	structclonedeep(pvoit);
+console.timeEnd("Struct clonedeep")
+
+console.time("Lodash cloneDeep");
+for(var un=0; un<100000; un++)
+	lodashclonedeep(pvoit);
+console.timeEnd("Lodash cloneDeep");
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+	<script src="../dist/struct.min.js"></script>
+	<!-- <script src="../src/struct.js"></script> -->
+</head>
+<body>
+<script async>
+
+var r = struct.random("array");
+var _diff = _.difference;
+var diff = struct.diff();
+var _intsec = _.intersection;
+var intsec = struct.intsec();
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Lodash diff");
+for(var un=0; un<100000; un++)
+	_diff(r(10,"int",1,30),r(5,"int",1,30),r(2,"int",1,15));
+console.timeEnd("Lodash diff");
+
+console.time("Struct diff");
+for(var ins=0; ins<100000; ins++)
+	diff(r(10,"int",1,30),r(5,"int",1,30),r(2,"int",1,15));
+console.timeEnd("Struct diff")
+
+console.time("Lodash intersection");
+for(var un=0; un<100000; un++)
+	_intsec(r(10,"int",1,30),r(5,"int",1,30),r(2,"int",1,15));
+console.timeEnd("Lodash intersection");
+
+console.time("Struct intersection");
+for(var ins=0; ins<100000; ins++)
+	intsec(r(10,"int",1,30),r(5,"int",1,30),r(2,"int",1,15));
+console.timeEnd("Struct intersection")
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>

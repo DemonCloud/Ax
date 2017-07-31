@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+	<script src="../dist/struct.min.js"></script>
+	<!-- <script src="../src/struct.js"></script> -->
+</head>
+<body>
+<script async>
+
+var r = struct.random("array");
+var loadshreduce = _.reduce;
+var structreduce = struct.reduce();
+var fn = function(a,b){ return a+b };
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Lodash reduce");
+for(var un=0; un<100000; un++)
+	loadshreduce(r(108,"int",1,100),fn,0);
+console.timeEnd("Lodash reduce");
+
+console.time("Struct reduce");
+for(var ins=0; ins<100000; ins++)
+	structreduce(r(108,"int",1,100),fn,0);
+console.timeEnd("Struct reduce")
+
+console.time("Native reduce");
+for(var n=0; n<100000; n++)
+	r(108,"int",1,100).reduce(fn,0);
+console.timeEnd("Native reduce")
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>
