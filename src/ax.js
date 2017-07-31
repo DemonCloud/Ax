@@ -154,10 +154,9 @@
 	}
 
 	function createExtend(use){
-		return function(opt){
-			var malloc = opt;
+		return function(malloc){
 			return function(o){
-				return new use(_merge(malloc,_isObj(o)?o:{}));
+				return new use(_merge(malloc,_isObj(o) ? o : {}));
 			};
 		};
 	}
@@ -196,11 +195,11 @@
 		notdata = prevent.concat(["compositionend"]);
 
 	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
-		eventMethods = {
+			eventMethods = {
 			preventDefault: 'isDefaultPrevented',
 			stopImmediatePropagation: 'isImmediatePropagationStopped',
 			stopPropagation: 'isPropagationStopped'
-		};
+			};
 
 	function zid(element) {
 		return element._zid || (element._zid = _zid++);
@@ -471,7 +470,9 @@
 	};
 
 	z.xEvent = function(event){
-		for(var key in event) this[key] = event[key];
+		var key;
+		for(key in event) 
+			this[key] = event[key];
 	};
 
 	// attr list mapping
@@ -730,10 +731,10 @@
 		},
 
 		mapTreeNode: function(ODOM,path){
-			var target;
-			for(var i=0,l=path.length,p=ODOM.children; i<l; i++){
+			var target,i=0,l=path.length,p=ODOM.children;
+			for(; i<l; i++){
 				if(p[path[i]]){ target = p[path[i]]; p = target.children; }
-				else{ break; }
+				else break;
 			}
 			return target;
 		},
@@ -903,11 +904,12 @@
 		},
 
 		closest : function(selector,element){
-			var el = this.el ,tmp=this.get(0) ,find;
+			var el=this.el ,tmp=this.get(0),
+					find, i=0, l=el.length;
 
-			for(var i=0,l=el.length;i<l;i++,tmp=el[i]){
+			for(;i<l;i++,tmp=el[i]){
 				while(tmp&&!find&&tmp!==element)
-					if(z.matchz((tmp=tmp.parentNode),selector))
+					if(z.matchz(tmp=tmp.parentNode,selector))
 						find = tmp;
 				if(find) break;
 			}
@@ -1049,10 +1051,12 @@
 
 	function checkValidate(newdata,model){
 		if(!model._v) return true;
-		var validate = model._asv(_),
-				error = [], valid, key = _keys(validate);
 
-		for(var i=0,s=key.length,isRequired,value; i<s; i++){
+		var validate = model._asv(_),
+				error = [], key = _keys(validate),
+				i=0, s=key.length, isRequired, value, valid;
+
+		for(; i<s; i++){
 			// get validate funtion
 			isRequired = validate[key[i]]; value= _get(newdata,key[i]);
 			if(!isRequired(value)){
@@ -1224,15 +1228,16 @@
 		},
 
 		incry: function(s,key){
-			var res = [];
-			for(var i=0,l=s.length; i<l; i++)
+			var i=0,l=s.length,res = [];
+			for(; i<l; i++)
 				res[i] = s[i].charCodeAt(0)^this.kAt(key,i);
 			return this.ecd(res);
 		},
 
 		decyt: function(s,key){
-			s = this.dcd(s);
-			for(var i=0,l=s.length; i<l; i++)
+			s = this.dcd(s); 
+			var i=0, l=s.length;
+			for(; i<l; i++)
 				s[i] = FCD(s[i]^this.kAt(key,i));
 			return s.join("");
 		},

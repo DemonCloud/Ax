@@ -450,11 +450,11 @@ function ol(obj,fn,ts){
 	return obj;
 }
 
-function fov(list){
-	if(isArray(list))
-		return al.apply(null,arguments);
-	else if(isObj(list) && !isFn(list) && list !== null)
-		return ol.apply(null,arguments);
+function fov(list,fn,ts){
+	if(isArrayLike(list))
+		return al(list,fn,ts);
+	else if(isObj(list) && list !== null)
+		return ol(list,fn,ts);
 	return list;
 }
 
@@ -469,9 +469,7 @@ function clone(l,shallow){
 		return slice(l);
 	if(isObj(l) && shallow){
 		var key = keys(l), i, tmp, len = key.length, res={};
-		for(i=len;i--;){
-			tmp = key[i]; res[tmp] = l[tmp];
-		}
+		for(i=len;i--;){ tmp = key[i]; res[tmp] = l[tmp]; }
 		return res;
 	}
 	if(!isPrimitive(l))
@@ -481,6 +479,7 @@ function clone(l,shallow){
 
 // Deeping Clone [ fast , complicated ]
 var p_ = function(){};
+
 function clonedeep(l){
 	var res = l;
 	if(isArrayLike(l)){
@@ -757,7 +756,7 @@ function pluck(list,mapkey,dowith){
 // groupBy [ method ]
 function groupBy(list,by){
 	var group = {},
-		func  = isFn(by);
+			func = isFn(by);
 	fov(list,function(val){
 		var key = func ? by(val) : getProp(val,by);
 		if(key){
@@ -970,11 +969,11 @@ function dropRight(ary,n){
 
 // dropTo([4,3,2,1,-1,-2],2) => [1,-1,-2];
 function dropTo(ary,it){
-	var res = slice(ary),
+	var i, res = slice(ary),
 			key = this===void 0 ? "shift" : "pop",
 			fn = isRegExp(it) ? cit(regCheck,it) : (isFn(it) ? it : fseq(it));
 
-	for(var i=res.length;i--;)
+	for(i=res.length;i--;)
 		if(fn(res[key]())) 
 			break;
 	return res;
@@ -1046,8 +1045,8 @@ function randomHex(format){
 // random string [ method ]
 function randomString(leng,all,upper){
 	// min leng => 2
-	var len = toNumber(leng) || 2,res=[];
-	for (var i=len; i--;)
+	var len = toNumber(leng) || 2, i=len, res=[];
+	for (;i--;)
 		res[i]=randomCharacter(all,upper);
 	return res.join('');
 }
@@ -1150,7 +1149,9 @@ var whiteSpace = /[\t\r\n\f\x20]/g,
 // @export requery
 function requery(serializea){
 	var res = {};
-	al(serializea,function(elm){ res[elm.name] = elm.value; });
+	al(serializea,function(elm){ 
+		res[elm.name] = elm.value; 
+	});
 	return res;
 }
 
@@ -1163,9 +1164,9 @@ function rInsignia(part){
 }
 
 function paramParse(url){
-	var turl = toString(url).split("#").shift();
-
-	var findQuery = turl.indexOf("?") , match , x = {},
+	var turl = toString(url).split("#").shift(),
+			
+			findQuery = turl.indexOf("?") , match , x = {},
 			param = ~findQuery ? turl.substr(findQuery+1) : turl;
 
 	while((match = qrsReg.exec(param)))
@@ -1175,9 +1176,9 @@ function paramParse(url){
 }
 
 function paramStringify(param){
-	var Cparam = clone(param);
+	var Cparam = clone(param), key;
 
-	for(var key in Cparam)
+	for(key in Cparam)
 		Cparam[key] = rInsignia(
 			isObj(Cparam[key]) ?
 			JSON.stringify(Cparam[key]) :
@@ -1804,7 +1805,7 @@ function getProp(obj,prop,dowith){
 			tmp = obj[prop];
 	}else{
 		// [a.b.2]
-		for(i=0,tmp = obj;i<keygen.length;i++)
+		for(i=0,tmp=obj;i<keygen.length;i++)
 			if(isPrimitive(tmp = tmp[keygen[i]])) 
 				break;
 	}
@@ -1814,9 +1815,7 @@ function getProp(obj,prop,dowith){
 		if(isFn(dowith))
 			tmp = dowith.apply(tmp,(args.unshift(tmp),args));
 		else if(isStr(dowith))
-			tmp = isFn(tmp[dowith]) ? 
-				tmp[dowith].apply(tmp,args) :
-				tmp[dowith];
+			tmp = isFn(tmp[dowith]) ? tmp[dowith].apply(tmp,args) : tmp[dowith];
 	}
 
 	return tmp;
@@ -1892,12 +1891,12 @@ function values(obj,prop){
 
 	// create Memoize function [ method ]
 function memoize(fn,context){
-	var memo = [];
+	var i, memo = [];
 	return function(){
 		var args = slice(arguments),df;
-		for(var i=memo.length; i--;)
-			if(eq(memo[i][0],args))
-				return (df=memo[i][1]);
+		for(i=memo.length; i--;)
+			if(eq(memo[i][0],args)) return (df=memo[i][1]);
+
 		return memo.push([args,df=fn.apply(context,args)]),df;
 	};
 }
@@ -1937,7 +1936,8 @@ function sort(ary,key){
 }
 
 function IST(ary){
-	for(var i = 0 ,len=ary.length,t,j; i < len;i++) {
+	var i=0, t, j, len=ary.length;
+	for(;i<len;i++) {
 		t = ary[i]; j = i-1;
 		while (j>=0 && ary[j]>t) {
 			ary[j+1] = ary[j]; j--;
@@ -1954,11 +1954,11 @@ function insertSort(ary,key){
 }
 
 function QST_part(ary,left,right){
-	var pivotValue = ary[right], index = left;
+	var pivotValue = ary[right], i=left, index = left;
 
-	for(var i=left; i<right; i++){
-		if(ary[i]<pivotValue) swap(ary,i,index,index++);
-	}
+	for(;i<right;i++)
+		if(ary[i]<pivotValue) 
+			swap(ary,i,index,index++);
 
 	swap(ary,right,index);
 
@@ -1985,12 +1985,13 @@ function quickSort(ary,key){
 
 function exist(check){
 	var args = slice(arguments,1);
-	if(check)
-		last(args).apply(null,args);
+	if(check) last(args).apply(this,args);
 }
 
 function frozen(){
-	return al(castArray.apply(null,arguments),Object.freeze).pop();
+	return al(
+		castArray.apply(null,arguments),
+		Object.freeze).pop();
 }
 
 // create frequency function
@@ -2035,8 +2036,8 @@ chain.prototype.value = function(){
 };
 
 function fill(len,value) {
-	var res = [];
-	for(var i=0; i<len; i++)
+	var i, res = [];
+	for(i=0; i<len; i++)
 		res[i] = value;
 	return res;
 }

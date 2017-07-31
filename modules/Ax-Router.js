@@ -1,6 +1,5 @@
 // import ax from "ax-js"
 // import ax from "ax" #or from alias for webpack
-
 ax.module("Router",function(ax,struct){
 'use strict';
 
@@ -13,7 +12,7 @@ ax.module("Router",function(ax,struct){
 // *define assert;
 // *define history [H]
 // *define pathReg to exec
-var _ = [] ,
+var _ = [],
 		H = struct.root.history,
 		pathReg = /\/:([^\s\/]+)/g;
 
@@ -63,18 +62,24 @@ function checkPath(path){
 }
 
 function toActive(source,path,query,state,notpush,isLink){
-	if(!(isLink && !checkPath(path)) && this._status){
-		var _ROUTER = this, key = keys(source.mapping), route, param;
+	var cpath = checkPath(path);
+
+	if(!(isLink && !cpath) && this._status){
+
+		var _ROUTER = this, i, l, checker, 
+				key = keys(source.mapping), route, param;
 				state = is(state,"Object") ? state : {};
 
-		for(var i=0, l=key.length,checker; i<l; i++)
+		for(i=0,l=key.length,checker; i<l; i++)
 			if((checker = source.mapping[key[i]]).test(path)){
 				route = key[i];
 				param = cmb(source.params[route], slice(checker.exec(path),1));
 				break;
 			}
 
+		// if exist router
 		if(route){
+
 			var queryString = (isStr(query) ?
 					(query.charAt(0) !== '?' ? "?" : "") + query:
 					is(query,"Object") ? ("?"+qstr(query)) : "");
@@ -83,24 +88,25 @@ function toActive(source,path,query,state,notpush,isLink){
 				// setup funtion call
 				return source.actions[name] || noop;
 			}),function(fn){
-				return fn.call(_ROUTER,
-					param,
+				return fn.call(_ROUTER, param,
 					is(query,"Object") ? query : qpars(query),
 					state
 				);
 			});
 		
-			if(!notpush)
-				H[checkPath(path) ? "pushState" : "replaceState"](
+			if(!notpush) 
+				H[cpath ? "pushState" : "replaceState"](
 					state, null, path+queryString
 				);
 		}
+
 	}
 
 	return this;
 }
 
 var Router = function(option){
+
 	var source = merge(
 		clone(DEFAULT_ROUTER_OPTION),
 		is(option,"Object") ? option : {}
@@ -169,6 +175,7 @@ var Router = function(option){
 			true
 		);
 	}.bind(this));
+
 };
 
 Router.prototype = {
@@ -209,6 +216,18 @@ Router.prototype = {
 
 	stop: function(){
 		this._status = 0;
+		return this;
+	},
+
+	resolve: function(state){
+		if(!this._status) return;
+
+		H.replaceState(
+			is(state,"Object") ? state : {},
+			null,
+			location.href
+		);
+
 		return this;
 	}
 };
