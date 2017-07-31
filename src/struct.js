@@ -2456,7 +2456,7 @@ var zublist = {
 	// error    : $error,
 	assembly : $assembly,
 	doom     : $doom,
-	vst      : $doom
+	vt       : $doom
 };
 
 // Generators
