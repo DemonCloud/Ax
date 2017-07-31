@@ -16,7 +16,7 @@
     "url": "git+https://github.com/DemonCloud/Ax.git"
   },
   "scripts": {
-    "start": "browser-sync start --server --files **/*.html",
+    "start": "browser-sync start --s --no-notify --no-online --no-inject-changes --no-ui",
     "test": "jest"
   },
   "keywords": [

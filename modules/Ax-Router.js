@@ -65,6 +65,7 @@ function checkPath(path){
 function toActive(source,path,query,state,notpush,isLink){
 	if(!(isLink && !checkPath(path)) && this._status){
 		var _ROUTER = this, key = keys(source.mapping), route, param;
+				state = is(state,"Object") ? state : {};
 
 		for(var i=0, l=key.length,checker; i<l; i++)
 			if((checker = source.mapping[key[i]]).test(path)){
@@ -78,13 +79,6 @@ function toActive(source,path,query,state,notpush,isLink){
 					(query.charAt(0) !== '?' ? "?" : "") + query:
 					is(query,"Object") ? ("?"+qstr(query)) : "");
 
-			if(!notpush)
-				H[checkPath(path) ? "pushState" : "replaceState"](
-					{ state : state },
-					null,
-					path+queryString
-				);
-
 			each(map(source.routes[route],function(name){
 				// setup funtion call
 				return source.actions[name] || noop;
@@ -95,6 +89,11 @@ function toActive(source,path,query,state,notpush,isLink){
 					state
 				);
 			});
+		
+			if(!notpush)
+				H[checkPath(path) ? "pushState" : "replaceState"](
+					state, null, path+queryString
+				);
 		}
 	}
 
@@ -147,7 +146,7 @@ var Router = function(option){
 	each(source.routes,function(action,path){
 		var routeParam = [],
 		pathMatcher = trim(path).replace(pathReg,
-			function(match,param){
+			function(match,param){ 
 				routeParam.push(param);
 				return "/([^\\s\\/]+)";
 			}

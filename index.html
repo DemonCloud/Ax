@@ -80,22 +80,28 @@ var route = new Router({
 
 	actions:{
 		default: function(param,query,state){
-			console.log(0,"default");
-			app.render({ query: { id: "default", cd: "default" } });
+			console.log(0,"default",state);
+
+			app.render({ query: { 
+				id: "default", 
+				cd: "default" 
+			} });
+
+			if(!state.default) state.default = true;
 		},
+
 		bone: function(param,query,state){
-			console.log(size(param)+1,"bone");
+			console.log(size(param)+1,"bone",state);
+
 			app.render({ query: query });
+
+			if(!state.bone) state.bone = true;
 		}
 	}
 });
 
 route.start("/");
 
-var a = [{a:1,b:2},{c:1}]
-var b = [{a:2},{c:2,d:{e:1}}]
-
-console.log(merge(a,b));
 </script>
 </body>
 </html>

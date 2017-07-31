@@ -81,7 +81,7 @@ function zub(fn,name){
 
 // extend Object-assign or pub struct method
 // @use has
-// @use depclone
+// @use clonedeep
 // @export extend
 // @export *depextend
 function extend(o1,o2,nothisproperty){
@@ -185,6 +185,10 @@ function isNum(e){
 // Primitive [ type ]
 function isPrimitive(e){
 	return e == null || typeof e !== "object" ;
+}
+
+function isRegExp(e){
+	return e && isDefine(e,"RegExp");
 }
 
 // Native isArray
@@ -426,54 +430,67 @@ function keys(e){
 // @use ol
 // @export *op
 // @alias each
+function createBounder(fn, context){
+	if(context === void 0)
+		return fn
+	return function(){
+		return fn.apply(context,arguments);
+	};
+};
+
 function al(ary,fn,ts){
-	for(var i=0, l=ary.length; i<l; i++)
-		fn.call(2 in arguments ? ts : ary, ary[i], i, ary);
+	var i, len = ary.length, cb = createBounder(fn,ts); 
+	for(i=0; i<len; i++) cb(ary[i],i,ary);
 	return ary;
 }
 
 function ol(obj,fn,ts){
-	var _ = function(key){ fn.call(this,obj[key],key,obj); };
-	al(keys(obj), _, 2 in arguments ? ts : obj);
+	var cb = function(key){ fn.call(this,obj[key],key,obj); };
+	al(keys(obj),cb,ts);
 	return obj;
 }
 
 function fov(list){
 	if(isArray(list))
-		return al.apply(list,arguments);
+		return al.apply(null,arguments);
 	else if(isObj(list) && !isFn(list) && list !== null)
-		return ol.apply(list,arguments);
+		return ol.apply(null,arguments);
 	return list;
 }
 
 // Simple Clone [ fast , signet ]
-// @use depclone
+// @use clonedeep
 // @export *clone
-// @alias(deep) depclone
+// @alias(deep) clonedeep
 
 // Simple clone [ fast ]
-function clone(l,deep){
-	if(deep)
-		return depclone(l);
+function clone(l,shallow){
 	if(isArrayLike(l))
 		return slice(l);
+	if(isObj(l) && shallow){
+		var key = keys(l), i, tmp, len = key.length, res={};
+		for(i=len;i--;){
+			tmp = key[i]; res[tmp] = l[tmp];
+		}
+		return res;
+	}
 	if(!isPrimitive(l))
 		return JSON.parse(JSON.stringify(l));
 	return l;
 }
 
-var p_ = function(){};
 // Deeping Clone [ fast , complicated ]
-function depclone(l){
+var p_ = function(){};
+function clonedeep(l){
 	var res = l;
 	if(isArrayLike(l)){
 		// clone array 
-		res = slice(l).map(citd(depclone,negate(isPrimitive)));
+		res = slice(l).map(citd(clonedeep,negate(isPrimitive)));
 	}else if(!isPrimitive(l) && !(l instanceof Node)){
 		var prt = p_.prototype = l.constructor.prototype;
 		// clone object ^ with copy prototype
 		ol(l, function(val,key){
-			this[key] = isPrimitive(val) ? val : depclone(val);
+			this[key] = isPrimitive(val) ? val : clonedeep(val);
 		},res = (prt !== Object.prototype ? new p_ : {} ));
 	}
 	return res;
@@ -488,27 +505,19 @@ function regCheck(reg,n){
 // use reduceRight
 // @export *reduce
 function reduce(list,fn,initValue,context){
-	if(isObj(list) && isArrayLike(list)){
-		var result, key = keys(list), init = !(2 in arguments);
-		result = !init ? initValue : list[first(key)];
+	var init = 2 in arguments,
+			cb = createBounder(fn,context),
+			initValue = init ? initValue : first(list);
 
-		for(var i= +init ,l=key.length; i<l; i++)
-			result = fn.call(context,result,list[key[i]],i,list);
-
-		return result;
-	}
+	return slice(list,init ? 0 : 1).reduce(cb,initValue);
 }
 
 function reduceRight(list,fn,initValue,context){
-	if(isObj(list) && isArrayLike(list)){
-		var result, key = keys(list), init = !(2 in arguments);
-		result = !init ? initValue : list[last(key)];
+	var init = 2 in arguments,
+			cb = createBounder(fn,context),
+			initValue = init ? initValue : last(list);
 
-		for(var i= key.length - (+init); i--;)
-			result = fn.call(context,result,list[key[i]],i,list);
-
-		return result;
-	}
+	return slice(list,0,init ? void 0 : -1).reduceRight(cb,initValue);
 }
 
 // List has [ method ]
@@ -519,11 +528,19 @@ function reduceRight(list,fn,initValue,context){
 
 // has([1,2,3],2) => true;
 function has(list,n,ueq){
-	var compare = isDefine(n,"RegExp") ? regCheck : (ueq ? eq : seq),
-			idf = false , key = keys(list);
-	for(var i=key.length; i--;)
-		if(idf=compare(n,list[key[i]])) 
-			break;
+	var compare = isRegExp(n) ? regCheck : (ueq ? eq : seq),
+			idf = false, i;
+
+	if(isArrayLike(list)){
+		for(i=list.length;i--;)
+			if(idf=compare(n,list[i]))
+				break;
+	}else if(isObj(list)){
+		var key = keys(list);
+		for(i=key.length; i--;)
+			if(idf=compare(n,list[key[i]])) 
+				break;
+	}
 	return idf;
 }
 
@@ -543,7 +560,7 @@ function notdel(list,k,isarr){
 
 // not([1,2,3,2,3,4,5],3) => [1,2,2,4,5]
 function not(list,n,useq){
-	var check = isDefine(n,"RegExp") ? regCheck : (useq ? eq : seq),
+	var check = isRegExp(n) ? regCheck : (useq ? eq : seq),
 			isarr = isArray(list), p = keys(list);
 	for(var i=0 ; i<p.length ; i++)
 		if(check(n,list[p[i]]))
@@ -560,7 +577,7 @@ function not(list,n,useq){
 // support regexp && value filter
 function filter(list,idf,reskey){
 	var res = [], 
-			fn = isDefine(idf,'RegExp') ? cit(regCheck,idf) :
+			fn = isRegExp(idf) ? cit(regCheck,idf) :
 			(isFn(idf) ? idf : fseq(idf));
 	fov(clone(list),function(val,key,that){
 		if(fn.apply(that,arguments)) 
@@ -574,16 +591,16 @@ function reject(list,idf,reskey){
 }
 
 function every(list,idf){
-	var res = true;
-	for(var key = keys(list),i=key.length;i--;)
+	var res = true, key;
+	for(key = keys(list),i=key.length;i--;)
 		if(!(res=idf(list[key[i]],key[i],list)))
 			break;
 	return res;
 }
 
 function some(list,idf){
-	var res = false;
-	for(var key = keys(list),i=key.length;i--;)
+	var res = false, key;
+	for(key = keys(list),i=key.length;i--;)
 		if((res=idf(list[key[i]],key[i],list)))
 			break;
 	return res;
@@ -657,7 +674,7 @@ function mapKey(list,fn){
 // List cat [ method ]
 function cat(list,idf){
 	var res = [],
-			fn = isDefine(idf,'RegExp') ? cit(regCheck,idf) :
+			fn = isRegExp(idf) ? cit(regCheck,idf) :
 			(isFn(idf) ? idf : fseq(idf));
 
 	if(isArray(list)){
@@ -859,29 +876,50 @@ function concat(){
 // @export diff
 // @export *intsec
 // diff([1,2],[2,3],[1,3,4],[5]) => [4,5]
-function diff(){
-	var res = [];
-	for(var tmp = concat.apply([],arguments),
-			s = tmp.shift(tmp.push(tmp.length-1)); 
-			tmp.length !== 0; s = tmp.shift())
-			has(tmp,s,true) ? not(tmp,s,true) : res.push(s);
-	return res;
+function createDiff(usq){
+	return function(){
+		var res = [], i, j, pvoit, is=true,
+			tmp = concat.apply([],arguments),
+			cb = usq ? eq : seq;
+
+		for(i=0; i<tmp.length; i++){
+			pvoit = tmp[i];
+			for(j=0; j<tmp.length; j++)
+				if(i!==j && cb(pvoit,tmp[j])){
+					is=false; break; }
+			if(is) res.push(pvoit); is=true;
+		}
+
+		return res;
+	}
 }
+
+var diff = createDiff(), slimDiff = createDiff(true);
 
 // intersection([1,2],[2,3],[2,3,4]) => [2]
-function intersection(){
-	var res = [], pact = slice(arguments);
-	reduce(pact,function(cot,arr){
-		var r = [];
-		if(size(cot) && size(arr))
-			al(cot,function(value){
-				if(has(this,value,true)) 
-					r.push(value); },arr);
-		return (res = r);
-	},pact.shift()||[]);
+function createIntsec(usq){
+	return function(){
+		var pvoit = slice(arguments[0]),
+			argslen = arguments.length,
+			res = [],i,j,pvoitT,is;
 
-	return res;
+		for(i=0; i<pvoit.length; i++){
+			pvoitT = pvoit[i]; is=true;
+			if(has(res,pvoitT,usq)) continue;
+
+			for(j=1; j<argslen; j++){
+				if(!has(arguments[j],pvoitT,usq)){
+					is=false; break;
+				}
+			}
+			if(is) res.push(pvoitT);
+		}
+
+		return res;
+	}
 }
+
+var intsec = createIntsec(), slimIntsec = createIntsec(true);
 
 // Merge array [ method ]
 // @export merge
@@ -934,9 +972,7 @@ function dropRight(ary,n){
 function dropTo(ary,it){
 	var res = slice(ary),
 			key = this===void 0 ? "shift" : "pop",
-			fn = isDefine(it,'RegExp') ? 
-					 cit(regCheck,it) :
-					 (isFn(it) ? it : fseq(it));
+			fn = isRegExp(it) ? cit(regCheck,it) : (isFn(it) ? it : fseq(it));
 
 	for(var i=res.length;i--;)
 		if(fn(res[key]())) 
@@ -1734,7 +1770,7 @@ function copyEvent(toobj,related){
 			configurable: true 
 		});
 
-		_events[toobj._eid] = depclone(_events[rid]);
+		_events[toobj._eid] = clonedeep(_events[rid]);
 	}
 	return toobj;
 }
@@ -1868,7 +1904,7 @@ function memoize(fn,context){
 
 // create Negate function [ method ]
 function negate(fn,context){
-	var mapper = isDefine(fn,"RegExp") ? cit(regCheck,fn) : fn;
+	var mapper = isRegExp(fn) ? cit(regCheck,fn) : fn;
 
 	return isFn(mapper) ? function(){
 		return !mapper.apply(context,arguments);
@@ -2324,6 +2360,18 @@ var $sort = {
 	default: sort
 };
 
+var $diff = {
+	fast: diff,
+	slim: slimDiff,
+	default: diff
+};
+
+var $intsec = {
+	fast: intsec,
+	slim: slimIntsec,
+	default: intsec
+};
+
 var $doom = {
 	default: DOOM.bind(doomSetting)
 };
@@ -2337,7 +2385,8 @@ var nublist = {
 	keys      : keys,
 	noop      : noop,
 	clone     : clone,
-	depclone  : depclone,
+	cloneDeep : clonedeep,
+	depclone  : clonedeep,
 	not       : not,
 	cat       : cat,
 	slice     : slice,
@@ -2346,8 +2395,6 @@ var nublist = {
 	reject    : reject,
 	every     : every,
 	some      : some,
-	diff      : diff,
-	intsec    : intersection,
 	chunk     : chunk,
 	compact   : compact,
 	pluck     : pluck,
@@ -2388,6 +2435,8 @@ var zublist = {
 	each     : $op,
 	map      : $map,
 	has      : $has,
+	diff     : $diff,
+	intsec   : $intsec,
 	type     : $type,
 	sort     : $sort,
 	html     : $html,
@@ -2431,5 +2480,4 @@ struct.toString = toString;
 struct.prototype = struct.__proto__ = null;
 
 return frozen(v8(struct));
-
 }, void 0));
