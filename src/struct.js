@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.0-alpha0.1";
+struct.VERSION = "4.0.0-alpha0.3";
 
 // base method
 var or = {},
@@ -560,8 +560,8 @@ function notdel(list,k,isarr){
 // not([1,2,3,2,3,4,5],3) => [1,2,2,4,5]
 function not(list,n,useq){
 	var check = isRegExp(n) ? regCheck : (useq ? eq : seq),
-			isarr = isArray(list), p = keys(list);
-	for(var i=0 ; i<p.length ; i++)
+			isarr = isArray(list), p = keys(list), i=0;
+	for(; i<p.length ; i++)
 		if(check(n,list[p[i]]))
 			if(notdel(list,p[i],isarr) && isarr)
 				p.pop(i--);
@@ -677,11 +677,13 @@ function cat(list,idf){
 			(isFn(idf) ? idf : fseq(idf));
 
 	if(isArray(list)){
-		for(var i=0,l=list.length; i<l; i++)
+		var i, l;
+		for(i=0,l=list.length; i<l; i++)
 			if(fn.call(list,list[i],i,list))
 				res.push(list.splice(i,1).pop(i--));
 	}else if(isObj(list)){
-		for(var k in list){
+		var k;
+		for(k in list){
 			if(list.hasOwnProperty(k))
 				if(fn.call(list,list[k],k,list)){
 					var po = {};
@@ -716,9 +718,9 @@ function fseq(a){
 }
 
 function fastUnique(ary){
-	var u = {}, n = isNum(first(ary));
+	var u = {}, n = isNum(first(ary)), i=0;
 
-	for(var i = 0 ; i<ary.length; i++){
+	for(; i<ary.length; i++){
 		if(u[ary[i]]) continue;
 		u[ary[i]] = true;
 	}
@@ -727,10 +729,10 @@ function fastUnique(ary){
 }
 
 function slimUnique(ary,ueq){
-	var c = slice(ary);
-	for(var check = ueq ? eq : seq, i = 0 ; i<c.length; i++)
+	var c = slice(ary), check, i, j;
+	for(check = ueq ? eq : seq, i = 0 ; i<c.length; i++)
 		if(i !== c.length-1)
-			for(var j=i+1; j<c.length; j++)
+			for(j=i+1; j<c.length; j++)
 				if(check(c[i],c[j])) c.splice(j--,1);
 	return c;
 }
@@ -796,16 +798,15 @@ function countBy(list,by){
 // pairs({a:1,b:2}) => [['a',1],['b',2]]
 // unpairs([['a',1],['b',2]]) => {a:1,b:2}
 function pairs(obj){
-	var res = [];
-	var key = keys(obj);
-	for(var i=0,l=key.length; i<l ; i++)
+	var res = [], key = keys(obj), i, l;
+	for(i=0,l=key.length; i<l ; i++)
 		res.push([key[i],obj[key[i]]]);
 	return res;
 }
 
 function unpairs(ary){
-	var res = {};
-	for(var i=0,l=ary.length; i<l ; i++)
+	var res = {}, i, l;
+	for(i=0,l=ary.length; i<l ; i++)
 		res[ary[i][0]] = ary[i][1];
 	return res;
 }
@@ -838,8 +839,9 @@ var pullWith = not;
 // @use random
 function shuffle(ary){
 	var ln = ary.length,
-			disorder = new Array(ln);
-	for( var i=0 , ra; i<ln; i++){
+			disorder = new Array(ln),
+			i=0, ra;
+	for(; i<ln; i++){
 		ra = randomInt(0,i);
 		if(ra !==i)
 			disorder[i] = disorder[ra];
@@ -851,8 +853,8 @@ function shuffle(ary){
 // Chunk partof array [ method ]
 // chunk([1,2,3,4]) => [[1,2],[3,4]]
 function chunk(ary,size){
-	var s = parseInt(toNumber(size)) || 2 ,res = [];
-	for(var i=0,l=ary.length;i<l;i+=s)
+	var s = parseInt(toNumber(size)) || 2 ,res = [],i,l;
+	for(i=0,l=ary.length;i<l;i+=s)
 		res.push(ary.slice(i,i+s));
 
 	return res;
@@ -1081,10 +1083,9 @@ function partial(fn){
 	var boundArgs = slice(arguments,1);
 
 	return function(){
-		var position = 0;
-		var args = boundArgs.slice();
+		var position = 0 , args = boundArgs.slice(), i=0, len=args.length;
 
-		for (var i = 0, len = args.length; i < len; i++)
+		for (; i < len; i++)
 			if(args[i] === struct)
 				args[i] = arguments[position++];
 
@@ -1122,9 +1123,9 @@ function eq(x,y){
 	if(x===y || ts.call(x) !== ts.call(y)|| (isPrimitive(x) && isPrimitive(y)))
 		return x===y;
 	if(x.toString() === y.toString()){
-		var xkeys = keys(x) , ykeys = keys(y);
+		var xkeys = keys(x) , ykeys = keys(y), i=xkeys.length;
 		if(xkeys.length === ykeys.length){
-			for(var i=xkeys.length; i--; )
+			for( ;i--; )
 				if(!eq(x[xkeys[i]],y[xkeys[i]]))
 					return false;
 			return true;
@@ -1261,8 +1262,8 @@ function trimRight(s){
 function camelize(s){
 	var uspt = !~s.search('-') ? (!~s.search('_') ? '' : '_') : '-';
 	if(uspt){
-		uspt = s.split(uspt);
-		for(var i=1;i<uspt.length;i++)
+		var i = 1; uspt = s.split(uspt);
+		for(;i<uspt.length;i++)
 			uspt[i] = capitalize(uspt[i]);
 		return uspt.join('');
 	}

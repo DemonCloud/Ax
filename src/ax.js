@@ -192,7 +192,8 @@
 		change = { change: 'input', input: 'input' },
 		prevent = ["compositionstart","compositionupdate"],
 		ininput = ["input","keypress","keydown","keyup"],
-		notdata = prevent.concat(["compositionend"]);
+		notdata = prevent.concat("compositionend"),
+		isFF = struct.root.navigator.userAgent.indexOf("Firefox")>-1;
 
 	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
 			eventMethods = {
@@ -336,7 +337,7 @@
 				});
 				element.addEventListener("compositionend",function(e){
 					e.target._compositionIn = false;
-					z(e.target).trigger("input");
+					if(!isFF) z(e.target).trigger("input");
 				});
 			}
 
@@ -1310,40 +1311,45 @@
 
 		get: function(key,by){
 			var data = this._ast(_clone,_);
-			return  (key || key===0) ? _get.call(this,data,key,by) : data;
+			return (key || key===0) ? 
+				_get.call(this,data,key,by) : data;
 		},
 
-		set: function(key,val){
-			var assert = this._ast(cool,_), ref;
+		set: function(key,val,setStatic){
+			var assert = this._ast(cool,_), argslen = arguments.length,
+					ref, single = !_isPrim(key) && _isObj(key);
 
-			if(1 in arguments){
-				if(_isPrim(key) &&
-					!_eq(_get(assert,key),val) &&
-					singleValidate(key,val,this)){
+			if(argslen){
+				if(single){
+					// single pointer select
+					setStatic = val;
 
-					_set(assert,key,val);
-					this.change = true;
-					if(this._s) aS.set(this.name,assert);
-					this.emit("change",[_clone(assert)]);
-					this.emit("change:"+key,[val]);
-				}
-			}else{
-				if(!_isPrim(key)&&
-					(ref=this._f(key))&&
-					!_eq(assert,ref)&&
-					checkValidate(ref,this)){
+					if((ref=this._f(key))&&
+						!_eq(assert,ref)&&
+						checkValidate(ref,this)){
 
-					this._c(ref,_);
-					this.change = true;
-					if(this._s) aS.set(this.name,ref);
-					this.emit("change",[_clone(ref)]);
+						this._c(ref,_,this.change=true);
+						if(this._s) aS.set(this.name,ref);
+						if(!setStatic) this.emit("change",[_clone(ref)]);
+					}
+				} else {
+					if(!_eq(_get(assert,key),val) &&
+						singleValidate(key,val,this)){
+
+						_set(assert,key,val,this.change = true);
+						if(this._s) aS.set(this.name,assert);
+						if(!setStatic){ 
+							this.emit("change",[_clone(assert)]);
+							this.emit("change:"+key,[val]);
+						}
+					}
 				}
 			}
 
 			return this;
 		},
 
-		rm: function(prop){
+		rm: function(prop,rmStatic){
 			var assert = this._ast(cool,_);
 
 			if(_isPrim(prop) &&
@@ -1351,15 +1357,21 @@
 				 _get(assert,prop) !== void 0){
 				_rm(assert,prop);
 				if(this._s) aS.set(this.name,assert);
-				this.emit("change",[_clone(assert)]);
-				this.emit("remove:"+prop);
+				if(!rmStatic){
+					this.emit("change",[_clone(assert)]);
+					this.emit("remove:"+prop)
+				};
 			}
 
 			return this;
 		},
 
-		moc: function(key,val){
-			return this.set(key,moc(this.get(key),val));
+		moc: function(key,val,setStatic){
+			return this.set(
+				key,
+				moc(this.get(key),val),
+				setStatic
+			);
 		},
 
 		// API event
