@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.0-alpha0.3";
+struct.VERSION = "4.0.0-alpha0.4";
 
 // base method
 var or = {},
@@ -57,9 +57,9 @@ var or = {},
     ts = or.toString,
     tm = st.trim,
     cot = ar.concat,
-  	ev = eval,
+		ev = eval,
 
-  	broken = Object.freeze({});
+		broken = Object.freeze({});
 
 // strict mode hack this
 // hack* =>
@@ -159,7 +159,7 @@ var reHostCtor = /^\[object .+?Constructor\]$/,
 
 // Function [ type ]
 function isFn(e){
-	return typeof e === "function" && e === e && !!e;
+	return typeof e === "function";
 }
 
 // Object [ type ]
@@ -209,7 +209,7 @@ function isError(obj){
 	return obj !== null &&
 		isObj(obj) &&
 		isStr(obj.message) &&
-		isStr(obj.name)
+		isStr(obj.name);
 }
 
 // Define the typename [ type ]
@@ -220,9 +220,9 @@ function isDefine(obj,name){
 // ArrayLike [ type ] 
 function isArrayLike(obj){
 	return !!obj && 
-				 !isFn(obj) && 
-				 isObj(obj) && 
-				 isNum(obj.length);
+				!isFn(obj) && 
+				isObj(obj) && 
+				isNum(obj.length);
 }
 
 // isNaN [ ES6 Method ]
@@ -356,7 +356,7 @@ function toString(s){
 }
 
 function toNumber(s){
-	return (typeof +s === "number" && +s===+s) ? +s : s>>0;
+	return (+s && typeof +s === "number") ? +s : s>>0;
 }
 
 // HEX Create RGB object
@@ -432,11 +432,11 @@ function keys(e){
 // @alias each
 function createBounder(fn, context){
 	if(context === void 0)
-		return fn
+		return fn;
 	return function(){
 		return fn.apply(context,arguments);
 	};
-};
+}
 
 function al(ary,fn,ts){
 	var i, len = ary.length, cb = createBounder(fn,ts); 
@@ -469,7 +469,7 @@ function clone(l,shallow){
 		return slice(l);
 	if(isObj(l) && shallow){
 		var key = keys(l), i, tmp, len = key.length, res={};
-		for(i=len;i--;){ tmp = key[i]; res[tmp] = l[tmp]; }
+		for(i=len; i--; ){ tmp = key[i]; res[tmp] = l[tmp]; }
 		return res;
 	}
 	if(!isPrimitive(l))
@@ -490,7 +490,7 @@ function clonedeep(l){
 		// clone object ^ with copy prototype
 		ol(l, function(val,key){
 			this[key] = isPrimitive(val) ? val : clonedeep(val);
-		},res = (prt !== Object.prototype ? new p_ : {} ));
+		},res = (prt !== Object.prototype ? new p_ : {}));
 	}
 	return res;
 }
@@ -527,8 +527,8 @@ function reduceRight(list,fn,initValue,context){
 
 // has([1,2,3],2) => true;
 function has(list,n,ueq){
-	var compare = isRegExp(n) ? regCheck : (ueq ? eq : seq),
-			idf = false, i;
+	var compare = isRegExp(n) ? regCheck : (ueq ? eq : seq), 
+		idf = false, i;
 
 	if(isArrayLike(list)){
 		for(i=list.length;i--;)
@@ -561,7 +561,7 @@ function notdel(list,k,isarr){
 function not(list,n,useq){
 	var check = isRegExp(n) ? regCheck : (useq ? eq : seq),
 			isarr = isArray(list), p = keys(list), i=0;
-	for(; i<p.length ; i++)
+	for( ; i<p.length; i++)
 		if(check(n,list[p[i]]))
 			if(notdel(list,p[i],isarr) && isarr)
 				p.pop(i--);
@@ -578,8 +578,8 @@ function filter(list,idf,reskey){
 	var res = [], 
 			fn = isRegExp(idf) ? cit(regCheck,idf) :
 			(isFn(idf) ? idf : fseq(idf));
-	fov(clone(list),function(val,key,that){
-		if(fn.apply(that,arguments)) 
+	fov(clone(list),function(val,key,selflist){
+		if(fn.apply(selflist,arguments)) 
 			this.push(reskey ? key : val);
 	},res);
 	return res;
@@ -590,16 +590,16 @@ function reject(list,idf,reskey){
 }
 
 function every(list,idf){
-	var res = true, key;
-	for(key = keys(list),i=key.length;i--;)
+	var res = true, key, i;
+	for(key = keys(list),i=key.length; i--; )
 		if(!(res=idf(list[key[i]],key[i],list)))
 			break;
 	return res;
 }
 
 function some(list,idf){
-	var res = false, key;
-	for(key = keys(list),i=key.length;i--;)
+	var res = false, key, i;
+	for(key = keys(list),i=key.length; i--; )
 		if((res=idf(list[key[i]],key[i],list)))
 			break;
 	return res;
@@ -684,13 +684,12 @@ function cat(list,idf){
 	}else if(isObj(list)){
 		var k;
 		for(k in list){
-			if(list.hasOwnProperty(k))
-				if(fn.call(list,list[k],k,list)){
-					var po = {};
-					po[k] = list[k];
-					res.push(po);
-					delete list[k];
-				}
+			if(fn.call(list,list[k],k,list)){
+				var po = {};
+				po[k] = list[k];
+				res.push(po);
+				delete list[k];
+			}
 		}
 	}
 	return res;
@@ -730,7 +729,7 @@ function fastUnique(ary){
 
 function slimUnique(ary,ueq){
 	var c = slice(ary), check, i, j;
-	for(check = ueq ? eq : seq, i = 0 ; i<c.length; i++)
+	for(check = ueq ? eq : seq, i = 0; i<c.length; i++)
 		if(i !== c.length-1)
 			for(j=i+1; j<c.length; j++)
 				if(check(c[i],c[j])) c.splice(j--,1);
@@ -749,7 +748,7 @@ function hook(list,hookname){
 function pluck(list,mapkey,dowith){
 	var res = [], keyname = toString(mapkey);
 	fov(list,function(item){
-		var v = getProp(item,mapkey,dowith);
+		var v = getProp(item,keyname,dowith);
 		return v !== void 0 && this.push(v);
 	},res);
 	return res;
@@ -761,6 +760,7 @@ function groupBy(list,by){
 			func = isFn(by);
 	fov(list,function(val){
 		var key = func ? by(val) : getProp(val,by);
+
 		if(key){
 			if(!this[key])
 				// first time should init group check
@@ -780,6 +780,7 @@ function countBy(list,by){
 		fn = isFn(by);
 	fov(list,function(val){
 		var key = fn ? by(val) : getProp(val,by);
+
 		if(key){
 			if(!res[key])
 				this[key] = 1;
@@ -799,14 +800,14 @@ function countBy(list,by){
 // unpairs([['a',1],['b',2]]) => {a:1,b:2}
 function pairs(obj){
 	var res = [], key = keys(obj), i, l;
-	for(i=0,l=key.length; i<l ; i++)
+	for(i=0,l=key.length; i<l; i++)
 		res.push([key[i],obj[key[i]]]);
 	return res;
 }
 
 function unpairs(ary){
 	var res = {}, i, l;
-	for(i=0,l=ary.length; i<l ; i++)
+	for(i=0,l=ary.length; i<l; i++)
 		res[ary[i][0]] = ary[i][1];
 	return res;
 }
@@ -854,7 +855,7 @@ function shuffle(ary){
 // chunk([1,2,3,4]) => [[1,2],[3,4]]
 function chunk(ary,size){
 	var s = parseInt(toNumber(size)) || 2 ,res = [],i,l;
-	for(i=0,l=ary.length;i<l;i+=s)
+	for(i=0,l=ary.length; i<l; i+=s)
 		res.push(ary.slice(i,i+s));
 
 	return res;
@@ -892,7 +893,7 @@ function createDiff(usq){
 		}
 
 		return res;
-	}
+	};
 }
 
 var diff = createDiff(), slimDiff = createDiff(true);
@@ -917,7 +918,7 @@ function createIntsec(usq){
 		}
 
 		return res;
-	}
+	};
 }
 
 var intsec = createIntsec(), slimIntsec = createIntsec(true);
@@ -928,8 +929,8 @@ var intsec = createIntsec(), slimIntsec = createIntsec(true);
 // merge({ a:1 },{ a:2,b:{c:1} },{ b:{d:4} }) => { a:1,b:{c:1,d:4} }
 function mergeCompare(v,n){
 	return (!isPrimitive(v) && !isPrimitive(n)) && 
-				 ((isDefine(v,"Object") && isDefine(n,"Object")) || 
-				 (isArrayLike(v) && isArrayLike(n)));
+				((isDefine(v,"Object") && isDefine(n,"Object")) || 
+				(isArrayLike(v) && isArrayLike(n)));
 }
 
 function merge(f){
@@ -939,12 +940,12 @@ function merge(f){
 	if(isArray(f)) reduce(collect,function(val,next){
 		return al(next,function(nextval,i){ 
 			var v = val[i], n = nextval;
-			val[i] = mergeCompare(v,n) ? merge(v,n) : n ;
+			val[i] = mergeCompare(v,n) ? merge(v,n) : n;
 		}),(res=val);
 	},[]);
 
 	else if(isObj(f)) reduce(collect,function(val,next){
-		var vk = keys(val) , nk = keys(next);
+		var nk = keys(next);
 		return al(nk,function(key){ var v = val[key], n = next[key];
 			val[key] = mergeCompare(v,n) ? merge(v,n) : n; }), (res=val);
 	},{});
@@ -975,7 +976,7 @@ function dropTo(ary,it){
 			key = this===void 0 ? "shift" : "pop",
 			fn = isRegExp(it) ? cit(regCheck,it) : (isFn(it) ? it : fseq(it));
 
-	for(i=res.length;i--;)
+	for(i=res.length; i--; )
 		if(fn(res[key]())) 
 			break;
 	return res;
@@ -1001,7 +1002,6 @@ function flatten(){
 var rNumber = '0123456789',
 		rCharow = 'abcdefghijklmnopqrstuvwxyz',
 		rCharup = rCharow.toUpperCase(),
-		rHex    = rNumber+'abcdef',
 		rSymbol = '~`!@#$%^&*(){}[]-+=_|/.,><:;';
 
 // Random static Int [ method ]
@@ -1072,7 +1072,7 @@ function randomArray(len,use){
 			usemethod = $random[use] || $random.default;
 	return mapValue(fill(len,0),function(){
 		return usemethod.apply(null,args);
-	})
+	});
 }
 
 // Create Function caller [ method ]
@@ -1186,11 +1186,11 @@ function paramStringify(param){
 			Cparam[key]
 		);
 
-	return JSON.stringify(Cparam)
-		.replace(/["{}]/g,"")
-		.replace(/:/g,"=")
-		.replace(/,/g,"&")
-		.replace(whiteSpace,"");
+	return JSON.stringify(Cparam).
+				replace(/["{}]/g,"").
+				replace(/:/g,"=").
+				replace(/,/g,"&").
+				replace(whiteSpace,"");
 }
 
 // slim Template engine call [ DOOM ]
@@ -1235,7 +1235,7 @@ var encodeReg    = /[&<">'](?:(amp|lt|quot|gt|#39);)?/g,
 		tagCenterReg = new RegExp('>'+sReg+'<','g'),
 		tagLeftReg   = new RegExp('<'+sReg,'g'),
 		tagRightReg  = new RegExp(sReg+'>','g'),
-		tagCloseReg  = new RegExp('<\/'+sReg,'g');
+		tagCloseReg  = new RegExp('</'+sReg,'g');
 
 // String Methods 
 // @use trim
@@ -1263,7 +1263,7 @@ function camelize(s){
 	var uspt = !~s.search('-') ? (!~s.search('_') ? '' : '_') : '-';
 	if(uspt){
 		var i = 1; uspt = s.split(uspt);
-		for(;i<uspt.length;i++)
+		for(; i<uspt.length; i++)
 			uspt[i] = capitalize(uspt[i]);
 		return uspt.join('');
 	}
@@ -1275,12 +1275,12 @@ function capitalize(s){
 }
 
 function collapse(s){
-	return trim(s).replace(zipReg,'')
-					.replace(collapseReg,' ')
-					.replace(tagCenterReg,'><')
-					.replace(tagLeftReg,'<')
-					.replace(tagRightReg,'>')
-					.replace(tagCloseReg,'</');
+	return trim(s).replace(zipReg,'').
+					replace(collapseReg,' ').
+					replace(tagCenterReg,'><').
+					replace(tagLeftReg,'<').
+					replace(tagRightReg,'>').
+					replace(tagCloseReg,'</');
 }
 
 function rize(s,and,upper){
@@ -1316,8 +1316,8 @@ function decodeHTML(str){
 }
 
 function stripHTML(str){
-	return str.replace(stripReg,'')
-						.replace(commentReg,'');
+	return str.replace(stripReg,'').
+						replace(commentReg,'');
 }
 
 function zipHTML(str){
@@ -1384,14 +1384,14 @@ function makeComand(command){
 
 function compiLing(usestruct,who,useargs){
 	return "'; struct."+usestruct+'()('+who+","+ 
-				 "function("+useargs.replace(agExec,'')+"){ _p+='";
+				"function("+useargs.replace(agExec,'')+"){ _p+='";
 }
 
 function compSaze(usestruct,who,useargs,assign){
 	var api = usestruct.split(":");
 	return "'; "+ (assign ? (who+"=") : "") + 
-				 "struct."+api[0]+'("'+(api[1]||"")+'")('+who+","+
-				 useargs.replace(agExec,'')+"); _p+='";
+				"struct."+api[0]+'("'+(api[1]||"")+'")('+who+","+
+				useargs.replace(agExec,'')+"); _p+='";
 }
 
 function DOOM(txt,bounds,name){
@@ -1409,8 +1409,8 @@ function DOOM(txt,bounds,name){
 			"|$","g");
 
 	// Start parse
-	trim(txt)
-	.replace(exp,function(
+	trim(txt).
+	replace(exp,function(
 		match,
 		escape,
 		interpolate,
@@ -1435,13 +1435,13 @@ function DOOM(txt,bounds,name){
 	});
 
 	// Minix compline
-	res = res.replace(/[\r\n\f]/gim,'')
-	  			 .replace(/<!--(.*?)-->/gim,'')
-					 .replace(/_p\+=\'(\\n)*\'[^\+]/gim,'')
-		 			 .replace(/\s*;;\s*/gim,';')
-					 .replace(/[\x20\xA0\uFEFF]+/gim,' ')
-					 .replace(/>\s{2,}/gim,'> ')
-					 .replace(/\s{2,}</gim,' <');
+	res = res.replace(/[\r\n\f]/gim,'').
+						replace(/<!--(.*?)-->/gim,'').
+						replace(/_p\+='(\\n)*'[^+]/gim,'').
+						replace(/\s*;;\s*/gim,';').
+						replace(/[\x20\xA0\uFEFF]+/gim,' ').
+						replace(/>\s{2,}/gim,'> ').
+						replace(/\s{2,}</gim,' <');
 	// End wrap res@ String
 	// use default paramKey to compline
 	res = "with(__("+(!rname ? "__({},_x_||{})" : "{}")+",_bounds)){ " + res + "'; }";
@@ -1493,18 +1493,17 @@ function cookie(param){
 		// get cookie
 		if(len === 1)
 			return parsec[param];
-		else{
-			var time = new Date();
-			time.setDate(time.getDate()+365);
 
-			return document.cookie = trim(
-				args[0]+"="+(args[1]||"") + ';' +
-				"expires="+(args[2]||time.toUTCString()) + ';' +
-				"path="   +(args[3]||"/") + ';' +
-				"domain=" +(args[4]||"") + ';' +
-				( args[5] ? "secure":"" )
-			),true;
-		}
+		var time = new Date();
+		time.setDate(time.getDate()+365);
+
+		return document.cookie = trim(
+			args[0]+"="+(args[1]||"") + ';' +
+			"expires="+(args[2]||time.toUTCString()) + ';' +
+			"path="   +(args[3]||"/") + ';' +
+			"domain=" +(args[4]||"") + ';' +
+			( args[5] ? "secure":"" )
+		),true;
 	}
 
 	return parsec;
@@ -1529,7 +1528,7 @@ function dataMIME(enable,header,param){
 				return paramStringify(param||{});
 			case 1:
 				return JSON.stringify(param||{});
-			default : 
+			default: 
 				return paramStringify(param||{});
 		}
 	return param;
@@ -1631,9 +1630,9 @@ function aix(option){
 	// setTimeout data of ajax
 	if(toNumber(config.timeout)){
 		xhr.timeout = toNumber(config.timeout)*1000;
-		xhr.ontimeout = function(event){
+		xhr.ontimeout = function(){
 			if(xhr.readyState !== 4 || !xhr.responseText)
-				config.error.call(root,xhr);xhr.abort();
+				config.error.call(root,xhr); xhr.abort();
 		};
 	}
 
@@ -1778,7 +1777,8 @@ function copyEvent(toobj,related){
 }
 
 function fireEvent(obj,type,args){
-	var id = obj._eid || 0, args = args||[];
+	var id = obj._eid || 0; args = args||[];
+
 	if(id && _events[id] && type!=="")
 		ol(_events[id][type],function(f){
 			f.apply(this,args);
@@ -1802,11 +1802,11 @@ function getProp(obj,prop,dowith){
 	var tmp,i,keygen = toString(prop||"").split(".");
 
 	if(keygen.length === 1){
-		if(obj.hasOwnProperty(prop))
+		if(obj.hasOwnProperty(prop)) 
 			tmp = obj[prop];
 	}else{
 		// [a.b.2]
-		for(i=0,tmp=obj;i<keygen.length;i++)
+		for(i=0,tmp=obj; i<keygen.length; i++)
 			if(isPrimitive(tmp = tmp[keygen[i]])) 
 				break;
 	}
@@ -1828,8 +1828,8 @@ function setProp(obj,prop,value){
 		obj[prop] = value;
 	}else{
 		// [a.b.2]
-		for(i=0,tmp=obj,check,end=keygen.pop();i<keygen.length;i++)
-			tmp = (check = tmp[keygen[i]]) == null ? {} : check ;
+		for(i=0,tmp=obj,check,end=keygen.pop(); i<keygen.length; i++)
+			tmp = (check = tmp[keygen[i]]) == null ? {} : check;
 		tmp[end] = value;
 	}
 	return obj;
@@ -1841,7 +1841,7 @@ function rmProp(obj,prop){
 		if(obj.hasOwnProperty(prop))
 			delete obj[prop];
 	}else{
-		for(i=0,tmp=obj,end = keygen.pop();i<keygen.length;i++)
+		for(i=0,tmp=obj,end = keygen.pop(); i<keygen.length; i++)
 			tmp = tmp[keygen[i]]; 
 		if(isArray(tmp))
 			tmp.splice(toNumber(end),1);
@@ -1868,7 +1868,7 @@ function auto(ary,num){
 function size(n){
 	if(!isFn(n) && n!= null && !isNaN(n))
 		return isNum(n.length) ? n.length : 
-			 (isObj(n) ? keys(n).length : 0);
+			(isObj(n) ? keys(n).length : 0);
 	return 0;
 }
 
@@ -1881,12 +1881,12 @@ function now(){
 // @export values
 function values(obj,prop){
 	var res=[], withProp = isStr(prop);
-	if(isDefine(obj,"String"))
-		return obj.split('');
-	else
-		fov(obj,function(val){ 
-			res.push(withProp ? getProp(val,prop) : val); 
-		});
+
+	if(isDefine(obj,"String")) return obj.split('');
+
+	fov(obj,function(val){ 
+		res.push(withProp ? getProp(val,prop) : val); 
+	});
 	return res;
 }
 
@@ -1938,7 +1938,7 @@ function sort(ary,key){
 
 function IST(ary){
 	var i=0, t, j, len=ary.length;
-	for(;i<len;i++) {
+	for(; i<len; i++) {
 		t = ary[i]; j = i-1;
 		while (j>=0 && ary[j]>t) {
 			ary[j+1] = ary[j]; j--;
@@ -1957,14 +1957,14 @@ function insertSort(ary,key){
 function QST_part(ary,left,right){
 	var pivotValue = ary[right], i=left, index = left;
 
-	for(;i<right;i++)
+	for(; i<right; i++)
 		if(ary[i]<pivotValue) 
 			swap(ary,i,index,index++);
 
 	swap(ary,right,index);
 
 	return index;
-};
+}
 
 function QST_sort(ary,left,right){
 	if(left>right) return;
@@ -2032,8 +2032,8 @@ function chain(args){
 // building the Run method
 // @emit *run
 chain.prototype.value = function(){
-	return wrap.apply(null,this["="].splice(0,size(this['='])))
-						 .apply(null,this['-']===void 0 ? arguments : this['-']);
+	return wrap.apply(null,this["="].splice(0,size(this['=']))).
+							apply(null,this['-']===void 0 ? arguments : this['-']);
 };
 
 function fill(len,value) {
@@ -2333,7 +2333,7 @@ var $prop = {
 	not: rmProp,
 	remove: rmProp,
 	default: getProp
-}
+};
 
 var $assembly = {
 	a2b: atob,

@@ -25,7 +25,6 @@
 })(this, {}, function(ax,struct){
 	"use strict";
 
-	// Define DOM frame
 	var aM,aV,aT,aS,vA,z,Z,
 			aMP,aVP,aTP, _ = [] ,maker = {}, root = struct.root,
 			RAM = [], LS = root.localStorage, SN = "Ax@",
@@ -85,8 +84,6 @@
 	_get      = struct.prop('get'),
 	_set      = struct.prop('set'),
 	_rm       = struct.prop('not'),
-	_param    = struct.param(),
-	_paramStr = struct.param("string"),
 	_has      = struct.has(),
 	_ajax     = struct.ajax(),
 	_size     = struct.size(),
@@ -147,16 +144,16 @@
 		};
 	}
 
-	function createAx(use){
+	function createAx(Use){
 		return function(o){
-			return new use(_isObj(o) ? o : {});
+			return new Use(_isObj(o) ? o : {});
 		};
 	}
 
-	function createExtend(use){
+	function createExtend(Use){
 		return function(malloc){
 			return function(o){
-				return new use(_merge(malloc,_isObj(o) ? o : {}));
+				return new Use(_merge(malloc,_isObj(o) ? o : {}));
 			};
 		};
 	}
@@ -177,8 +174,7 @@
 	// @ much more need its better
 
 	Z = function(elm){
-		this.el = _isAryL(elm) ? _slice(elm) :
-							(_isElm(elm) ? [elm] : []);
+		this.el = _isAryL(elm) ? _slice(elm) : (_isElm(elm) ? [elm] : []);
 	};
 
 	z = function(x){ return z.init.call(root,x); };
@@ -190,9 +186,7 @@
 		hover = { mouseenter: 'mouseover', mouseleave: 'mouseout' },
 		check = { check: 'change' },
 		change = { change: 'input', input: 'input' },
-		prevent = ["compositionstart","compositionupdate"],
 		ininput = ["input","keypress","keydown","keyup"],
-		notdata = prevent.concat("compositionend"),
 		isFF = struct.root.navigator.userAgent.indexOf("Firefox")>-1;
 
 	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
@@ -209,8 +203,7 @@
 	function findHandlers(element, event, fn, selector) {
 		event = parse(event);
 
-		if (event.ns)
-			var matcher = matcherFor(event.ns);
+		if (event.ns) var matcher = matcherFor(event.ns);
 
 		return (handlers[zid(element)] || []).filter(function(handler) {
 			return handler &&
@@ -223,7 +216,7 @@
 
 	function parse(event) {
 		var parts = ('' + event).split('.');
-		return {e: parts[0], ns: parts.slice(1).sort().join(' ')};
+		return { e: parts[0], ns : parts.slice(1).sort().join(' ') };
 	}
 
 	function matcherFor(ns) {
@@ -231,13 +224,14 @@
 	}
 
 	function eventCapture(handler, captureSetting) {
-		return handler.del &&
+		return handler.del && 
 			(!focusinSupported && (handler.e in focus)) ||
 			!!captureSetting;
 	}
 
 	function capCursor(elm){
 		var pos = 0;
+
 		if (elm.selectionStart != null)
 			pos = elm.selectionStart;
 		// IE Support
@@ -256,21 +250,19 @@
 		if(elm.createTextRange) {
 			var range = elm.createTextRange();
 			range.move('character', pos);
-			range.select();
-		} else {
-			if(elm.selectionStart)
-				elm.setSelectionRange(pos, pos, elm.focus());
-			else
-				elm.focus();
+			return range.select();
 		}
+		return elm.selectionStart ? 
+			elm.setSelectionRange(pos, pos, elm.focus()) :
+			elm.focus();
 	}
 
 	function realEvent(type) {
 		return hover[type] ||
-					 change[type] ||
-					 check[type] ||
-					 (focusinSupported && focus[type]) ||
-					 type;
+					change[type] ||
+					check[type] ||
+					(focusinSupported && focus[type]) ||
+					type;
 	}
 
 	// I Just want to fuck zepto, because the rubbish lib give not work for new browser
@@ -287,7 +279,7 @@
 			if (handler.e in hover)
 				fn = function(e){
 					var related = e.relatedTarget;
-					if (!related || (related !== this && ! this.contains(related)))
+					if (!related || (related !== this && !this.contains(related)))
 						return handler.fn.apply(this, arguments);
 				};
 
@@ -387,9 +379,8 @@
 				event[predicate] = returnFalse;
 			});
 
-			try {
-				event.timeStamp || (event.timeStamp = Date.now());
-			} catch (ignored) { }
+			try { event.timeStamp || (event.timeStamp = Date.now()); } 
+			catch(ignored){ /*ignore*/ }
 
 			if (source.defaultPrevented !== void 0 ? source.defaultPrevented :
 				'returnValue' in source ? source.returnValue === false :
@@ -433,7 +424,7 @@
 	z.proxy = function(fn, context) {
 		var args = (2 in arguments) && _slice(arguments, 2);
 
-		if (_isFn(fn)) {
+		if(_isFn(fn)){
 			var proxyFn = function(){
 				return fn.apply(
 					context, args ?
@@ -444,27 +435,31 @@
 			proxyFn._zid = zid(fn);
 			return proxyFn;
 
-		} else if (_isStr(context)) {
+		}else if(_isStr(context)) {
 			if (args)
 				return z.proxy.apply(null,(args.unshift(fn[context],fn),args));
 			else
 				return z.proxy(fn[context], fn);
-		} else {
+		}else
 			throw new TypeError("expected function");
-		}
 	};
 
 	// z Custom Events
 	z.Event = function(type, props) {
+		var name;
+
 		if (!_isStr(type))
 			props = type, type = props.type;
 
 		var event = document.createEvent(
-			_has(capTypes['MouseEvent'],type) ? 'MouseEvent' : 'Events'), bubbles = true;
+			_has(capTypes.MouseEvent,type) ? 
+			'MouseEvent' : 'Events'), bubbles = true;
 
-		if (props)
-			for (var name in props)
-				(name === 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name]);
+		if(props)
+			for(name in props)
+				(name === 'bubbles') ? 
+				(bubbles = !!props[name]) : 
+				(event[name] = props[name]);
 
 		event.initEvent(type, bubbles, true);
 		return compatible(event);
@@ -559,7 +554,7 @@
 		polygon:1
 	};
 
-	var attrexec = /(\S+)=["'](.*?)["']|([\w\-]+)/gi,
+	var attrexec = /(\S+)=["'](.*?)["']|([\w-]+)/gi,
 			attreval = /^\{|\}$/gi,
 			attrprops = /^\{([^'"\s]+)\}$/i,
 			excapetab = /^[\r\n\f\t\s]+|[\r\n\f\t\s]+$/gi,
@@ -568,12 +563,13 @@
 	var attrSetter = function(elm,attr,val){
 		var attrName = attrList[attr] || attr;
 				val = _isStr(val) ?  _decode(val) : val;
+
 		if(defaultAttr.test(attrName)){
 			// is defaultAttr
 			attrName = attrName.slice(7).toLowerCase();
 			var inval = elm.getAttribute(attrName) || elm[attrName];
-			if(inval == null || inval === "")
-				attrSetter(elm,attrName,val);
+
+			if(inval == null || inval === "") attrSetter(elm,attrName,val);
 		}
 		else if(attrName[0] === "*")
 			_set(elm,attrName.slice(1),(val==="true"||val===true));
@@ -589,7 +585,7 @@
 		if(key[0] === ":" && _isFn(val))
 			z(elm).off(key.slice(1),val);
 		else if(elm[key] && !(delete elm[key]))
-			try{ elm[key] = null; }catch(e){}
+			try{ elm[key] = null; }catch(e){ }
 		else
 			elm.removeAttribute(key);
 	};
@@ -618,7 +614,7 @@
 
 	var patchHack = [
 		_noop,  //0
- 		//1 replace
+		//1 replace
 		function(patch,t){
 			t = patch.s;
 			if(t) if(t.parentNode){
@@ -626,23 +622,23 @@
 				t.parentNode.removeChild(t);
 			}
 		},
- 		//2 append
+		//2 append
 		function(patch,t){
 			t = patch.s;
 			t.appendChild(patch.n);
 		},
- 		//3 remove
+		//3 remove
 		function(patch,t){
 			t = patch.s;
 			if(t) if(t.parentNode)
 				t.parentNode.removeChild(t);
 		},
- 		//4 modifytext
+		//4 modifytext
 		function(patch,t){
 			t = patch.s;
 			t.innerHTML = patch.c;
 		},
- 		//5 withtext
+		//5 withtext
 		function(patch,t){
 			t = patch.s;
 			t.innerHTML = "";
@@ -680,11 +676,11 @@
 	// SLIK SINGE virtualDOM DIFF
 	var slik = {
 
-		treeDiff: function(org,tag,patch,orgParent,tagParent){
+		treeDiff: function(org,tag,patch,orgParent/*,tagParent*/){
 			if(org === void 0){
 				// new node
-				patch.unshift(this.createPatch(orgParent,tag,2));}
-			else if(tag === void 0)
+				patch.unshift(this.createPatch(orgParent,tag,2)); 
+			} else if(tag === void 0)
 				// remove node
 				patch.push( this.createPatch(org,tag,3));
 			else if(org.tagName === tag.tagName){
@@ -727,7 +723,8 @@
 				patch.s = this.mapTreeNode(oDOM,patch.s);
 				return patch;
 			}.bind(this)),function(patch){
-				patchHack[patch.t].call(oDOM,patch);});
+				patchHack[patch.t].call(oDOM,patch);
+			});
 			return callback ? callback(oDOM) : oDOM;
 		},
 
@@ -744,7 +741,7 @@
 			var path = [org.i];
 			while((org=org.parent))
 				if(org.i !== void 0)
-					 path.unshift(org.i);
+					path.unshift(org.i);
 			return path;
 		},
 
@@ -854,8 +851,8 @@
 				elm.innerHTML = obj.text;
 
 			else if(obj.child.length)
-				_fal(obj.child,function(obj){
-					elm.appendChild(this.createDOMElememnt(obj)); },this);
+				_fal(obj.child,function(child){
+					elm.appendChild(this.createDOMElememnt(child)); },this);
 
 			return elm;
 		}
@@ -888,7 +885,7 @@
 	Z.prototype = {
 		get : function(index){
 			return 0 in arguments ?
-				this.el[( +index + ( index < 0 ? this.length : 0 ) )] :
+				this.el[+index + ( index < 0 ? this.length : 0 )] :
 				this.el;
 		},
 
@@ -908,7 +905,7 @@
 			var el=this.el ,tmp=this.get(0),
 					find, i=0, l=el.length;
 
-			for(;i<l;i++,tmp=el[i]){
+			for(; i<l; i++,tmp=el[i]){
 				while(tmp&&!find&&tmp!==element)
 					if(z.matchz(tmp=tmp.parentNode,selector))
 						find = tmp;
@@ -919,14 +916,14 @@
 		},
 
 		on : function(event, selector, data, callback, one){
-			var autoRemove, delegator, $this = this;
+			var autoRemove, delegator;
 
 			if (event && !_isStr(event)) {
 				_loop(event, function(fn, type){
-					$this.on(type, selector, data, fn, one);
-				});
+					this.on(type, selector, data, fn, one);
+				},this);
 
-				return $this;
+				return this;
 			}
 
 			if (!_isStr(selector) &&
@@ -939,7 +936,7 @@
 			if (callback === false)
 				callback = returnFalse;
 
-			return $this.each(function(element){
+			return this.each(function(element){
 				if (one)
 					autoRemove = function(e){
 						zremoveEvent(element, e.type, callback);
@@ -948,14 +945,15 @@
 
 				if (selector)
 					delegator = function(e){
-						var match = !z.matchz(e.target,selector) ?
-											z(e.target).closest(selector, element).get(0) : e.target;
+						var match = z.matchz(e.target,selector) ?
+							e.target : z(e.target).closest(selector, element).get(0);
 
 						if (match && match !== element)
-							return (autoRemove || callback).apply(
+							(autoRemove || callback).apply(
 								match,
-								[_extend(e, {currentTarget: match, liveFired: element})]
-								.concat(_slice(arguments,1))
+								[_extend(e, { currentTarget: match, liveFired: element })].concat(
+									_slice(arguments,1)
+								)
 							);
 					};
 
@@ -1011,6 +1009,7 @@
 					result = handler.proxy(e);
 					if (e.isImmediatePropagationStopped())
 						return false;
+					return true;
 				});
 			});
 
@@ -1025,9 +1024,7 @@
 
 		remove: function(){
 			return this.each(function(elm){
-				elm.parentNode.removeChild(
-					z(elm).off().get(0)
-				);
+				elm.parentNode.removeChild(z(elm).off().get(0));
 			});
 		},
 
@@ -1047,7 +1044,7 @@
 	};
 
 	// checker template;
-	var checker = _doom("[ checker -> ax.va.{{#type}} ]"),
+	var checkalert = _doom("[ checker -> ax.va.{{#type}} ]"),
 			vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
 
 	function checkValidate(newdata,model){
@@ -1107,13 +1104,14 @@
 
 	function warn(value,msg){
 		return !console.warn(
-			vahandler({ value : value, type : _type(value), msg : msg||""})
+			vahandler({ value : value, type : _type(value), msg : msg||"" })
 		);
 	}
 
 	function makeChecker(checker,type){
 		return function(value){
-			return checker(value) || warn(value,checker({ type:type }));
+			return checker(value) || 
+				warn(value,checkalert({ type:type }));
 		};
 	}
 
@@ -1163,13 +1161,13 @@
 			});
 		},model);
 		return model;
-	};
+	}
 
 	ax.module = function(name,creater){
 		var make = maker[name];
 		if(make) return make;
 		if(make = creater.apply(struct.root,
-				[ax,struct].concat(_slice(arguments,2))))
+			[ax,struct].concat(_slice(arguments,2))))
 			return (maker[name] = make);
 	};
 
@@ -1283,11 +1281,11 @@
 			_v: !!_size(validate),
 			_f: filter,
 			_c:function(newdata,v){
-				return v===_? (data = newdata) : {};},
+				return v===_? (data = newdata) : {}; },
 			_s: usestore
 		}));
 
-		if(existname){ RAM[this.name] = this;}
+		if(existname){ RAM[this.name] = this; }
 
 		delete config.name;
 		delete config.data;
@@ -1298,9 +1296,7 @@
 		delete config.filter;
 
 		// init event
-		_extend(this,config)
-			.emit("init")
-			.unbind("init");
+		_extend(this,config).emit("init").unbind("init");
 	};
 
 
@@ -1353,14 +1349,14 @@
 			var assert = this._ast(cool,_);
 
 			if(_isPrim(prop) &&
-				 prop!=null &&
-				 _get(assert,prop) !== void 0){
+				prop!=null &&
+				_get(assert,prop) !== void 0){
 				_rm(assert,prop);
 				if(this._s) aS.set(this.name,assert);
 				if(!rmStatic){
 					this.emit("change",[_clone(assert)]);
-					this.emit("remove:"+prop)
-				};
+					this.emit("remove:"+prop);
+				}
 			}
 
 			return this;
@@ -1428,13 +1424,13 @@
 				url = null;
 			}
 
-		  return pipe.apply(this,[
-		  	"sync",
-		  	url || this.url,
-		  	this.get(),
-		  	_noop,
-		  	_noop,
-		  	header
+			return pipe.apply(this,[
+				"sync",
+				url || this.url,
+				this.get(),
+				_noop,
+				_noop,
+				header
 			]);
 		},
 
@@ -1442,14 +1438,6 @@
 			return _toString(this.toJSON());
 		}
 	};
-
-	function packRender(view,render){
-		return _link(
-			packBefore(view),
-			packMain(view,render),
-			packComplete(view)
-		);
-	}
 
 	function packBefore(view){
 		return function(){
@@ -1472,14 +1460,24 @@
 		};
 	}
 
+	function packRender(view,render){
+		var b = packBefore(view),
+				m = packMain(view,render),
+				c = packComplete(view);
+		return _link(b,m,c);
+	}
+
 	function setRender(view,render){
-		var that = packRender(view,render);
+		var thatRender = packRender(view,render);
 
 		_define(view,"render",{
-			get : function(){ return that; },
+			get : function(){ 
+				return thatRender; 
+			},
 			set : function(fn){
-				if(_isFn(fn)) that = packRender(view,fn);
-				return that;
+				if(_isFn(fn)) 
+					thatRender = packRender(view,fn);
+				return thatRender;
 			},
 			enumerable:true,
 			configurable:false
@@ -1560,9 +1558,7 @@
 		}
 
 		// first trigger "init" event
-		_extend(this,config,this._vid=vid++)
-			.emit("init")
-			.unbind("init");
+		_extend(this,config,this._vid=vid++).emit("init").unbind("init");
 	};
 
 	aVP = aV.prototype = {
@@ -1597,7 +1593,7 @@
 		},
 
 		emit: function(type,args){
-			var t = _toString(t), k = t.split(":");
+			var t = _toString(type), k = t.split(":");
 			if(k.length>2){
 				return _fal(t.split("|"),function(mk){
 					var mkf = mk.split(":");
@@ -1688,7 +1684,7 @@
 		var c = ax.atom({ use:list });
 		c.back = function(){ return atom; };
 		return c;
-	};
+	}
 
 	aTP = aT.prototype = {
 		constructor: aT,
