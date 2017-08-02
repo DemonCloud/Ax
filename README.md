@@ -1,9 +1,11 @@
 
 # Ax - [ VERSION 3.3.3+ ]
 
-![Ax Logo](http://7j1zwt.com1.z0.glb.clouddn.com/logo.png)
+<img width=50 src="http://7j1zwt.com1.z0.glb.clouddn.com/logo.png" alt="Ax">
 
 <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
+
+<img src="https://nodei.co/npm/ax-js.png" alt="npm info">
 
 ### Ax is a fast MV JavaScript Framework. 
 
