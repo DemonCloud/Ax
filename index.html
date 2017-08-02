@@ -102,7 +102,7 @@ var route = new Router({
 });
 
 //#example2
-var model2 = ax.model();
+var model2 = ax.model({ name:"111" });
 
 var view2 = ax.view({
 	template:"<div><input style='margin-bottom:5px' defaultValue='{{-text}}'>"+
@@ -123,7 +123,6 @@ view2.mount(
 );
 
 route.start("/");
-
 </script>
 </body>
 </html>

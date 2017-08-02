@@ -1550,7 +1550,6 @@
 					if(1 in arguments)
 						this.render.apply(this,_slice(arguments,1));
 
-
 					// delete mount
 					return delete this.mount,this;
 				}
@@ -1693,7 +1692,7 @@
 
 		use: function(list){
 			return assertMake.call(this,list,function(LIST,name,M){
-				if(name && (M = RAM[name]) && vA.model(M) && !_has(LIST,M))
+				if((M = RAM[name]) && !_has(LIST,M))
 					LIST.push(M);
 			});
 		},
