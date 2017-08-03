@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<!-- <script src="../src/struct.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+	<script src="../dist/struct.min.js"></script>
+</head>
+<body>
+<script async>
+
+var clone = struct.clone();
+var randomInt = struct.random("int");
+var randomFloat = struct.random("float");
+var randomArray = struct.random("array");
+var randomBool = struct.random("bool");
+var randomString = struct.random("string");
+
+var pvoit = {
+	a:1,
+	b:"2",
+	c: {
+		d: 2,
+	},
+	f: [1,2,3],
+	g:{
+		h: "dasjhkasd",
+		i:{
+			j: 4,
+			k: [3],
+			m: {
+				n: 2.3431123,
+				o: "sadsadd",
+				p:[]
+			}
+		},
+		q:[{
+			r: 2,
+			s: {
+				u: [2123,233,{
+					v:"12312"
+				}]
+			}
+		}]
+	}
+};
+
+var pvoitA = clone(pvoit);
+var pvoitB = {
+	a:"2",
+	b:"1",
+	c: {
+		d: 7,
+		e: [2,2,3],
+		f: 8
+	},
+	g:{ h:[], i:2 }
+};
+
+var leq = _.isEqual;
+var seq = struct.eq();
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Lodash isEqual Same");
+for(var l=0; l<100000; l++)
+	leq(pvoit,pvoit);
+console.timeEnd("Lodash isEqual Same");
+
+console.time("Struct eq Same");
+for(var s=0; s<100000; s++)
+	seq(pvoit,pvoit);
+console.timeEnd("Struct eq Same")
+
+console.time("Lodash isEqual Yes");
+for(var l=0; l<100000; l++)
+	leq(pvoit,pvoitA);
+console.timeEnd("Lodash isEqual Yes");
+
+console.time("Struct eq Yes");
+for(var s=0; s<100000; s++)
+	seq(pvoit,pvoitA);
+console.timeEnd("Struct eq Yes")
+
+console.time("Lodash isEqual Random");
+for(var l=0; l<100000; l++){
+	var o = { 
+		a:Math.random,
+		b:randomInt(1,100),
+		c: {
+			d: randomArray(10,"int",1,88),
+			e: [
+				randomString(),
+				randomString(),
+				randomString(),
+				randomString(),
+				{
+					g: randomArray(8,"int",1,10)
+				}
+			]
+		},
+		f: randomFloat(),
+		h: [ randomBool(50)]
+	}
+	leq(o,clone(o));
+}
+console.timeEnd("Lodash isEqual Random");
+
+console.time("Struct eq Random");
+for(var s=0; s<100000; s++){
+	var o = { 
+		a:Math.random,
+		b:randomInt(1,100),
+		c: {
+			d: randomArray(10,"int",1,88),
+			e: [
+				randomString(),
+				randomString(),
+				randomString(),
+				randomString(),
+				{
+					g: randomArray(8,"int",1,10)
+				}
+			]
+		},
+		f: randomFloat(),
+		h: [ randomBool(50)]
+	}
+	seq(o,clone(o));
+}
+console.timeEnd("Struct eq Random")
+
+console.time("Lodash isEqual No");
+for(var l=0; l<100000; l++)
+	leq(pvoit,pvoitB);
+console.timeEnd("Lodash isEqual No");
+
+console.time("Struct eq No");
+for(var s=0; s<100000; s++)
+	seq(pvoit,pvoitB);
+console.timeEnd("Struct eq No")
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>

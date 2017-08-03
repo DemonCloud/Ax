@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.0-alpha0.5";
+struct.VERSION = "4.0.0-alpha0.6";
 
 // base method
 var or = {},
@@ -184,7 +184,7 @@ function isNum(e){
 
 // Primitive [ type ]
 function isPrimitive(e){
-	return e == null || typeof e !== "object" ;
+	return e == null || typeof e !== "object";
 }
 
 function isRegExp(e){
@@ -243,8 +243,7 @@ function isDate(n){
 }
 
 function isEmpty(n){
-	return isStr(n) ? !size(n) : 
-	isPrimitive(n) || !size(n) ;
+	return isStr(n) ? !size(n) : isPrimitive(n) || !size(n);
 }
 
 function isDOM(e){
@@ -528,10 +527,10 @@ function reduceRight(list,fn,initValue,context){
 // has([1,2,3],2) => true;
 function has(list,n,ueq){
 	var compare = isRegExp(n) ? regCheck : (ueq ? eq : seq), 
-		idf = false, i;
+			idf = false, i;
 
 	if(isArrayLike(list)){
-		for(i=list.length;i--;)
+		for(i=list.length; i--; )
 			if(idf=compare(n,list[i]))
 				break;
 	}else if(isObj(list)){
@@ -561,10 +560,12 @@ function notdel(list,k,isarr){
 function not(list,n,useq){
 	var check = isRegExp(n) ? regCheck : (useq ? eq : seq),
 			isarr = isArray(list), p = keys(list), i=0;
+
 	for( ; i<p.length; i++)
 		if(check(n,list[p[i]]))
-			if(notdel(list,p[i],isarr) && isarr)
-				p.pop(i--);
+			if(notdel(list,p[i],isarr) && isarr){
+				p.pop(); i--;
+			}
 	return list;
 }
 
@@ -1755,7 +1756,10 @@ var _events = {} , _eid=0;
 function addEvent(obj,type,fn){
 	var id = obj._eid || 0;
 	if(id === 0) define(obj, "_eid",
-		{ value : (id = (++_eid)), writable : false, enumerable: false, configurable: true });
+		{ value : (id = (++_eid)), 
+			writable : false, 
+			enumerable: false, 
+			configurable: true });
 	if(!_events[id]) _events[id] = {};
 	if(!_events[id][type]) _events[id][type] = [];
 	if(!has(_events[id][type],fn)) _events[id][type].push(fn);
