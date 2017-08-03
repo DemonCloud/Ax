@@ -6,6 +6,8 @@ module.exports = {
         "es6": true
     },
     "globals": {
+    	"test": true,
+    	"expect": true,
     	"define": true,
     	"require": true,
     	"exports": true

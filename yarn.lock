@@ -255,8 +255,8 @@ aws4@^1.2.1:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
 ax-struct-js@latest:
-  version "4.0.14"
-  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-4.0.14.tgz#4945bab845da9a728f79c47fbd3a00571b6f4f9c"
+  version "4.0.15"
+  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-4.0.15.tgz#860872bf317d6abfdfa6c7f77c0d746146f4bdf9"
 
 babel-code-frame@^6.22.0:
   version "6.22.0"

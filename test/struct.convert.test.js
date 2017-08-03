@@ -3,7 +3,9 @@
 const struct = require('../src/struct');
 const toStr = struct.convert("string"),
 			toNum = struct.convert("number"),
-			toAry = struct.convert('array');
+			toAry = struct.convert('array'),
+			toHEX = struct.convert('hex'),
+			toRGB = struct.convert('rgb');
 
 test("convert [toString]", ()=>{
 	expect(toStr(null)).toBe("");
@@ -49,4 +51,12 @@ test("convert [toArray]",()=>{
 	expect(toAry({})).toEqual([]);
 	expect(toAry(true)).toEqual([true]);
 	expect(toAry(false)).toEqual([false]);
+});
+
+test("convert [toHEX]",()=>{
+	expect(toHEX({r:204,g:204,b:204})).toBe("cccccc");
+});
+
+test("convert [toRGB]",()=>{
+	expect(toRGB("cccccc")).toEqual({r:204,g:204,b:204});
 });

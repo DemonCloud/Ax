@@ -17,7 +17,7 @@
 		// support CommonJS exports
 		// * fuck the npm package rubbish, where package name use [ struct ]
 		// should defined webpack alias with [ "struct" : "ax-struct-js" ]
-		factory(exports,require('struct') || require("ax-struct-js"));
+		factory(exports,require('struct'));
 	}else
 		// build on browser global object
 		root.ax = factory(ax,root.struct);
@@ -31,6 +31,10 @@
 			FCD = String.fromCharCode, vid = 0,
 
 	// Define Setting
+	VIEW_KEYWORDS  = ["root","mount","props","events","render","template","destroy"],
+	ATOM_KEYWORDS  = ["use","events"],
+	MODEL_KEYWORDS = ["name","data","store","change","events","validate","filter"],
+
 	VIEW_DEFAULT  = { },
 	ATOM_DEFAULT  = { use:[] },
 	MODEL_DEFAULT = { data:{}, validate:{} },
@@ -867,12 +871,12 @@
 	};
 
 	var capTypes = {
-		"UIEvent"       : [
-			"focus",
-			"blur",
-			"focusin",
-			"focusout"
-		],
+		// "UIEvent"       : [
+		// 	"focus",
+		// 	"blur",
+		// 	"focusin",
+		// 	"focusout"
+		// ],
 		"MouseEvent"    : [
 			"click",
 			"dbclick",
@@ -883,11 +887,11 @@
 			"mouseenter",
 			"mouseleave"
 		],
-		"KeyboardEvent" : [
-			"keydown",
-			"keypress",
-			"keyup"
-		]
+		// "KeyboardEvent" : [
+		// 	"keydown",
+		// 	"keypress",
+		// 	"keyup"
+		// ]
 	};
 
 	Z.prototype = {
@@ -1292,18 +1296,11 @@
 			_s: usestore
 		}));
 
-		if(existname){ RAM[this.name] = this; }
-
-		delete config.name;
-		delete config.data;
-		delete config.store;
-		delete config.change;
-		delete config.events;
-		delete config.validate;
-		delete config.filter;
+		if(existname) RAM[this.name] = this;
 
 		// init event
-		_extend(this,config).emit("init").unbind("init");
+		_extend(this,config,MODEL_KEYWORDS).
+			emit("init").unbind("init");
 	};
 
 
@@ -1512,15 +1509,8 @@
 				vroot   = config.root,
 				render  = config.render,
 				events  = config.events,
+				model   = config.model,
 				stencil = config.template;
-
-		delete config.root;
-		delete config.mount;
-		delete config.props;
-		delete config.events;
-		delete config.render;
-		delete config.template;
-		delete config.destroy;
 
 		// parse template
 		// building the render function
@@ -1543,9 +1533,8 @@
 
 			_fol(events,uon,setRender(this,render));
 
-			if(config.model)
-				if(vA.model(config.model))
-					config.model.on("change",this.render);
+			if(model && vA.model(model))
+				model.on("change",this.render);
 
 		}else{
 			this.mount = function(el){
@@ -1553,10 +1542,9 @@
 					// bind events
 					this.root = vroot = el;
 					_fol(events,uon,setRender(this,render));
-					if(config.model)
-						if(vA.model(config.model))
-							config.model.on("change",this.render);
 
+					if(model && vA.model(model))
+						model.on("change",this.render);
 					// trigger render
 					if(1 in arguments)
 						this.render.apply(this,_slice(arguments,1));
@@ -1568,7 +1556,7 @@
 		}
 
 		// first trigger "init" event
-		_extend(this,config,this._vid=vid++).emit("init").unbind("init");
+		_extend(this,config,VIEW_KEYWORDS,this._vid=vid++).emit("init").unbind("init");
 	};
 
 	aVP = aV.prototype = {
@@ -1688,12 +1676,10 @@
 				initList = config.use,
 				LIST = [];
 
-		delete config.use;
-		delete config.events;
-
 		// create assert
 		this._assert = assert(LIST);
-		_extend(this.use(initList),config);
+
+		_extend(this.use(initList),config,ATOM_KEYWORDS);
 	};
 
 	aTP = aT.prototype = {
@@ -1727,8 +1713,7 @@
 		},
 
 		swap: function(a,b,swapStatic){
-			var ma = this.p(a),
-					mb = this.p(b);
+			var ma = this.p(a), mb = this.p(b);
 			
 			if(ma && mb){
 				var tmp = ma.get();

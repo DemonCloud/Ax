@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<!-- <script src="../src/struct.js"></script> -->
+	<script src="../dist/struct.min.js"></script>
+</head>
+<body>
+<script async>
+
+var tpl = "<div>{{#name}}</div><div>{{#score}}</div><div>{{#id}}</div>"+
+	"<ul>{{*each [v] in list}} <li>{{-v}}</li> {{*end}}</ul>";
+var data = { 
+	name: "YiJun", 
+	score:88, 
+	id:11,
+	list: [2,3,4,1,5]
+};
+
+var data2 = {
+	name: "Buky", 
+	score: 9, 
+	id:2,
+	list: ["asd","ddf","sda",'s']
+}
+
+var doom = struct.doom();
+var axt = struct.doom("axt");
+
+var dcomp = doom(tpl);
+var acomp = axt(tpl);
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Cache Render");
+for(var j=0; j<100000; j++)
+	acomp(data);
+console.timeEnd("Cache Render");
+
+console.time("Normal render");
+for(var i=0; i<100000; i++)
+	dcomp(data);
+console.timeEnd("Normal render");
+
+console.time("Cross Cache Render");
+for(var k=0; k<100000; k++)
+	acomp(k%2 ? data : data2);
+console.timeEnd("Cross Cache Render");
+
+console.time("Cross Normal Render");
+for(var k=0; k<100000; k++)
+	dcomp(k%2 ? data : data2);
+console.timeEnd("Cross Normal Render");
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>
