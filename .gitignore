@@ -15,6 +15,9 @@ _dom.html
 .idea/*
 tmp/
 tmp/*
+webpack
+webpack/*
+gulp/*
 
 npm-debug.log*
 
