@@ -98,31 +98,16 @@ var route = new Router({
 
 			if(!state.bone) state.bone = true;
 		}
-	}
+	},
+	
+//	beforeActions : function(){
+//		console.log("hello word");
+//		return true;
+//	}
 });
-
-//#example2
-var model2 = ax.model({ name:"111" });
-
-var view2 = ax.view({
-	template:"<div><input style='margin-bottom:5px' defaultValue='{{-text}}'>"+
-	"<h2>{{-text}}</h2></div>",
-
-	model : model2,
-
-	events:{
-		"change:input":function(event){
-			this.model.set("text",event.target.value);
-		}
-	}
-});
-
-view2.mount(
-	document.getElementById("mount"),
-	{ text: "Hello World" }
-);
 
 route.start("/");
+
 </script>
 </body>
 </html>

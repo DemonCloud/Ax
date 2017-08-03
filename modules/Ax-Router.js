@@ -1,5 +1,6 @@
 // import ax from "ax-js"
 // import ax from "ax" #or from alias for webpack
+
 ax.module("Router",function(ax,struct){
 'use strict';
 
@@ -12,15 +13,14 @@ ax.module("Router",function(ax,struct){
 // *define assert;
 // *define history [H]
 // *define pathReg to exec
-var _ = [],
-		H = struct.root.history,
-		pathReg = /\/:([^\s\/]+)/g;
+var _ = [], H = struct.root.history,
+		pathReg = /\/:([^\s/]+)/g,
+		mappingReg = "/([^\\s\\/]+)";
 
 // Define Utils [ struct ]
 var merge = struct.merge(),
-		clone = struct.clone(),
+		ext   = struct.extend(),
 		is    = struct.type("def"),
-		aget  = struct.prop("get"),
 		each  = struct.each(),
 		map   = struct.map(),
 		trim  = struct.string("trim"),
@@ -33,13 +33,6 @@ var merge = struct.merge(),
 		qstr  = struct.param("stringify"),
 		toNum = struct.convert("number"),
 		qpars = struct.param("parse");
-
-// Default Options
-// for merge the keywords
-var DEFAULT_ROUTER_OPTION = {
-	routes: {},
-	actions: {}
-};
 
 // delegator view
 // view bind on root;
@@ -57,8 +50,12 @@ var delegatorView = ax.view.extend({
 // Active the routers
 function checkPath(path){
 	return path &&
-				 path !== location.pathname &&
-				 path !== location.pathname + "/";
+				path !== location.pathname &&
+				path !== location.pathname + "/";
+}
+
+function returnT(){
+	return true;
 }
 
 function toActive(source,path,query,state,notpush,isLink){
@@ -66,38 +63,42 @@ function toActive(source,path,query,state,notpush,isLink){
 
 	if(!(isLink && !cpath) && this._status){
 
-		var _ROUTER = this, i, l, checker, 
+		var _this = this, i, l, checker, 
 				key = keys(source.mapping), route, param;
 				state = is(state,"Object") ? state : {};
 
 		for(i=0,l=key.length,checker; i<l; i++)
 			if((checker = source.mapping[key[i]]).test(path)){
 				route = key[i];
-				param = cmb(source.params[route], slice(checker.exec(path),1));
+				param = cmb(
+					source.params[route],
+					slice(checker.exec(path),1)
+				);
 				break;
 			}
 
 		// if exist router
 		if(route){
-
 			var queryString = (isStr(query) ?
-					(query.charAt(0) !== '?' ? "?" : "") + query:
+					(query.charAt(0) !== '?' ? "?" : "") + query :
 					is(query,"Object") ? ("?"+qstr(query)) : "");
 
-			each(map(source.routes[route],function(name){
-				// setup funtion call
-				return source.actions[name] || noop;
-			}),function(fn){
-				return fn.call(_ROUTER, param,
-					is(query,"Object") ? query : qpars(query),
-					state
-				);
-			});
-		
-			if(!notpush) 
-				H[cpath ? "pushState" : "replaceState"](
-					state, null, path+queryString
-				);
+			query = is(query,"Object") ? query : qpars(query);
+
+			if(source.beforeActions(param,query,state)){
+
+				each(map(source.routes[route],function(name){
+					// setup funtion call
+					return source.actions[name] || noop;
+				}),function(fn){
+					return fn.call(_this, param, query, state);
+				});
+
+				if(!notpush)
+					H[cpath ? "pushState" : "replaceState"](state, null, path+queryString);
+
+				source.afterActions(param,query);
+			}
 		}
 
 	}
@@ -105,25 +106,33 @@ function toActive(source,path,query,state,notpush,isLink){
 	return this;
 }
 
+// Default Options
+// for merge the keywords
+var DEFAULT_ROUTER_OPTION = {
+	routes: {},
+	actions: {},
+	beforeActions: returnT,
+	afterActions: noop
+};
+
 var Router = function(option){
 
+	var _this = this;
+
 	var source = merge(
-		clone(DEFAULT_ROUTER_OPTION),
+		ext({},DEFAULT_ROUTER_OPTION),
 		is(option,"Object") ? option : {}
-	), _this = this;
+	); 
 
 	// create Assert method
 	this._status = 0;
-	this._assert = function(idf){
-		if(idf === _) return source;
-	};
+	this._assert = function(idf){ if(idf === _) return source; };
 
-	var delegatorEvents = {},
-	events = map(source.elements, function(elm){
-		return "click:"+elm;
-	});
+	var delegatorEvents = {}, events;
 
-	if(events = events.join("|")){
+	if((events = map(source.elements, function(elm){
+		return "click:"+elm; }).join("|"))){
+
 		delegatorEvents[events] = function(e){
 			e.preventDefault();
 			e.stopPropagation();
@@ -152,14 +161,12 @@ var Router = function(option){
 	each(source.routes,function(action,path){
 		var routeParam = [],
 		pathMatcher = trim(path).replace(pathReg,
-			function(match,param){ 
-				routeParam.push(param);
-				return "/([^\\s\\/]+)";
-			}
-		);
-
+		function(match,param){ 
+			routeParam.push(param);
+			return mappingReg;
+		});
 		source.params[path] = routeParam;
-		source.mapping[path] = RegExp("^"+pathMatcher+"[\/]?$");
+		source.mapping[path] = RegExp("^"+pathMatcher+"[/]?$");
 	});
 
 	// use location API
