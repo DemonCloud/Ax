@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.0-alpha0.4";
+struct.VERSION = "4.0.0-alpha0.5";
 
 // base method
 var or = {},
@@ -1068,8 +1068,7 @@ function randomDice(max){
 
 // random Array [ method ]
 function randomArray(len,use){
-	var args = slice(arguments,2),
-			usemethod = $random[use] || $random.default;
+	var args = slice(arguments,2), usemethod = $random[use] || $random.default;
 	return mapValue(fill(len,0),function(){
 		return usemethod.apply(null,args);
 	});
@@ -1462,7 +1461,10 @@ function DOOM(txt,bounds,name){
 		)));
 	};
 
-	return _; eval(_);
+	return _; 
+
+	// ignore eval
+	eval(_);
 }
 
 // Browser cookie
@@ -1874,7 +1876,7 @@ function size(n){
 
 // return now TimeStamp [ method ]
 function now(){
-	return (new Date).getTime();
+	return (new Date()).getTime();
 }
 
 // object values [ method ]
@@ -1999,7 +2001,8 @@ function frozen(){
 function hz(fn,time,context){
 	var fq;
 	return function(){
-		if(!fq) setTimeout((fn.apply((fq = 1,context),arguments),
+		if(!fq) 
+			ayc((fn.apply((fq = 1,context),arguments),
 				function(){ fq = 0; }),time);
 	};
 }

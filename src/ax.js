@@ -28,7 +28,7 @@
 	var aM,aV,aT,aS,vA,z,Z,
 			aMP,aVP,aTP, _ = [] ,maker = {}, root = struct.root,
 			RAM = [], LS = root.localStorage, SN = "Ax@",
-			FCD = String.fromCharCode,
+			FCD = String.fromCharCode, vid = 0,
 
 	// Define Setting
 	VIEW_DEFAULT  = { },
@@ -117,7 +117,7 @@
 
 		aT.prototype[apiName] = function(){
 			return struct[apiUse](apiSelect).apply(this,
-			[this.toData()].concat(_slice(arguments)));
+			[this.toChunk()].concat(_slice(arguments)));
 		};
 	}
 
@@ -140,7 +140,7 @@
 
 		aT.prototype[apiName] = function(){
 			return struct[apiUse](apiSelect).apply(this,
-			[this.toData()].concat(_slice(arguments)));
+			[this.toChunk()].concat(_slice(arguments)));
 		};
 	}
 
@@ -466,7 +466,7 @@
 	};
 
 	z.xEvent = function(event){
-		var key;
+		var key; 
 		for(key in event) 
 			this[key] = event[key];
 	};
@@ -613,7 +613,8 @@
 	};
 
 	var patchHack = [
-		_noop,  //0
+		//0 nopatch
+		_noop,  
 		//1 replace
 		function(patch,t){
 			t = patch.s;
@@ -677,10 +678,10 @@
 	var slik = {
 
 		treeDiff: function(org,tag,patch,orgParent/*,tagParent*/){
-			if(org === void 0){
+			if(org === void 0)
 				// new node
 				patch.unshift(this.createPatch(orgParent,tag,2)); 
-			} else if(tag === void 0)
+			else if(tag === void 0)
 				// remove node
 				patch.push( this.createPatch(org,tag,3));
 			else if(org.tagName === tag.tagName){
@@ -708,11 +709,12 @@
 				}
 
 				// with child diff
+				var i;
 				if(org.child.length || tag.child.length)
-					for(var i=Math.max(org.child.length,tag.child.length); i--;)
+					for(i=Math.max(org.child.length,tag.child.length); i--;)
 						this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
-
-			}else if(org.tagName !== tag.tagName)
+			}
+			else if(org.tagName !== tag.tagName)
 				patch.push(this.createPatch(org,tag,1));
 
 			return patch;
@@ -720,6 +722,7 @@
 
 		applyPatch:function(oDOM,patchs,callback){
 			_fal(_map(patchs,function(patch){
+				patch.path = patch.s;
 				patch.s = this.mapTreeNode(oDOM,patch.s);
 				return patch;
 			}.bind(this)),function(patch){
@@ -729,10 +732,12 @@
 		},
 
 		mapTreeNode: function(ODOM,path){
-			var target,i=0,l=path.length,p=ODOM.children;
-			for(; i<l; i++){
-				if(p[path[i]]){ target = p[path[i]]; p = target.children; }
-				else break;
+			var target,i=0,p=ODOM.children;
+			for(; i<path.length; i++){
+				if(p[path[i]]){ 
+					target = p[path[i]]; 
+					p = target.children; 
+				} else break;
 			}
 			return target;
 		},
@@ -788,7 +793,8 @@
 		createTreeFromHTML: function(html,vprops){
 			var root = {
 				tagName:"root",
-				child:[] };
+				child:[] 
+			};
 
 			var p = root , c = root.child, n;
 
@@ -811,6 +817,7 @@
 				}
 				return match;
 			}.bind(this));
+
 			return root;
 		},
 
@@ -823,7 +830,7 @@
 
 			if(attributes){
 				var attrs = {} ,s, tg;
-				while(s=attrexec.exec(attributes)){
+				while((s=attrexec.exec(attributes))){
 					if(!s[1]){
 						if(!tg)
 							tg = s[0];
@@ -852,7 +859,8 @@
 
 			else if(obj.child.length)
 				_fal(obj.child,function(child){
-					elm.appendChild(this.createDOMElememnt(child)); },this);
+					elm.appendChild(this.createDOMElememnt(child)); 
+				},this);
 
 			return elm;
 		}
@@ -1166,8 +1174,7 @@
 	ax.module = function(name,creater){
 		var make = maker[name];
 		if(make) return make;
-		if(make = creater.apply(struct.root,
-			[ax,struct].concat(_slice(arguments,2))))
+		if((make = creater.apply(struct.root,[ax,struct].concat(_slice(arguments,2)))))
 			return (maker[name] = make);
 	};
 
@@ -1280,7 +1287,7 @@
 				return v===_? validate : {}; },
 			_v: !!_size(validate),
 			_f: filter,
-			_c:function(newdata,v){
+			_c: function(newdata,v){
 				return v===_? (data = newdata) : {}; },
 			_s: usestore
 		}));
@@ -1316,6 +1323,7 @@
 					ref, single = !_isPrim(key) && _isObj(key);
 
 			if(argslen){
+
 				if(single){
 					// single pointer select
 					setStatic = val;
@@ -1326,9 +1334,12 @@
 
 						this._c(ref,_,this.change=true);
 						if(this._s) aS.set(this.name,ref);
-						if(!setStatic) this.emit("change",[_clone(ref)]);
+						if(!setStatic) 
+							this.emit("change",[_clone(ref)]);
 					}
+
 				} else {
+
 					if(!_eq(_get(assert,key),val) &&
 						singleValidate(key,val,this)){
 
@@ -1339,7 +1350,9 @@
 							this.emit("change:"+key,[val]);
 						}
 					}
+
 				}
+
 			}
 
 			return this;
@@ -1475,8 +1488,7 @@
 				return thatRender; 
 			},
 			set : function(fn){
-				if(_isFn(fn)) 
-					thatRender = packRender(view,fn);
+				if(_isFn(fn)) thatRender = packRender(view,fn);
 				return thatRender;
 			},
 			enumerable:true,
@@ -1494,7 +1506,6 @@
 
 	// Ax View
 	// View container
-	var vid = 0;
 	aV = function(obj){
 		var config  = _extend(_clone(VIEW_DEFAULT),obj||{}),
 				props   = _lock(_isObj(config.props) ? config.props : {}),
@@ -1664,6 +1675,12 @@
 		return use;
 	}
 
+	function stom(atom,list){
+		var c = ax.atom({ use:list });
+		c.back = function(){ return atom; };
+		return c;
+	}
+
 	// Ax atom * stom
 	// Useful models manager
 	aT = function(obj){
@@ -1679,26 +1696,22 @@
 		_extend(this.use(initList),config);
 	};
 
-	function stom(atom,list){
-		var c = ax.atom({ use:list });
-		c.back = function(){ return atom; };
-		return c;
-	}
-
 	aTP = aT.prototype = {
 		constructor: aT,
 
 		all: function(){ return this._assert(_slice,_); },
 
 		use: function(list){
-			return assertMake.call(this,list,function(LIST,name,M){
+			return assertMake.call(this,list,
+			function(LIST,name,M){
 				if((M = RAM[name]) && !_has(LIST,M))
 					LIST.push(M);
 			});
 		},
 
 		out: function(list){
-			return assertMake.call(this,list,function(LIST,name){
+			return assertMake.call(this,list,
+			function(LIST,name){
 				var find = _index(LIST,assertModel.bind(name));
 				if(_isNum(find)) LIST.splice(find,1);
 			});
@@ -1711,6 +1724,19 @@
 		of: function(fn,args){
 			return _fal(this.all(),
 				(_isFn(fn) ? fn : aTite(fn,args))),this;
+		},
+
+		swap: function(a,b,swapStatic){
+			var ma = this.p(a),
+					mb = this.p(b);
+			
+			if(ma && mb){
+				var tmp = ma.get();
+				ma.set(mb.get(),swapStatic);
+				mb.set(tmp,swapStatic);
+			}
+
+			return this;
 		},
 
 		select: function(match){
