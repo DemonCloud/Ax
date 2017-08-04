@@ -2,13 +2,15 @@
 
 <img width=50 src="http://7j1zwt.com1.z0.glb.clouddn.com/logo.png" alt="Ax">
 
-<img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
+> <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
 
 <img src="https://nodei.co/npm/ax-js.png" alt="npm info">
 
 <br>
 
-## Ax is a fast MV JavaScript Framework. 
+<br>
+
+## The Fast MV JavaScript Framework. 
 
 It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` & `Vue` very well.
 
@@ -24,11 +26,14 @@ It require `Struct` utils lib, for the sake of better organization application s
 
 ### Install
 
-use **npm** or **yarn** install `ax` and `struct`
+Install `ax` and `struct`
 
 ```shell
-npm install ax-js
-npm install ax-struct-js
+yarn install ax-js ax-struct-js
+
+# or
+
+npm install ax-js ax-struct-js
 ```
 
 Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
@@ -53,7 +58,9 @@ Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
 ### Document (current version 3.3.33 -> v3)
 
-> The document will rebuild on 4.0
+> The Document will rebuild on 4.0
+
+<br>
 
 **Document V3 📃** : [ Use Ax in your Project ](https://demoncloud.github.io/Ax/v3)
 

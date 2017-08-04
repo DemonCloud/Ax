@@ -98,8 +98,6 @@
 	_index    = struct.index(),
 	_one      = struct.index("one"),
 	_decode   = struct.html("decode"),
-	_utob     = struct.assembly("utob"),
-	_btou     = struct.assembly("btob"),
 	cool      = struct.cool();
 
 	// ax genertor function
@@ -603,9 +601,7 @@
 
 	var patchAttr = function(o,t){
 		var s = {};
-		_fol(t,function(v,k){
-			if(o[k] === v) s[k]=1;
-		});
+		_fol(t,function(v,k){ if(o[k] === v) s[k]=1; });
 		return s;
 	};
 
@@ -615,10 +611,10 @@
 		//1 replace
 		function(patch,t){
 			t = patch.s;
-			if(t) if(t.parentNode){
-				t.parentNode.insertBefore(patch.n,t);
-				t.parentNode.removeChild(t);
-			}
+			if(t && t.parentNode)
+				t.parentNode.replaceChild(patch.n,t);
+				// t.parentNode.insertBefore(patch.n,t);
+				// t.parentNode.removeChild(t);
 		},
 		//2 append
 		function(patch,t){
@@ -628,19 +624,18 @@
 		//3 remove
 		function(patch,t){
 			t = patch.s;
-			if(t) if(t.parentNode)
+			if(t && t.parentNode)
 				t.parentNode.removeChild(t);
 		},
 		//4 modifytext
 		function(patch,t){
 			t = patch.s;
-			t.innerHTML = patch.c;
+			t.textContent = _decode(patch.c);
 		},
 		//5 withtext
 		function(patch,t){
 			t = patch.s;
-			t.innerHTML = "";
-			t.innerHTML = patch.c;
+			t.textContent = _decode(patch.c);
 		},
 		//6 removetext
 		function(patch,t){
@@ -678,9 +673,11 @@
 			if(org === void 0)
 				// new node
 				patch.unshift(this.createPatch(orgParent,tag,2));
+
 			else if(tag === void 0)
 				// remove node
-				patch.push(this.createPatch(org,tag,3));
+				patch.push(this.createPatch(org,0,3));
+
 			else if(org.tagName === tag.tagName){
 				if(!_eq(org.attributes,tag.attributes)){
 					if(org.attributes&&tag.attributes) patch.push(this.createPatch(org,tag,8));
@@ -690,7 +687,7 @@
 
 				// some node , maybe modify
 				if(org.text !== tag.text){
-					if((org.text && tag.text) && org.text !== tag.text) patch.push(this.createPatch(org,tag,4));
+					if( org.text && tag.text && org.text !== tag.text) patch.push(this.createPatch(org,tag,4));
 					else if(!org.text) patch.push(this.createPatch(org,tag,5));
 					else if(!tag.text) patch.push(this.createPatch(org,tag,6));
 					return patch;
@@ -700,18 +697,26 @@
 				// optimzer patch at child diff
 				var i, o = org.child.length, t = tag.child.length;
 
+				// There is an algorithm problem
+				// and if you need the smallest patcher - 
+				// you need to make extreme comparisons and optimizations to diff child nodes
+				// but it also leads to more cycles and complexity
+				// *will rebuild using some algorithm with reduce the patcher
 				if(o || t){
+					// org < tag ( add tag )
 					if(o < t){
-						for(i=t; i--;){
-							if(i>=o) patch.push(this.createPatch(org,tag.child[i],2));
-							else this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
-						}
+						// don't be naive. There are order problems
+						for(i=o; i<t; i++) patch.push(this.createPatch(org,tag.child[i],2));
+						for(i=o; i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
 
 					// org > tag ( exist remove tag )
-					// org === tag ( modify )
+					}else if(o>t){
+						for(i=o-1; i>=t; i--) patch.push(this.createPatch(org.child[i],0,3));
+						for(i=t; i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+
 					}else{
-						for(i=Math.max(o,t); i--;)
-							this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+					// org === tag ( modify )
+						for(i=Math.max(o,t); i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
 					}
 				}
 			}
@@ -753,27 +758,28 @@
 
 		createPatch: function(org,tag,type){
 			var node, patch, sl = this.createSelector(org);
+
 			switch(patchList[type]){
 				case "replace":
 					node = this.createDOMElememnt(tag);
-					patch = { t:1,s:sl,n:node };
+					patch = { t:1, s:sl, n:node };
 					break;
 				case "append":
 					node = this.createDOMElememnt(tag);
-					patch = { t:2,s:sl,n:node };
+					patch = { t:2, s:sl, n:node };
 					break;
 				case "remove":
-					patch = { t:3,s:sl };
+					patch = { t:3, s:sl };
 					break;
 				case "modifytext":
-					patch = { t:4,s:sl,c:tag.text };
+					patch = { t:4, s:sl, c:tag.text };
 					break;
 				case "withtext":
-					patch = { t:5,s:sl,c:tag.text };
+					patch = { t:5, s:sl, c:tag.text };
 					break;
 				case "removetext":
 					node = this.createDOMElememnt(tag);
-					patch = { t:6,s:sl,n:node };
+					patch = { t:6, s:sl, n:node };
 					break;
 				case "addattr":
 					patch = { t:7, s:sl ,a:tag.attributes };
@@ -792,12 +798,12 @@
 		},
 
 		createTreeFromHTML: function(html,vprops){
-			var root = {
-				tagName:"root",
+			var axroot = {
+				tagName: "AXROOT",
 				child:[]
 			};
 
-			var p = root , c = root.child, n;
+			var p = axroot , c = axroot.child, n;
 
 			html.replace(slikReg,function(match,close,stag,tag,text){
 				if(!match || !(match.replace(excapetab,"")))
@@ -810,16 +816,14 @@
 				}else if(tag){
 					n = this.createObjElement(tag, vprops);
 					n.i= c.length; c.push(n); n.parent = p;
-					if(!(n.tagName in tagList)){
-						p = n; c = n.child;
-					}
+					if(!(n.tagName in tagList)) p = n, c = n.child;
 				}else if(text){
 					if(text.trim()) p.text = text;
 				}
 				return match;
 			}.bind(this));
 
-			return root;
+			return axroot;
 		},
 
 		createObjElement:function(str,vprops){
@@ -928,7 +932,7 @@
 		on : function(event, selector, data, callback, one){
 			var autoRemove, delegator;
 
-			if (event && !_isStr(event)) {
+			if(event && !_isStr(event)) {
 				_loop(event, function(fn, type){
 					this.on(type, selector, data, fn, one);
 				},this);
@@ -936,24 +940,24 @@
 				return this;
 			}
 
-			if (!_isStr(selector) &&
+			if(!_isStr(selector) &&
 				!_isFn(callback) &&
 				callback !== false)
 				callback = data, data = selector, selector = void 0;
-			if (callback === void 0 || data === false)
+			if(callback === void 0 || data === false)
 				callback = data, data = void 0;
 
-			if (callback === false)
+			if(callback === false)
 				callback = returnFalse;
 
 			return this.each(function(element){
-				if (one)
+				if(one)
 					autoRemove = function(e){
 						zremoveEvent(element, e.type, callback);
 						return callback.apply(this, arguments);
 					};
 
-				if (selector)
+				if(selector)
 					delegator = function(e){
 						var match = z.matchz(e.target,selector) ?
 							e.target : z(e.target).closest(selector, element).get(0);
@@ -979,12 +983,12 @@
 				return this;
 			}
 
-			if (!_isStr(selector) &&
+			if(!_isStr(selector) &&
 				!_isFn(callback) &&
 				callback !== false)
 				callback = selector, selector = void 0;
 
-			if (callback === false)
+			if(callback === false)
 				callback = returnFalse;
 
 			return this.each(function(element){
@@ -1048,6 +1052,7 @@
 
 				var target = slik.createTreeFromHTML(newhtml,props);
 				var patcher = slik.treeDiff(view.axml,target,[]);
+
 				return slik.applyPatch(elm, patcher, view.axml = target);
 			});
 		}
@@ -1104,12 +1109,9 @@
 
 	function moc(target,val){
 		var res;
-		if(_isAry(target))
-			res = target.concat(val);
-		else if(_isObj(target))
-			res = _merge(_extend({},target),val);
-		else
-			res = val;
+		if(_isAry(target)) res = target.concat(val);
+		else if(_isObj(target)) res = _merge(_extend({},target),val);
+		else res = val;
 		return res;
 	}
 
@@ -1297,10 +1299,8 @@
 		}));
 
 		if(existname) RAM[this.name] = this;
-
 		// init event
-		_extend(this,config,MODEL_KEYWORDS).
-			emit("init").unbind("init");
+		_extend(this,config,MODEL_KEYWORDS).emit("init").unbind("init");
 	};
 
 

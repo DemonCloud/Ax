@@ -18,14 +18,24 @@ function taskjs(){
 	gulp.src("./src/ax.js")
 				.pipe(filter(["**"], { restore:true }))
 				.pipe(rename('ax.min.js'))
-				.pipe(uglify())
+				.pipe(uglify({
+					compress:{
+						unsafe: true,
+						hoist_vars: true
+					}
+				}))
 				.pipe(optimizejs())
 				.pipe(gulp.dest('./dist'));
 
 	return gulp.src("./src/struct.js")
 				.pipe(filter(["**"], { restore:true }))
 				.pipe(rename('struct.min.js'))
-				.pipe(uglify())
+				.pipe(uglify({
+					compress:{
+						unsafe: true,
+						hoist_vars: true
+					}
+				}))
 				.pipe(optimizejs())
 				.pipe(gulp.dest('./dist'));
 }
