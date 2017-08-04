@@ -6,109 +6,74 @@
 </head>
 <body>
 <style>
-	.router{
-		color: #3f67a9;
+	.del{
+		display: inline-block;
+		margin-left: 5px;
+		background-color:#ccc;
 		cursor: pointer;
-		text-decoration: underline;
+		font-size: 12px;
+		font-weight: normal;
+		color: #fff;
+		padding: 1px 3px;
 	}
 </style>
-<div id="tree"></div>
 <div id="app"></div>
-<div id="mount"></div>
 
 <script src="./src/struct.js"></script>
 <script src="./src/ax.js"></script>
 <script src="./modules/Ax-Router.js"></script>
 <script src="./modules/Ax-Loader.js"></script>
 
-<script id="tpl" type='ax/tpl'>
-	{{ var r=struct.random("string") }}
-	{{ var ri=struct.random("int") }}
-	<div>
-		{{* each [route] in routes }}
-	<router 
-		class="router" 
-		href="javascript:;"
-		to="{{#route.path}}"
-		query="id={{#r(6)}}&cd={{#ri(1,10000)}}">{{#route.name}}</router><br>
-		{{* end}}
-	</div>
-</script>
-
 <script id="state" type="ax/tpl">
-	<div>
-		<span>id =&gt; {{#query.id}}</span><br>
-		<span>cd =&gt; {{#query.cd}}</span>
-	</div>
+	<form id="form">
+		<input id="name" maxlength=10><button id="add">Add</button>
+		<ul>
+		{{* each [item,i] in list }}
+			 <li style="max-width:168px">
+				<span>{{-(item.name)}}</span>
+				<b class="del" key={{-i}}>×</b>
+			 </li>
+		{{* end }}
+		</ul>
+	</form>
 </script>
 
 <script>
-var slice = struct.slice();
-var merge = struct.merge();
-
-var view = ax.view({
-	template:document.getElementById("tpl").innerHTML,
+//example3
+var model3 = ax.model({
+	name:"todolist",
+	data:{ 
+		list:[] 
+	},
+	store: true,
 });
 
-var app = ax.view({
-	root: document.getElementById("app"),
-	template:document.getElementById("state").innerHTML,
-})
+var view3 = ax.view({
+	template: document.getElementById("state").innerHTML,
 
-view.mount(
-	document.getElementById("tree"),
-	{ 
-		routes : [
-			{ path: "/route", name:"Link1" },
-			{ path: "/route/213", name:"Link2" },
-			{ path: "/route/321/edit/2", name:"Link3"}
-		]
-	}
-);
+	model: model3,
 
-var size = struct.size();
-var Router = ax.use("Router");
-var abc = ax.use("abc");
-
-var route = new Router({
-	elements: [".router"],
-
-	routes:{
-		"/": ["default"],
-		"/route" : ["bone"],
-		"/route/:id": ["bone"] ,
-		"/route/:id/edit/:store" : ["bone"]
-	},
-
-	actions:{
-		default: function(param,query,state){
-			console.log(0,"default",state);
-
-			app.render({ query: { 
-				id: "default", 
-				cd: "default" 
-			} });
-
-			if(!state.default) state.default = true;
+	events:{
+		"submit:#form":function(event){
+			event.preventDefault();
+			var name = document.getElementById("name");
+			var getName = name.value.trim();
+			if(getName){
+				name.value="";
+				model3.moc("list",{ name : getName });
+			}
 		},
 
-		bone: function(param,query,state){
-			console.log(size(param)+1,"bone",state);
-
-			app.render({ query: query });
-
-			if(!state.bone) state.bone = true;
+		"click:.del":function(event){
+			model3.rm("list."+event.target.key);
 		}
-	},
-	
-//	beforeActions : function(){
-//		console.log("hello word");
-//		return true;
-//	}
+	}
 });
 
-route.start("/");
-
+view3.mount(
+	document.getElementById("app"),
+	model3.get()
+);
 </script>
 </body>
 </html>

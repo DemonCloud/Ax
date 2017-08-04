@@ -97,7 +97,7 @@ function toActive(source,path,query,state,notpush,isLink){
 				if(!notpush)
 					H[cpath ? "pushState" : "replaceState"](state, null, path+queryString);
 
-				source.afterActions(param,query);
+				source.completedActions(param,query);
 			}
 		}
 
@@ -112,13 +112,12 @@ var DEFAULT_ROUTER_OPTION = {
 	routes: {},
 	actions: {},
 	beforeActions: returnT,
-	afterActions: noop
+	completedActions: noop
 };
 
 var Router = function(option){
 
 	var _this = this;
-
 	var source = merge(
 		ext({},DEFAULT_ROUTER_OPTION),
 		is(option,"Object") ? option : {}

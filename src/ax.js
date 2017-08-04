@@ -45,15 +45,13 @@
 	// use for ax ajax-api
 	RESTFUL = {
 		get    : "GET",
-		put    : "POST",
 		send   : "GET",
 		sync   : "POST",
-		post   : "POST",
-		fetch  : "GET",
-		update : "POST"
+		fetch  : "GET"
 	},
 
 	// *use struct utils list
+	// *minix with struct API
 	v8        = struct.v8(),
 	_ayc      = struct.ayc(),
 	_lock     = struct.lock(),
@@ -100,6 +98,8 @@
 	_index    = struct.index(),
 	_one      = struct.index("one"),
 	_decode   = struct.html("decode"),
+	_utob     = struct.assembly("utob"),
+	_btou     = struct.assembly("btob"),
 	cool      = struct.cool();
 
 	// ax genertor function
@@ -220,7 +220,7 @@
 	}
 
 	function eventCapture(handler, captureSetting) {
-		return handler.del && 
+		return handler.del &&
 			(!focusinSupported && (handler.e in focus)) ||
 			!!captureSetting;
 	}
@@ -249,7 +249,7 @@
 			return range.select();
 		}
 
-		return elm.selectionStart ? 
+		return elm.selectionStart ?
 			elm.setSelectionRange(pos, pos, elm.focus()) :
 			elm.focus();
 	}
@@ -376,7 +376,7 @@
 				event[predicate] = returnFalse;
 			});
 
-			try { event.timeStamp || (event.timeStamp = Date.now()); } 
+			try { event.timeStamp || (event.timeStamp = Date.now()); }
 			catch(ignored){ /*ignore*/ }
 
 			if (source.defaultPrevented !== void 0 ? source.defaultPrevented :
@@ -409,7 +409,7 @@
 		return (
 		elm!==null &&
 		elm!==document &&
-		_isStr(selector)) && 
+		_isStr(selector)) &&
 		matchzx.call(elm,selector);
 	};
 
@@ -449,13 +449,13 @@
 			props = type, type = props.type;
 
 		var event = document.createEvent(
-			_has(capTypes.MouseEvent,type) ? 
+			_has(capTypes.MouseEvent,type) ?
 			'MouseEvent' : 'Events'), bubbles = true;
 
 		if(props)
 			for(name in props)
-				(name === 'bubbles') ? 
-				(bubbles = !!props[name]) : 
+				(name === 'bubbles') ?
+				(bubbles = !!props[name]) :
 				(event[name] = props[name]);
 
 		event.initEvent(type, bubbles, true);
@@ -463,8 +463,8 @@
 	};
 
 	z.xEvent = function(event){
-		var key; 
-		for(key in event) 
+		var key;
+		for(key in event)
 			this[key] = event[key];
 	};
 
@@ -611,7 +611,7 @@
 
 	var patchHack = [
 		//0 nopatch
-		_noop,  
+		_noop,
 		//1 replace
 		function(patch,t){
 			t = patch.s;
@@ -677,47 +677,52 @@
 		treeDiff: function(org,tag,patch,orgParent/*,tagParent*/){
 			if(org === void 0)
 				// new node
-				patch.unshift(this.createPatch(orgParent,tag,2)); 
+				patch.unshift(this.createPatch(orgParent,tag,2));
 			else if(tag === void 0)
 				// remove node
-				patch.push( this.createPatch(org,tag,3));
+				patch.push(this.createPatch(org,tag,3));
 			else if(org.tagName === tag.tagName){
 				if(!_eq(org.attributes,tag.attributes)){
-					if(org.attributes&&tag.attributes)
-						patch.push(this.createPatch(org,tag,8));
-					else if(!org.attributes)
-						patch.push(this.createPatch(org,tag,7));
-					else if(!tag.attributes)
-						patch.push(this.createPatch(org,tag,9));
+					if(org.attributes&&tag.attributes) patch.push(this.createPatch(org,tag,8));
+					else if(!org.attributes) patch.push(this.createPatch(org,tag,7));
+					else if(!tag.attributes) patch.push(this.createPatch(org,tag,9));
 				}
 
 				// some node , maybe modify
 				if(org.text !== tag.text){
-					if((org.text && tag.text) && org.text !== tag.text)
-						// modify text
-						patch.push(this.createPatch(org,tag,4));
-					else if(!org.text)
-						// fill with text
-						patch.push(this.createPatch(org,tag,5));
-					else if(!tag.text)
-						// modify to child DOM or empty
-						patch.push(this.createPatch(org,tag,6));
+					if((org.text && tag.text) && org.text !== tag.text) patch.push(this.createPatch(org,tag,4));
+					else if(!org.text) patch.push(this.createPatch(org,tag,5));
+					else if(!tag.text) patch.push(this.createPatch(org,tag,6));
 					return patch;
 				}
 
 				// with child diff
-				var i;
-				if(org.child.length || tag.child.length)
-					for(i=Math.max(org.child.length,tag.child.length); i--;)
-						this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+				// optimzer patch at child diff
+				var i, o = org.child.length, t = tag.child.length;
+
+				if(o || t){
+					if(o < t){
+						for(i=t; i--;){
+							if(i>=o) patch.push(this.createPatch(org,tag.child[i],2));
+							else this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+						}
+
+					// org > tag ( exist remove tag )
+					// org === tag ( modify )
+					}else{
+						for(i=Math.max(o,t); i--;)
+							this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+					}
+				}
 			}
+
 			else if(org.tagName !== tag.tagName)
 				patch.push(this.createPatch(org,tag,1));
 
 			return patch;
 		},
 
-		applyPatch:function(oDOM,patchs,callback){
+		applyPatch:function(oDOM,patchs){
 			_fal(_map(patchs,function(patch){
 				patch.path = patch.s;
 				patch.s = this.mapTreeNode(oDOM,patch.s);
@@ -725,15 +730,14 @@
 			}.bind(this)),function(patch){
 				patchHack[patch.t].call(oDOM,patch);
 			});
-			return callback ? callback(oDOM) : oDOM;
 		},
 
 		mapTreeNode: function(ODOM,path){
 			var target,i=0,p=ODOM.children;
 			for(; i<path.length; i++){
-				if(p[path[i]]){ 
-					target = p[path[i]]; 
-					p = target.children; 
+				if(p[path[i]]){
+					target = p[path[i]];
+					p = target.children;
 				} else break;
 			}
 			return target;
@@ -790,7 +794,7 @@
 		createTreeFromHTML: function(html,vprops){
 			var root = {
 				tagName:"root",
-				child:[] 
+				child:[]
 			};
 
 			var p = root , c = root.child, n;
@@ -856,7 +860,7 @@
 
 			else if(obj.child.length)
 				_fal(obj.child,function(child){
-					elm.appendChild(this.createDOMElememnt(child)); 
+					elm.appendChild(this.createDOMElememnt(child));
 				},this);
 
 			return elm;
@@ -895,7 +899,8 @@
 		},
 
 		each : function(fn,context){
-			return _fal(this.el,fn,context||this),this;
+			_fal(this.el,fn,context||this);
+			return this;
 		},
 
 		find : function(sl){
@@ -1042,8 +1047,8 @@
 					).firstElementChild, elm.innerHTML = null);
 
 				var target = slik.createTreeFromHTML(newhtml,props);
-				return slik.applyPatch(elm, slik.treeDiff(view.axml,target,[]),
-					function(){ view.axml = target; });
+				var patcher = slik.treeDiff(view.axml,target,[]);
+				return slik.applyPatch(elm, patcher, view.axml = target);
 			});
 		}
 	};
@@ -1063,7 +1068,7 @@
 			// get validate funtion
 			isRequired = validate[key[i]]; value= _get(newdata,key[i]);
 			if(!isRequired(value)){
-				error.push(key[i],value); 
+				error.push(key[i],value);
 				break;
 			}
 		}
@@ -1116,7 +1121,7 @@
 
 	function makeChecker(checker,type){
 		return function(value){
-			return checker(value) || 
+			return checker(value) ||
 				warn(value,checkalert({ type:type }));
 		};
 	}
@@ -1160,10 +1165,10 @@
 
 	function modelDefined(model,props){
 		_fol(props,function(t,n){
-			_define(this,n,{ value: t, 
-				writable: false, 
-				enumerable: false, 
-				configurable: false 
+			_define(this,n,{ value: t,
+				writable: false,
+				enumerable: false,
+				configurable: false
 			});
 		},model);
 		return model;
@@ -1250,13 +1255,13 @@
 		set: function(name,data){
 			LS.setItem(
 				(SN+this.incry(name,revs(name))),
-				this.incry(JSON.stringify(data),name)
+				this.incry(encodeURIComponent(JSON.stringify(data)),name)
 			);
 		},
 
 		get: function(name){
 			var str = LS.getItem(SN+this.incry(name,revs(name)));
-			return str ? JSON.parse(this.decyt(str,name)) : 0;
+			return str ? JSON.parse(decodeURIComponent(this.decyt(str,name))) : 0;
 		},
 
 		rm: function(name){
@@ -1306,8 +1311,7 @@
 
 		get: function(key,by){
 			var data = this._ast(_clone,_);
-			return (key || key===0) ? 
-				_get.call(this,data,key,by) : data;
+			return (key || key===0) ? _get.call(this,data,key,by) : data;
 		},
 
 		set: function(key,val,setStatic){
@@ -1337,7 +1341,7 @@
 
 						_set(assert,key,val,this.change = true);
 						if(this._s) aS.set(this.name,assert);
-						if(!setStatic){ 
+						if(!setStatic){
 							this.emit("change",[_clone(assert)]);
 							this.emit("change:"+key,[val]);
 						}
@@ -1477,8 +1481,8 @@
 		var thatRender = packRender(view,render);
 
 		_define(view,"render",{
-			get : function(){ 
-				return thatRender; 
+			get : function(){
+				return thatRender;
 			},
 			set : function(fn){
 				if(_isFn(fn)) thatRender = packRender(view,fn);
@@ -1513,7 +1517,7 @@
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
-			stencil = _isStr(stencil) ? 
+			stencil = _isStr(stencil) ?
 			(config.cache ? _doom : _axt)(stencil.trim(), props) :
 			(_isFn(stencil) ? stencil : _noop);
 
@@ -1521,7 +1525,7 @@
 				return stencil !== _noop &&
 					z(this.root).render(
 						stencil.apply(this,_slice(arguments)),
-						this, 
+						this,
 						props
 					);
 			}.bind(this);
@@ -1551,12 +1555,12 @@
 						this.render.apply(this,_slice(arguments,1));
 
 					// delete mount
-					return delete this.mount,this;
+					delete this.mount;
+					return this;
 				}
 			};
 		}
 
-		// first trigger "init" event
 		_extend(this,config,VIEW_KEYWORDS,this._vid=vid++).emit("init").unbind("init");
 	};
 
@@ -1564,7 +1568,7 @@
 		constructor:aV,
 
 		on: function(type,fn){
-			return _fal(_toString(type).split("|"),function(mk){
+			_fal(_toString(type).split("|"),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
@@ -1573,35 +1577,42 @@
 						param[1],
 						fn._bind||(fn._bind=fn.bind(this))
 					);
-				else _on(this,mk,fn);
-			},this),this;
+				else 
+					_on(this,mk,fn);
+			},this);
+
+			return this;
 		},
 
 		unbind: function(type,fn){
-			return _fal(_toString(type).split("|"),function(mk){
+			_fal(_toString(type).split("|"),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
-					z(this.root).off(
-						param[0],
-						param[1],
+					z(this.root).off(param[0], param[1],
 						fn ? (fn._bind||fn) : void 0
 					);
 				else _unbind(this,mk,fn);
-			},this),this;
+			},this);
+
+			return this;
 		},
 
 		emit: function(type,args){
 			var t = _toString(type), k = t.split(":");
+
 			if(k.length>2){
-				return _fal(t.split("|"),function(mk){
+				_fal(t.split("|"),function(mk){
 					var mkf = mk.split(":");
 					z(this.root).find(mkf[1]).trigger(mkf[0],args);
-				},this),this;
+				},this);
+				return this;
 			}
 
-			if(k.length>1)
-				return z(this.root).find(k[1]).trigger(k[0],args),this;
+			if(k.length>1){
+				z(this.root).find(k[1]).trigger(k[0],args);
+				return this;
+			}
 
 			return _emit(this,type,args);
 		},
@@ -1638,9 +1649,8 @@
 	function assertMake(list,callback){
 		var LIST = this._assert(cool,_);
 		var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
-		return _fal(target,function(name){
-			callback.call(this,LIST,name);
-		},this),this;
+		_fal(target,function(name){ callback.call(this,LIST,name); },this);
+		return this;
 	}
 
 	function assertMatch(list,match){
@@ -1686,7 +1696,9 @@
 	aTP = aT.prototype = {
 		constructor: aT,
 
-		all: function(){ return this._assert(_slice,_); },
+		all: function(){ 
+			return this._assert(_slice,_); 
+		},
 
 		use: function(list){
 			return assertMake.call(this,list,
@@ -1709,13 +1721,13 @@
 		},
 
 		of: function(fn,args){
-			return _fal(this.all(),
-				(_isFn(fn) ? fn : aTite(fn,args))),this;
+			_fal(this.all(), _isFn(fn) ? fn : aTite(fn,args));
+			return this;
 		},
 
 		swap: function(a,b,swapStatic){
 			var ma = this.p(a), mb = this.p(b);
-			
+
 			if(ma && mb){
 				var tmp = ma.get();
 				ma.set(mb.get(),swapStatic);
