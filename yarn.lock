@@ -255,8 +255,8 @@ aws4@^1.2.1:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
 ax-struct-js@latest:
-  version "4.0.15"
-  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-4.0.15.tgz#860872bf317d6abfdfa6c7f77c0d746146f4bdf9"
+  version "4.0.16"
+  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-4.0.16.tgz#90b284c6bcaed6729266058dc86697df45944235"
 
 babel-code-frame@^6.22.0:
   version "6.22.0"
@@ -606,8 +606,8 @@ camelcase@^3.0.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-3.0.0.tgz#32fc4b9fcdaf845fcdf7e73bb97cac2261f0ab0a"
 
 caniuse-lite@^1.0.30000697, caniuse-lite@^1.0.30000704:
-  version "1.0.30000709"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000709.tgz#e027c7a0dfd5ada58f931a1080fc71965375559b"
+  version "1.0.30000710"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000710.tgz#1c249bf7c6a61161c9b10906e3ad9fa5b6761af1"
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -1752,8 +1752,8 @@ gulp-eslint@latest:
     gulp-util "^3.0.8"
 
 gulp-filter@latest:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/gulp-filter/-/gulp-filter-5.0.0.tgz#cfa81966fb67884f2ba754b067152929428d59bc"
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/gulp-filter/-/gulp-filter-5.0.1.tgz#5d87f662e317e5839ef7650e620e6c9008ff92d0"
   dependencies:
     gulp-util "^3.0.6"
     multimatch "^2.0.0"

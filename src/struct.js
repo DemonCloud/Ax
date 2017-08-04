@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.0-alpha0.6";
+struct.VERSION = "4.0.0-alpha0.8";
 
 // base method
 var or = {},
@@ -1119,18 +1119,30 @@ function once(fn){
 }
 
 // slim equal [ method ]
+// performance see the test [ benchmark/eq.html ]
 function eq(x,y){
-	if(x===y || ts.call(x) !== ts.call(y)|| (isPrimitive(x) && isPrimitive(y)))
+	if(x===y || 
+		ts.call(x) !== ts.call(y) || 
+		(isPrimitive(x) && isPrimitive(y)))
 		return x===y;
+
 	if(x.toString() === y.toString()){
-		var xkeys = keys(x) , ykeys = keys(y), i=xkeys.length;
-		if(xkeys.length === ykeys.length){
-			for( ;i--; )
-				if(!eq(x[xkeys[i]],y[xkeys[i]]))
-					return false;
-			return true;
+		if(isArray(x)){
+			if(x.length === y.length){
+				var i = x.length;
+				for(; i--; ) if(!eq(x[i],y[i])) return false;
+				return true;
+			}
+		}else{
+			var xkeys = keys(x), ykeys = keys(y), j=xkeys.length;
+
+			if(xkeys.length === ykeys.length){
+				for( ;j--; ) if(!eq(x[xkeys[j]],y[xkeys[j]])) return false;
+				return true;
+			}
 		}
 	}
+
 	return false;
 }
 
@@ -1263,8 +1275,7 @@ function camelize(s){
 	var uspt = !~s.search('-') ? (!~s.search('_') ? '' : '_') : '-';
 	if(uspt){
 		var i = 1; uspt = s.split(uspt);
-		for(; i<uspt.length; i++)
-			uspt[i] = capitalize(uspt[i]);
+		for(; i<uspt.length; i++) uspt[i] = capitalize(uspt[i]);
 		return uspt.join('');
 	}
 	return s;
@@ -1461,7 +1472,7 @@ function DOOM(txt,bounds,name){
 	// Complete building Function string
 	// try to build anmousyous function
 	// console.warn(res);
-	try{ render = ev("(function(_bounds,struct,"+(rname||"_x_")+(args.length?","+args.toString():"")+"){ "+ res + " })"); 
+	try{ render = ev("(function(_bounds,struct,"+(rname||"_x_")+(args.length?","+args.toString():"")+"){ "+res+" })"); 
 	}catch(e){ console.error(e.res = res); throw e; }
 
   // @ Precomplete JavaScript Template Function
@@ -1673,12 +1684,12 @@ function aix(option){
 function JSONP(option){
 	var config = extend({
 		url : "",
-		param : broken,
 		key : "callback",
-		callback : ("jsonp"+Math.random()).replace(".",""),
+		param : broken,
 		timeout: 5,
+		error : noop,
 		success : noop,
-		error : noop
+		callback : ("jsonp"+Math.random()).replace(".","")
 	}, option || {} );
 
 	var url = config.url+"?" +
@@ -1687,13 +1698,11 @@ function JSONP(option){
 		config.key + "=" + config.callback;
 
 	var tag = document.createElement("script");
-	tag.src = url;
+			tag.src = url;
 
 	// define callback
 	root[config.callback] = function(res){
-		clearTimeout(config.timesetup);
-
-		document.body.removeChild(tag);
+		document.body.removeChild(tag,cyc(config.timesetup));
 		root[config.callback] = null;
 		config.success(res);
 	};
@@ -1704,7 +1713,7 @@ function JSONP(option){
 
 	// if timeout will trigger fail call
 	if(toNumber(config.timeout)){
-		config.timesetup = setTimeout(function(){
+		config.timesetup = ayc(function(){
 			document.body.removeChild(tag);
 			root[config.callback] = null;
 
@@ -1810,9 +1819,7 @@ function fireEvent(obj,type,args){
 	var id = obj._eid || 0; args = args||[];
 
 	if(id && _events[id] && type!=="")
-		ol(_events[id][type],function(f){
-			f.apply(this,args);
-		},obj);
+		ol(_events[id][type],function(f){ f.apply(this,args); },obj);
 }
 
 function emit(obj,type,args){

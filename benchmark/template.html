@@ -18,15 +18,56 @@ var data = {
 	list: [2,3,4,1,5]
 };
 
-var data2 = {
+var randomList = [
+data,
+{
 	name: "Buky", 
 	score: 9, 
 	id:2,
 	list: ["asd","ddf","sda",'s']
+},
+{
+	name: "Same", 
+	score: 123123, 
+	id:4,
+	list: [2123,"ddf","sda",'s']
+},{
+	name: "adshuoshd",
+	score : 322112,
+	id: 213123,
+	list : []
+},{
+	name: "i",
+	score: 1.2318921312,
+	id: "assd",
+	list: [1,4,5,'asd','r','q','ewqeqw']
+},
+{
+	name: "3io223",
+	score: 234.22323,
+	id:0,
+	list : ["asd"]
+},
+{
+	name: "disdjoj",
+	score: 234.22323,
+	id:0,
+	list : ["asd",34,2,6,7,76,1]
+},
+{
+	name: "8asi",
+	score: 293,
+	id: 0.123,
+	list : ["aipoasd",'dsdsf','ee',2]
 }
+];
 
+
+var end = randomList.length - 1;
+console.log("Cross Array Length: ", end+1);
 var doom = struct.doom();
 var axt = struct.doom("axt");
+var rint = struct.random("int");
 
 var dcomp = doom(tpl);
 var acomp = axt(tpl);
@@ -40,19 +81,19 @@ for(var j=0; j<100000; j++)
 	acomp(data);
 console.timeEnd("Cache Render");
 
-console.time("Normal render");
+console.time("Normal Render");
 for(var i=0; i<100000; i++)
 	dcomp(data);
-console.timeEnd("Normal render");
+console.timeEnd("Normal Render");
 
 console.time("Cross Cache Render");
 for(var k=0; k<100000; k++)
-	acomp(k%2 ? data : data2);
+	acomp(randomList[rint(0,end)]);
 console.timeEnd("Cross Cache Render");
 
 console.time("Cross Normal Render");
 for(var k=0; k<100000; k++)
-	dcomp(k%2 ? data : data2);
+	dcomp(randomList[rint(0,end)]);
 console.timeEnd("Cross Normal Render");
 
 console.log("---------- End Benchmark ----------");

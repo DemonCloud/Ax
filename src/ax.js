@@ -31,7 +31,9 @@
 			FCD = String.fromCharCode, vid = 0,
 
 	// Define Setting
-	VIEW_KEYWORDS  = ["root","mount","props","events","render","template","destroy"],
+	AXMODULE_INJECT = [ax,struct],
+
+	VIEW_KEYWORDS  = ["root","mount","props","events","render","template","destroy","cache"],
 	ATOM_KEYWORDS  = ["use","events"],
 	MODEL_KEYWORDS = ["name","data","store","change","events","validate","filter"],
 
@@ -93,6 +95,7 @@
 	_size     = struct.size(),
 	_link     = struct.link(),
 	_doom     = struct.doom(),
+	_axt      = struct.doom("axt"),
 	_merge    = struct.merge(),
 	_index    = struct.index(),
 	_one      = struct.index("one"),
@@ -161,17 +164,6 @@
 			};
 		};
 	}
-
-	// get childNodes and filter by selector
-	// cant use Global matcher
-	//var isId    = /^#[^\s\=\+\.\#\[\]]+/i,												// "#idname"
-	//	isClass   = /^\.[^\s\=\+\.\#\[\]]+$/i,											// ".className"
-	//	isTag     = /^[^\[\]\+\-\.#\s\=]+$/i,												// "p" "div" "DIV"
-	//	isAttr    = /([^\s]+)?\[([^\s]+)=["']?([^\s'"]+)["']?\]$/i,		// div[id="nami"]
-	//	mreSl     = /^[^\s]+,[^\s]+/gi,
-	//	cidSl     = /[\s|\r]+/im,
-	//	pitSl     = /[>|\+|\~]+/im,
-	//	isHTML    = /<[a-zA-Z][\s\S]*>/;
 
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
@@ -256,6 +248,7 @@
 			range.move('character', pos);
 			return range.select();
 		}
+
 		return elm.selectionStart ? 
 			elm.setSelectionRange(pos, pos, elm.focus()) :
 			elm.focus();
@@ -1057,7 +1050,7 @@
 
 	// checker template;
 	var checkalert = _doom("[ checker -> ax.va.{{#type}} ]"),
-			vahandler = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
+			vahandler  = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
 
 	function checkValidate(newdata,model){
 		if(!model._v) return true;
@@ -1070,7 +1063,8 @@
 			// get validate funtion
 			isRequired = validate[key[i]]; value= _get(newdata,key[i]);
 			if(!isRequired(value)){
-				error.push(key[i],value); break;
+				error.push(key[i],value); 
+				break;
 			}
 		}
 
@@ -1178,12 +1172,13 @@
 	ax.module = function(name,creater){
 		var make = maker[name];
 		if(make) return make;
-		if((make = creater.apply(struct.root,[ax,struct].concat(_slice(arguments,2)))))
+		if((make = creater.apply(struct.root,AXMODULE_INJECT)))
 			return (maker[name] = make);
 	};
 
 	ax.use = function(name){
-		return maker[name];
+		if(maker[name]) return maker[name];
+		console.warn("Ax was not find dependency injection { module } as: [",name,"]");
 	};
 
 	aS = {
@@ -1474,6 +1469,7 @@
 		var b = packBefore(view),
 				m = packMain(view,render),
 				c = packComplete(view);
+
 		return _link(b,m,c);
 	}
 
@@ -1497,7 +1493,9 @@
 
 	function checkElm(el){
 		if(!(_isElm(el) || _isAryL(el)))
-				throw new TypeError("el must be typeof DOMElement or NodeList collections -> not " + el);
+			throw new TypeError(
+				"el must be typeof DOMElement or NodeList collections -> not " + el
+			);
 		return true;
 	}
 
@@ -1516,13 +1514,16 @@
 		// building the render function
 		if(!_isFn(render)){
 			stencil = _isStr(stencil) ? 
-			_doom(stencil.trim(), props) :
+			(config.cache ? _doom : _axt)(stencil.trim(), props) :
 			(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){
 				return stencil !== _noop &&
-					z(this.root).render(stencil.apply(this,
-					_slice(arguments)),this,props);
+					z(this.root).render(
+						stencil.apply(this,_slice(arguments)),
+						this, 
+						props
+					);
 			}.bind(this);
 		}
 
@@ -1753,6 +1754,7 @@
 	ax.model = createAx(aM);
 	ax.view  = createAx(aV);
 	ax.atom  = createAx(aT);
+
 	ax.model.extend = createExtend(aM);
 	ax.view.extend  = createExtend(aV);
 	ax.atom.extend  = createExtend(aT);

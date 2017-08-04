@@ -1,5 +1,4 @@
-
-# Ax - [ VERSION 3.3.3+ ]
+# Ax - [ VERSION 4.0.0+ ]
 
 <img width=50 src="http://7j1zwt.com1.z0.glb.clouddn.com/logo.png" alt="Ax">
 
@@ -7,18 +6,23 @@
 
 <img src="https://nodei.co/npm/ax-js.png" alt="npm info">
 
-### Ax is a fast MV JavaScript Framework. 
+<br>
+
+## Ax is a fast MV JavaScript Framework. 
 
 It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` & `Vue` very well.
 
-## The Ax design target
+<br>
+
+### The Ax design target
 
 * **model** - immutable, fast, persistence, safety
 * **view** - simple, fast, container, virtualDOM
-* **route** - simple, parameterized, hashonly (will delete in 4.0)
 * **atom** - connector, fast, independent
 
-## Install
+<br>
+
+### Install
 
 use **npm** or **yarn** install `ax` and `struct`
 
@@ -29,7 +33,9 @@ npm install ax-struct-js
 
 Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
-## Prepare Feature VERSION 4.0+
+<br>
+
+### Prepare Feature VERSION v4+
 
 1. Remove `route` from `ax` , just focus `model` `view` and `atom`
 
@@ -43,7 +49,9 @@ Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
 6. addMore `struct` function with benchmark, as `sort(inertSort)`,`sort(quickSort)`
 
-## Document (current version 3.3.33 -> v3)
+<br>
+
+### Document (current version 3.3.33 -> v3)
 
 > The document will rebuild on 4.0
 
