@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.2";
+struct.VERSION = "4.0.21";
 
 // base method
 var or = {},
@@ -141,21 +141,6 @@ function citd(fn,check){
 // @ Element [ Node ]
 // @ Native
 // @ *Define [ contain ]
-
-// @ exprot type[name] 
-var reHostCtor = /^\[object .+?Constructor\]$/,
-	// Compile a regexp using a common native method as a template.
-	// We chose `Object#toString` because there's a good chance it is not being mucked with.
-	reNative = RegExp('^' +
-		// Coerce `Object#toString` to a string
-		String(ts)
-		// Escape any special regexp characters
-		.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&')
-		// Replace mentions of `toString` with `.*?` to keep the template generic.
-		// Replace thing like `for ...` to support environments like Rhino which add extra info
-		// such as method arity.
-		.replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-	);
 
 // Function [ type ]
 function isFn(e){
@@ -261,15 +246,24 @@ function isNode(e){
 }
 
 // Detect if a Function is Native Code with JavaScript
-function isNative(api){
-  return typeof api === 'function' ?
-  // Use `Function#toString` to bypass the value's own `toString` method
-  // and avoid being faked out.
-     reNative.test(Function.prototype.toString.call(api)) :
-  // Fallback to a host object check because some environments will represent
-  // things like typed arrays as DOM methods which may not conform to the
-  // normal native pattern.
-     (api && typeof api === 'object' && reHostCtor.test(ts.call(api))) || false;
+function isNative(fn){
+	var funcToString = Function.prototype.toString;
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+	var reIsNative = RegExp('^' + funcToString.
+		// Take an example native function source for comparison
+		call(hasOwnProperty
+			// Strip regex characters so we can use it for regex
+		).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&'
+			// Remove hasOwnProperty from the template to make it generic
+		).replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$');
+
+	try {
+		var source = funcToString.call(fn);
+		return reIsNative.test(source);
+	} catch (err) {
+		return false;
+	}
 }
 
 var typeArray = [
@@ -656,9 +650,14 @@ function last(ary){
 // @use mapKey
 // @export map
 function mapValue(list,fn){
-	return fov(clone(list),function(val,key,list){
-		list[key] = this ? fn.apply(list,arguments) : val[fn];
+	var isArr = isArrayLike(list), 
+			result = isArr ? [] : {};
+
+	(isArr ? al : ol)(list,function(val,key,list){
+		result[key] = this ? fn.call(list,val,key,list) : val[fn];
 	},isFn(fn));
+
+	return result;
 }
 
 // function mapKey [ method ]

@@ -1,6 +1,6 @@
 {
   "name": "ax-js",
-  "version": "4.0.2",
+  "version": "4.0.21",
   "description": "[ Ax ] is a Fast Javascript MVR Framework",
   "main": "dist/ax.min.js",
   "homepage": "https://demoncloud.github.io/Ax",
@@ -38,7 +38,6 @@
     "gulp": "latest",
     "gulp-autoprefixer": "latest",
     "gulp-clean": "latest",
-    "gulp-clean-css": "latest",
     "gulp-concat": "latest",
     "gulp-concat-css": "latest",
     "gulp-css-url-rebase": "latest",

@@ -609,37 +609,37 @@
 		//0 nopatch
 		_noop,
 		//1 replace
-		function(patch,t){
-			t = patch.s;
-			if(t && t.parentNode)
-				t.parentNode.replaceChild(patch.n,t);
+		function(patch){
+			var t = patch.s;
+
+			if(t && t.parentNode) t.parentNode.replaceChild(patch.n,t);
 				// t.parentNode.insertBefore(patch.n,t);
 				// t.parentNode.removeChild(t);
 		},
 		//2 append
-		function(patch,t){
-			t = patch.s;
-			t.appendChild(patch.n);
+		function(patch){
+			var t = patch.s;
+			if(t) t.appendChild(patch.n);
 		},
 		//3 remove
-		function(patch,t){
-			t = patch.s;
+		function(patch){
+			var t = patch.s;
 			if(t && t.parentNode)
 				t.parentNode.removeChild(t);
 		},
 		//4 modifytext
-		function(patch,t){
-			t = patch.s;
+		function(patch){
+			var t = patch.s;
 			t.textContent = _decode(patch.c);
 		},
 		//5 withtext
-		function(patch,t){
-			t = patch.s;
+		function(patch){
+			var t = patch.s;
 			t.textContent = _decode(patch.c);
 		},
 		//6 removetext
-		function(patch,t){
-			t = patch.s;
+		function(patch){
+			var t = patch.s;
 			t.innerHTML = patch.n.innerHTML;
 		},
 		//7 addattr
@@ -649,9 +649,10 @@
 			});
 		},
 		//8 modifyattr
-		function(patch,t,s){
-			t = patch.s;
-			s = patchAttr(patch.o,patch.a);
+		function(patch){
+			var t = patch.s;
+			var s = patchAttr(patch.o,patch.a);
+
 			_fol(patch.o,function(value,key){
 				if(!(key in s)) attrClear(t,key,value);
 			});
@@ -669,14 +670,14 @@
 	// SLIK SINGE virtualDOM DIFF
 	var slik = {
 
-		treeDiff: function(org,tag,patch,orgParent/*,tagParent*/){
+		treeDiff: function(org,tag,patch,orgParent,tagParent,view){
 			if(org === void 0)
 				// new node
-				patch.unshift(this.createPatch(orgParent,tag,2));
+				patch.unshift(this.createPatch(orgParent,tag,2,view));
 
 			else if(tag === void 0)
 				// remove node
-				patch.push(this.createPatch(org,0,3));
+				patch.push(this.createPatch(org,0,3,view));
 
 			else if(org.tagName === tag.tagName){
 				if(!_eq(org.attributes,tag.attributes)){
@@ -689,7 +690,7 @@
 				if(org.text !== tag.text){
 					if( org.text && tag.text && org.text !== tag.text) patch.push(this.createPatch(org,tag,4));
 					else if(!org.text) patch.push(this.createPatch(org,tag,5));
-					else if(!tag.text) patch.push(this.createPatch(org,tag,6));
+					else if(!tag.text) patch.push(this.createPatch(org,tag,6,view));
 					return patch;
 				}
 
@@ -706,23 +707,23 @@
 					// org < tag ( add tag )
 					if(o < t){
 						// don't be naive. There are order problems
-						for(i=o; i<t; i++) patch.push(this.createPatch(org,tag.child[i],2));
-						for(i=o; i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+						for(i=o; i<t; i++) patch.push(this.createPatch(org,tag.child[i],2,view));
+						for(i=o; i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag,view);
 
 					// org > tag ( exist remove tag )
 					}else if(o>t){
-						for(i=o-1; i>=t; i--) patch.push(this.createPatch(org.child[i],0,3));
-						for(i=t; i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+						for(i=o-1; i>=t; i--) patch.push(this.createPatch(org.child[i],0,3,view));
+						for(i=t; i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag,view);
 
 					}else{
 					// org === tag ( modify )
-						for(i=Math.max(o,t); i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag);
+						for(i=Math.max(o,t); i--;) this.treeDiff(org.child[i],tag.child[i],patch,org,tag,view);
 					}
 				}
 			}
 
 			else if(org.tagName !== tag.tagName)
-				patch.push(this.createPatch(org,tag,1));
+				patch.push(this.createPatch(org,tag,1,view));
 
 			return patch;
 		},
@@ -737,8 +738,8 @@
 			});
 		},
 
-		mapTreeNode: function(ODOM,path){
-			var target,i=0,p=ODOM.children;
+		mapTreeNode: function(oDOM,path){
+			var target,i=0,p=oDOM.children;
 			for(; i<path.length; i++){
 				if(p[path[i]]){
 					target = p[path[i]];
@@ -756,16 +757,16 @@
 			return path;
 		},
 
-		createPatch: function(org,tag,type){
+		createPatch: function(org,tag,type,view){
 			var node, patch, sl = this.createSelector(org);
 
 			switch(patchList[type]){
 				case "replace":
-					node = this.createDOMElememnt(tag);
+					node = this.createDOMElement(tag,view);
 					patch = { t:1, s:sl, n:node };
 					break;
 				case "append":
-					node = this.createDOMElememnt(tag);
+					node = this.createDOMElement(tag,view);
 					patch = { t:2, s:sl, n:node };
 					break;
 				case "remove":
@@ -778,7 +779,7 @@
 					patch = { t:5, s:sl, c:tag.text };
 					break;
 				case "removetext":
-					node = this.createDOMElememnt(tag);
+					node = this.createDOMElement(tag,view);
 					patch = { t:6, s:sl, n:node };
 					break;
 				case "addattr":
@@ -814,7 +815,7 @@
 					n = this.createObjElement(stag,vprops);
 					n.i= c.length; c.push(n); n.parent = p;
 				}else if(tag){
-					n = this.createObjElement(tag, vprops);
+					n = this.createObjElement(tag,vprops);
 					n.i= c.length; c.push(n); n.parent = p;
 					if(!(n.tagName in tagList)) p = n, c = n.child;
 				}else if(text){
@@ -851,20 +852,21 @@
 			return elm;
 		},
 
-		createDOMElememnt:function(obj){
+		createDOMElement:function(obj,view){
 			var elm = document.createElement(obj.tagName);
 
-			if(obj.attributes)
-				_fol(obj.attributes,function(value,key){
-					attrSetter(elm,key,value);
-				});
+			if(view && obj.attributes && obj.attributes.ref)
+				view.refs[obj.attributes.ref] = elm;
+
+			_fol(obj.attributes,function(value,key){ 
+				attrSetter(elm,key,value); 
+			});
 
 			if(obj.text)
 				elm.innerHTML = obj.text;
-
 			else if(obj.child.length)
-				_fal(obj.child,function(child){
-					elm.appendChild(this.createDOMElememnt(child));
+				_fal(obj.child,function(child){ 
+					elm.appendChild(this.createDOMElement(child,view)); 
 				},this);
 
 			return elm;
@@ -1046,12 +1048,12 @@
 		render : function(newhtml,view,props){
 			return this.each(function(elm){
 				if(elm._vid !== view._vid)
-					return elm.appendChild(slik.createDOMElememnt(
-						view.axml = slik.createTreeFromHTML(newhtml,props)
-					).firstElementChild, elm.innerHTML = null);
+					return elm.appendChild(slik.createDOMElement(
+						view.axml = slik.createTreeFromHTML(newhtml,props), view
+					).firstElementChild, elm.innerHTML = "");
 
 				var target = slik.createTreeFromHTML(newhtml,props);
-				var patcher = slik.treeDiff(view.axml,target,[]);
+				var patcher = slik.treeDiff(view.axml,target,[],null,null,view);
 
 				return slik.applyPatch(elm, patcher, view.axml = target);
 			});
@@ -1503,8 +1505,7 @@
 		return true;
 	}
 
-	// Ax View
-	// View container
+	// Ax View [ The view container ]
 	aV = function(obj){
 		var config  = _extend(_clone(VIEW_DEFAULT),obj||{}),
 				props   = _lock(_isObj(config.props) ? config.props : {}),
@@ -1514,6 +1515,7 @@
 				model   = config.model,
 				stencil = config.template;
 
+		this.refs = {};
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
@@ -1749,9 +1751,7 @@
 
 		toChunk: function(){
 			var res = {};
-			this.of(function(model){
-				res[model.name] = model.get();
-			});
+			this.of(function(model){ res[model.name] = model.get(); });
 			return res;
 		}
 	};

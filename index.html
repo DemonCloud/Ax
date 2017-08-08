@@ -19,14 +19,16 @@
 </style>
 <div id="app"></div>
 
-<script src="./dist/struct.min.js"></script>
-<script src="./dist/ax.min.js"></script>
+<script src="./src/struct.js"></script>
+<script src="./src/ax.js"></script>
+<!-- <script src="./dist/struct.min.js"></script> -->
+<!-- <script src="./dist/ax.min.js"></script> -->
 <script src="./modules/Ax-Router.js"></script>
 <script src="./modules/Ax-Loader.js"></script>
 
 <script id="state" type="ax/tpl">
 	<form id="form">
-		<input id="name" maxlength=10><button id="add">Add</button>
+		<input ref="name" id="name" maxlength=10><button id="add">Add</button>
 		<ul>
 		{{* each [item,i] in list }}
 			 <li style="max-width:168px">
@@ -56,7 +58,7 @@ var view3 = ax.view({
 	events:{
 		"submit:#form":function(event){
 			event.preventDefault();
-			var name = document.getElementById("name");
+			var name = this.refs.name;
 			var getName = name.value.trim();
 			if(getName){
 				name.value="";
