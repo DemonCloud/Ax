@@ -42,7 +42,7 @@
 
 <script>
 //example3
-var model3 = ax.model({
+var model = ax.model({
 	name:"todolist",
 	data:{ 
 		list:[] 
@@ -50,10 +50,10 @@ var model3 = ax.model({
 	store: true,
 });
 
-var view3 = ax.view({
+var view = ax.view({
 	template: document.getElementById("state").innerHTML,
 
-	model: model3,
+	model: model,
 
 	events:{
 		"submit:#form":function(event){
@@ -62,20 +62,21 @@ var view3 = ax.view({
 			var getName = name.value.trim();
 			if(getName){
 				name.value="";
-				model3.moc("list",{ name : getName });
+				this.model.moc("list",{ name : getName });
 			}
 		},
 
 		"click:.del":function(event){
-			model3.rm("list."+event.target.key);
+			this.model.rm("list."+event.target.key);
 		}
 	}
 });
 
-view3.mount(
+view.mount(
 	document.getElementById("app"),
-	model3.get()
+	model.get()
 );
+
 </script>
 </body>
 </html>

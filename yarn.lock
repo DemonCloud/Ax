@@ -255,8 +255,8 @@ aws4@^1.2.1:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
 ax-struct-js@latest:
-  version "4.0.21"
-  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-4.0.21.tgz#6d97e43e9bd26cae9aea72c596e4a87c707910b9"
+  version "4.0.22"
+  resolved "https://registry.yarnpkg.com/ax-struct-js/-/ax-struct-js-4.0.22.tgz#9b52d718c011b6d95b402e183d0df682cf123a93"
 
 babel-code-frame@^6.22.0:
   version "6.22.0"
@@ -529,10 +529,10 @@ browser-sync@latest:
     yargs "6.4.0"
 
 browserslist@^2.1.5:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-2.3.0.tgz#b2aa76415c71643fe2368f6243b43bbbb4211752"
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-2.3.1.tgz#39500a2090330b2a090120ea6c7fc78b6e091c5e"
   dependencies:
-    caniuse-lite "^1.0.30000710"
+    caniuse-lite "^1.0.30000712"
     electron-to-chromium "^1.3.17"
 
 bs-recipes@1.3.4:
@@ -605,9 +605,9 @@ camelcase@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-3.0.0.tgz#32fc4b9fcdaf845fcdf7e73bb97cac2261f0ab0a"
 
-caniuse-lite@^1.0.30000697, caniuse-lite@^1.0.30000710:
-  version "1.0.30000712"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000712.tgz#b4732def2459224f3f78c6a9ba103abfcc705670"
+caniuse-lite@^1.0.30000697, caniuse-lite@^1.0.30000712:
+  version "1.0.30000713"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000713.tgz#33957ecb4a2154a5d40a60d13d8bf1cfa0881a8a"
 
 caseless@~0.12.0:
   version "0.12.0"

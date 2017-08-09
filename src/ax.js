@@ -1290,13 +1290,13 @@
 		_fol(events,uon,modelDefined(this,{
 			name: existname ? config.name : "_",
 			_ast: function(todo,v){
-				return v===_? todo(data) : {}; },
+				return v===_ ? todo(data) : {}; },
 			_asv: function(v){
-				return v===_? validate : {}; },
+				return v===_ ? validate : {}; },
 			_v: !!_size(validate),
 			_f: filter,
 			_c: function(newdata,v){
-				return v===_? (data = newdata) : {}; },
+				return v===_ ? (data = newdata) : {}; },
 			_s: usestore
 		}));
 
@@ -1317,6 +1317,8 @@
 		},
 
 		set: function(key,val,setStatic){
+			if(this.lock) return;
+
 			var assert = this._ast(cool,_), argslen = arguments.length,
 					ref, single = !_isPrim(key) && _isObj(key);
 
@@ -1357,6 +1359,8 @@
 		},
 
 		rm: function(prop,rmStatic){
+			if(this.lock) return;
+
 			var assert = this._ast(cool,_);
 
 			if(_isPrim(prop) &&
@@ -1591,10 +1595,9 @@
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
-					z(this.root).off(param[0], param[1],
-						fn ? (fn._bind||fn) : void 0
-					);
-				else _unbind(this,mk,fn);
+					z(this.root).off(param[0], param[1], fn ? (fn._bind||fn) : void 0);
+				else 
+					_unbind(this,mk,fn);
 			},this);
 
 			return this;

@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.21";
+struct.VERSION = "4.0.23";
 
 // base method
 var or = {},
@@ -498,7 +498,7 @@ function regCheck(reg,n){
 // @export *reduce
 function reduce(list,fn,initValue,context){
 	var init = 2 in arguments,
-			cb = createBounder(fn,context),
+			cb = createBounder(fn,context);
 			initValue = init ? initValue : first(list);
 
 	return slice(list,init ? 0 : 1).reduce(cb,initValue);
@@ -506,7 +506,7 @@ function reduce(list,fn,initValue,context){
 
 function reduceRight(list,fn,initValue,context){
 	var init = 2 in arguments,
-			cb = createBounder(fn,context),
+			cb = createBounder(fn,context);
 			initValue = init ? initValue : last(list);
 
 	return slice(list,0,init ? void 0 : -1).reduceRight(cb,initValue);
@@ -724,16 +724,20 @@ function fastUnique(ary){
 		u[ary[i]] = true;
 	}
 
-	return keys(u).map(n ? toNumber : cool);
+	return mapValue(keys(u), n ? toNumber : cool);
 }
 
 function slimUnique(ary,ueq){
-	var c = slice(ary), check, i, j;
-	for(check = ueq ? eq : seq, i = 0; i<c.length; i++)
-		if(i !== c.length-1)
-			for(j=i+1; j<c.length; j++)
-				if(check(c[i],c[j])) c.splice(j--,1);
-	return c;
+	var c = slice(ary), check = ueq ? eq : seq,
+			res = [], i=0, j;
+
+	for(; i<c.length; i++){
+		if(c[i]===void 0) continue;
+		for(res.push(c[i]),j=i+1; j<c.length; j++)
+			if(check(c[i],c[j])) c[j]=void 0;
+	}
+
+	return res;
 }
 
 // advance map [ method ]

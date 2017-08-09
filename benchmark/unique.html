@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<script src="../dist/struct.min.js"></script>
+	<!-- <script src="../src/struct.js"></script> -->
+</head>
+<body>
+<script async>
+
+var r = struct.random("array");
+var f = struct.unique("fast");
+var c = struct.unique(); 
+
+// start Benchmark
+// see the console
+console.log("---------- Start Benchmark ----------");
+
+console.time("Struct slimUnique");
+for(var ins=0; ins<100000; ins++)
+	c(r(20,"int",1,20));
+console.timeEnd("Struct slimUnique")
+
+console.time("Struct fastUnique");
+for(var ins=0; ins<100000; ins++)
+	f(r(20,"int",1,20));
+console.timeEnd("Struct fastUnique")
+
+console.time("Struct slimUnique 100 length");
+for(var ins=0; ins<100000; ins++)
+	c(r(100,"int",1,20));
+console.timeEnd("Struct slimUnique 100 length")
+
+console.time("Struct fastUnique 100 length");
+for(var ins=0; ins<100000; ins++)
+	f(r(100,"int",1,20));
+console.timeEnd("Struct fastUnique 100 length")
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>

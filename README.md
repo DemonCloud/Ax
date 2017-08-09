@@ -2,11 +2,13 @@
 
 <img width=50 src="http://7j1zwt.com1.z0.glb.clouddn.com/logo.png" alt="Ax">
 
-> <img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
-
-<img src="https://nodei.co/npm/ax-js.png" alt="npm info">
+<img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
 
 <br>
+
+<br>
+
+<img src="https://nodei.co/npm/ax-js.png" alt="npm info">
 
 <br>
 
@@ -16,7 +18,7 @@ It require `Struct` utils lib, for the sake of better organization application s
 
 <br>
 
-### The Ax design target
+## The Ax design target
 
 * **model** - immutable, fast, persistence, safety
 * **view** - simple, fast, container, virtualDOM
@@ -24,7 +26,7 @@ It require `Struct` utils lib, for the sake of better organization application s
 
 <br>
 
-### Install
+## Install
 
 Install `ax` and `struct`
 
@@ -40,7 +42,7 @@ Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
 <br>
 
-### Prepare Feature VERSION v4+
+## Prepare Feature VERSION v4+
 
 1. Remove `route` from `ax` , just focus `model` `view` and `atom`
 
@@ -53,6 +55,8 @@ Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 5. Make plugin use `moudle` API. prepare for `Ax-Loader` && `Ax-Router`
 
 6. addMore `struct` function with benchmark, as `sort(inertSort)`,`sort(quickSort)`
+
+<br>
 
 <br>
 
