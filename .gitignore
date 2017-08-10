@@ -18,6 +18,8 @@ tmp/*
 webpack
 webpack/*
 gulp/*
+v4/*
+docs/v4/*
 
 npm-debug.log*
 

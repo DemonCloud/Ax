@@ -26,7 +26,7 @@
 	"use strict";
 
 	var aM,aV,aT,aS,vA,z,Z,
-			aMP,aVP,aTP, _ = [] ,maker = {}, root = struct.root,
+			aMP,aVP,aTP, _ = [], maker = {}, root = struct.root,
 			RAM = [], LS = root.localStorage, SN = "Ax@",
 			FCD = String.fromCharCode, vid = 0,
 
@@ -34,7 +34,7 @@
 	AXMODULE_INJECT = [ax,struct],
 
 	VIEW_KEYWORDS  = ["root","mount","props","events","render","template","destroy","cache"],
-	ATOM_KEYWORDS  = ["use","events"],
+	ATOM_KEYWORDS  = ["use","events","_assert"],
 	MODEL_KEYWORDS = ["name","data","store","change","events","validate","filter"],
 
 	VIEW_DEFAULT  = { },
@@ -102,7 +102,7 @@
 
 	// ax genertor function
 	function genertor_(api){
-		var apiName, apiUse, apiSelect;
+		var apiName, apiUse, apiSelect, Use;
 		if(_isAry(api)){
 			apiUse = api[1];
 			apiName = api[0];
@@ -112,23 +112,25 @@
 			apiName = api;
 			apiSelect = void 0; }
 
+		Use = struct[apiUse](apiSelect);
+
 		aM.prototype[apiName] = function(){
 			var tmp = this.get(),
 					args = [tmp].concat(_slice(arguments));
-			if(!_eq(tmp = struct[apiUse](apiSelect).apply(tmp,args),this.get()))
+			if(!_eq(tmp = Use.apply(tmp,args),this.get()))
 				this.emit((this.set(tmp),api),args);
 			return this;
 		};
 
 		aT.prototype[apiName] = function(){
-			return struct[apiUse](apiSelect).apply(this,
-			[this.toChunk()].concat(_slice(arguments)));
+			return Use.apply(this,
+				[this.toChunk()].concat(_slice(arguments)));
 		};
 	}
 
 	// not change rebase data
 	function genertor_$(api){
-		var apiName, apiUse, apiSelect;
+		var apiName, apiUse, apiSelect, Use;
 		if(_isAry(api)){
 			apiUse = api[1];
 			apiName = api[0];
@@ -138,13 +140,15 @@
 			apiName = api;
 			apiSelect = void 0; }
 
+		Use = struct[apiUse](apiSelect);
+
 		aM.prototype[apiName] = function(){
 			var args = [this.get()].concat(_slice(arguments));
-			return struct[apiUse](apiSelect).apply(this,args);
+			return Use.apply(this,args);
 		};
 
 		aT.prototype[apiName] = function(){
-			return struct[apiUse](apiSelect).apply(this,
+			return Use.apply(this,
 			[this.toChunk()].concat(_slice(arguments)));
 		};
 	}
@@ -166,7 +170,6 @@
 	// Performance JavaScript selector
 	// Just Optimzer this function for sl pref
 	// @ much more need its better
-
 	Z = function(elm){
 		this.el = _isAryL(elm) ? _slice(elm) : (_isElm(elm) ? [elm] : []);
 	};
@@ -1322,7 +1325,6 @@
 					ref, single = !_isPrim(key) && _isObj(key);
 
 			if(argslen){
-
 				if(single){
 					// single pointer select
 					setStatic = val;
@@ -1338,7 +1340,6 @@
 					}
 
 				} else {
-
 					if(!_eq(_get(assert,key),val) &&
 						singleValidate(key,val,this)){
 
@@ -1508,6 +1509,8 @@
 
 	// Ax View [ The view container ]
 	aV = function(obj){
+		this.refs = {};
+
 		var config  = _extend(_clone(VIEW_DEFAULT),obj||{}),
 				props   = _lock(_isObj(config.props) ? config.props : {}),
 				vroot   = config.root,
@@ -1516,7 +1519,6 @@
 				model   = config.model,
 				stencil = config.template;
 
-		this.refs = {};
 		// parse template
 		// building the render function
 		if(!_isFn(render)){
@@ -1553,6 +1555,7 @@
 
 					if(model && vA.model(model))
 						model.on("change",this.render);
+
 					// trigger render
 					if(1 in arguments)
 						this.render.apply(this,_slice(arguments,1));
@@ -1653,7 +1656,10 @@
 	function assertMake(list,callback){
 		var LIST = this._assert(cool,_);
 		var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
-		_fal(target,function(name){ callback.call(this,LIST,name); },this);
+		_fal(target,function(name){ 
+			callback.call(this,LIST,name); 
+		},this);
+
 		return this;
 	}
 
@@ -1720,7 +1726,7 @@
 			});
 		},
 
-		_: function(name){
+		p: function(name){
 			return _one(this.all(),assertModel(name));
 		},
 
