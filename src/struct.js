@@ -1209,7 +1209,7 @@ function paramStringify(param){
 }
 
 // slim Template engine call [ DOOM ]
-var no = "(.)^";
+// var no = "(.)^";
 var ecode = {
 	"&" : "&amp;",
 	">" : "&gt;",
@@ -1426,10 +1426,11 @@ function DOOM(txt,bounds,name){
 		methods = isObj(bounds) ? bounds : {},
 
 		args = slice(arguments,2),
-		exp = new RegExp((this.escape||no) +
-			"|" + (this.interpolate||no) + 
-			"|" + (this.command||no) + 
-			"|" + (this.evaluate||no) + 
+		exp = new RegExp(
+						this.escape +
+			"|" + this.interpolate + 
+			"|" + this.command + 
+			"|" + this.evaluate + 
 			"|$",
 			"g");
 

@@ -624,8 +624,7 @@
 		//3 remove
 		function(patch){
 			var t = patch.s;
-			if(t && t.parentNode)
-				t.parentNode.removeChild(t);
+			if(t.parentNode) t.parentNode.removeChild(t);
 		},
 		//4 modifytext
 		function(patch){
@@ -863,7 +862,8 @@
 			});
 
 			if(obj.text)
-				elm.innerHTML = obj.text;
+				elm.textContent = _decode(obj.text);
+
 			else if(obj.child.length)
 				_fal(obj.child,function(child){ 
 					elm.appendChild(this.createDOMElement(child,view)); 
@@ -1159,7 +1159,6 @@
 			this.emit(type+":fail",arguments);
 		}.bind(this);
 
-		// trigger ajax events
 		return this.emit(type,[_ajax(st),st]);
 	}
 
@@ -1169,12 +1168,12 @@
 
 	function modelDefined(model,props){
 		_fol(props,function(t,n){
-			_define(this,n,{ value: t,
+			_define(model, n, { value: t,
 				writable: false,
 				enumerable: false,
 				configurable: false
 			});
-		},model);
+		});
 		return model;
 	}
 
@@ -1396,8 +1395,6 @@
 			return JSON.stringify(this.get());
 		},
 
-		// Fetch mean Restful "GET"
-		// fetch data form url with param
 		send: function(url,header){
 			if(_isObj(url)){
 				header = url;
@@ -1647,8 +1644,10 @@
 			return (_isFn(tdo)&&v===_) ? tdo(LIST) : []; };
 	}
 
-	function assertModel(model){
-		return model.name === this;
+	function assertModel(name){
+		return function(m){ 
+			return m.name === name; 
+		};
 	}
 
 	function assertMake(list,callback){
@@ -1716,13 +1715,13 @@
 		out: function(list){
 			return assertMake.call(this,list,
 			function(LIST,name){
-				var find = _index(LIST,assertModel.bind(name));
+				var find = _index(LIST,assertModel(name));
 				if(_isNum(find)) LIST.splice(find,1);
 			});
 		},
 
-		p: function(name){
-			return _one(this.all(),assertModel.bind(name));
+		_: function(name){
+			return _one(this.all(),assertModel(name));
 		},
 
 		of: function(fn,args){

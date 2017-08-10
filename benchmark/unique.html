@@ -3,8 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Benchmark Test</title>
-	<script src="../dist/struct.min.js"></script>
-	<!-- <script src="../src/struct.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+	<!-- <script src="../dist/struct.min.js"></script> -->
+	<script src="../src/struct.js"></script>
 </head>
 <body>
 <script async>
@@ -12,6 +13,14 @@
 var r = struct.random("array");
 var f = struct.unique("fast");
 var c = struct.unique(); 
+var l = _.uniq;
+
+
+var normalUnique = function(array){
+	return array.filter(function(ele,index,array){
+    return index===array.indexOf(ele)
+	});
+};
 
 // start Benchmark
 // see the console
@@ -27,6 +36,16 @@ for(var ins=0; ins<100000; ins++)
 	f(r(20,"int",1,20));
 console.timeEnd("Struct fastUnique")
 
+console.time("SB Unique");
+for(var ins=0; ins<100000; ins++)
+	normalUnique(r(20,"int",1,20));
+console.timeEnd("SB Unique")
+
+console.time("Lodash Unique");
+for(var ins=0; ins<100000; ins++)
+	l(r(20,"int",1,20));
+console.timeEnd("Lodash Unique")
+
 console.time("Struct slimUnique 100 length");
 for(var ins=0; ins<100000; ins++)
 	c(r(100,"int",1,20));
@@ -36,6 +55,16 @@ console.time("Struct fastUnique 100 length");
 for(var ins=0; ins<100000; ins++)
 	f(r(100,"int",1,20));
 console.timeEnd("Struct fastUnique 100 length")
+
+console.time("SB Unique 100 length");
+for(var ins=0; ins<100000; ins++)
+	normalUnique(r(100,"int",1,20));
+console.timeEnd("SB Unique 100 length")
+
+console.time("Lodash Unique 100 length");
+for(var ins=0; ins<100000; ins++)
+	l(r(100,"int",1,20));
+console.timeEnd("Lodash Unique 100 length");
 
 console.log("---------- End Benchmark ----------");
 </script>
