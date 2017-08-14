@@ -33,13 +33,13 @@
 	// Define Setting
 	AXMODULE_INJECT = [ax,struct],
 
-	VIEW_KEYWORDS  = ["root","mount","props","events","render","template","destroy","cache"],
-	ATOM_KEYWORDS  = ["use","events","_assert"],
-	MODEL_KEYWORDS = ["name","data","store","change","events","validate","filter"],
+	ATOM_KEYWORDS   = ["use","events","_assert"],
+	VIEW_KEYWORDS   = ["root","mount","props","events","render","template","destroy","cache"],
+	MODEL_KEYWORDS  = ["name","data","store","change","events","validate","filter"],
 
-	VIEW_DEFAULT  = { },
-	ATOM_DEFAULT  = { use:[] },
-	MODEL_DEFAULT = { data:{}, validate:{} },
+	VIEW_DEFAULT    = { },
+	ATOM_DEFAULT    = { use:[] },
+	MODEL_DEFAULT   = { data:{}, validate:{} },
 
 	// resetful list
 	// use for ax ajax-api
@@ -1087,6 +1087,7 @@
 		}
 
 		valid = !_size(error);
+
 		model.emit("validate:"+(valid ? "success" : "fail"),
 								valid ? [_clone(newdata)] : error);
 
@@ -1324,7 +1325,8 @@
 		set: function(key,val,setStatic){
 			if(this.lock) return;
 
-			var assert = this._ast(cool,_), argslen = arguments.length,
+			var assert = this._ast(cool,_), 
+					argslen = arguments.length,
 					ref, single = !_isPrim(key) && _isObj(key);
 
 			if(argslen){
@@ -1470,6 +1472,7 @@
 
 	function packComplete(view){
 		return function(args){
+
 			view.root._vid = view._vid;
 			view.root.setAttribute("ax-root","");
 			return view.emit("completed",args);
