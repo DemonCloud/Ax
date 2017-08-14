@@ -34,6 +34,7 @@ var DEFAULT_LOADER_OPTION = [
 
 var extend = struct.extend(),
 		clone = struct.clone(),
+		depclone = struct.cloneDeep(),
 		is    = struct.type('def');
 
 var Loader = function(option){

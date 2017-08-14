@@ -19,7 +19,6 @@ var _ = [], H = struct.root.history,
 
 // Define Utils [ struct ]
 var merge = struct.merge(),
-		ext   = struct.extend(),
 		is    = struct.type("def"),
 		each  = struct.each(),
 		map   = struct.map(),
@@ -32,6 +31,7 @@ var merge = struct.merge(),
 		noop  = struct.noop(),
 		qstr  = struct.param("stringify"),
 		toNum = struct.convert("number"),
+		clone = struct.cloneDeep(),
 		qpars = struct.param("parse");
 
 // delegator view
@@ -108,6 +108,24 @@ function toActive(source,path,query,state,notpush,isLink){
 
 // Default Options
 // for merge the keywords
+// * example :
+//
+//  new Router({
+//  	elements: [".router"],
+//  
+//  	routes:{
+//  		"/": ["home"],
+//  		"/hifi" : ["hifi"],
+//  		"/article/:name" : ["article"],
+//  	},
+//
+//  	actions:{
+//  		home: act_home,
+//  		hifi: act_hifi,
+//  		article: act_post
+//  	}
+//  });
+
 var DEFAULT_ROUTER_OPTION = {
 	routes: {},
 	actions: {},
@@ -119,7 +137,7 @@ var Router = function(option){
 
 	var _this = this;
 	var source = merge(
-		ext({},DEFAULT_ROUTER_OPTION),
+		clone(DEFAULT_ROUTER_OPTION),
 		is(option,"Object") ? option : {}
 	); 
 

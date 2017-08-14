@@ -1050,15 +1050,18 @@
 		// virtual render
 		render : function(newhtml,view,props){
 			return this.each(function(elm){
+				var target = slik.createTreeFromHTML(newhtml,props);
+
 				if(elm._vid !== view._vid)
 					return elm.appendChild(slik.createDOMElement(
-						view.axml = slik.createTreeFromHTML(newhtml,props), view
+						view.axml = target, view
 					).firstElementChild, elm.innerHTML = "");
 
-				var target = slik.createTreeFromHTML(newhtml,props);
-				var patcher = slik.treeDiff(view.axml,target,[],null,null,view);
-
-				return slik.applyPatch(elm, patcher, view.axml = target);
+				return slik.applyPatch(
+					elm, 
+					slik.treeDiff(view.axml,target,[],null,null,view), 
+					view.axml = target
+				);
 			});
 		}
 	};
@@ -1686,7 +1689,11 @@
 
 	function stom(atom,list){
 		var c = ax.atom({ use:list });
-		c.back = function(){ return atom; };
+
+		c.back = function(){ 
+			return atom; 
+		};
+
 		return c;
 	}
 
