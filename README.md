@@ -1,13 +1,5 @@
 # Ax - [ VERSION 4.0.0+ ]
 
-<img width=50 src="http://7j1zwt.com1.z0.glb.clouddn.com/logo.png" alt="Ax">
-
-<img src="https://travis-ci.org/DemonCloud/Ax.svg?branch=master" alt="building pass">
-
-<br>
-
-<br>
-
 <img src="https://nodei.co/npm/ax-js.png" alt="npm info">
 
 <br>
@@ -44,17 +36,17 @@ Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
 ## Prepare Feature VERSION v4+
 
-1. Remove `route` from `ax` , just focus `model` `view` and `atom`
+<del>1. Remove `route` from `ax` , just focus `model` `view` and `atom`</del>
 
-2. `model` extend more useful API, as `model.lock`
+<del>2. `model` extend more useful API, as `model.lock`</del>
 
-3. `atom` more fast with use `struct` connect
+<del>3. `atom` more fast with use `struct` connect</del>
 
-4. `moudle` interface to given way to make plugin in `ax`
+<del>4. `moudle` interface to given way to make plugin in `ax`</del>
 
 5. Make plugin use `moudle` API. prepare for `Ax-Loader` && `Ax-Router`
 
-6. addMore `struct` function with benchmark, as `sort(inertSort)`,`sort(quickSort)`
+<del>6. addMore `struct` function with benchmark, as `sort(inertSort)`,`sort(quickSort)`</del>
 
 <br>
 
