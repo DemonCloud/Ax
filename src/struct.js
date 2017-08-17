@@ -51,12 +51,12 @@ struct.VERSION = "4.0.23";
 
 // base method
 var or = {},
-    ar = [],
-    st = "",
-    slc = ar.slice,
-    ts = or.toString,
-    tm = st.trim,
-    cot = ar.concat,
+		ar = [],
+		st = "",
+		slc = ar.slice,
+		ts = or.toString,
+		tm = st.trim,
+		cot = ar.concat,
 		ev = eval,
 
 		broken = Object.freeze({});
@@ -267,24 +267,24 @@ function isNative(fn){
 }
 
 var typeArray = [
-  'array',
-  'function',
-  'null',
-  'undefined',
-  'arguments',
-  'boolean',
-  'string',
-  'number',
-  'date',
-  'regexp',
-  'nodeList',
-  'htmlcollection'
+	'array',
+	'function',
+	'null',
+	'undefined',
+	'arguments',
+	'boolean',
+	'string',
+	'number',
+	'date',
+	'regexp',
+	'nodeList',
+	'htmlcollection'
 ];
 
 // Typec advance typeof [ method ]
 function typec(e){
-  var types = [
-  	isArray(e),
+	var types = [
+		isArray(e),
 		isFn(e),
 		e === null,
 		e === void 0,
@@ -1479,8 +1479,8 @@ function DOOM(txt,bounds,name){
 	try{ render = ev("(function(_bounds,struct,"+(rname||"_x_")+(args.length?","+args.toString():"")+"){ "+res+" })"); 
 	}catch(e){ console.error(e.res = res); throw e; }
 
-  // @ Precomplete JavaScript Template Function
-  // @ the you build once template that use diff Data, not use diff to build function again
+	// @ Precomplete JavaScript Template Function
+	// @ the you build once template that use diff Data, not use diff to build function again
 	// @ protect your template code other can observe it?
 	
 	// _ = function(data){ return eq(arguments,render.pre) ? (render.complete) : 
