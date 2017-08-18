@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Benchmark Test</title>
+	<script src="../dist/struct.min.js"></script>
+</head>
+<body>
+<script async>
+
+var rint = struct.random('int');
+var slice = struct.slice();
+var clone = struct.clone();
+
+var fn = function(){
+	var a = arguments[0];
+	var b = arguments[1];
+	var c = arguments[2];
+}
+
+var fn2 = function(){
+	var args = slice(arguments);
+	var a = args[0];
+	var b = args[1];
+	var c = args[2];
+}
+
+var fn3 = function(){
+	var i,args = [];
+
+	for(var i=0; i<arguments.length; i++ )
+		args[i] = arguments[i];
+	var a = args[0];
+	var b = args[1];
+	var c = args[2];
+}
+
+var fn4 = function(){
+	var args = clone(arguments,true);
+	var a = args[0];
+	var b = args[1];
+	var c = args[2];
+}
+
+console.log("---------- Start Benchmark ----------");
+
+console.time("Arguments Leaks");
+for(var i=0; i<1000000; i++)
+	fn(rint(1,10),rint(1,10),rint(1,10));
+console.timeEnd("Arguments Leaks");
+
+console.time("Slice Arguments");
+for(var j=0; j<1000000; j++)
+	fn2(rint(1,10),rint(1,10),rint(1,10));
+console.timeEnd("Slice Arguments")
+
+console.time("Shallow Arguments");
+for(var k=0; k<1000000; k++)
+	fn3(rint(1,10),rint(1,10),rint(1,10));
+console.timeEnd("Shallow Arguments");
+
+console.time("Shallow Clone Arguments");
+for(var g=0; g<1000000; g++)
+	fn4(rint(1,10),rint(1,10),rint(1,10));
+console.timeEnd("Shallow Clone Arguments");
+
+console.log("---------- End Benchmark ----------");
+</script>
+</body>
+</html>
