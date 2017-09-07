@@ -11,7 +11,7 @@
 <script async>
 
 var lodashclonedeep = _.cloneDeep;
-var structclonedeep = struct.clonedeep();
+var structclonedeep = struct.cloneDeep();
 var pvoit = {
 	a:1,
 	b:"2",
@@ -48,10 +48,10 @@ var pvoit = {
 // see the console
 console.log("---------- Start Benchmark ----------");
 
-console.time("Struct clonedeep");
+console.time("Struct cloneDeep");
 for(var ins=0; ins<100000; ins++)
 	structclonedeep(pvoit);
-console.timeEnd("Struct clonedeep")
+console.timeEnd("Struct cloneDeep")
 
 console.time("Lodash cloneDeep");
 for(var un=0; un<100000; un++)

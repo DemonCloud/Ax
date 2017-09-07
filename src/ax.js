@@ -1488,20 +1488,8 @@
 	}
 
 	function setRender(view,render){
-		var thatRender = packRender(view,render);
-
-		_define(view,"render",{
-			get : function(){
-				return thatRender;
-			},
-			set : function(fn){
-				if(_isFn(fn)) thatRender = packRender(view,fn);
-				return thatRender;
-			},
-			enumerable:true,
-			configurable:false
-		});
-
+		if(_isFn(render))
+			view.render = packRender(view,render);
 		return view;
 	}
 
