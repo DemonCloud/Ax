@@ -1,6 +1,6 @@
 {
   "name": "ax-js",
-  "version": "4.0.23",
+  "version": "4.0.24",
   "description": "[ Ax ] is a Fast Javascript MVR Framework",
   "main": "dist/ax.min.js",
   "homepage": "https://demoncloud.github.io/Ax",
@@ -51,7 +51,7 @@
     "gulp-requirejs-optimize": "latest",
     "gulp-sequence": "latest",
     "gulp-uglify": "latest",
-    "jest": "latest",
+    "jest": "^21.0.2",
     "requirejs": "latest"
   }
 }

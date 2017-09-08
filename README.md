@@ -2,8 +2,6 @@
 
 <img src="https://nodei.co/npm/ax-js.png" alt="npm info">
 
-<br>
-
 ## The Fast MV JavaScript Framework. 
 
 It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` & `Vue` very well.
@@ -31,24 +29,6 @@ npm install ax-js ax-struct-js
 ```
 
 Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
-
-<br>
-
-## Prepare Feature VERSION v4+
-
-<del>1. Remove `route` from `ax` , just focus `model` `view` and `atom`</del>
-
-<del>2. `model` extend more useful API, as `model.lock`</del>
-
-<del>3. `atom` more fast with use `struct` connect</del>
-
-<del>4. `moudle` interface to given way to make plugin in `ax`</del>
-
-5. Make plugin use `moudle` API. prepare for `Ax-Loader` && `Ax-Router`
-
-<del>6. addMore `struct` function with benchmark, as `sort(inertSort)`,`sort(quickSort)`</del>
-
-<br>
 
 <br>
 
