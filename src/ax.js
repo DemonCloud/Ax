@@ -29,7 +29,7 @@
 			aMP,aVP,aTP, _ = [], maker = {}, root = struct.root,
 			RAM = [], LS = root.localStorage, SN = "Ax@",
 			FCD = String.fromCharCode, vid = 0,
-
+	
 	// Define Setting
 	AXMODULE_INJECT = [ax,struct],
 
