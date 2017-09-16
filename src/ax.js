@@ -13,12 +13,12 @@
 		// support AMD require.js
 		// ruler by UMD Javascript
 		define('ax',['struct'],function(_){ return factory(ax,_); });
-	else if(typeof exports !== "undefined"){
+	else if(typeof exports !== "undefined")
 		// support CommonJS exports
 		// * fuck the npm package rubbish, where package name use [ struct ]
 		// should defined webpack alias with [ "struct" : "ax-struct-js" ]
 		factory(exports,require('struct'));
-	}else
+	else
 		// build on browser global object
 		root.ax = factory(ax,root.struct);
 
@@ -1283,15 +1283,15 @@
 	// Ax build -> 3.0
 	// model constructor
 	aM = function(obj){
-		var config = _extend(_clone(MODEL_DEFAULT),obj||{}),
-				events = config.events,
-				validate = config.validate||{},
-				filter = _isFn(config.filter) ? config.filter : cool ,
+		var config    = _extend(_clone(MODEL_DEFAULT),obj||{}),
+				events    = config.events,
+				validate  = config.validate||{},
+				filter    = _isFn(config.filter) ? config.filter : cool ,
 
 				existname = _isStr(config.name),
-				usestore = !!(config.store && existname),
-				usedata = config.data || {},
-				data = usestore ? (aS.get(config.name) || usedata) : usedata;
+				usestore  = !!(config.store && existname),
+				usedata   = config.data || {},
+				data      = usestore ? (aS.get(config.name) || usedata) : usedata;
 
 		_fol(events,uon,modelDefined(this,{
 			name: existname ? config.name : "_",
@@ -1355,7 +1355,6 @@
 							this.emit("change:"+key,[val]);
 						}
 					}
-
 				}
 
 			}
