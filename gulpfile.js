@@ -5,8 +5,6 @@
 /* because it useful package v3 documents */
 
 const gulp = require('gulp');
-const eslint = require("gulp-eslint");
-const concat = require("gulp-concat");
 const rename = require("gulp-rename");
 const filter = require("gulp-filter");
 const uglify = require('gulp-uglify');

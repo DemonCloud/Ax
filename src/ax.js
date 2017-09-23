@@ -15,9 +15,9 @@
 		define('ax',['struct'],function(_){ return factory(ax,_); });
 	else if(typeof exports !== "undefined")
 		// support CommonJS exports
-		// * fuck the npm package rubbish, where package name use [ struct ]
+		// * fuck the npm package rubbish offset name, where package name use [ struct ]
 		// should defined webpack alias with [ "struct" : "ax-struct-js" ]
-		factory(exports,require('struct'));
+		factory(exports,require('ax-struct-js'));
 	else
 		// build on browser global object
 		root.ax = factory(ax,root.struct);
@@ -29,7 +29,7 @@
 			aMP,aVP,aTP, _ = [], maker = {}, root = struct.root,
 			RAM = [], LS = root.localStorage, SN = "Ax@",
 			FCD = String.fromCharCode, vid = 0,
-	
+
 	// Define Setting
 	AXMODULE_INJECT = [ax,struct],
 
@@ -520,7 +520,9 @@
 		"</([^><]+?)>|" +
 		"<([^><]+?)/>|" +
 		"<([^><]+?)>|"  +
-		"([^><]+)|$" ,"g");
+		"([^><]+)|$",
+		"g"
+	);
 
 	var tagList = {
 		input:1,
@@ -701,7 +703,7 @@
 				var i, o = org.child.length, t = tag.child.length;
 
 				// There is an algorithm problem
-				// and if you need the smallest patcher - 
+				// and if you need the smallest patcher -
 				// you need to make extreme comparisons and optimizations to diff child nodes
 				// but it also leads to more cycles and complexity
 				// *will rebuild using some algorithm with reduce the patcher
@@ -860,16 +862,16 @@
 			if(view && obj.attributes && obj.attributes.ref)
 				view.refs[obj.attributes.ref] = elm;
 
-			_fol(obj.attributes,function(value,key){ 
-				attrSetter(elm,key,value); 
+			_fol(obj.attributes,function(value,key){
+				attrSetter(elm,key,value);
 			});
 
 			if(obj.text)
 				elm.textContent = _decode(obj.text);
 
 			else if(obj.child.length)
-				_fal(obj.child,function(child){ 
-					elm.appendChild(this.createDOMElement(child,view)); 
+				_fal(obj.child,function(child){
+					elm.appendChild(this.createDOMElement(child,view));
 				},this);
 
 			return elm;
@@ -1058,8 +1060,8 @@
 					).firstElementChild, elm.innerHTML = "");
 
 				return slik.applyPatch(
-					elm, 
-					slik.treeDiff(view.axml,target,[],null,null,view), 
+					elm,
+					slik.treeDiff(view.axml,target,[],null,null,view),
 					view.axml = target
 				);
 			});
@@ -1215,9 +1217,9 @@
 				h2 = bits >> 12 & 0x3f;
 				h3 = bits >> 6 & 0x3f;
 				h4 = bits & 0x3f;
-				enc += this.t.charAt(h1) 
-						+  this.t.charAt(h2) 
-						+  this.t.charAt(h3) 
+				enc += this.t.charAt(h1)
+						+  this.t.charAt(h2)
+						+  this.t.charAt(h3)
 						+  this.t.charAt(h4);
 			} while (i < data.length);
 			r = data.length % 3;
@@ -1325,7 +1327,7 @@
 		set: function(key,val,setStatic){
 			if(this.lock) return;
 
-			var assert = this._ast(cool,_), 
+			var assert = this._ast(cool,_),
 					argslen = arguments.length,
 					ref, single = !_isPrim(key) && _isObj(key);
 
@@ -1340,7 +1342,7 @@
 
 						this._c(ref,_,this.change=true);
 						if(this._s) aS.set(this.name,ref);
-						if(!setStatic) 
+						if(!setStatic)
 							this.emit("change",[_clone(ref)]);
 					}
 
@@ -1576,7 +1578,7 @@
 						param[1],
 						fn._bind||(fn._bind=fn.bind(this))
 					);
-				else 
+				else
 					_on(this,mk,fn);
 			},this);
 
@@ -1641,16 +1643,16 @@
 	}
 
 	function assertModel(name){
-		return function(m){ 
-			return m.name === name; 
+		return function(m){
+			return m.name === name;
 		};
 	}
 
 	function assertMake(list,callback){
 		var LIST = this._assert(cool,_);
 		var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
-		_fal(target,function(name){ 
-			callback.call(this,LIST,name); 
+		_fal(target,function(name){
+			callback.call(this,LIST,name);
 		},this);
 
 		return this;
@@ -1680,9 +1682,7 @@
 	function stom(atom,list){
 		var c = ax.atom({ use:list });
 
-		c.back = function(){ 
-			return atom; 
-		};
+		c.back = function(){ return atom; };
 
 		return c;
 	}
@@ -1703,8 +1703,8 @@
 	aTP = aT.prototype = {
 		constructor: aT,
 
-		all: function(){ 
-			return this._assert(_slice,_); 
+		all: function(){
+			return this._assert(_slice,_);
 		},
 
 		use: function(list){

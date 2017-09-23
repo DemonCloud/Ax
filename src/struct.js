@@ -1,4 +1,4 @@
-/* 
+/*
  * Struct
  *
  * The C Lang Javascript construction lib
@@ -32,13 +32,13 @@
 		if(module.exports && !module.nodeType) // support CommonJS exports
 			exports = module.exports = _;
 		exports.struct = _;
-	} else 
+	} else
 		// build on browser global object
 		root.struct = _;
 
 	// due to [ Webpack ] fucking should return [ Window ]
-}(this, function(root){ 
-	if(typeof self !== "undefined") root = self; 
+}(this, function(root){
+	if(typeof self !== "undefined") root = self;
 	else root = this || global;
 	return root;
 }, function(struct){
@@ -69,13 +69,13 @@ var root = struct();
 
 // Sub struct return pointer
 // Zub struct with custom method in function
-function nub(fn,name){ 
+function nub(fn,name){
 	struct[name] = function(){ return fn; };
 }
 
-function zub(fn,name){ 
-	struct[name] = function(use){ 
-		return fn[trim(toString(use).toLowerCase())] || fn.default; 
+function zub(fn,name){
+	struct[name] = function(use){
+		return fn[trim(toString(use).toLowerCase())] || fn.default;
 	};
 }
 
@@ -87,10 +87,10 @@ function zub(fn,name){
 function extend(o1,o2,nothisproperty){
 	if(nothisproperty)
 		fov(o2,function(v,k){
-			if(isArray(nothisproperty) ? 
+			if(isArray(nothisproperty) ?
 				!has(nothisproperty,k) :
 				(nothisproperty != null ? k !== nothisproperty : true))
-				o1[k] = v; 
+				o1[k] = v;
 		});
 	else
 		fov(o2,function(v,k){ o1[k] = v; });
@@ -115,7 +115,7 @@ function define(obj,prop,st){
 function cit(fn){
 	var args = slice(arguments,1);
 	return function(){
-		return fn.apply(null,args.concat(slice(arguments))); 
+		return fn.apply(null,args.concat(slice(arguments)));
 	};
 }
 
@@ -126,7 +126,7 @@ function citd(fn,check){
 		return (check.apply(null,arguments) ? fn : cool).apply(null,arguments);
 	};
 }
-	
+
 // Typeof Check List
 // @ Object
 // @ Primitive
@@ -202,11 +202,11 @@ function isDefine(obj,name){
 	return ts.call(obj) === '[object ' + name + ']';
 }
 
-// ArrayLike [ type ] 
+// ArrayLike [ type ]
 function isArrayLike(obj){
-	return !!obj && 
-				!isFn(obj) && 
-				isObj(obj) && 
+	return !!obj &&
+				!isFn(obj) &&
+				isObj(obj) &&
 				isNum(obj.length);
 }
 
@@ -232,8 +232,8 @@ function isEmpty(n){
 }
 
 function isDOM(e){
-	return isObj(e) 
-		&& e.nodeType > 0 
+	return isObj(e)
+		&& e.nodeType > 0
 		&& (e instanceof Node || e instanceof Element);
 }
 
@@ -298,7 +298,7 @@ function typec(e){
 		isDefine(e,"HTMLCollection")
 	];
 
-	return typeArray[index(types,fseq(true))] || "object"; 
+	return typeArray[index(types,fseq(true))] || "object";
 }
 
 
@@ -307,7 +307,7 @@ function typec(e){
 function v8(obj){
 	var $ = function(){};
 	$.prototype = obj;
-	
+
 	var l = 8;
 	while(l--) new $();
 	return obj;
@@ -334,7 +334,7 @@ function v8(obj){
 // noop function pointer
 // cool function return origin value
 function noop(){}
-function cool(e){ 
+function cool(e){
 	return e;
 }
 
@@ -369,7 +369,7 @@ function toHEX(rgb){
 	// return '#'+hex.map(function(val){
 	// 	return (val.length === 1 ? '0' : '') + val;
 	// }).join('');
-	
+
 	return ((1<<24) + (rgb.r<<16) + (rgb.g<<8) + rgb.b).toString(16).substr(1);
 }
 
@@ -386,15 +386,15 @@ function toMinus(n){
 	return -toNumber(n);
 }
 
-// XOR operation, 
+// XOR operation
 // details: http://en.wikipedia.org/wiki/XOR_swap_algorithm
 function swap(ary,a,b){
 	var tmp = ary[a];
 	ary[a] = ary[b];
 	ary[b] = tmp;
 
-	//[ a, b ] = [ b, a ]; 
-	
+	//[ a, b ] = [ b, a ];
+
 	// a^=b;
 	// b^=a;
 	// a^=b;
@@ -476,7 +476,7 @@ var p_ = function(){};
 function clonedeep(l){
 	var res = l;
 	if(isArrayLike(l)){
-		// clone array 
+		// clone Array
 		res = slice(l).map(citd(clonedeep,negate(isPrimitive)));
 	}else if(!isPrimitive(l) && !(l instanceof Node)){
 		var prt = p_.prototype = l.constructor.prototype;
@@ -520,7 +520,7 @@ function reduceRight(list,fn,initValue,context){
 
 // has([1,2,3],2) => true;
 function has(list,n,ueq){
-	var compare = isRegExp(n) ? regCheck : (ueq ? eq : seq), 
+	var compare = isRegExp(n) ? regCheck : (ueq ? eq : seq),
 			idf = false, i;
 
 	if(isArrayLike(list)){
@@ -530,7 +530,7 @@ function has(list,n,ueq){
 	}else if(isObj(list)){
 		var key = keys(list);
 		for(i=key.length; i--;)
-			if(idf=compare(n,list[key[i]])) 
+			if(idf=compare(n,list[key[i]]))
 				break;
 	}
 	return idf;
@@ -570,11 +570,11 @@ function not(list,n,useq){
 // @use reject
 // support regexp && value filter
 function filter(list,idf,reskey){
-	var res = [], 
+	var res = [],
 			fn = isRegExp(idf) ? cit(regCheck,idf) :
 			(isFn(idf) ? idf : fseq(idf));
 	fov(clone(list),function(val,key,selflist){
-		if(fn.apply(selflist,arguments)) 
+		if(fn.apply(selflist,arguments))
 			this.push(reskey ? key : val);
 	},res);
 	return res;
@@ -650,7 +650,7 @@ function last(ary){
 // @use mapKey
 // @export map
 function mapValue(list,fn){
-	var isArr = isArrayLike(list), 
+	var isArr = isArrayLike(list),
 			result = isArr ? [] : {};
 
 	(isArr ? al : ol)(list,function(val,key,list){
@@ -795,7 +795,7 @@ function countBy(list,by){
 	return res;
 }
 
-// Pairs Object to array 
+// Pairs Object to array
 // @use pairs
 // @use unpairs
 // @export *pair(s)
@@ -932,8 +932,8 @@ var intsec = createIntsec(), slimIntsec = createIntsec(true);
 // merge([1,2,3],[2,1,3],[3,4],[1,5]) => [1,5,3]
 // merge({ a:1 },{ a:2,b:{c:1} },{ b:{d:4} }) => { a:1,b:{c:1,d:4} }
 function mergeCompare(v,n){
-	return (!isPrimitive(v) && !isPrimitive(n)) && 
-				((isDefine(v,"Object") && isDefine(n,"Object")) || 
+	return (!isPrimitive(v) && !isPrimitive(n)) &&
+				((isDefine(v,"Object") && isDefine(n,"Object")) ||
 				(isArrayLike(v) && isArrayLike(n)));
 }
 
@@ -942,7 +942,7 @@ function merge(f){
 
 	// deeping reduce to merge
 	if(isArray(f)) reduce(collect,function(val,next){
-		return al(next,function(nextval,i){ 
+		return al(next,function(nextval,i){
 			var v = val[i], n = nextval;
 			val[i] = mergeCompare(v,n) ? merge(v,n) : n;
 		}),(res=val);
@@ -981,7 +981,7 @@ function dropTo(ary,it){
 			fn = isRegExp(it) ? cit(regCheck,it) : (isFn(it) ? it : fseq(it));
 
 	for(i=res.length; i--; )
-		if(fn(res[key]())) 
+		if(fn(res[key]()))
 			break;
 	return res;
 }
@@ -992,8 +992,8 @@ function flatten(){
 			deep = isDefine(last(args),'Boolean') ? args.pop() : false;
 
 	return reduce(slice(args),function(flat,toFlat){
-		return flat.concat(deep ? 
-			(isArray(toFlat) ? flatten(toFlat,deep) : toFlat) : toFlat); 
+		return flat.concat(deep ?
+			(isArray(toFlat) ? flatten(toFlat,deep) : toFlat) : toFlat);
 	},[]);
 }
 
@@ -1066,7 +1066,7 @@ function randomDate(){
 // random like dice [ method ]
 // only odd
 function randomDice(max){
-	max = toNumber(max) > 0 ? toNumber(max) : 2; 
+	max = toNumber(max) > 0 ? toNumber(max) : 2;
 	return randomInt(1,(max%2===0?max:max+1));
 }
 
@@ -1124,8 +1124,8 @@ function once(fn){
 // slim equal [ method ]
 // performance see the test [ benchmark/eq.html ]
 function eq(x,y){
-	if(x===y || 
-		ts.call(x) !== ts.call(y) || 
+	if(x===y ||
+		ts.call(x) !== ts.call(y) ||
 		(isPrimitive(x) && isPrimitive(y)))
 		return x===y;
 
@@ -1165,23 +1165,23 @@ var whiteSpace = /[\t\r\n\f\x20]/g,
 // @export requery
 function requery(serializea){
 	var res = {};
-	al(serializea,function(elm){ 
-		res[elm.name] = elm.value; 
+	al(serializea,function(elm){
+		res[elm.name] = elm.value;
 	});
 	return res;
 }
 
-function rSpace(part){ 
-	return decodeURIComponent(part.replace(/\+/g," ")); 
+function rSpace(part){
+	return decodeURIComponent(part.replace(/\+/g," "));
 }
 
-function rInsignia(part){ 
-	return encodeURIComponent(part).replace(" ","%20"); 
+function rInsignia(part){
+	return encodeURIComponent(part).replace(" ","%20");
 }
 
 function paramParse(url){
 	var turl = toString(url).split("#").shift(),
-			
+
 			findQuery = turl.indexOf("?") , match , x = {},
 			param = ~findQuery ? turl.substr(findQuery+1) : turl;
 
@@ -1252,7 +1252,7 @@ var encodeReg    = /[&<">'](?:(amp|lt|quot|gt|#39);)?/g,
 		tagRightReg  = new RegExp(sReg+'>','g'),
 		tagCloseReg  = new RegExp('</'+sReg,'g');
 
-// String Methods 
+// String Methods
 // @use trim
 // @use trimLeft
 // @use trimRight
@@ -1299,7 +1299,8 @@ function collapse(s){
 
 function rize(s,and,upper){
 	var cmd = upper ? "toUpperCase" : "toLowerCase",
-		c = toString(and) || '-'; 
+			c = toString(and) || '-';
+
 	return s.replace(upperReg,function(charz,index){
 		return (index>0 ? c : '') + charz[cmd]();
 	});
@@ -1318,14 +1319,14 @@ function c_escape(et){ return '\\' + escapes[et]; }
 //
 // @export html(command)
 function encodeHTML(str){
-	return +str===str ? 
+	return +str===str ?
 					str :
 					toString(str).replace(encodeReg,c_ecode);
 }
 
 function decodeHTML(str){
-	return +str===str ? 
-					str : 
+	return +str===str ?
+					str :
 					toString(str).replace(decodeReg,c_dcode);
 }
 
@@ -1357,7 +1358,7 @@ var cmExec = /^([\S]+)\s?([\s\S]+)?/;
 var agExec = /[\[\]]*/g;
 
 function makeComand(command){
-	var res = "", 
+	var res = "",
 			cms = cmExec.exec(trim(command)),
 			cmd = cms[1],
 			param = cms[2];
@@ -1397,13 +1398,13 @@ function makeComand(command){
 }
 
 function compiLing(usestruct,who,useargs){
-	return "'; struct."+usestruct+'()('+who+","+ 
+	return "'; struct."+usestruct+'()('+who+","+
 				"function("+useargs.replace(agExec,'')+"){ _p+='";
 }
 
 function compSaze(usestruct,who,useargs,assign){
 	var api = usestruct.split(":");
-	return "'; "+ (assign ? (who+"=") : "") + 
+	return "'; "+ (assign ? (who+"=") : "") +
 				"struct."+api[0]+'("'+(api[1]||"")+'")('+who+","+
 				useargs.replace(agExec,'')+"); _p+='";
 }
@@ -1428,9 +1429,9 @@ function DOOM(txt,bounds,name){
 		args = slice(arguments,2),
 		exp = new RegExp(
 						this.escape +
-			"|" + this.interpolate + 
-			"|" + this.command + 
-			"|" + this.evaluate + 
+			"|" + this.interpolate +
+			"|" + this.command +
+			"|" + this.evaluate +
 			"|$",
 			"g");
 
@@ -1441,7 +1442,7 @@ function DOOM(txt,bounds,name){
 		interpolate,
 		command,
 		evaluate,
-		offset 
+		offset
 	){
 		res += txt.slice(position,offset).replace(escaper,c_escape);
 		// refresh index where to find text string
@@ -1476,19 +1477,19 @@ function DOOM(txt,bounds,name){
 	// Complete building Function string
 	// try to build anmousyous function
 	// console.warn(res);
-	try{ render = ev("(function(_bounds,struct,"+(rname||"_x_")+(args.length?","+args.toString():"")+"){ "+res+" })"); 
+	try{ render = ev("(function(_bounds,struct,"+(rname||"_x_")+(args.length?","+args.toString():"")+"){ "+res+" })");
 	}catch(e){ console.error(e.res = res); throw e; }
 
 	// @ Precomplete JavaScript Template Function
 	// @ the you build once template that use diff Data, not use diff to build function again
 	// @ protect your template code other can observe it?
-	
-	// _ = function(data){ return eq(arguments,render.pre) ? (render.complete) : 
+
+	// _ = function(data){ return eq(arguments,render.pre) ? (render.complete) :
 	// 	(render.pre=arguments, render.complete = trim(render.apply(this,
 	// 		[data,methods,struct].concat(slice(arguments,1))
 	// 	)));
 	// };
-	
+
 	bounder = [ methods, struct ];
 
 	_ = function(){
@@ -1497,7 +1498,7 @@ function DOOM(txt,bounds,name){
 		));
 	};
 
-	return _; 
+	return _;
 	// ignore eval
 	eval(_);
 }
@@ -1570,7 +1571,7 @@ function dataMIME(enable,header,param){
 				return paramStringify(param||{});
 			case 1:
 				return JSON.stringify(param||{});
-			default: 
+			default:
 				return paramStringify(param||{});
 		}
 	return param;
@@ -1608,7 +1609,7 @@ function aix(option){
 		var cache = JSON.parse(ls.getItem("_"));
 		var data = cache[config.url || root.location.href.split("#").shift()];
 
-		if(data!==void 0) 
+		if(data!==void 0)
 			return config.sucess.call(root,data);
 	}
 
@@ -1634,15 +1635,15 @@ function aix(option){
 	);
 
 	// with POST method
-	cType = isObj(config.header) ? 
-		(config.header["Content-Type"] || "application/x-www-form-urlencoded" ) : 
+	cType = isObj(config.header) ?
+		(config.header["Content-Type"] || "application/x-www-form-urlencoded" ) :
 		"application/x-www-form-urlencoded";
 
 	if(config.header !== broken && isObj(config.header))
 		ol(config.header,function(val,key){ xhr.setRequestHeader(key,val); });
 
-	if(config.type.toUpperCase() === "POST" && 
-		config.contentType === true && 
+	if(config.type.toUpperCase() === "POST" &&
+		config.contentType === true &&
 		(cType||"").search("json")===-1)
 		xhr.setRequestHeader("Content-Type",cType+";chartset="+config.charset);
 
@@ -1679,8 +1680,8 @@ function aix(option){
 	}
 
 	// send request
-	return xhr.send(config.param ? 
-		(isObj(config.param) ? 
+	return xhr.send(config.param ?
+		(isObj(config.param) ?
 			dataMIME(config.contentType,MIME[cType],config.param) :
 			config.param ) : null),xhr;
 }
@@ -1758,7 +1759,7 @@ function ajaxPOST(url,param,sucess,error){
 	});
 }
 
-// Struct Events 
+// Struct Events
 // object add custom event, use [ emit ] to trigger
 // @use addEvent
 // @use removeEvent
@@ -1769,9 +1770,9 @@ var _events = {} , _eid=0;
 function addEvent(obj,type,fn){
 	var id = obj._eid || 0;
 	if(id === 0) define(obj, "_eid",
-		{ value : (id = (++_eid)), 
-			writable : false, 
-			enumerable: false, 
+		{ value : (id = (++_eid)),
+			writable : false,
+			enumerable: false,
 			configurable: true });
 	if(!_events[id]) _events[id] = {};
 	if(!_events[id][type]) _events[id][type] = [];
@@ -1807,11 +1808,11 @@ function hasEvent(obj,type,fn){
 function copyEvent(toobj,related){
 	var rid = (isObj(related) ? related._eid : 0) || 0;
 	if(rid){
-		define(toobj,"_eid",{ 
-			value : ++_eid, 
-			writable : false, 
-			enumerable: false, 
-			configurable: true 
+		define(toobj,"_eid",{
+			value : ++_eid,
+			writable : false,
+			enumerable: false,
+			configurable: true
 		});
 
 		_events[toobj._eid] = clonedeep(_events[rid]);
@@ -1843,12 +1844,12 @@ function getProp(obj,prop,dowith){
 	var tmp,i,keygen = toString(prop||"").split(".");
 
 	if(keygen.length === 1){
-		if(obj.hasOwnProperty(prop)) 
+		if(obj.hasOwnProperty(prop))
 			tmp = obj[prop];
 	}else{
 		// [a.b.2]
 		for(i=0,tmp=obj; i<keygen.length; i++)
-			if(isPrimitive(tmp = tmp[keygen[i]])) 
+			if(isPrimitive(tmp = tmp[keygen[i]]))
 				break;
 	}
 
@@ -1883,7 +1884,7 @@ function rmProp(obj,prop){
 			delete obj[prop];
 	}else{
 		for(i=0,tmp=obj,end = keygen.pop(); i<keygen.length; i++)
-			tmp = tmp[keygen[i]]; 
+			tmp = tmp[keygen[i]];
 		if(isArray(tmp))
 			tmp.splice(toNumber(end),1);
 		else
@@ -1895,8 +1896,8 @@ function rmProp(obj,prop){
 // return random element [ method ]
 // auto([1,2,3,4,5]) => random(in ary);
 function auto(ary,num){
-	return toNumber(num) > 1 ? 
-		slice(shuffle(ary),0,toNumber(num)) : 
+	return toNumber(num) > 1 ?
+		slice(shuffle(ary),0,toNumber(num)) :
 		ary[randomInt(size(ary)-1)];
 }
 
@@ -1908,8 +1909,9 @@ function auto(ary,num){
 // size(NaN) => 0
 function size(n){
 	if(!isFn(n) && n!= null && !isNaN(n))
-		return isNum(n.length) ? n.length : 
+		return isNum(n.length) ? n.length :
 			(isObj(n) ? keys(n).length : 0);
+
 	return 0;
 }
 
@@ -1925,8 +1927,8 @@ function values(obj,prop){
 
 	if(isDefine(obj,"String")) return obj.split('');
 
-	fov(obj,function(val){ 
-		res.push(withProp ? getProp(val,prop) : val); 
+	fov(obj,function(val){
+		res.push(withProp ? getProp(val,prop) : val);
 	});
 	return res;
 }
@@ -1937,8 +1939,9 @@ function memoize(fn,context){
 	return function(){
 		var args = slice(arguments),df;
 		for(i=memo.length; i--; )
-			if(eq(memo[i][0],args)) 
+			if(eq(memo[i][0],args))
 				return (df=memo[i][1]);
+
 		memo.push([args,df=fn.apply(context||this,args)]);
 		return df;
 	};
@@ -1960,11 +1963,11 @@ function negate(fn,context){
 // var c = function(t){ return "<c>"+t+"<c>"}
 // var w = wrap(a,b,c);
 // w("tag") => "<c><b><a>tag<a><b><c>"
-function wrap(){ 
-	var arg = slice(arguments); 
-	return function(x){ 
+function wrap(){
+	var arg = slice(arguments);
+	return function(x){
 		return reduce(arg,function(val,fn){ return fn(val); },x);
-	}; 
+	};
 }
 
 function sort(ary,key){
@@ -2000,7 +2003,7 @@ function QST_part(ary,left,right){
 	var pivotValue = ary[right], i=left, index = left;
 
 	for(; i<right; i++)
-		if(ary[i]<pivotValue) 
+		if(ary[i]<pivotValue)
 			swap(ary,i,index,index++);
 
 	swap(ary,right,index);
@@ -2041,7 +2044,7 @@ function frozen(){
 function hz(fn,time,context){
 	var fq;
 	return function(){
-		if(!fq) 
+		if(!fq)
 			ayc((fn.apply((fq = 1,context),arguments),
 				function(){ fq = 0; }),time);
 	};
@@ -2090,7 +2093,7 @@ function combined(nameArr,valueArr){
 	var res = {};
 
 	if(isArray(nameArr) && isArray(valueArr))
-		al(nameArr,function(name,index){ 
+		al(nameArr,function(name,index){
 			res[name] = valueArr[index]; });
 
 	return res;
@@ -2182,7 +2185,7 @@ var $type = {
 	num: isNum,
 	number: isNum,
 	fn: isFn,
-	function:isFn,
+	func: isFn,
 	nan: isNaN,
 	prim: isPrimitive,
 	primitive: isPrimitive,
@@ -2351,7 +2354,7 @@ $event = {
 	on: addEvent,
 	add: addEvent,
 	bind: addEvent,
-	
+
 	off: removeEvent,
 	remove: removeEvent,
 	unbind: removeEvent,
@@ -2508,10 +2511,10 @@ zublist = {
 // Generators
 // @define base symbol
 ol(nublist,function(fn,key){
-	chain.prototype[key] = function(){ 
+	chain.prototype[key] = function(){
 		return this['='].push(fn),this; };
 	nub(fn,key);
-}); 
+});
 
 ol(zublist,function(fn,key){
 	chain.prototype[key] = function(use){

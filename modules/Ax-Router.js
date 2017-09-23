@@ -3,7 +3,6 @@
 
 ax.module("Router",function(ax,struct){
 'use strict';
-
 // Router use HTML5 History API
 
 // * use pushState or replaceState
