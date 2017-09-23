@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.0.25";
+struct.VERSION = "4.0.28";
 
 // base method
 var or = {},
@@ -345,7 +345,7 @@ function cool(e){
 // @use toHEX => RGBToHex
 // @export convert(method)
 function toString(s){
-	return s!=null ? (typeof s.toString === "function" ? s.toString() : s+'') : '';
+	return s!=null ? (isFn(s.toString) ? s.toString() : s+'') : '';
 }
 
 function toNumber(s){

@@ -66,7 +66,7 @@
 	_toString = struct.convert('string'),
 	_type     = struct.type(),
 	_isObj    = struct.type('object'),
-	_isFn     = struct.type('function'),
+	_isFn     = struct.type('func'),
 	_isNum    = struct.type('num'),
 	_isBool   = struct.type("bool"),
 	_isStr    = struct.type("str"),
