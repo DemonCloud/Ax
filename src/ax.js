@@ -16,8 +16,9 @@
 	else if(typeof exports !== "undefined")
 		// support CommonJS exports
 		// * fuck the npm package rubbish offset name, where package name use [ struct ]
-		// should defined webpack alias with [ "struct" : "ax-struct-js" ]
-		factory(exports,require('ax-struct-js'));
+		// * should defined Webpack alias as [ "struct" : "ax-struct-js" ]
+		// factory(exports,require('ax-struct-js'));
+		factory(exports,require('struct'));
 	else
 		// build on browser global object
 		root.ax = factory(ax,root.struct);
