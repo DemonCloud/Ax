@@ -26,56 +26,26 @@
 <script src="./modules/Ax-Router.js"></script>
 <script src="./modules/Ax-Loader.js"></script>
 
-<script id="state" type="ax/tpl">
-	<form id="form">
-		<input ref="name" id="name" maxlength=10><button id="add">Add</button>
-		<ul>
-		{{* each [item,i] in list }}
-			 <li style="max-width:168px">
-				<span>{{-item.name}}</span>
-				<b class="del" key={{-i}}>×</b>
-			 </li>
-		{{* end }}
-		</ul>
-	</form>
-</script>
-
 <script>
+
 //example3
 var model = ax.model({
-	name:"todolist",
-	data:{
-		list:[]
-	},
-	store: true,
-});
+	data: {
+		sma: [1,2,3],
 
-var view = ax.view({
-	template: document.getElementById("state").innerHTML,
-
-	model: model,
-
-	events:{
-		"submit:#form":function(event){
-			event.preventDefault();
-			var name = this.refs.name;
-			var getName = name.value.trim();
-			if(getName){
-				name.value="";
-				this.model.moc("list",{ name : getName });
-			}
+		spm: {
+			a: 123,
+			b: 321,
+			c: 2
 		},
 
-		"click:.del":function(event){
-			this.model.rm("list."+event.target.key);
-		}
+		snb: "noob"
 	}
 });
 
-view.mount(
-	document.getElementById("app"),
-	model.get()
-);
+model.on("change:spm",val=>console.log(val));
+
+model.set("spm.b",888)
 
 </script>
 </body>

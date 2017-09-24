@@ -1258,7 +1258,7 @@
 		},
 
 		decyt: function(s,key){
-			s = this.dcd(s); 
+			s = this.dcd(s);
 			var i=0, l=s.length;
 			for(; i<l; i++)
 				s[i] = FCD(s[i]^this.kAt(key,i));
@@ -1310,6 +1310,7 @@
 		}));
 
 		if(existname) RAM[this.name] = this;
+
 		// init event
 		_extend(this,config,MODEL_KEYWORDS).emit("init").unbind("init");
 	};
@@ -1326,13 +1327,14 @@
 		},
 
 		set: function(key,val,setStatic){
-			if(this.lock) return;
+			if(this.lock) return this;
 
 			var assert = this._ast(cool,_),
 					argslen = arguments.length,
 					ref, single = !_isPrim(key) && _isObj(key);
 
 			if(argslen){
+
 				if(single){
 					// single pointer select
 					setStatic = val;
@@ -1342,7 +1344,9 @@
 						checkValidate(ref,this)){
 
 						this._c(ref,_,this.change=true);
+
 						if(this._s) aS.set(this.name,ref);
+
 						if(!setStatic)
 							this.emit("change",[_clone(ref)]);
 					}
@@ -1353,9 +1357,19 @@
 
 						_set(assert,key,val,this.change = true);
 						if(this._s) aS.set(this.name,assert);
+
 						if(!setStatic){
 							this.emit("change",[_clone(assert)]);
-							this.emit("change:"+key,[val]);
+
+							var pkey = key.split(".");
+							var tkey = pkey[0];
+							var tval = {};
+
+							tval[tkey] = _clone(assert[tkey]);
+
+							if(pkey.length > 1)
+								this.emit("change:"+tkey,[tval]);
+							this.emit("change:"+key,[tval]);
 						}
 					}
 				}
@@ -1366,7 +1380,7 @@
 		},
 
 		rm: function(prop,rmStatic){
-			if(this.lock) return;
+			if(this.lock) return this;
 
 			var assert = this._ast(cool,_);
 
@@ -1396,6 +1410,13 @@
 		on: on,
 		emit: emit,
 		unbind: unbind,
+
+		subscribe: function(eventList,fn){
+			_fal(eventList,function(event){
+				this.on(event,fn);
+			},this);
+			return this;
+		},
 
 		// Ax Restful API design for
 		// [Ax Model] data format serialize
@@ -1683,7 +1704,9 @@
 	function stom(atom,list){
 		var c = ax.atom({ use:list });
 
-		c.back = function(){ return atom; };
+		c.back = function(){
+			return atom;
+		};
 
 		return c;
 	}
@@ -1750,14 +1773,15 @@
 		},
 
 		toData: function(){
-			return _map(
-				this._assert(cool,_),
+			return _map(this._assert(cool,_),
 				function(m){ return m.get(); });
 		},
 
 		toChunk: function(){
 			var res = {};
-			this.of(function(model){ res[model.name] = model.get(); });
+			this.of(function(model){
+				res[model.name] = model.get();
+			});
 			return res;
 		}
 	};
@@ -1780,7 +1804,7 @@
 	// ax validate functional
 	ax.va = vA = {
 		required  : makeChecker(_isNeed  , "required")  ,
-		fn        : makeChecker(_isFn    , "function")  ,
+		func      : makeChecker(_isFn    , "function")  ,
 		int       : makeChecker(_isInt   , "int")       ,
 		array     : makeChecker(_isAry   , "array")     ,
 		float     : makeChecker(_isFloat , "float")     ,
