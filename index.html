@@ -30,6 +30,8 @@
 
 //example3
 var model = ax.model({
+	name: "spm",
+
 	data: {
 		sma: [1,2,3],
 
@@ -43,7 +45,7 @@ var model = ax.model({
 	}
 });
 
-model.on("change:spm",val=>console.log(val));
+model.on("back",source=>console.log("back",source));
 
 model.set("spm.b",888)
 

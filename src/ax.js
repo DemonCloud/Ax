@@ -36,7 +36,7 @@
 
 	ATOM_KEYWORDS   = ["use","events","_assert"],
 	VIEW_KEYWORDS   = ["root","mount","props","events","render","template","destroy","cache"],
-	MODEL_KEYWORDS  = ["name","data","store","change","events","validate","filter"],
+	MODEL_KEYWORDS  = ["name","data","store","change","events","validate","filter","lock"],
 
 	VIEW_DEFAULT    = { },
 	ATOM_DEFAULT    = { use:[] },
@@ -99,7 +99,9 @@
 	_index    = struct.index(),
 	_one      = struct.index("one"),
 	_decode   = struct.html("decode"),
-	cool      = struct.cool();
+	cool      = struct.cool(),
+	broken    = struct.broken;
+
 
 	// ax genertor function
 	function genertor_(api){
@@ -1121,9 +1123,11 @@
 
 	function moc(target,val){
 		var res;
+
 		if(_isAry(target)) res = target.concat(val);
-		else if(_isObj(target)) res = _merge(_extend({},target),val);
+		else if(_isObj(target)) res = _merge(_clone(target),val);
 		else res = val;
+
 		return res;
 	}
 
@@ -1147,13 +1151,15 @@
 	}
 
 	function pipe(type,url,param,fns,fnf,header){
+		if(this._asl(_)) return this;
+
 		//param must be object typeof
 		var st = {
 			url : url,
 			type  : RESTFUL[type],
 			aysnc : true,
-			param : param,
-			header : header
+			param : param || this.param || broken,
+			header : header || this.header || broken
 		};
 
 		// deal with arguments
@@ -1176,6 +1182,11 @@
 		return str.split("").reverse().join("");
 	}
 
+	function assert(data){
+		return function(tdo,v){
+			return (_isFn(tdo)&&v===_) ? tdo(data) : []; };
+	}
+
 	function modelDefined(model,props){
 		_fol(props,function(t,n){
 			_define(model, n, { value: t,
@@ -1187,6 +1198,12 @@
 		return model;
 	}
 
+	function modelAsset(returnValue,or){
+		return function(validate){
+			return validate === _ ? returnValue : or;
+		};
+	}
+
 	ax.module = function(name,creater){
 		var make = maker[name];
 		if(make) return make;
@@ -1196,7 +1213,7 @@
 
 	ax.use = function(name){
 		if(maker[name]) return maker[name];
-		console.warn("Ax was not find dependency injection { module } as: [",name,"]");
+		console.error("Ax could not find dependency injection Module as: [",name,"]");
 	};
 
 	aS = {
@@ -1283,25 +1300,31 @@
 	};
 
 	// Ax Model
-	// Ax build -> 3.0
 	// model constructor
 	aM = function(obj){
+
 		var config    = _extend(_clone(MODEL_DEFAULT),obj||{}),
 				events    = config.events,
 				validate  = config.validate||{},
-				filter    = _isFn(config.filter) ? config.filter : cool ,
+				filter    = _isFn(config.filter) ? config.filter : cool,
 
 				existname = _isStr(config.name),
-				usestore  = !!(config.store && existname),
+				usestore  = !!config.store && existname,
 				usedata   = config.data || {},
-				data      = usestore ? (aS.get(config.name) || usedata) : usedata;
+				data      = usestore ? (aS.get(config.name) || usedata) : usedata,
+				lock      = this.isLock = !!config.lock,
+				ram       = [];
 
 		_fol(events,uon,modelDefined(this,{
-			name: existname ? config.name : "_",
-			_ast: function(todo,v){
-				return v===_ ? todo(data) : {}; },
-			_asv: function(v){
-				return v===_ ? validate : {}; },
+			name: existname ? config.name : "",
+			_lock: function(state,v){
+				if(v===_) lock = state; },
+			_ast: assert(data),
+			_asl: function(v){
+				return v===_ ? lock : null; },
+			_asv: modelAsset(validate,{}),
+			_ash: modelAsset(ram,[]),
+
 			_v: !!_size(validate),
 			_f: filter,
 			_c: function(newdata,v){
@@ -1309,10 +1332,17 @@
 			_s: usestore
 		}));
 
-		if(existname) RAM[this.name] = this;
+		if(existname){
+
+			if(RAM[this.name])
+				console.error("Model.name: ['"+this.name+"'] has already registered, prev model will be overwrite in atom cache indexes");
+
+			RAM[this.name] = this;
+		}
 
 		// init event
 		_extend(this,config,MODEL_KEYWORDS).emit("init").unbind("init");
+
 	};
 
 
@@ -1321,15 +1351,39 @@
 	aMP = aM.prototype = {
 		constructor: aM,
 
+		lock: function(){
+			this._lock(this.isLock=true,_);
+			return this.emit("lock");
+		},
+
+		unlock: function(){
+			this._lock(this.isLock=false,_);
+			return this.emit("unlock");
+		},
+
+		back: function(){
+			if(this._asl(_)) return this;
+
+			var ram = this._ash(_), source;
+
+			if(ram.length && (source = ram.pop())){
+				this._c(source,_,this.change=true);
+				this.emit("change,back",[source]);
+			}
+
+			return this;
+		},
+
 		get: function(key,by){
 			var data = this._ast(_clone,_);
 			return (key || key===0) ? _get.call(this,data,key,by) : data;
 		},
 
 		set: function(key,val,setStatic){
-			if(this.lock) return this;
+			if(this._asl(_)) return this;
 
 			var assert = this._ast(cool,_),
+					assertram = this._ash(_),
 					argslen = arguments.length,
 					ref, single = !_isPrim(key) && _isObj(key);
 
@@ -1343,27 +1397,37 @@
 						!_eq(assert,ref)&&
 						checkValidate(ref,this)){
 
+						// create history
+						assertram.push(_clone(assert));
+
 						this._c(ref,_,this.change=true);
 
-						if(this._s) aS.set(this.name,ref);
+						if(this._s)
+							aS.set(this.name,ref);
 
 						if(!setStatic)
-							this.emit("change",[_clone(ref)]);
+							this.emit("change",[ref]);
 					}
 
 				} else {
+
 					if(!_eq(_get(assert,key),val) &&
 						singleValidate(key,val,this)){
 
+						// create history
+						assertram.push(_clone(assert));
+
 						_set(assert,key,val,this.change = true);
-						if(this._s) aS.set(this.name,assert);
+
+						if(this._s)
+							aS.set(this.name,assert);
 
 						if(!setStatic){
 							this.emit("change",[_clone(assert)]);
 
-							var pkey = key.split(".");
-							var tkey = pkey[0];
-							var tval = {};
+							var pkey = key.split("."),
+									tkey = pkey[0],
+									tval = {};
 
 							tval[tkey] = _clone(assert[tkey]);
 
@@ -1372,6 +1436,7 @@
 							this.emit("change:"+key,[tval]);
 						}
 					}
+
 				}
 
 			}
@@ -1379,16 +1444,23 @@
 			return this;
 		},
 
+
 		rm: function(prop,rmStatic){
-			if(this.lock) return this;
+			if(this._asl(_)) return this;
 
-			var assert = this._ast(cool,_);
+			var assert = this._ast(cool,_),
+					assertram = this._ash(_);
 
-			if(_isPrim(prop) &&
-				prop!=null &&
-				_get(assert,prop) !== void 0){
+			if(_isPrim(prop) && prop!=null){
+
+				// create history
+				assertram.push(_clone(assert));
+
 				_rm(assert,prop);
-				if(this._s) aS.set(this.name,assert);
+
+				if(this._s)
+					aS.set(this.name,assert);
+
 				if(!rmStatic){
 					this.emit("change",[_clone(assert)]);
 					this.emit("remove:"+prop);
@@ -1399,11 +1471,15 @@
 		},
 
 		moc: function(key,val,setStatic){
-			return this.set(
-				key,
-				moc(this.get(key),val),
-				setStatic
-			);
+			if(this._asl(_)) return this;
+
+			if(_isStr(key) && 1 in arguments){
+				var target = this.get(key);
+
+				this.set(key, moc(target,val), setStatic);
+			}
+
+			return this;
 		},
 
 		// API event
@@ -1412,9 +1488,9 @@
 		unbind: unbind,
 
 		subscribe: function(eventList,fn){
-			_fal(eventList,function(event){
-				this.on(event,fn);
-			},this);
+			_fal(_isStr(eventList) ? eventList.split(",") : eventList,
+			function(event){ this.on(event,fn); },this);
+
 			return this;
 		},
 
@@ -1613,7 +1689,7 @@
 				// DOM Element events
 				if(param.length > 1)
 					z(this.root).off(param[0], param[1], fn ? (fn._bind||fn) : void 0);
-				else 
+				else
 					_unbind(this,mk,fn);
 			},this);
 
@@ -1659,11 +1735,6 @@
 		};
 	}
 
-	function assert(LIST){
-		return function(tdo,v){
-			return (_isFn(tdo)&&v===_) ? tdo(LIST) : []; };
-	}
-
 	function assertModel(name){
 		return function(m){
 			return m.name === name;
@@ -1673,6 +1744,7 @@
 	function assertMake(list,callback){
 		var LIST = this._assert(cool,_);
 		var target = _isStr(list) ? [list] : (_isAry(list) ? list : []);
+
 		_fal(target,function(name){
 			callback.call(this,LIST,name);
 		},this);
