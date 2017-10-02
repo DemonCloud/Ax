@@ -1,6 +1,6 @@
 {
   "name": "ax-js",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "[ Ax ] is a Fast Javascript MVR Framework",
   "main": "dist/ax.min.js",
   "homepage": "https://demoncloud.github.io/Ax",
@@ -30,7 +30,7 @@
     "url": "https://github.com/DemonCloud/Ax/issues"
   },
   "dependencies": {
-    "ax-struct-js": "^4.0.30"
+    "ax-struct-js": "^4.1.0"
   },
   "devDependencies": {
     "browser-sync": "latest",

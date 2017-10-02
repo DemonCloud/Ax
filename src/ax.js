@@ -102,7 +102,6 @@
 	cool      = struct.cool(),
 	broken    = struct.broken;
 
-
 	// ax genertor function
 	function genertor_(api){
 		var apiName, apiUse, apiSelect, Use;
@@ -1182,11 +1181,6 @@
 		return str.split("").reverse().join("");
 	}
 
-	function assert(data){
-		return function(tdo,v){
-			return (_isFn(tdo)&&v===_) ? tdo(data) : []; };
-	}
-
 	function modelDefined(model,props){
 		_fol(props,function(t,n){
 			_define(model, n, { value: t,
@@ -1199,8 +1193,8 @@
 	}
 
 	function modelAsset(returnValue,or){
-		return function(validate){
-			return validate === _ ? returnValue : or;
+		return function(v){
+			return v === _ ? returnValue : or;
 		};
 	}
 
@@ -1317,9 +1311,9 @@
 
 		_fol(events,uon,modelDefined(this,{
 			name: existname ? config.name : "",
-			_lock: function(state,v){
-				if(v===_) lock = state; },
-			_ast: assert(data),
+			_ast: function(todo,v){
+				return v===_ ? todo(data) : {};
+			},
 			_asl: function(v){
 				return v===_ ? lock : null; },
 			_asv: modelAsset(validate,{}),
@@ -1327,6 +1321,8 @@
 
 			_v: !!_size(validate),
 			_f: filter,
+			_l: function(state,v){
+				if(v===_) lock = state; },
 			_c: function(newdata,v){
 				return v===_ ? (data = newdata) : {}; },
 			_s: usestore
@@ -1352,12 +1348,12 @@
 		constructor: aM,
 
 		lock: function(){
-			this._lock(this.isLock=true,_);
+			this._l(this.isLock=true,_);
 			return this.emit("lock");
 		},
 
 		unlock: function(){
-			this._lock(this.isLock=false,_);
+			this._l(this.isLock=false,_);
 			return this.emit("unlock");
 		},
 
@@ -1393,8 +1389,8 @@
 					// single pointer select
 					setStatic = val;
 
-					if((ref=this._f(key))&&
-						!_eq(assert,ref)&&
+					if((ref=this._f(key)) &&
+						!_eq(assert,ref) &&
 						checkValidate(ref,this)){
 
 						// create history
@@ -1433,6 +1429,7 @@
 
 							if(pkey.length > 1)
 								this.emit("change:"+tkey,[tval]);
+
 							this.emit("change:"+key,[tval]);
 						}
 					}
