@@ -86,6 +86,7 @@
 	_on       = struct.event('on'),
 	_unbind   = struct.event('unbind'),
 	_emit     = struct.event('emit'),
+	_hasEvent = struct.event('has'),
 	_get      = struct.prop('get'),
 	_set      = struct.prop('set'),
 	_rm       = struct.prop('not'),
@@ -163,9 +164,12 @@
 
 	function createExtend(Use){
 		return function(malloc){
-			return function(o){
+			var extender = function(o){
 				return new Use(_merge(malloc,_isObj(o) ? o : {}));
 			};
+
+			extender.constructor = Use;
+			return extender;
 		};
 	}
 
@@ -587,7 +591,7 @@
 		if(key[0] === ":" && _isFn(val))
 			z(elm).off(key.slice(1),val);
 		else if(elm[key] && !(delete elm[key]))
-			try{ elm[key] = null; }catch(e){ }
+			try{ elm[key] = null; }catch(e){ /**/ }
 		else
 			elm.removeAttribute(key);
 	};
@@ -636,11 +640,15 @@
 		//4 modifytext
 		function(patch){
 			var t = patch.s;
+			if(patch.isSlot)
+				return t.parentNode.replaceChild(patch.n,t);
 			t.textContent = _decode(patch.c);
 		},
 		//5 withtext
 		function(patch){
 			var t = patch.s;
+			if(patch.isSlot)
+				return t.parentNode.replaceChild(patch.n,t);
 			t.textContent = _decode(patch.c);
 		},
 		//6 removetext
@@ -673,6 +681,23 @@
 		}
 	];
 
+	// createSlot
+	var patchSlot = function(slot,elm){
+		var name = _isStr(slot) ? slot : "";
+
+		if(name && elm){
+			var slotParse = name.trim().split("::"),
+					slotName  = slotParse[0],
+					dataName  = slotParse[1];
+
+			return {
+				name: slotName,
+				path: dataName,
+				root: elm
+			};
+		}
+	};
+
 	// SLIK SINGE virtualDOM DIFF
 	var slik = {
 
@@ -686,16 +711,21 @@
 				patch.push(this.createPatch(org,0,3,view));
 
 			else if(org.tagName === tag.tagName){
+				if(tag.isSlot || org.isSlot){
+					patch.push(this.createPatch(org,tag,5,view));
+					return patch;
+				}
+
 				if(!_eq(org.attributes,tag.attributes)){
-					if(org.attributes&&tag.attributes) patch.push(this.createPatch(org,tag,8));
-					else if(!org.attributes) patch.push(this.createPatch(org,tag,7));
-					else if(!tag.attributes) patch.push(this.createPatch(org,tag,9));
+					if(org.attributes&&tag.attributes) patch.push(this.createPatch(org,tag,8,view));
+					else if(!org.attributes) patch.push(this.createPatch(org,tag,7,view));
+					else if(!tag.attributes) patch.push(this.createPatch(org,tag,9,view));
 				}
 
 				// some node , maybe modify
 				if(org.text !== tag.text){
-					if( org.text && tag.text && org.text !== tag.text) patch.push(this.createPatch(org,tag,4));
-					else if(!org.text) patch.push(this.createPatch(org,tag,5));
+					if( org.text && tag.text && org.text !== tag.text) patch.push(this.createPatch(org,tag,4,view));
+					else if(!org.text) patch.push(this.createPatch(org,tag,5,view));
 					else if(!tag.text) patch.push(this.createPatch(org,tag,6,view));
 					return patch;
 				}
@@ -765,6 +795,7 @@
 
 		createPatch: function(org,tag,type,view){
 			var node, patch, sl = this.createSelector(org);
+			var isSlot = tag.isSlot;
 
 			switch(patchList[type]){
 				case "replace":
@@ -779,10 +810,12 @@
 					patch = { t:3, s:sl };
 					break;
 				case "modifytext":
-					patch = { t:4, s:sl, c:tag.text };
+					patch = { t:4, s:sl, c:tag.text, isSlot: isSlot };
+					if( isSlot ) patch.n = this.createDOMElement(tag,view);
 					break;
 				case "withtext":
-					patch = { t:5, s:sl, c:tag.text };
+					patch = { t:5, s:sl, c:tag.text, isSlot: isSlot };
+					if( isSlot ) patch.n = this.createDOMElement(tag,view);
 					break;
 				case "removetext":
 					node = this.createDOMElement(tag,view);
@@ -806,7 +839,8 @@
 
 		createTreeFromHTML: function(html,vprops){
 			var axroot = {
-				tagName: "AXROOT",
+				tagName: "__AX_DEFAULT_VIEWROOT__",
+				isRoot: true,
 				child:[]
 			};
 
@@ -838,19 +872,24 @@
 					props = _isObj(vprops) ? vprops : {},
 					tagName = arr.shift(),
 					attributes = arr.join(" "),
-					elm =  { tagName: tagName, child:[] };
+					elm = {
+						tagName: tagName,
+						isSlot: tagName === "slot",
+						child:[]
+					};
 
 			if(attributes){
 				var attrs = {} ,s, tg;
 				while((s=attrexec.exec(attributes))){
 					if(!s[1]){
-						if(!tg)
+						if(!tg){
 							tg = s[0];
-						else{
+						}else{
 							attrs[tg] = attrEvent(tg,s[0],props); tg=0;
 						}
-					}else
+					}else{
 						attrs[s[1]] = attrEvent(s[1],s[2],props);
+					}
 				}
 				elm.attributes = attrs;
 			}
@@ -861,6 +900,7 @@
 		createDOMElement:function(obj,view){
 			var elm = document.createElement(obj.tagName);
 
+			// registered view.refs Update
 			if(view && obj.attributes && obj.attributes.ref)
 				view.refs[obj.attributes.ref] = elm;
 
@@ -868,13 +908,28 @@
 				attrSetter(elm,key,value);
 			});
 
-			if(obj.text)
-				elm.textContent = _decode(obj.text);
+			// parse if it's <slot>
+			// slot is significative in [ax.view]
+			if(view && obj.isSlot){
+				var slotComponent = patchSlot(obj.text,elm);
 
-			else if(obj.child.length)
+				// parser success
+				if(slotComponent)
+					view._updateSlotQueue.push(slotComponent);
+
+				return elm;
+			}
+
+			if(obj.text){
+				// pureText content
+				elm.textContent = _decode(obj.text);
+			}
+
+			if(obj.child.length){
 				_fal(obj.child,function(child){
 					elm.appendChild(this.createDOMElement(child,view));
 				},this);
+			}
 
 			return elm;
 		}
@@ -1052,7 +1107,7 @@
 		},
 
 		// virtual render
-		render : function(newhtml,view,props){
+		render : function(newhtml,view,props,args){
 			return this.each(function(elm){
 				var target = slik.createTreeFromHTML(newhtml,props);
 
@@ -1061,17 +1116,23 @@
 						view.axml = target, view
 					).firstElementChild, elm.innerHTML = "");
 
-				return slik.applyPatch(
+				slik.applyPatch(
 					elm,
 					slik.treeDiff(view.axml,target,[],null,null,view),
 					view.axml = target
 				);
+
+				// async render Slot
+				_fal(view._updateSlotQueue,
+					asyncRenderSlot.bind(view,args));
+
+				view._updateSlotQueue = [];
 			});
 		}
 	};
 
 	// checker template;
-	var checkalert = _doom("[ checker -> ax.va.{{#type}} ]"),
+	var checkalert = _doom("[ validate.{{#type}} ]"),
 			vahandler  = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
 
 	function checkValidate(newdata,model){
@@ -1131,15 +1192,23 @@
 	}
 
 	function warn(value,msg){
-		return !console.warn(
-			vahandler({ value : value, type : _type(value), msg : msg||"" })
+		console.warn(
+			vahandler({
+				value : value,
+				type : _type(value),
+				msg : msg||""
+			})
 		);
+
+		return false;
 	}
 
 	function makeChecker(checker,type){
-		return function(value){
-			return checker(value) ||
-				warn(value,checkalert({ type:type }));
+		return function(value,warnStatic){
+			var res = checker(value);
+			return !warnStatic ?
+				(res || warn(value,checkalert({ type:type }))) :
+				res;
 		};
 	}
 
@@ -1156,7 +1225,7 @@
 		var st = {
 			url : url,
 			type  : RESTFUL[type],
-			aysnc : true,
+			async : true,
 			param : param || this.param || broken,
 			header : header || this.header || broken
 		};
@@ -1597,9 +1666,60 @@
 		return true;
 	}
 
+	function asyncRenderSlot(args, slot){
+
+		var slotTarget = _get(this, slot.name);
+		if(!slotTarget) return;
+
+		var render = _noop;
+		var slotOneArg = args[0];
+		var slotData   = slot.path ?
+			(_isObj(slotOneArg) ? [_get(slotOneArg,slot.path)] : args) :
+			args;
+
+		// is truly view
+		if(vA.view(slotTarget,true)){
+			if(slotTarget.root){
+				render = function(){
+					slotTarget.root = slot.root;
+					slotTarget.render.apply(slotTarget,slotData);
+				};
+			}else{
+				render = function(){
+					slotTarget.mount.apply(slotTarget,[slot.root].concat(slotData));
+				};
+			}
+
+		} else if(slotTarget.constructor === aV){
+		// is extends constructor view
+			var t = slotTarget({ root: slot.root });
+
+			if(!t.axml)
+				render = function(){
+					t.render.apply(t, slotData);
+				};
+
+		} else if(_isFn(slotTarget)){
+			render = function(){
+				slotTarget.apply(this, [slot.root].concat(slotData));
+			}.bind(this);
+		} else if(_isStr(slotTarget) ||  _isNum(slotTarget)){
+			render = function(){
+				slot.root.textContent = slotTarget;
+			};
+		} else {
+			render = function(){
+				slot.root.textContent = "";
+			};
+		}
+
+		_ayc(render);
+	}
+
 	// Ax View [ The view container ]
 	aV = function(obj){
 		this.refs = {};
+		this._updateSlotQueue = [];
 
 		var config  = _extend(_clone(VIEW_DEFAULT),obj||{}),
 				props   = _lock(_isObj(config.props) ? config.props : {}),
@@ -1617,17 +1737,24 @@
 			(_isFn(stencil) ? stencil : _noop);
 
 			render = function(){
-				return stencil !== _noop &&
+				var args = _slice(arguments);
+
+				if(stencil !== _noop) {
 					z(this.root).render(
-						stencil.apply(this,_slice(arguments)),
-						this,
-						props
-					);
+						stencil.apply(this,arguments),
+						this, props, args);
+
+					// async render Slot
+					_fal(this._updateSlotQueue,
+						asyncRenderSlot.bind(this,args));
+					this._updateSlotQueue = [];
+				}
+
 			}.bind(this);
 		}
 
 		// if userobj has more events
-		if(vroot&&checkElm(vroot)){
+		if(vroot && checkElm(vroot)){
 			// bind events
 			this.root = vroot;
 
@@ -1637,6 +1764,7 @@
 				model.on("change",this.render);
 
 		}else{
+
 			this.mount = function(el){
 				if(checkElm(el)){
 					// bind events
@@ -1655,6 +1783,7 @@
 					return this;
 				}
 			};
+
 		}
 
 		_extend(this,config,VIEW_KEYWORDS,this._vid=vid++).emit("init").unbind("init");
@@ -1710,6 +1839,10 @@
 			}
 
 			return _emit(this,type,args);
+		},
+
+		hasEvent: function(type,fn){
+			return _hasEvent(this,type,fn);
 		},
 
 		destroy: function(withRoot){
@@ -1788,7 +1921,9 @@
 				LIST = [];
 
 		// create assert
-		this._assert = assert(LIST);
+		this._assert = function(todo,v){
+			return v===_ ? todo(LIST) : [];
+		};
 
 		_extend(this.use(initList),config,ATOM_KEYWORDS);
 	};

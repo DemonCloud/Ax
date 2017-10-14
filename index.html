@@ -2,25 +2,43 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title></title>
+	<title>Ax Test</title>
 </head>
 <body>
-<style>
-	.del{
-		display: inline-block;
-		margin-left: 5px;
-		background-color:#ccc;
-		cursor: pointer;
-		font-size: 12px;
-		font-weight: normal;
-		color: #fff;
-		padding: 1px 3px;
-	}
-</style>
 <div id="app"></div>
+<div id="app2"></div>
 
 <script src="./src/struct.js"></script>
 <script src="./src/ax.js"></script>
+<script id="tpl" type="text/ax">
+	<div id="appName">
+		<slot id="frslot">
+			components.childComponent::text
+		</slot>
+
+		<ul>
+		{{* for [item,index] in list }}
+			<li>
+				<b>{{#index}}:{{#item}}</b>
+			</li>
+		{{* /}}
+		</ul>
+
+		<slot id="seslot">
+			{{ if state === 1 }}
+			components.childComponent::text
+			{{ else }}
+			components.childSeComponent::text2
+			{{ /if }}
+		</slot>
+	</div>
+</script>
+<script id="tpl2" type="text/ax">
+	<div id="abc">
+		<div>{{#JSON.stringify(a)}}</div>
+		<div>{{#JSON.stringify(b)}}</div>
+	</div>
+</script>
 <!-- <script src="./dist/struct.min.js"></script> -->
 <!-- <script src="./dist/ax.min.js"></script> -->
 <script src="./modules/Ax-Router.js"></script>
@@ -28,26 +46,63 @@
 
 <script>
 
+var randomArr = struct.random("array");
+
+var childView = ax.view.extend({
+	template: document.getElementById("tpl2").innerHTML
+});
+
+var childView2 = ax.view({
+	template: document.getElementById("tpl2").innerHTML,
+});
+
 //example3
-var model = ax.model({
-	name: "spm",
+var view = ax.view.extend({
+	root: document.getElementById("app"),
+	template: document.getElementById("tpl").innerHTML,
 
-	data: {
-		sma: [1,2,3],
+	// function
+	// childComponent: function(elm,data){
+	//	elm.innerHTML = JSON.stringify(data);
+	// },
 
-		spm: {
-			a: 123,
-			b: 321,
-			c: 2
+	// childComponent: childView2,
+
+	components : {
+		childComponent: childView,
+		childSeComponent: childView2
+	},
+
+	events : {
+		init: function(){
+			this.render({
+				state: 1,
+				list: randomArr(10,"int",0,9),
+				text: {
+					a: "a",
+					b: "b"
+				},
+			});
 		},
 
-		snb: "noob"
+		changeState: function(){
+			this.render({
+				state: 2,
+				list: randomArr(10,"int",10,20),
+				text: {
+					a: "a2",
+					b: "b2"
+				},
+				text2: {
+					a: "aaaa",
+					b: "bbbb"
+				}
+			});
+		}
 	}
 });
 
-model.on("back",source=>console.log("back",source));
-
-model.set("spm.b",888)
+var myview = view();
 
 </script>
 </body>

@@ -1357,14 +1357,67 @@ var doomSetting  = {
 var cmExec = /^([\S]+)\s?([\s\S]+)?/;
 var agExec = /[\[\]]*/g;
 
+function makeEvaluate(evaluate){
+	var evaluatec  = evaluate;
+	var parserEval = (evaluatec || "").trim();
+	var ifpart = parserEval.slice(0,3);
+	var elsepart = parserEval.slice(0,5);
+	var elseifpart = parserEval.slice(0,7);
+	var lastpart = parserEval[parserEval.length-1];
+
+	if(
+		parserEval === "/if"  ||
+		parserEval === "/for" ||
+		parserEval === "/"
+	)
+		evaluatec = "}";
+
+	if(lastpart !== "}" && lastpart  !== "{"){
+
+		if(
+			(ifpart === "if " ||
+			ifpart  === "if(" )
+		)
+			evaluatec = "if("+parserEval.slice(2)+"){";
+
+		else if(
+			(elseifpart === "elseif" ||
+			elseifpart === "elseif(")
+		)
+			evaluatec = "}elseif(" + parserEval.slice(6) + "){";
+
+		else if(
+			(elsepart === "elif " ||
+			elsepart === "elif(")
+		)
+			evaluatec = "}elseif(" + parserEval.slice(4) + "){";
+
+		else if(
+			elsepart === "else"
+		)
+			evaluatec = "}else{";
+
+	}
+
+	return evaluatec;
+}
+
 function makeComand(command){
 	var res = "",
 			cms = cmExec.exec(trim(command)),
 			cmd = cms[1],
 			param = cms[2];
+
 	if(cmd){
 		switch(cmd.toLowerCase()){
+			// {{* / }}
+			// {{* end }}
 			case "end":
+			case "/for":
+			case "/each":
+			case "/if":
+			case "/exist":
+			case "/":
 				res = "';}); _p+='";
 				break;
 			case "if":
@@ -1456,7 +1509,7 @@ function DOOM(txt,bounds,name){
 		else if(command)
 			res += makeComand(command,res);
 		else if(evaluate)
-			res += "';" + evaluate + ";_p+='";
+			res += "';" + makeEvaluate(evaluate) + ";_p+='";
 		return match;
 	});
 
