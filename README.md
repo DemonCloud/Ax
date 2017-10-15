@@ -1,4 +1,4 @@
-# Ax
+<h1>Ax <img src="https://img.shields.io/npm/v/ax-js.svg?label=Ax&style=flat-square&maxAge=3600"></h1>
 
 <img src="https://nodei.co/npm/ax-js.png" alt="npm info">
 

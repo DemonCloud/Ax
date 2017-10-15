@@ -1,10 +1,18 @@
 /*
- * Ax
+ * ------------------------------
+               ___
+              /   |
+             / /| |_  __
+            / ___ \ \/ /
+           /_/  |_/_/\_\
+
+ * ------------------------------
+ *  @Author : YiJun
+ *  @Date   : 2017.4.1 - now
  *
- * @Author : YiJun
- * @Date   : 2017.4.1 - now
- *
- * require Utils Lib [ struct ]
+ *  require Utils Lib [ struct ]
+ *  VERSION : 4.2.0
+ * ------------------------------
  */
 
 (function(root,ax,factory){
@@ -16,7 +24,8 @@
 	else if(typeof exports !== "undefined")
 		// support CommonJS exports
 		// * fuck the npm package rubbish offset name, where package name use [ struct ]
-		// * should defined Webpack alias as [ "struct" : "ax-struct-js" ]
+		// * should defined Webpack resolved alias as [ "struct" : "ax-struct-js" ]
+
 		// factory(exports,require('ax-struct-js'));
 		factory(exports,require('struct'));
 	else
@@ -34,9 +43,9 @@
 	// Define Setting
 	AXMODULE_INJECT = [ax,struct],
 
-	ATOM_KEYWORDS   = ["use","events","_assert"],
-	VIEW_KEYWORDS   = ["root","mount","props","events","render","template","destroy","cache"],
-	MODEL_KEYWORDS  = ["name","data","store","change","events","validate","filter","lock"],
+	ATOM_KEYWORDS   = [ "use","events","_assert" ],
+	VIEW_KEYWORDS   = [ "root","mount","props","events","render","template","destroy","cache" ],
+	MODEL_KEYWORDS  = [ "name","data","store","change","events","validate","filter","lock" ],
 
 	VIEW_DEFAULT    = { },
 	ATOM_DEFAULT    = { use:[] },
@@ -441,8 +450,8 @@
 		}else if(_isStr(context)) {
 			if (args)
 				return z.proxy.apply(null,(args.unshift(fn[context],fn),args));
-			else
-				return z.proxy(fn[context], fn);
+
+			return z.proxy(fn[context], fn);
 		}else
 			throw new TypeError("expected function");
 	};
@@ -451,7 +460,7 @@
 	z.Event = function(type, props) {
 		var name;
 
-		if (!_isStr(type))
+		if(!_isStr(type))
 			props = type, type = props.type;
 
 		var event = document.createEvent(
