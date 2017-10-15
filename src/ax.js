@@ -50,7 +50,6 @@
 		sync   : "POST",
 		fetch  : "GET"
 	},
-
 	// *use struct utils list
 	// *minix with struct API
 	v8        = struct.v8(),
@@ -936,12 +935,6 @@
 	};
 
 	var capTypes = {
-		// "UIEvent"       : [
-		// 	"focus",
-		// 	"blur",
-		// 	"focusin",
-		// 	"focusout"
-		// ],
 		"MouseEvent"    : [
 			"click",
 			"dbclick",
@@ -952,6 +945,12 @@
 			"mouseenter",
 			"mouseleave"
 		],
+		// "UIEvent"       : [
+		// 	"focus",
+		// 	"blur",
+		// 	"focusin",
+		// 	"focusout"
+		// ],
 		// "KeyboardEvent" : [
 		// 	"keydown",
 		// 	"keypress",
@@ -1713,7 +1712,8 @@
 			};
 		}
 
-		_ayc(render);
+		return this.useAsyncRenderSlot ?
+			_ayc(render) : render();
 	}
 
 	// Ax View [ The view container ]
@@ -1747,6 +1747,7 @@
 					// async render Slot
 					_fal(this._updateSlotQueue,
 						asyncRenderSlot.bind(this,args));
+
 					this._updateSlotQueue = [];
 				}
 
@@ -1997,9 +1998,9 @@
 
 	// Extend method
 	// Create Ax Pack extends
-	ax.model = createAx(aM);
-	ax.view  = createAx(aV);
-	ax.atom  = createAx(aT);
+	ax.model        = createAx(aM);
+	ax.view         = createAx(aV);
+	ax.atom         = createAx(aT);
 
 	ax.model.extend = createExtend(aM);
 	ax.view.extend  = createExtend(aV);
