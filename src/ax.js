@@ -11,7 +11,8 @@
  *  @Date   : 2017.4.1 - now
  *
  *  require Utils Lib [ struct ]
- *  VERSION : 4.2.0
+ *
+ *  @VERSION : 4.2.0
  * ------------------------------
  */
 
@@ -880,11 +881,10 @@
 					props = _isObj(vprops) ? vprops : {},
 					tagName = arr.shift(),
 					attributes = arr.join(" "),
-					elm = {
-						tagName: tagName,
-						isSlot: tagName === "slot",
-						child:[]
-					};
+					elm = { tagName: tagName, child:[] };
+
+			if(tagName === "slot")
+				elm.isSlot = true;
 
 			if(attributes){
 				var attrs = {} ,s, tg;
@@ -1231,24 +1231,24 @@
 
 		//param must be object typeof
 		var st = {
-			url : url,
+			url : url || "",
 			type  : RESTFUL[type],
 			async : true,
-			param : param || this.param || broken,
-			header : header || this.header || broken
+			param : param || this.pipeParam || broken,
+			header : header || this.pipeHeader || broken
 		};
 
 		// deal with arguments
 		// set http header param
 		st.success = function(){
 			// change the data before dispatch event;
-			(fns||_noop).apply(this,arguments);
+			fns.apply(this,arguments);
 			this.emit(type+":success",arguments);
 		}.bind(this);
 
 		st.fail = function(){
-			(fnf||_noop).apply(this,arguments);
-			this.emit(type+":fail",arguments);
+			fnf.apply(this,arguments);
+			this.emit(type+":error",arguments);
 		}.bind(this);
 
 		return this.emit(type,[_ajax(st),st]);
@@ -1434,14 +1434,15 @@
 			return this.emit("unlock");
 		},
 
-		back: function(){
+		back: function(backStatic){
 			if(this._asl(_)) return this;
 
 			var ram = this._ash(_), source;
 
 			if(ram.length && (source = ram.pop())){
 				this._c(source,_,this.change=true);
-				this.emit("change,back",[source]);
+
+				if(!backStatic) this.emit("change,back",[source]);
 			}
 
 			return this;
@@ -1561,7 +1562,7 @@
 		emit: emit,
 		unbind: unbind,
 
-		subscribe: function(eventList,fn){
+		collect: function(eventList,fn){
 			_fal(_isStr(eventList) ? eventList.split(",") : eventList,
 			function(event){ this.on(event,fn); },this);
 
@@ -1574,20 +1575,40 @@
 			return JSON.stringify(this.get());
 		},
 
+		pipe: function(config){
+			if(_isObj(config)){
+				var c = _merge({
+					type    : "get",
+					async   : true,
+					success : _noop,
+					error   : _noop
+				},config);
+
+				return pipe.call(this,
+					c.type,
+					c.url,
+					c.param,
+					c.success,
+					c.error,
+					c.header
+				);
+			}
+
+			return this;
+		},
+
 		send: function(url,header){
 			if(_isObj(url)){
 				header = url;
 				url = null;
 			}
 
-			return pipe.apply(this,[
-				"send",
-				url || this.url,
-				this.get(),
-				_noop,
-				_noop,
-				header
-			]);
+			return this.pipe({
+				type    : "send",
+				url     : url || this.url,
+				param   : this.get(),
+				header  : header
+			});
 		},
 
 		fetch: function(param,byfilter,header){
@@ -1597,16 +1618,15 @@
 				param = {};
 			}
 
-			return pipe.apply(this,[
-				"fetch",
-				this.url,
-				param,
-				_link(
+			return this.pipe({
+				type   : "fetch",
+				url    : this.url,
+				param  : this.get(),
+				success: _link(
 					(_isFn(byfilter) ? byfilter : JSON.parse),
 					this.set.bind(this)),
-				_noop,
-				header
-			]);
+				header : header
+			});
 		},
 
 		sync: function(url,header){
@@ -1615,14 +1635,12 @@
 				url = null;
 			}
 
-			return pipe.apply(this,[
-				"sync",
-				url || this.url,
-				this.get(),
-				_noop,
-				_noop,
-				header
-			]);
+			return this.pipe({
+				type    : "sync",
+				url     : url || this.url,
+				param   : this.get(),
+				header  : header
+			});
 		},
 
 		toString: function(){
