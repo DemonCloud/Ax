@@ -1,4 +1,5 @@
 /*
+
    ------------------------------
   |             ___              |
   |            /   |             |
@@ -7,7 +8,8 @@
   |         /_/  |_/_/\_\        |
   |                              |
    ------------------------------
- *  @Author : YiJun
+
+ *  @Author : YiJun @alibaba-inc
  *  @Date   : 2017.4.1 - now
  *
  *  require Utils Lib [ struct ]
@@ -42,7 +44,7 @@
 			FCD = String.fromCharCode, vid = 0,
 
 	// Define Setting
-	AXMODULE_INJECT = arguments,
+	INJECT = arguments,
 
 	ATOM_KEYWORDS   = [ "use","events","_assert" ],
 	VIEW_KEYWORDS   = [ "root","mount","props","events","render","template","destroy","cache" ],
@@ -696,15 +698,14 @@
 		var name = _isStr(slot) ? slot : "";
 
 		if(name && elm){
-			var slotParse = name.trim().split("::"),
-					slotName  = slotParse[0],
-					dataName  = slotParse[1];
+			var sloter = {};
+			var slotParse = name.trim().split("::");
 
-			return {
-				name: slotName,
-				path: dataName,
-				root: elm
-			};
+			sloter.name = slotParse[0];
+			sloter.path = slotParse[1];
+			sloter.root = elm;
+
+			return sloter;
 		}
 	};
 
@@ -921,7 +922,6 @@
 			// slot is significative in [ax.view]
 			if(view && obj.isSlot){
 				var slotComponent = patchSlot(obj.text,elm);
-
 				// parser success
 				if(slotComponent)
 					view._updateSlotQueue.push(slotComponent);
@@ -1092,6 +1092,7 @@
 
 				e._args = args;
 				e.target = element;
+
 				_loop(findHandlers(element, event.type || event), function(handler){
 					result = handler.proxy(e);
 					if (e.isImmediatePropagationStopped())
@@ -1227,8 +1228,9 @@
 		};
 	}
 
-	function pipe(type,url,param,fns,fnf,header){
-		if(this._asl(_)) return this;
+	function pipe(type,url,param,fnsucess,fnerror,header){
+		if(this._asl(_))
+			return this;
 
 		//param must be object typeof
 		var st = {
@@ -1243,12 +1245,12 @@
 		// set http header param
 		st.success = function(){
 			// change the data before dispatch event;
-			fns.apply(this,arguments);
+			fnsucess.apply(this,arguments);
 			this.emit(type+":success",arguments);
 		}.bind(this);
 
-		st.fail = function(){
-			fnf.apply(this,arguments);
+		st.error = function(){
+			fnerror.apply(this,arguments);
 			this.emit(type+":error",arguments);
 		}.bind(this);
 
@@ -1279,7 +1281,7 @@
 	ax.module = function(name,creater){
 		var make = maker[name];
 		if(make) return make;
-		if((make = creater.apply(struct.root,AXMODULE_INJECT)))
+		if((make = creater.apply(struct.root,INJECT)))
 			return (maker[name] = make);
 	};
 
@@ -1406,14 +1408,7 @@
 			_s: usestore
 		}));
 
-		if(existname){
-
-			if(RAM[this.name])
-				console.error("Model.name: ['"+this.name+"'] has already registered, prev model will be overwrite in atom cache indexes");
-
-			RAM[this.name] = this;
-		}
-
+		if(existname) RAM[this.name] = this;
 		// init event
 		_extend(this,config,MODEL_KEYWORDS).emit("init").unbind("init");
 
