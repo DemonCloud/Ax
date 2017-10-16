@@ -1,7 +1,28 @@
 // import ax from "ax-js"
 // import ax from "ax" #or from alias for webpack
 
+// Default Options
+// for merge the keywords
+// * example :
+//
+//  new Router({
+//  	elements: [".router"],
+//
+//  	routes:{
+//  		"/": ["home"],
+//  		"/hifi" : ["hifi"],
+//  		"/article/:name" : ["article"],
+//  	},
+//
+//  	actions:{
+//  		home: act_home,
+//  		hifi: act_hifi,
+//  		article: act_post
+//  	}
+//  });
+
 ax.module("Router",function(ax,struct){
+
 'use strict';
 // Router use HTML5 History API
 
@@ -62,7 +83,7 @@ function toActive(source,path,query,state,notpush,isLink){
 
 	if(!(isLink && !cpath) && this._status){
 
-		var _this = this, i, l, checker, 
+		var _this = this, i, l, checker,
 				key = keys(source.mapping), route, param;
 				state = is(state,"Object") ? state : {};
 
@@ -105,26 +126,6 @@ function toActive(source,path,query,state,notpush,isLink){
 	return this;
 }
 
-// Default Options
-// for merge the keywords
-// * example :
-//
-//  new Router({
-//  	elements: [".router"],
-//  
-//  	routes:{
-//  		"/": ["home"],
-//  		"/hifi" : ["hifi"],
-//  		"/article/:name" : ["article"],
-//  	},
-//
-//  	actions:{
-//  		home: act_home,
-//  		hifi: act_hifi,
-//  		article: act_post
-//  	}
-//  });
-
 var DEFAULT_ROUTER_OPTION = {
 	routes: {},
 	actions: {},
@@ -138,7 +139,7 @@ var Router = function(option){
 	var source = merge(
 		clone(DEFAULT_ROUTER_OPTION),
 		is(option,"Object") ? option : {}
-	); 
+	);
 
 	// create Assert method
 	this._status = 0;
@@ -177,7 +178,7 @@ var Router = function(option){
 	each(source.routes,function(action,path){
 		var routeParam = [],
 		pathMatcher = trim(path).replace(pathReg,
-		function(match,param){ 
+		function(match,param){
 			routeParam.push(param);
 			return mappingReg;
 		});

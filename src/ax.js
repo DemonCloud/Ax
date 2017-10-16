@@ -1,12 +1,12 @@
 /*
- * ------------------------------
-               ___
-              /   |
-             / /| |_  __
-            / ___ \ \/ /
-           /_/  |_/_/\_\
-
- * ------------------------------
+   ------------------------------
+  |             ___              |
+  |            /   |             |
+  |           / /| |_  __        |
+  |          / ___ \ \/ /        |
+  |         /_/  |_/_/\_\        |
+  |                              |
+   ------------------------------
  *  @Author : YiJun
  *  @Date   : 2017.4.1 - now
  *
@@ -42,7 +42,7 @@
 			FCD = String.fromCharCode, vid = 0,
 
 	// Define Setting
-	AXMODULE_INJECT = [ax,struct],
+	AXMODULE_INJECT = arguments,
 
 	ATOM_KEYWORDS   = [ "use","events","_assert" ],
 	VIEW_KEYWORDS   = [ "root","mount","props","events","render","template","destroy","cache" ],
@@ -273,7 +273,7 @@
 	function realEvent(type) {
 		return hover[type] ||
 					change[type] ||
-					check[type] ||
+					check[type]  ||
 					(focusinSupported && focus[type]) ||
 					type;
 	}
@@ -356,7 +356,7 @@
 
 	function zremoveEvent(element, events, fn, selector, capture){
 		var id = zid(element);
-		_loop((events || '').split(/\s/),function(event){
+		_fal((events || '').split(/\s/),function(event){
 			_loop(findHandlers(element, event, fn, selector),function(handler){
 				delete handlers[id][handler.i];
 
@@ -453,8 +453,9 @@
 				return z.proxy.apply(null,(args.unshift(fn[context],fn),args));
 
 			return z.proxy(fn[context], fn);
-		}else
-			throw new TypeError("expected function");
+		}
+
+		throw new TypeError("expected function");
 	};
 
 	// z Custom Events
@@ -1284,7 +1285,7 @@
 
 	ax.use = function(name){
 		if(maker[name]) return maker[name];
-		console.error("Ax could not find dependency injection Module as: [",name,"]");
+		console.error("Ax could not find dependency injection defined Module as: [",name,"]");
 	};
 
 	aS = {
