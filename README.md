@@ -11,6 +11,7 @@
 
 It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` & `Vue` very well.
 
+![Support](http://7j1zwt.com1.z0.glb.clouddn.com/testing22.png)
 
 <br>
 <br>
