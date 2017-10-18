@@ -14,7 +14,7 @@
  *
  *  require Utils Lib [ struct ]
  *
- *  @VERSION : 4.2.0
+ *  @VERSION : 4.2.1
  * ------------------------------
  */
 
@@ -1142,9 +1142,6 @@
 	};
 
 	// checker template;
-	var checkalert = _doom("[ validate.{{#type}} ]"),
-			vahandler  = _doom("The value Of *( {{#value}} ) with type [ {{#type}} ] not pass validate! {{#msg}}");
-
 	function checkValidate(newdata,model){
 		if(!model._v) return true;
 
@@ -1203,11 +1200,10 @@
 
 	function warn(value,msg){
 		console.warn(
-			vahandler({
-				value : value,
-				type : _type(value),
-				msg : msg||""
-			})
+			"The value Of *( "+ value +
+			" ) with type [ "+ _type(value) +
+			" ] not pass validate! "+
+			_toString(msg)
 		);
 
 		return false;
@@ -1217,7 +1213,7 @@
 		return function(value,warnStatic){
 			var res = checker(value);
 			return !warnStatic ?
-				(res || warn(value,checkalert({ type:type }))) :
+				(res || warn(value,"[ validate." + _toString(type) + " ]")) :
 				res;
 		};
 	}

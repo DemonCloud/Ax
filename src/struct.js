@@ -47,7 +47,7 @@
 // Strict model
 // Link to Ax.VERSION
 // define const
-struct.VERSION = "4.2.0";
+struct.VERSION = "4.2.1";
 
 // base method
 var or = {},
