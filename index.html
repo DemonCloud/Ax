@@ -17,8 +17,11 @@
 		</slot>
 
 		<ul>
-		{{* for item in list }}
-			<li>{{-item}}</li>
+		{{* for [item,key] in list }}
+			<li>
+				<span>{{-item}}</span>
+				<slot key={{#key}}>components.childTr</slot>
+			</li>
 		{{*/for}}
 		</ul>
 
@@ -65,7 +68,10 @@ var view = ax.view.extend({
 	 	child: function(root,data){
 			root.innerHTML = JSON.stringify(data);
 	 	},
-		childSe: childView2
+		childSe: childView2,
+		childTr: function(elm){
+			console.log(elm.key);
+		}
 	},
 
 	events : {
