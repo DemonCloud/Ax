@@ -29,8 +29,8 @@
 		// * fuck the npm package rubbish offset name, where package name use [ struct ]
 		// * should defined Webpack resolved alias as [ "struct" : "ax-struct-js" ]
 
-		// factory(exports,require('ax-struct-js'));
-		factory(exports,require('struct'));
+		// factory(exports,require('struct'));
+		factory(exports,require('ax-struct-js'));
 	else
 		// build on browser global object
 		root.ax = factory(ax,root.struct);
@@ -62,6 +62,7 @@
 		sync   : "POST",
 		fetch  : "GET"
 	},
+
 	// *use struct utils list
 	// *minix with struct API
 	v8        = struct.v8(),
@@ -74,7 +75,7 @@
 	_clone    = struct.clone(),
 	_extend   = struct.extend(),
 	_eq       = struct.eq(),
-	_toString = struct.convert('string'),
+	_toStr    = struct.convert('string'),
 	_type     = struct.type(),
 	_isObj    = struct.type('object'),
 	_isFn     = struct.type('func'),
@@ -617,7 +618,7 @@
 		}
 
 		if(key[0]===":")
-			res = _isFn(fn) ? fn : Function("event", _toString(val));
+			res = _isFn(fn) ? fn : Function("event", _toStr(val));
 
 		return res;
 	};
@@ -1106,7 +1107,7 @@
 
 		html : function(html){
 			return this.each(function(elm){
-				elm.innerHTML = _toString(html);
+				elm.innerHTML = _toStr(html);
 			});
 		},
 
@@ -1203,7 +1204,7 @@
 			"The value Of *( "+ value +
 			" ) with type [ "+ _type(value) +
 			" ] not pass validate! "+
-			_toString(msg)
+			_toStr(msg)
 		);
 
 		return false;
@@ -1213,7 +1214,7 @@
 		return function(value,warnStatic){
 			var res = checker(value);
 			return !warnStatic ?
-				(res || warn(value,"[ validate." + _toString(type) + " ]")) :
+				(res || warn(value,"[ validate." + _toStr(type) + " ]")) :
 				res;
 		};
 	}
@@ -1636,7 +1637,7 @@
 		},
 
 		toString: function(){
-			return _toString(this.toJSON());
+			return _toStr(this.toJSON());
 		}
 	};
 
@@ -1813,7 +1814,7 @@
 		constructor:aV,
 
 		on: function(type,fn){
-			_fal(_toString(type).split("|"),function(mk){
+			_fal(_toStr(type).split("|"),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
@@ -1830,7 +1831,7 @@
 		},
 
 		unbind: function(type,fn){
-			_fal(_toString(type).split("|"),function(mk){
+			_fal(_toStr(type).split("|"),function(mk){
 				var param = mk.split(":");
 				// DOM Element events
 				if(param.length > 1)
@@ -1843,7 +1844,7 @@
 		},
 
 		emit: function(type,args){
-			var t = _toString(type), k = t.split(":");
+			var t = _toStr(type), k = t.split(":");
 
 			if(k.length>2){
 				_fal(t.split("|"),function(mk){
