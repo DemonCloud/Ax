@@ -8,14 +8,19 @@
 
 <div id="app"></div>
 
-<script src="./src/struct.js"></script>
-<script src="./src/ax.js"></script>
+<!-- <script src="./src/struct.js"></script> -->
+<!-- <script src="./src/ax.js"></script> -->
+<script src="./dist/struct.min.js"></script>
+<script src="./dist/ax.min.js"></script>
+<script src="./modules/Ax-Router.js"></script>
+
 <script id="tpl" type="text/ax">
 	<div id="appName">
 		<slot id="frslot" ref="uncare">
 			components.child::text
 		</slot>
 
+	{{ if state === 1 }}
 		<ul>
 		{{* for [item,key] in list }}
 			<li>
@@ -24,35 +29,54 @@
 			</li>
 		{{*/for}}
 		</ul>
-
-		<slot id="seslot" ref="happy">
-			{{ if state === 1 }}
-			components.child::text
-			{{ else }}
-			components.childSe::text2
-			{{ /if }}
-		</slot>
+	{{ else }}
+	<slot id="seslot" ref="happy">components.childSe::text2</slot>
+	{{ /if }}
 	</div>
 </script>
+
 <script id="tpl2" type="text/ax">
 	<div id="abc">
+		<span>abc</span>
 		<div>{{#JSON.stringify(a)}}</div>
 		<div>{{#JSON.stringify(b)}}</div>
 	</div>
 </script>
-<!-- <script src="./dist/struct.min.js"></script> -->
-<!-- <script src="./dist/ax.min.js"></script> -->
-<script src="./modules/Ax-Router.js"></script>
 
 <script>
 var randomArr = struct.random("array");
+var randomInt = struct.random("int");
 
 var childView = ax.view.extend({
-	template: document.getElementById("tpl2").innerHTML
-});
-
-var childView2 = ax.view({
 	template: document.getElementById("tpl2").innerHTML,
+
+	events:{
+		init(){
+			this.model = ax.model();
+
+			this.model.on("change",this.render);
+		},
+
+		beforeRender(data){
+			data.a = data.a*2;
+			data.b = data.b*2;
+		},
+
+		completeRender(data){
+			console.log(data);
+			console.log(this.model.get());
+		},
+
+		"click:#abc span" : function(e){
+			e.stopPropagation();
+			e.preventDefault();
+
+			this.model.set({
+				a: randomInt(1,10),
+				b: randomInt(11,20)
+			});
+		}
+	}
 });
 
 //example3
@@ -67,10 +91,11 @@ var view = ax.view.extend({
 	components : {
 	 	child: function(root,data){
 			root.innerHTML = JSON.stringify(data);
+			root.onclick = function(){ alert(1) };
 	 	},
-		childSe: childView2,
+		childSe: childView,
 		childTr: function(elm){
-			console.log(elm.key);
+			elm.textContent = elm.key;
 		}
 	},
 
@@ -95,11 +120,31 @@ var view = ax.view.extend({
 					b: "b2"
 				},
 				text2: {
-					a: "aaaa",
-					b: "bbbb"
+					a: 1,
+					b: 2
 				}
 			});
-		}
+		},
+
+		backState: function(){
+			this.render({
+				state: 1,
+				list: randomArr(10,"int",0,9),
+				text: {
+					a: "a2",
+					b: "b2"
+				},
+				text2: {
+					a: 1,
+					b: 2
+				}
+			});
+		},
+
+		"click:ul li": function(e){
+			alert(e.currentTarget.innerText);
+		},
+
 	}
 });
 

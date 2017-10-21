@@ -9,13 +9,13 @@
   |                              |
    ------------------------------
 
+
  *  @Author : YiJun @alibaba-inc
  *  @Date   : 2017.4.1 - now
  *
  *  require Utils Lib [ struct ]
  *
- *  @VERSION : 4.2.1
- * ------------------------------
+ *  @VERSION : 4.2.2
  */
 
 (function(root,ax,factory){
@@ -38,6 +38,8 @@
 })(this, {}, function(ax,struct){
 	"use strict";
 
+	var VERSION = "4.2.2";
+
 	var aM,aV,aT,aS,vA,z,Z,
 			aMP,aVP,aTP, _ = [], maker = {}, root = struct.root,
 			RAM = [], LS = root.localStorage, SN = "Ax@",
@@ -46,20 +48,24 @@
 	// Define Setting
 	INJECT = arguments,
 
-	ATOM_KEYWORDS   = [ "use","events","_assert" ],
-	VIEW_KEYWORDS   = [ "root","mount","props","events","render","template","destroy","cache" ],
-	MODEL_KEYWORDS  = [ "name","data","store","change","events","validate","filter","lock" ],
+	ATOM_KEYWORDS  = [ "use","events","_assert" ],
+	VIEW_KEYWORDS  = [ "root","mount","props","events","render","template","destroy","cache" ],
+	MODEL_KEYWORDS = [ "name","data","store","change","events","validate","filter","lock" ],
 
-	VIEW_DEFAULT    = { },
-	ATOM_DEFAULT    = { use:[] },
-	MODEL_DEFAULT   = { data:{}, validate:{} },
+	VIEW_DEFAULT   = { },
+	ATOM_DEFAULT   = { use:[] },
+	MODEL_DEFAULT  = { data:{}, validate:{} },
 
 	// resetful list
 	// use for ax ajax-api
-	RESTFUL = {
+	EMULATEHTTP = {
 		get    : "GET",
 		send   : "GET",
+		post   : "POST",
 		sync   : "POST",
+		put    : "POST",
+		delete : "POST",
+		patch  : "POST",
 		fetch  : "GET"
 	},
 
@@ -96,7 +102,7 @@
 	_fal      = struct.op('array'),
 	_map      = struct.map(),
 	_on       = struct.event('on'),
-	_unbind   = struct.event('unbind'),
+	_off      = struct.event('off'),
 	_emit     = struct.event('emit'),
 	_hasEvent = struct.event('has'),
 	_get      = struct.prop('get'),
@@ -112,61 +118,7 @@
 	_index    = struct.index(),
 	_one      = struct.index("one"),
 	_decode   = struct.html("decode"),
-	cool      = struct.cool(),
-	broken    = struct.broken;
-
-	// ax genertor function
-	function genertor_(api){
-		var apiName, apiUse, apiSelect, Use;
-		if(_isAry(api)){
-			apiUse = api[1];
-			apiName = api[0];
-			apiSelect = api[2]; }
-		else{
-			apiUse = api;
-			apiName = api;
-			apiSelect = void 0; }
-
-		Use = struct[apiUse](apiSelect);
-
-		aM.prototype[apiName] = function(){
-			var tmp = this.get(),
-					args = [tmp].concat(_slice(arguments));
-			if(!_eq(tmp = Use.apply(tmp,args),this.get()))
-				this.emit((this.set(tmp),api),args);
-			return this;
-		};
-
-		aT.prototype[apiName] = function(){
-			return Use.apply(this,
-				[this.toChunk()].concat(_slice(arguments)));
-		};
-	}
-
-	// not change rebase data
-	function genertor_$(api){
-		var apiName, apiUse, apiSelect, Use;
-		if(_isAry(api)){
-			apiUse = api[1];
-			apiName = api[0];
-			apiSelect = api[2]; }
-		else{
-			apiUse = api;
-			apiName = api;
-			apiSelect = void 0; }
-
-		Use = struct[apiUse](apiSelect);
-
-		aM.prototype[apiName] = function(){
-			var args = [this.get()].concat(_slice(arguments));
-			return Use.apply(this,args);
-		};
-
-		aT.prototype[apiName] = function(){
-			return Use.apply(this,
-			[this.toChunk()].concat(_slice(arguments)));
-		};
-	}
+	cool      = struct.cool();
 
 	function createAx(Use){
 		return function(o){
@@ -177,10 +129,10 @@
 	function createExtend(Use){
 		return function(malloc){
 			var extender = function(o){
-				return new Use(_merge(malloc,_isObj(o) ? o : {}));
+				return new Use(_merge(malloc, o||{}));
 			};
-
 			extender.constructor = Use;
+
 			return extender;
 		};
 	}
@@ -206,9 +158,9 @@
 
 	var ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,
 			eventMethods = {
-			preventDefault: 'isDefaultPrevented',
-			stopImmediatePropagation: 'isImmediatePropagationStopped',
-			stopPropagation: 'isPropagationStopped'
+				preventDefault: 'isDefaultPrevented',
+				stopImmediatePropagation: 'isImmediatePropagationStopped',
+				stopPropagation: 'isPropagationStopped'
 			};
 
 	function zid(element) {
@@ -653,15 +605,19 @@
 		//4 modifytext
 		function(patch){
 			var t = patch.s;
-			if(patch.isSlot)
+			if(patch.isSlot){
+				if(t._destory) t._destory();
 				return t.parentNode.replaceChild(patch.n,t);
+			}
 			t.textContent = _decode(patch.c);
 		},
 		//5 withtext
 		function(patch){
 			var t = patch.s;
-			if(patch.isSlot)
+			if(patch.isSlot){
+				if(t._destory) t._destory();
 				return t.parentNode.replaceChild(patch.n,t);
+			}
 			t.textContent = _decode(patch.c);
 		},
 		//6 removetext
@@ -776,7 +732,7 @@
 			return patch;
 		},
 
-		applyPatch:function(oDOM,patchs){
+		applyPatch: function(oDOM,patchs){
 			_fal(_map(patchs,function(patch){
 				patch.path = patch.s;
 				patch.s = this.mapTreeNode(oDOM,patch.s);
@@ -797,7 +753,7 @@
 			return target;
 		},
 
-		createSelector:function(org){
+		createSelector: function(org){
 			var path = [org.i];
 			while((org=org.parent))
 				if(org.i !== void 0)
@@ -879,7 +835,7 @@
 			return axroot;
 		},
 
-		createObjElement:function(str,vprops){
+		createObjElement: function(str,vprops){
 			var arr = str.split(" "),
 					props = _isObj(vprops) ? vprops : {},
 					tagName = arr.shift(),
@@ -908,7 +864,7 @@
 			return elm;
 		},
 
-		createDOMElement:function(obj,view){
+		createDOMElement: function(obj,view){
 			var elm = document.createElement(obj.tagName);
 
 			// registered view.refs Update
@@ -970,18 +926,18 @@
 	};
 
 	Z.prototype = {
-		get : function(index){
+		get: function(index){
 			return 0 in arguments ?
 				this.el[+index + ( index < 0 ? this.length : 0 )] :
 				this.el;
 		},
 
-		each : function(fn,context){
+		each: function(fn,context){
 			_fal(this.el,fn,context||this);
 			return this;
 		},
 
-		find : function(sl){
+		find: function(sl){
 			var res = [];
 			_fal(this.el,function(e){
 				res = _slice(e.querySelectorAll(sl)).concat(res);
@@ -989,7 +945,7 @@
 			return z(res);
 		},
 
-		closest : function(selector,element){
+		closest: function(selector,element){
 			var el=this.el ,tmp=this.get(0),
 					find, i=0, l=el.length;
 
@@ -1003,33 +959,31 @@
 			return z(find||[]);
 		},
 
-		on : function(event, selector, data, callback, one){
-			var autoRemove, delegator;
+		on: function(event, selector, data, callback, context){
+			var delegator;
 
 			if(event && !_isStr(event)) {
 				_loop(event, function(fn, type){
-					this.on(type, selector, data, fn, one);
+					this.on(type, selector, data, fn, context);
 				},this);
 
 				return this;
 			}
 
-			if(!_isStr(selector) &&
-				!_isFn(callback) &&
-				callback !== false)
+			if(!_isStr(selector) && !_isFn(callback) && callback !== false)
 				callback = data, data = selector, selector = void 0;
 			if(callback === void 0 || data === false)
 				callback = data, data = void 0;
+
+			if(_isFn(data) && _isStr(selector)){
+				context = callback;
+				callback = data;
+			}
 
 			if(callback === false)
 				callback = returnFalse;
 
 			return this.each(function(element){
-				if(one)
-					autoRemove = function(e){
-						zremoveEvent(element, e.type, callback);
-						return callback.apply(this, arguments);
-					};
 
 				if(selector)
 					delegator = function(e){
@@ -1037,19 +991,16 @@
 							e.target : z(e.target).closest(selector, element).get(0);
 
 						if (match && match !== element)
-							(autoRemove || callback).apply(
-								match,
-								[_extend(e, { currentTarget: match, liveFired: element })].concat(
-									_slice(arguments,1)
-								)
+							callback.apply( context || match,
+								[_extend(e, { currentTarget: match, liveFired: element })].concat(_slice(arguments,1))
 							);
 					};
 
-				zaddEvent(element, event, callback, data, selector, delegator || autoRemove);
+				zaddEvent(element, event, callback, data, selector, delegator);
 			});
 		},
 
-		off : function(event, selector, callback){
+		off: function(event, selector, callback){
 			if (event && !_isStr(event)) {
 				_loop(event, function(fn, type){
 					this.off(type, selector, fn);
@@ -1070,7 +1021,7 @@
 			});
 		},
 
-		trigger : function(event, args){
+		trigger: function(event, args){
 			event = _isStr(event) ? z.Event(event) : compatible(event);
 			event._args = args;
 
@@ -1086,7 +1037,7 @@
 			});
 		},
 
-		triggerHandler : function(event, args){
+		triggerHandler: function(event, args){
 			var e, result;
 			this.each(function(element){
 				e = createProxy(_isStr(event) ? z.Event(event) : event);
@@ -1105,7 +1056,7 @@
 			return result;
 		},
 
-		html : function(html){
+		html: function(html){
 			return this.each(function(elm){
 				elm.innerHTML = _toStr(html);
 			});
@@ -1118,26 +1069,25 @@
 		},
 
 		// virtual render
-		render : function(newhtml,view,props,args){
+		render: function(newhtml,view,props,args){
 			return this.each(function(elm){
 				var target = slik.createTreeFromHTML(newhtml,props);
 
-				if(elm._vid !== view._vid)
+				if(elm._vid !== view._vid){
+					elm._destory = function(){ view.destroy(); };
+
 					return elm.appendChild(slik.createDOMElement(
 						view.axml = target, view
 					).firstElementChild, elm.innerHTML = "");
+				}
 
 				slik.applyPatch(
 					elm,
 					slik.treeDiff(view.axml,target,[],null,null,view),
 					view.axml = target
 				);
-
 				// async render Slot
-				_fal(view._updateSlotQueue,
-					asyncRenderSlot.bind(view,args));
-
-				view._updateSlotQueue = [];
+				updateSlotComponent(view,args);
 			});
 		}
 	};
@@ -1181,8 +1131,8 @@
 		return this.on(type,fn);
 	}
 
-	function unbind(type,fn){
-		return _unbind(this,type,fn);
+	function off(type,fn){
+		return _off(this,type,fn);
 	}
 
 	function emit(type,args){
@@ -1231,12 +1181,17 @@
 
 		//param must be object typeof
 		var st = {
-			url : url || "",
-			type  : RESTFUL[type],
-			async : true,
-			param : param || this.pipeParam || broken,
-			header : header || this.pipeHeader || broken
+			url    : url || "",
+			type   : EMULATEHTTP[type],
+			async  : true,
+			param  : param || this.pipeParam || {},
+			header : header || this.pipeHeader || {}
 		};
+
+		if(st.type === "POST" && this.emulateJSON)
+			st.header["Content-Type"] = "application/json";
+
+		st.header["X-HTTP-Method-Override"] = type;
 
 		// deal with arguments
 		// set http header param
@@ -1283,7 +1238,9 @@
 	};
 
 	ax.use = function(name){
-		if(maker[name]) return maker[name];
+		if(maker[name])
+			return maker[name];
+
 		console.error("Ax could not find dependency injection defined Module as: [",name,"]");
 	};
 
@@ -1389,8 +1346,7 @@
 		_fol(events,uon,modelDefined(this,{
 			name: existname ? config.name : "",
 			_ast: function(todo,v){
-				return v===_ ? todo(data) : {};
-			},
+				return v===_ ? todo(data) : {}; },
 			_asl: function(v){
 				return v===_ ? lock : null; },
 			_asv: modelAsset(validate,{}),
@@ -1407,7 +1363,7 @@
 
 		if(existname) RAM[this.name] = this;
 		// init event
-		_extend(this,config,MODEL_KEYWORDS).emit("init").unbind("init");
+		_extend(this,config,MODEL_KEYWORDS).emit("init").off("init");
 
 	};
 
@@ -1469,11 +1425,10 @@
 
 						this._c(ref,_,this.change=true);
 
-						if(this._s)
-							aS.set(this.name,ref);
+						if(this._s) aS.set(this.name,ref);
 
 						if(!setStatic)
-							this.emit("change",[ref]);
+							this.emit("change",[_clone(ref)]);
 					}
 
 				} else {
@@ -1552,20 +1507,14 @@
 
 		// API event
 		on: on,
+		off: off,
 		emit: emit,
-		unbind: unbind,
 
-		collect: function(eventList,fn){
+		subscibe: function(eventList,fn){
 			_fal(_isStr(eventList) ? eventList.split(",") : eventList,
 			function(event){ this.on(event,fn); },this);
 
 			return this;
-		},
-
-		// Ax Restful API design for
-		// [Ax Model] data format serialize
-		toJSON: function(){
-			return JSON.stringify(this.get());
 		},
 
 		pipe: function(config){
@@ -1616,8 +1565,9 @@
 				url    : this.url,
 				param  : this.get(),
 				success: _link(
-					(_isFn(byfilter) ? byfilter : JSON.parse),
-					this.set.bind(this)),
+					_isFn(byfilter) ? byfilter : JSON.parse,
+					this.set.bind(this)
+				),
 				header : header
 			});
 		},
@@ -1636,6 +1586,12 @@
 			});
 		},
 
+		// Ax Restful API design for
+		// [ Ax Model ] data format serialize
+		toJSON: function(){
+			return JSON.stringify(this.get());
+		},
+
 		toString: function(){
 			return _toStr(this.toJSON());
 		}
@@ -1643,23 +1599,22 @@
 
 	function packBefore(view){
 		return function(){
-			var args = _slice(arguments);
-			return view.emit("beforeRender",args),args;
+			view.emit("beforeRender",arguments);
+			return arguments;
 		};
 	}
 
 	function packMain(view,renderFunc){
 		return function(args){
-			return renderFunc.apply(view,args),args;
+			renderFunc.apply(view,args);
+			return args;
 		};
 	}
 
 	function packComplete(view){
 		return function(args){
-
 			view.root._vid = view._vid;
-			view.root.setAttribute("ax-root","");
-			return view.emit("completed",args);
+			return view.emit("completeRender",args);
 		};
 	}
 
@@ -1672,8 +1627,23 @@
 	}
 
 	function setRender(view,render){
-		if(_isFn(render))
-			view.render = packRender(view,render);
+		if(_isFn(render)){
+			var renderFn = packRender(view, render.bind(view));
+
+			_define(view,"render",{
+				get: function(){
+					return renderFn;
+				},
+				set: function(newRender){
+					if(_isFn(newRender))
+						renderFn = packRender(view, newRender.bind(view));
+					return renderFn;
+				},
+				enumerable: false,
+				configurable: false,
+			});
+		}
+
 		return view;
 	}
 
@@ -1685,7 +1655,7 @@
 		return true;
 	}
 
-	function asyncRenderSlot(args, slot){
+	function renderSlotComponent(args, slot){
 
 		var slotTarget = _get(this, slot.name);
 		if(!slotTarget) return;
@@ -1696,37 +1666,21 @@
 			(_isObj(slotOneArg) ? [_get(slotOneArg,slot.path)] : args) :
 			args;
 
-		// is truly view
-		if(vA.view(slotTarget,true)){
-			if(slotTarget.root){
-				render = function(){
-					slotTarget.root = slot.root;
-					slotTarget.render.apply(slotTarget,slotData);
-				};
-			}else{
-				render = function(){
-					slotTarget.mount.apply(slotTarget,[slot.root].concat(slotData));
-				};
-			}
-
-		} else if(slotTarget.constructor === aV){
-		// is extends constructor view
-			var t = slotTarget({ root: slot.root });
-
-			if(!t.axml)
-				render = function(){
-					t.render.apply(t, slotData);
-				};
-
-		} else if(_isFn(slotTarget)){
+		if(slotTarget.constructor === aV && !vA.view(slotTarget, true)){
+			// is extends constructor view
+			render = function(){
+				var t = slotTarget({ root: slot.root });
+				t.render.apply(t, slotData);
+			};
+		}else if(_isFn(slotTarget)){
 			render = function(){
 				slotTarget.apply(this, [slot.root].concat(slotData));
 			}.bind(this);
-		} else if(_isStr(slotTarget) ||  _isNum(slotTarget)){
+		}else if(_isStr(slotTarget) ||  _isNum(slotTarget)){
 			render = function(){
 				slot.root.textContent = slotTarget;
 			};
-		} else {
+		}else{
 			render = function(){
 				slot.root.textContent = "";
 			};
@@ -1734,6 +1688,14 @@
 
 		return this.useAsyncRenderSlot ?
 			_ayc(render) : render();
+	}
+
+	function updateSlotComponent(view,args){
+		if(view && view._updateSlotQueue.length){
+			_fal(view._updateSlotQueue,
+				renderSlotComponent.bind(view,args));
+			view._updateSlotQueue = [];
+		}
 	}
 
 	// Ax View [ The view container ]
@@ -1760,18 +1722,13 @@
 				var args = _slice(arguments);
 
 				if(stencil !== _noop) {
-					z(this.root).render(
-						stencil.apply(this,arguments),
-						this, props, args);
+					z(this.root).render(stencil.apply(this,args),
+					this, props, args);
 
 					// async render Slot
-					_fal(this._updateSlotQueue,
-						asyncRenderSlot.bind(this,args));
-
-					this._updateSlotQueue = [];
+					updateSlotComponent(this,args);
 				}
-
-			}.bind(this);
+			};
 		}
 
 		// if userobj has more events
@@ -1781,7 +1738,7 @@
 
 			_fol(events,uon,setRender(this,render));
 
-			if(model && vA.model(model))
+			if(model && vA.model(model,true))
 				model.on("change",this.render);
 
 		}else{
@@ -1792,7 +1749,7 @@
 					this.root = vroot = el;
 					_fol(events,uon,setRender(this,render));
 
-					if(model && vA.model(model))
+					if(model && vA.model(model,true))
 						model.on("change",this.render);
 
 					// trigger render
@@ -1807,38 +1764,51 @@
 
 		}
 
-		_extend(this,config,VIEW_KEYWORDS,this._vid=vid++).emit("init").unbind("init");
+		_extend(this,config,VIEW_KEYWORDS,this._vid=vid++).emit("init").off("init");
 	};
 
 	aVP = aV.prototype = {
 		constructor:aV,
 
 		on: function(type,fn){
-			_fal(_toStr(type).split("|"),function(mk){
-				var param = mk.split(":");
-				// DOM Element events
-				if(param.length > 1)
-					z(this.root).on(
-						param[0],
-						param[1],
-						fn._bind||(fn._bind=fn.bind(this))
-					);
-				else
-					_on(this,mk,fn);
-			},this);
+			if(_isFn(fn)){
+
+				_fal(_toStr(type).split("|"),function(mk){
+					var param = mk.split(":");
+					// DOM Element events
+
+					if(param.length > 1){
+						z(this.root).on(
+							param[0],
+							param[1],
+							fn,
+							this
+						);
+					}else{
+						_on(this,mk,fn);
+					}
+				},this);
+
+			}
 
 			return this;
 		},
 
-		unbind: function(type,fn){
-			_fal(_toStr(type).split("|"),function(mk){
-				var param = mk.split(":");
-				// DOM Element events
-				if(param.length > 1)
-					z(this.root).off(param[0], param[1], fn ? (fn._bind||fn) : void 0);
-				else
-					_unbind(this,mk,fn);
-			},this);
+		off: function(type,fn){
+			if(type && _isStr(type)){
+
+				_fal(type.split("|"),function(mk){
+					var param = mk.split(":");
+
+					z(this.root).off(param[0], param[1], fn);
+
+					_off(this,mk,fn);
+				},this);
+
+				return this;
+			}
+
+			z(this.root).off();
 
 			return this;
 		},
@@ -1867,12 +1837,16 @@
 		},
 
 		destroy: function(withRoot){
-			this.root.removeAttribute("ax-root",this.root._vid=void 0);
+			this.root._vid=void 0;
 
-			_ayc(function(){
+			var createDestory = function(){
 				z(this.root).off()[withRoot?"remove":"html"]();
-				this.emit("destroy",delete this.root);
-			}.bind(this));
+				this.emit("destroy", delete this.root);
+
+				delete this;
+			}.bind(this);
+
+			_ayc(createDestory);
 		},
 
 		toString: function(){
@@ -2011,11 +1985,6 @@
 		}
 	};
 
-	// #genertor minmix [ struct ] api
-	_fal(["extend","not","cat","find","filter","reject","chunk","compact","pluck","groupBy","countBy","pairs","shuffle","flat","merge","map","sort","unique","concat","pull","drop","pairs",["hook","map","hook"],["mapKey","map","key"],["uniqueFast","unique","fast"],["pullAt","pull","at"],["dropLeft","drop","left"],["dropRight","drop","right"],["dropLeftTo","drop","leftto"],["dropRightTo","drop","rightto"],["unpairs","pairs","un"],["insertSort","sort","i"],["quickSort","sort","q"]],genertor_);
-
-	_fal(["keys","every","some","diff","intsec","first","last","auto","eq","values","size","each","has","type","index",["hasKey","has","key"],["findex","index","first"],["lindex","index","last"],["single","index","one"],["one","index","one"],["reduce","reduce","left"],["reduceRight","reduce","right"],["slimDiff","diff","slim"],["slimIntsec","intsec","slim"]],genertor_$);
-
 	// Extend method
 	// Create Ax Pack extends
 	ax.model        = createAx(aM);
@@ -2047,7 +2016,7 @@
 		atom      : makeChecker(isAx(aT) , "atom")
 	};
 
-	ax.VERSION = struct.VERSION;
+	ax.VERSION = VERSION;
 
 	return _lock(aM,aV,aT,aS,
 		v8(aMP),v8(aVP),v8(aTP),

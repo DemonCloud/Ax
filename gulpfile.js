@@ -17,10 +17,13 @@ function taskjs(){
 				.pipe(filter(["**"], { restore:true }))
 				.pipe(rename('ax.min.js'))
 				.pipe(uglify({
+					ie8: false,
 					compress:{
 						unsafe: true,
-						hoist_vars: true
-					}
+						hoist_vars: true,
+						warnings: false,
+					},
+					mangle: true
 				}))
 				.pipe(optimizejs())
 				.pipe(gulp.dest('./dist'));
@@ -29,10 +32,13 @@ function taskjs(){
 				.pipe(filter(["**"], { restore:true }))
 				.pipe(rename('struct.min.js'))
 				.pipe(uglify({
+					ie8: false,
 					compress:{
 						unsafe: true,
-						hoist_vars: true
-					}
+						hoist_vars: true,
+						warnings: false,
+					},
+					mangle: true
 				}))
 				.pipe(optimizejs())
 				.pipe(gulp.dest('./dist'));
