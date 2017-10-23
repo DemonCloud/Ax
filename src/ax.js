@@ -15,7 +15,7 @@
  *
  *  require Utils Lib [ struct ]
  *
- *  @VERSION : 4.2.2
+ *  @VERSION : 4.2.3
  */
 
 (function(root,ax,factory){
@@ -38,7 +38,7 @@
 })(this, {}, function(ax,struct){
 	"use strict";
 
-	var VERSION = "4.2.2";
+	var VERSION = "4.2.3";
 
 	var aM,aV,aT,aS,vA,z,Z,
 			aMP,aVP,aTP, _ = [], maker = {}, root = struct.root,
@@ -104,7 +104,6 @@
 	_on       = struct.event('on'),
 	_off      = struct.event('off'),
 	_emit     = struct.event('emit'),
-	_hasEvent = struct.event('has'),
 	_get      = struct.prop('get'),
 	_set      = struct.prop('set'),
 	_rm       = struct.prop('not'),
@@ -1181,7 +1180,7 @@
 
 		//param must be object typeof
 		var st = {
-			url    : url || "",
+			url    : url || this.url || "",
 			type   : EMULATEHTTP[type],
 			async  : true,
 			param  : param || this.pipeParam || {},
@@ -1832,10 +1831,6 @@
 			return _emit(this,type,args);
 		},
 
-		hasEvent: function(type,fn){
-			return _hasEvent(this,type,fn);
-		},
-
 		destroy: function(withRoot){
 			this.root._vid=void 0;
 
@@ -1985,8 +1980,6 @@
 		}
 	};
 
-	// Extend method
-	// Create Ax Pack extends
 	ax.model        = createAx(aM);
 	ax.view         = createAx(aV);
 	ax.atom         = createAx(aT);

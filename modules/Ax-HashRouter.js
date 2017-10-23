@@ -22,7 +22,7 @@ var DEFAULT_ROUTER_OPTION = {
 };
 
 var toActive = function(option, path, query){
-	
+
 };
 
 var HashRouter = function(o){
@@ -33,7 +33,7 @@ var HashRouter = function(o){
 
 
 	root.addEventListener("hashchange",function(event){
-		
+
 	});
 };
 
@@ -44,7 +44,7 @@ HashRouter.prototype = {
 
 	to: function(path,query){
 		if(this._status) return;
-	
+
 	},
 
 	stop: function(){

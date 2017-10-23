@@ -1412,12 +1412,12 @@ function makeComand(command){
 		switch(cmd.toLowerCase()){
 			// {{* / }}
 			// {{* end }}
+			case "/":
 			case "end":
 			case "/for":
 			case "/each":
 			case "/if":
 			case "/exist":
-			case "/":
 				res = "';}); _p+='";
 				break;
 			case "if":
