@@ -15,7 +15,7 @@
  *
  *  require Utils Lib [ struct ]
  *
- *  @VERSION : 4.2.3
+ *  @VERSION : 4.2.4
  */
 
 (function(root,ax,factory){
@@ -38,7 +38,7 @@
 })(this, {}, function(ax,struct){
 	"use strict";
 
-	var VERSION = "4.2.3";
+	var VERSION = "4.2.4";
 
 	var aM,aV,aT,aS,vA,z,Z,
 			aMP,aVP,aTP, _ = [], maker = {}, root = struct.root,
