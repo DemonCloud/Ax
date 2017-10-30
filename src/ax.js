@@ -15,7 +15,7 @@
  *
  *  require Utils Lib [ struct ]
  *
- *  @VERSION : 4.2.4
+ *  @VERSION : 4.2.5
  */
 
 (function(root,ax,factory){
@@ -38,7 +38,7 @@
 })(this, {}, function(ax,struct){
 	"use strict";
 
-	var VERSION = "4.2.4";
+	var VERSION = "4.2.5";
 
 	var aM,aV,aT,aS,vA,z,Z,
 			aMP,aVP,aTP, _ = [], maker = {}, root = struct.root,
@@ -143,7 +143,7 @@
 		this.el = _isAryL(elm) ? _slice(elm) : (_isElm(elm) ? [elm] : []);
 	};
 
-	z = function(x){ return z.init.call(root,x); };
+	z = function(x){ return z.init(x); };
 
 	var _zid = 1,
 		handlers = {},
@@ -435,6 +435,7 @@
 
 	z.xEvent = function(event){
 		var key;
+
 		for(key in event)
 			this[key] = event[key];
 	};
@@ -495,33 +496,33 @@
 	);
 
 	var tagList = {
-		input:1,
-		br:1,
-		hr:1,
-		img:1,
-		meta:1,
-		area:1,
-		base:1,
-		col:1,
-		isindex:1,
-		command:1,
-		embed:1,
-		keygen:1,
-		link:1,
-		head:1,
-		param:1,
-		source:1,
-		track:1,
-		wbr:1,
-		path:1,
-		circle:1,
-		ellipse:1,
-		line:1,
-		rect:1,
-		use:1,
-		stop:1,
-		polyline:1,
-		polygon:1
+		input    : 1,
+		br       : 1,
+		hr       : 1,
+		img      : 1,
+		meta     : 1,
+		area     : 1,
+		base     : 1,
+		col      : 1,
+		isindex  : 1,
+		command  : 1,
+		embed    : 1,
+		keygen   : 1,
+		link     : 1,
+		head     : 1,
+		param    : 1,
+		source   : 1,
+		track    : 1,
+		wbr      : 1,
+		path     : 1,
+		circle   : 1,
+		ellipse  : 1,
+		line     : 1,
+		rect     : 1,
+		use      : 1,
+		stop     : 1,
+		polyline : 1,
+		polygon  : 1
 	};
 
 	var attrexec = /(\S+)=["'](.*?)["']|([\w-]+)/gi,
@@ -801,6 +802,7 @@
 					patch = { t:0 };
 					break;
 			}
+
 			return patch;
 		},
 
@@ -1837,8 +1839,6 @@
 			var createDestory = function(){
 				z(this.root).off()[withRoot?"remove":"html"]();
 				this.emit("destroy", delete this.root);
-
-				delete this;
 			}.bind(this);
 
 			_ayc(createDestory);
@@ -1874,6 +1874,7 @@
 
 	function assertMatch(list,match){
 		var use = [];
+
 		switch(_type(match)){
 			case "regexp":
 				_fal(list,function(m){
@@ -1890,6 +1891,7 @@
 			default:
 				break;
 		}
+
 		return use;
 	}
 
