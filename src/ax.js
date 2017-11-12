@@ -1,14 +1,12 @@
 /*
-
-   ------------------------------
-  |             ___              |
-  |            /   |             |
-  |           / /| |_  __        |
-  |          / ___ \ \/ /        |
-  |         /_/  |_/_/\_\        |
-  |                              |
-   ------------------------------
-
+	 --------------------------
+	|          ___             |
+	|         /   |            |
+	|        / /| |_  __       |
+	|       / ___ \ \/ /       |
+	|      /_/  |_/_/\_\       |
+	|                          |
+	 --------------------------
 
  *  @Author : YiJun @alibaba-inc
  *  @Date   : 2017.4.1 - now
@@ -28,7 +26,6 @@
 		// support CommonJS exports
 		// * fuck the npm package rubbish offset name, where package name use [ struct ]
 		// * should defined Webpack resolved alias as [ "struct" : "ax-struct-js" ]
-
 		// factory(exports,require('struct'));
 		factory(exports,require('ax-struct-js'));
 	else
@@ -209,6 +206,7 @@
 			// The caret position is selection length
 			pos = sel.text.length;
 		}
+
 		return pos;
 	}
 
@@ -1399,8 +1397,8 @@
 		},
 
 		get: function(key,by){
-			var data = this._ast(_clone,_);
-			return (key || key===0) ? _get.call(this,data,key,by) : data;
+			var data = this._ast(cool,_);
+			return _clone((key || key===0) ? _get(data,key,by) : data);
 		},
 
 		set: function(key,val,setStatic){
@@ -1975,6 +1973,7 @@
 
 		toChunk: function(){
 			var res = {};
+
 			this.of(function(model){
 				res[model.name] = model.get();
 			});
