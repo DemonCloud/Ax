@@ -2,46 +2,32 @@
 
 <br>
 
-<img src="https://nodei.co/npm/ax-js.png" alt="npm info">
-
-<br>
-<br>
-
-## The Fast MV JavaScript Framework. 
-
-It require `Struct` utils lib, for the sake of better organization application structure with modular architecture( **AMD or CommonJS specification** ). This is not to replace `Backbone` or `Angular` etc, maybe it boring form of entertainment. Of course, it can cooperate with `React` & `Vue` very well.
+## The Fast MVC JavaScript Framework
 
 ![Support](http://7j1zwt.com1.z0.glb.clouddn.com/testing22.png)
 
-<br>
 <br>
 
 
 ## The Ax design target
 
-* **model** - immutable, fast, persistence, safety
-* **view** - simple, fast, container, virtualDOM
-* **atom** - connector, fast, independent
+* **model** - immutable, persistence, safety
+* **view** - simple, container, virtualDOM
+* **atom** - connector, independent
 
 
-<br>
 <br>
 
 
 ## Install
 
 ```shell
-yarn install ax-js ax-struct-js -S
-
-# or
-
-npm install ax-js ax-struct-js --save
+yarn install ax-js ax-struct-js -s
 ```
 
 Directly download [ Link ](https://github.com/DemonCloud/Ax/archive/master.zip);
 
 
-<br>
 <br>
 
 
