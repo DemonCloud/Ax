@@ -1485,6 +1485,17 @@
 
 				if(!rmStatic){
 					this.emit("change",[_clone(assert)]);
+
+					var pkey = prop.split("."),
+							tkey = pkey[0],
+							tval = {};
+
+					tval[tkey] = _clone(assert[tkey]);
+
+					if(pkey.length > 1)
+						this.emit("change:"+tkey,[tval]);
+
+					this.emit("change:"+prop,[tval]);
 					this.emit("remove:"+prop);
 				}
 			}
@@ -1989,7 +2000,7 @@
 	ax.view.extend  = createExtend(aV);
 	ax.atom.extend  = createExtend(aT);
 
-	// ax validate functional
+	// ax validate function
 	ax.va = vA = {
 		required  : makeChecker(_isNeed  , "required")  ,
 		func      : makeChecker(_isFn    , "function")  ,
