@@ -20,18 +20,20 @@
 			components.child::text
 		</slot>
 
-	{{ if state === 1 }}
+	{{if state === 1}}
 		<ul>
-		{{* for [item,key] in list }}
+		{{ var abc = "<bbb></bbb>" }}
+		{{*each [item,key] in list }}
 			<li>
+				<b>{{-abc}}</b>
 				<span>{{-item}}</span>
 				<slot key={{#key}}>components.childTr</slot>
 			</li>
-		{{*/for}}
+		{{*/}}
 		</ul>
-	{{ else }}
+	{{else}}
 	<slot id="seslot" ref="happy">components.childSe::text2</slot>
-	{{ /if }}
+	{{/if}}
 	</div>
 </script>
 
@@ -41,6 +43,10 @@
 		<div>{{#JSON.stringify(a)}}</div>
 		<div>{{#JSON.stringify(b)}}</div>
 	</div>
+</script>
+
+<script id="tpl3" type="text/ax">
+
 </script>
 
 <script>
